@@ -1,0 +1,3 @@
+      REAL NDBL,NDCL
+      COMMON /DFXCBE/ NDCL(4),NDBL(4)
+      SAVE /DFXCBE/

@@ -1,0 +1,12 @@
+      SUBROUTINE RXTIK
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'RXTIK'
+      CALL DFX324(3)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

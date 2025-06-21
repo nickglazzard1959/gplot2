@@ -1,0 +1,21 @@
+      SUBROUTINE DFX209(NFONT)
+C
+C    **INTERNAL LDMARK FUNCTION**
+C
+C    MAXBET IS NUMBER OF SIMULTANEOUSLY IN-CORE ALPHABETS
+C    DIMFILM CURRENTLY SUPPORTS MAXBET UP TO A MAXIMUM OF 3
+      PARAMETER (MAXBET=3)
+      INCLUDE 'dfxc20.cmn'
+      INCLUDE 'dfxc20s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      CHARACTER*6 THIS
+      CHARACTER*10 C1
+      THIS = 'LDMARK'
+      C1 = 'MARKERS'
+      IB = MAXBET + 2
+      CALL DFX201(IB,NFONT,THIS,C1)
+      END
+C
+C----------------------------------------------
+C

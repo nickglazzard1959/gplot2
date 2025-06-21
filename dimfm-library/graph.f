@@ -1,0 +1,13 @@
+      SUBROUTINE GRAPH(X,Y,N1)
+      REAL X(N1),Y(N1)
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'GRAPH'
+      CALL DFX336(X,Y,N1)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

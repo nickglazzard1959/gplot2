@@ -1,0 +1,17 @@
+      SUBROUTINE OWS
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      INCLUDE 'dfxcbd.cmn'
+      ROUTIN = 'OWS'
+      CALL DFX147(3)
+C    ALL ACTIVE WORK STATIONS
+      NWS = 0
+      CALL DFX000(201,DUMMY,DUMMY,DUMMY,NDUMMY)
+      CALL DFX147(1)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

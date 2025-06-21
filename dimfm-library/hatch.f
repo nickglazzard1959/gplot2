@@ -1,0 +1,22 @@
+      SUBROUTINE HATCH(THETA1,GAP)
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'HATCH'
+      IF (GAP.LE.0.0) GO TO 10
+      CALL DFX123(THETA1,GAP)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+   99 CONTINUE
+      ROUTIN = STARS6
+      RETURN
+   10 IF (ICHECK.GT.0) WRITE(ERRREC,11)ROUTIN,THETA1,GAP
+   11 FORMAT(1H0,'**DIMFILM WARNING**  ILLEGAL GAP SPECIFIED IN CALL OF
+     1',A/1H ,21X,'CALLED WITH ARGUMENTS - ',2E16.8/1H ,21X,
+     2'CALL IGNORED')
+      CALL DFX130(0)
+      GO TO 99
+      END
+C
+C----------------------------------------------
+C

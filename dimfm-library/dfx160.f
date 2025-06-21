@@ -1,0 +1,199 @@
+      SUBROUTINE DFX160(N,R1,R2,R3,RRR,GGG,BBB,IERR)
+C    CONVERTS FROM COLOUR MODELS TO RGB
+C
+C    N = 0 - RGB
+C        1 - CMY
+C        2 - YIQ (NTSC)
+C        3 - YUV (PAL)
+C        4 - YTV (USER DEFINED YIQ/YUV)
+C        5 - HSV
+C        6 - HLS
+C        7 - USR   USER DEFINED (NOT YET IMPLEMENTED)
+C
+C    COLOUR MODELS MUST MATCH IN ORDER AND NUMBER THOSE IN CMODEL
+C
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc04.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      INCLUDE 'dfxc16.cmn'
+      CHARACTER*3 MODEL(0:7)
+      REAL PQTV(4),P,Q,T,V,RRGGBB(3),RR,GG,BB,M1,M2
+      EQUIVALENCE (PQTV(1),P),(PQTV(2),Q),(PQTV(3),T),(PQTV(4),V)
+      EQUIVALENCE (RRGGBB(1),RR),(RRGGBB(2),GG),(RRGGBB(3),BB)
+      INTEGER RPQTV(0:5),GPQTV(0:5),BPQTV(0:5)
+      DATA MODEL/'RGB','CMY','YIQ','YUV','YTV','HSV','HLS','OWN'/
+      DATA RPQTV/4,2,1,1,3,4/
+      DATA GPQTV/3,4,4,2,1,1/
+      DATA BPQTV/1,1,3,4,4,2/
+      ZZ01(Z) = AMIN1(AMAX1(Z,0.0),1.0)
+      ZZ11(Z) = AMIN1(AMAX1(Z,-1.0),1.0)
+      ZZQQ(Z,QQ) = AMIN1(AMAX1(Z,-QQ),QQ)
+      ZZ0360(Z) = AMIN1(AMAX1(Z,0.0),360.0)
+      IERR = 0
+      RR = R1
+      GG = R2
+      BB = R3
+      NN = N + 1
+      GO TO (10,11,12,13,14,15,16,17),NN
+C    RGB MODEL - CHECK VALID RANGE - ALSO USED ON EXIT BY ALL MODELS
+   10 IF (IERR.EQ.0) THEN
+           RRR = ZZ01(RR)
+           GGG = ZZ01(GG)
+           BBB = ZZ01(BB)
+           IF ((RRR.NE.RR).OR.(GGG.NE.GG).OR.(BBB.NE.BB)) THEN
+                     IF ((ICHECK.GT.0).AND.(N.NE.0)) WRITE(ERRREC,100)
+     1                                ROUTIN,RR,GG,BB,RRR,GGG,BBB
+      CALL DFX130(0)
+  100 FORMAT(1H0,'**DIMFILM WARNING**  ROUTINE ',A,' GENERATED OUT OF RA
+     1NGE RGB-TRIPLET (',F6.3,',',F6.3,',',F6.3,')'/
+     21H ,21X,'HOWEVER, (',F6.3,',',F6.3,',',F6.3,') WILL BE USED')
+                     IERR = -1
+                     IF (N.EQ.0) IERR = 1
+           ENDIF
+      ENDIF
+      IF((IERR.GT.0).AND.(ICHECK.GT.0))
+     1                WRITE(ERRREC,101) ROUTIN,R1,R2,R3,MODEL(N)
+  101 FORMAT(1H0,'**DIMFILM WARNING** ROUTINE ',A,' REFERENCED WITH INVA
+     1LID TRIPLET (',F6.3,',',F6.3,',',F6.3,') FOR ',A,' COLOUR MODEL')
+      RETURN
+C    CMY MODEL - CHECK VALID RANGE THEN CONVERT
+   11 RR = ZZ01(R1)
+      GG = ZZ01(R2)
+      BB = ZZ01(R3)
+      IF ((RR.NE.R1).OR.(GG.NE.R2).OR.(BB.NE.R3)) IERR = 1
+      RR = 1. - RR
+      GG = 1. - GG
+      BB = 1. - BB
+      GO TO 10
+C    YIQ MODEL - CHECK VALID RANGE THEN CONVERT
+   12 ITV = 1
+      GG = ZZQQ(R2,0.60)
+      BB = ZZQQ(R3,0.52)
+  120 RR = ZZ01(R1)
+      IF ((RR.NE.R1).OR.(GG.NE.R2).OR.(BB.NE.R3)) THEN
+         IERR = 1
+      ELSE
+         RR = TVRGB(1,1,ITV)*R1 + TVRGB(1,2,ITV)*R2 + TVRGB(1,3,ITV)*R3
+         GG = TVRGB(2,1,ITV)*R1 + TVRGB(2,2,ITV)*R2 + TVRGB(2,3,ITV)*R3
+         BB = TVRGB(3,1,ITV)*R1 + TVRGB(3,2,ITV)*R2 + TVRGB(3,3,ITV)*R3
+      ENDIF
+      GO TO 10
+C    YUV MODEL - CHECK VALID RANGE THEN CONVERT
+   13 ITV = 2
+      GG = ZZQQ(R2,0.439)
+      BB = ZZQQ(R3,5.007)
+      GO TO 120
+C    YTV MODEL - CHECK VALID RANGE THEN CONVERT
+   14 ITV = 3
+C    PRESENTLY NO T,V RANGE CHECK (MAY COMPUTE FROM RGBTV ARRAY LATER)
+      GG = R2
+      BB = R3
+      GO TO 120
+C    HSV MODEL - CHECK VALID RANGE THEN CONVERT
+C
+C                (N.B. HUE IS TAKEN MODULO 360 IF S,V VALID)
+C                IF IT IS MANDATORY FOR H(UE) TO BE
+C                IN RANGE 0,360 FOR NON-ZERO S(ATURATION)
+C                REINSTATE COMMENTED OUT STATEMENTS C1-C4
+C
+   15 GG = ZZ01(R2)
+      BB = ZZ01(R3)
+C
+      IF ((GG.NE.R2).OR.(BB.NE.R3)) IERR = 1
+C
+      IF (IERR.EQ.0) THEN
+          IF (R2.EQ.0.) THEN
+                RR = R3
+                GG = R3
+                BB = R3
+          ELSE
+                RR = R1
+C
+C1              RR = ZZ0360(R1)
+C
+C2              IF (RR.NE.R1) IERR = 1
+C3              IF (IERR.EQ.0) THEN
+C
+                RR = MOD(RR,360.0)
+                IF (RR.LT.0.0) RR = RR + 360.0
+                H = RR/60.
+                I = INT(H)
+                F = H - FLOAT(I)
+                V = R3
+                S = R2
+                P = V*(1.-S)
+                Q = V*(1.-S*F)
+                T = V*(1.-S*(1.-F))
+                RR = PQTV(RPQTV(I))
+                GG = PQTV(GPQTV(I))
+                BB = PQTV(BPQTV(I))
+C
+C4              ENDIF
+C
+          ENDIF
+      ENDIF
+      GO TO 10
+C    HLS MODEL - CHECK VALID RANGE THEN CONVERT
+C
+C                (N.B. HUE IS TAKEN MODULO 360 IF S,V VALID)
+C                IF IT IS MANDATORY FOR H(UE) TO BE
+C                IN RANGE 0,360 FOR NON-ZERO S(ATURATION)
+C                REINSTATE COMMENTED OUT STATEMENTS C1-C4
+C
+   16 GG = ZZ01(R2)
+      BB = ZZ01(R3)
+C
+      IF ((GG.NE.R2).OR.(BB.NE.R3)) IERR = 1
+      IF (IERR.EQ.0) THEN
+               IF (R3.EQ.0.) THEN
+                       RR = R2
+                       GG = R2
+                       BB = R2
+               ELSE
+                       RR = R1
+C
+C1                     RR = ZZ0360(R1)
+C
+C2                     IF (RR.NE.R1) IERR = 1
+C
+C3                     IF (IERR.EQ.0) THEN
+
+                       RRM = MOD(RR,360.0)
+                       IF (RRM.LT.0.0) RRM = RRM + 360.0
+
+                       IF (R2.LE.0.5) THEN
+                                 M2 = R2*(1. + R3)
+                       ELSE
+                                 M2 = R2 + R3 - R2*R3
+                       ENDIF
+               M1 = 2.*R2 - M2
+                       DO 160 I=1,3
+                       H = RRM +120.*FLOAT(2-I)
+                       IF (H.GT.360.) H = H - 360.
+                       IF (H.LT.0.) H = H + 360.
+                       IF (H.LT.60.) THEN
+                                V = M1 + (M2 - M1)*H/60.
+                       ELSE IF (H.LT.180.) THEN
+                                V = M2
+                       ELSE IF (H.LT.240.) THEN
+                                V = M1 + (M2 - M1)*(240. - H)/60.
+                       ELSE
+                                V = M1
+                       ENDIF
+  160                  RRGGBB(I) = V
+C
+C4                     ENDIF
+C
+               ENDIF
+      ENDIF
+      GO TO 10
+C    USER MODEL - CONVERT THEN CHECK VALID CONVERSION
+   17 CONTINUE
+C     ***NOT YET IMPLEMENTED**   ASSUMES RGB
+      GO TO 10
+      END
+C
+C----------------------------------------------
+C

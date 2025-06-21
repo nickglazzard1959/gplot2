@@ -1,0 +1,13 @@
+      SUBROUTINE LUXOPT
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'LUXOPT'
+      CALL DFX311(-13,0.0)
+      CALL DFX311(-14,0.0)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

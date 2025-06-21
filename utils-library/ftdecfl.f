@@ -1,0 +1,377 @@
+      PROGRAM DECFL(OUTPUT,TAPE6=OUTPUT)
+C======================================================================
+C DECFL - DECODE HEX ENCODED FILE.
+C  NICK GLAZZARD, 2021.
+C======================================================================
+      IMPLICIT CHARACTER*1 (A-Z)
+      INTEGER KNORMAL, KASCII, KBINARY, KMODPRM, KMXRECL
+      PARAMETER( KNORMAL=1, KASCII=2, KBINARY=3 )
+      PARAMETER( KMODPRM=53791 )
+      PARAMETER( KMXRECL=160 )
+C
+C---- VARIABLES
+C
+      CHARACTER*1 ESCHAR
+      CHARACTER*7 INFLNM, OUTFLNM, FTYPE
+      CHARACTER*80 KEY, VALUE, INLINE
+      CHARACTER*(KMXRECL) OUTLINE
+      INTEGER ISTAT, NLINES, NVALID, CKSUM, NCHARS, NOUT, IWORD, IJUNK
+      INTEGER ISHFL, I, IASCII, INCKS, INNUM, IFTYPE, NWF, LFTYPE, LNWF
+      INTEGER IFWA, IWOFF, FBOPEN, FBCLOSE, FBWRITE, FBZPUT, STATUS
+      INTEGER OUTFLEN, FOUT, CWA, NEOR
+      BOOLEAN BDATA(36), B612DC, ESCODE, CHCODE, WBUF(1), BINVAL
+      BOOLEAN BINBUF
+      LOGICAL TRUNC
+C
+C---- CONSTANT DATA
+C
+      CHARACTER*1 ATOD6(0:127)
+      BOOLEAN A2D612B(0:127)
+      CHARACTER*1 DSPCHR(0:63)
+      LOGICAL DEBUG
+C
+C---- FUNCTIONS
+C
+      INTEGER LNBC, GETWORD
+      LOGICAL IFROMC
+C
+C---- CONSTANT DATA INITIALIZATION
+C
+C---- ASCII CODES DIRECTLY TO 6 BIT DISPLAY CODE CHARACTERS.
+      DATA ATOD6/
+     +'*','*','*','*','*','*','*','*',
+     +'*','*','*','*','*','*','*','*',
+     +'*','*','*','*','*','*','*','*',
+     +'*','*','*','*','*','*','*','*',
+     +' ','!','"','#','$','%','&','''',
+     +'(',')','*','+',',','-','.','/',
+     +'0','1','2','3','4','5','6','7',
+     +'8','9',':',';','<','=','>','?',
+     +'@','A','B','C','D','E','F','G',
+     +'H','I','J','K','L','M','N','O',
+     +'P','Q','R','S','T','U','V','W',
+     +'X','Y','Z','[','\',']','^','_',
+     +'*','A','B','C','D','E','F','G',
+     +'H','I','J','K','L','M','N','O',
+     +'P','Q','R','S','T','U','V','W',
+     +'X','Y','Z','*','*','*','*','*'/
+C
+C---- ASCII CODES TO 6/12 DISPLAY CODE CODES.
+      DATA A2D612B/O"7640",O"7641",O"7642",O"7643",O"7644",O"7645",
+     +O"7646",O"7647",O"7650",O"7651",O"7652",O"7653",O"7654",O"7655",
+     +O"7656",O"7657",O"7660",O"7661",O"7662",O"7663",O"7664",O"7665",
+     +O"7666",O"7667",O"7670",O"7671",O"7672",O"7673",O"7674",O"7675",
+     +O"7676",O"7677",O"55",O"66",O"64",O"60",O"53",O"63",O"67",O"70",
+     +O"51",O"52",O"47",O"45",O"56",O"46",O"57",O"50",O"33",O"34",O"35",
+     +O"36",O"37",O"40",O"41",O"42",O"43",O"44",O"7404",O"77",O"72",
+     +O"54",O"73",O"71",O"7401",O"1",O"2",O"3",O"4",O"5",O"6",O"7",
+     +O"10",O"11",O"12",O"13",O"14",O"15",O"16",O"17",O"20",O"21",O"22",
+     +O"23",O"24",O"25",O"26",O"27",O"30",O"31",O"32",O"61",O"75",O"62",
+     +O"7402",O"65",O"7407",O"7601",O"7602",O"7603",O"7604",O"7605",
+     +O"7606",O"7607",O"7610",O"7611",O"7612",O"7613",O"7614",O"7615",
+     +O"7616",O"7617",O"7620",O"7621",O"7622",O"7623",O"7624",O"7625",
+     +O"7626",O"7627",O"7630",O"7631",O"7632",O"7633",O"7634",O"7635",
+     +O"7636",O"7637"/
+C
+C---- 6 BIT DISPLAY CODE CODES TO DISPLAY CODE CHARACTERS.
+      DATA DSPCHR/':','A','B','C','D','E','F','G','H','I','J','K','L',
+     +'M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1',
+     +'2','3','4','5','6','7','8','9','+','-','*','/','(',')','$','=',
+     +' ',',','.','#','[',']','%','"','_','!','&','''','?','<','>','@',
+     +'\','^',';'/
+C
+C---- PARSE COMMAND LINE ARGUMENTS.
+C
+      DEBUG = .FALSE.
+      TRUNC = .FALSE.
+      INFLNM = ' '
+      OUTFLNM = ' '
+ 1    CONTINUE
+         CALL GETPARM( KEY, VALUE, ISTAT )
+         IF( ISTAT .EQ. -1 )GOTO 2
+            IF( ISTAT .EQ. 1 )THEN
+               WRITE(6,100)KEY(1:LNBC(KEY,1,1))
+ 100           FORMAT(1X,'UNKNOWN KEY ONLY OPTION ',A)
+            ELSE
+               IF( KEY(1:LNBC(KEY,1,1)) .EQ. 'I' )THEN
+                  INFLNM = VALUE(1:MIN(7,LNBC(VALUE,1,1)))
+               ELSE IF( KEY(1:LNBC(KEY,1,1)) .EQ. 'O' )THEN
+                  OUTFLNM = VALUE(1:MIN(7,LNBC(VALUE,1,1)))
+               ELSE
+                  WRITE(6,101)KEY(1:LNBC(KEY,1,1))
+ 101              FORMAT(1X,'UNKNOWN KEY-VAL OPTION ',A)
+               ENDIF
+            ENDIF
+         GOTO 1
+ 2    CONTINUE
+C
+C---- CHECK WE HAVE THE REQUIRED ARGUMENTS.
+C
+      IF( INFLNM(1:1) .EQ. ' ' )GOTO 934
+      IF( OUTFLNM(1:1) .EQ. ' ' )GOTO 935
+      OUTFLEN = LNBC(OUTFLNM,1,1)
+      IF( DEBUG )THEN
+         WRITE(6,*)'IN=',INFLNM,' OUT=',OUTFLNM
+      ENDIF
+C
+C---- OPEN THE INPUT FILE.
+C
+      OPEN(UNIT=8,FILE=INFLNM(1:LNBC(INFLNM,1,1)),STATUS='OLD',ERR=99)
+C
+C---- REWIND THE INPUT FILE.
+C
+      REWIND(8,ERR=81)
+C
+C---- READ THE FILE TYPE AND ESTIMATED NUMBER OF WORDS.
+C
+ 700  CONTINUE
+      READ(8,120,ERR=91,END=91)INLINE
+ 120  FORMAT(A)
+      IF( INLINE(1:1) .EQ. '*' )GOTO 700
+      LFTYPE = GETWORD( 1, INLINE, FTYPE )
+      IF( LFTYPE .LT. 0 )GOTO 91
+      IF( GETWORD( 2, INLINE, VALUE ) .LT. 0 )GOTO 91
+      LNWF = GETWORD( 3, INLINE, VALUE )
+      IF( LNWF .LT. 0 )GOTO 91
+      IF( .NOT. IFROMC(VALUE,NWF,1,IJUNK) )GOTO 91
+      IF( FTYPE(1:LFTYPE) .EQ. 'NORMAL' )THEN
+         IFTYPE = KNORMAL
+      ELSE IF( FTYPE(1:LFTYPE) .EQ. 'ASCII' )THEN
+         IFTYPE = KASCII
+      ELSE IF( FTYPE(1:LFTYPE) .EQ. 'BINARY' )THEN
+         IFTYPE = KBINARY
+      ELSE
+         STOP 'UNKNOWN FILE TYPE READ.'
+      ENDIF
+      WRITE(6,121)FTYPE,NWF
+ 121  FORMAT(1X,'DECODING ',A,' FILE WITH ',I6,' BUFFER WORDS.')
+C
+C---- ALLOCATE AN SLR BUFFER FOR OUTPUT WORDS.
+C
+      CALL CMMALF(NWF+2,0,0,IFWA)
+      IWOFF = IFWA - LOCF(WBUF(1)) + 1
+C
+C---- CREATE THE OUTPUT FILE.
+C
+      FOUT = FBOPEN(9,OUTFLNM(1:OUTFLEN),'W')
+      IF( FOUT .LT. 0 )GOTO 97
+C
+C---- READ DATA LINES UNTIL ONE WITH 0 VALID BYTES IS FOUND.
+C
+      NCHARS = 0
+      CKSUM = 0
+      NLINES = 0
+      NOUT = 0
+      CWA = 0
+      NEOR = 0
+C
+C---- VARIABLES FOR BINARY CASE.
+C
+      IWORD = 1
+      ISHFL = 0
+      BINVAL = 0
+      BINBUF = 0
+C
+C---- START OF LOOP OVER INPUT DATA LINES.
+C---- READ A LINE OF 72 HEX CHARS AND 2 DECIMAL DIGIT VALID LENGTH.
+C---- NEITHER ERROR NOR END OF FILE IS TO BE EXPECTED.
+C
+ 201  CONTINUE
+         READ(8,200,ERR=203,END=203)(BDATA(I),I=1,36),NVALID
+ 200     FORMAT(36Z2,I2)
+         NLINES = NLINES + 1
+         IF( DEBUG )THEN
+            WRITE(6,299)NLINES,NVALID,BDATA(1),BDATA(36)
+         ENDIF
+ 299     FORMAT(1X,'NL=',I8,' NV=',I2,' BDATA(1)=',Z2,' BDATA(36)=',Z2)
+         IF( NVALID .EQ. 0 )GOTO 202
+C
+C---- CONVERT ASCII CODE VALUES TO CDC CHARACTERS.
+C---- NORMAL (6 BIT) CHARACTER CASE AND
+C---- ASCII TO 6/12 DISPLAY CODE CASE.
+C
+         IF( (IFTYPE .EQ. KNORMAL) .OR. (IFTYPE .EQ. KASCII) )THEN
+C---- LOOP OVER ALL VALID INPUT ASCII CODES BYTES.
+            DO 500 I = 1,NVALID
+               IASCII = BDATA(I)
+               IF( IASCII .EQ. 10 )THEN
+C---- DEAL WITH NEWLINE CODE. PUT ACCUMULATED LINE INTO SLR AS A
+C---- Z RECORD.
+                  CWA = FBZPUT(WBUF(IWOFF),NWF,CWA,OUTLINE,NOUT)
+                  IF( CWA .LT. 0 )GOTO 9797
+                  NOUT = 0
+                  OUTLINE = ' '
+C---- DEAL WITH EOR CASE. WRITE THE SLR TO DISK.
+               ELSE IF( IASCII .EQ. 255 )THEN
+                  NEOR = NEOR + 1
+                  STATUS = FBWRITE(FOUT,WBUF(IWOFF),CWA)
+                  IF( STATUS .LT. 0 )GOTO 590
+                  CWA = 0
+               ELSE
+                  IF( IFTYPE .EQ. KNORMAL )THEN
+C---- CONVERT ASCII CODE DIRECTLY TO DISPLAY CODE CHARACTER FOR 6 BIT.
+C---- INVALID CHARACTERS ARE REPLACED BY *
+                     NOUT = NOUT + 1
+                     IF( NOUT .LE. KMXRECL )THEN
+                        OUTLINE(NOUT:NOUT) = ATOD6(IASCII)
+                     ELSE
+                        TRUNC = .TRUE.
+                     ENDIF
+                  ELSE
+C---- GET THE DISPLAY CODE CODE CORRESPONDING TO THE ASCII CODE. THIS
+C---- MAY BE 6 BIT OR 12 BIT, WHERE THE TOP 6 BITS ARE DISPLAY CODE
+C---- FOR AN ESCAPE CHARACTER AND THE BOTTOM 6 BITS ANOTHER DISPLAY
+C---- CODE CODE.
+                     B612DC = A2D612B(IASCII)
+                     ESCODE = AND( B612DC, O"7700" )
+                     CHCODE = AND( B612DC, O"77" )
+C---- CONVERT ESCAPE DISPLAY CODE CODE TO DISPLAY CODE CHARACTER.
+                     IF( ESCODE .NE. 0 )THEN
+                        IF( ESCODE .EQ. O"7400" )THEN
+                           ESCHAR = '@'
+                        ELSE
+                           ESCHAR = '^'
+                        ENDIF
+                        NOUT = NOUT + 1
+                        IF( NOUT .LE. KMXRECL )THEN
+                           OUTLINE(NOUT:NOUT) = ESCHAR
+                        ELSE
+                           TRUNC = .TRUE.
+                        ENDIF
+                     ENDIF
+C---- CONVERT THE ALWAYS PRESENT LOWER 6 BIT CODE TO A CHARACTER.
+                     NOUT = NOUT + 1
+                     IF( NOUT .LE. KMXRECL )THEN
+                        OUTLINE(NOUT:NOUT) = DSPCHR(CHCODE)
+                     ELSE
+                        TRUNC = .TRUE.
+                     ENDIF
+                 ENDIF
+               ENDIF
+C---- END OF LOOP OVER ALL VALID INPUT ASCII CODES BYTES.
+ 500        CONTINUE
+C
+C---- BINARY CASE. PACK 15 BYTES OF INPUT DATA INTO 2 60 BIT WORDS.
+C---- SPLIT THE 8TH OF EACH 15 INTO TWO NIBBLES, LO IN 1ST WORD, HI
+C---- IN 2ND WORD.
+C
+         ELSE
+            DO 600 I=1,NVALID
+C---- IF SHIFT IS 56, PUT LOW NIBBLE OF CURRENT BYTE IN WORD 1, MOVE
+C---- TO WORD 2. PUT HIGH NIBBLE IN BOTTOM 4 BITS, SET SHIFT TO 4.
+               IF( ISHFL .EQ. 56 )THEN
+                 BINVAL = SHIFT( AND( BDATA(I), O"17" ), ISHFL )
+                 BINBUF = OR( BINBUF, BINVAL )
+                 IF( IWORD .GT. NWF )GOTO 9798
+                 CALL WBUFPUT(WBUF(IWOFF),IWORD,BINBUF)
+                 IWORD = IWORD + 1
+                 BINVAL = AND( SHIFT( BDATA(I), -4 ), O"17" )
+                 BINBUF = BINVAL
+                 ISHFL = 4
+               ELSE
+C---- OTHERWISE, INSERT CURRENT BYTE INTO CURRENT WORD.
+                 BINVAL = SHIFT( BDATA(I), ISHFL )
+                 BINBUF = OR( BINBUF, BINVAL )
+                 ISHFL = ISHFL + 8
+               ENDIF
+C---- IF SHIFT IS 60, BOTH WORDS ARE FULL. ADD TO SLR AND RESET FOR
+C---- NEXT SET OF INPUT BYTES.
+               IF( ISHFL .EQ. 60 )THEN
+                  ISHFL = 0
+                  IF( IWORD .GT. NWF )GOTO 9798
+                  CALL WBUFPUT(WBUF(IWOFF),IWORD,BINBUF)
+                  IWORD = IWORD + 1
+                  BINBUF = 0
+               ENDIF
+C---- END OF LOOP OVER BYTES FROM CURRENT INPUT LINE.
+ 600        CONTINUE
+         ENDIF
+C
+C---- MAINTAIN INPUT ASCII BYTE CHECKSUM AND BYTE COUNT.
+C
+         NCHARS = NCHARS + NVALID
+         DO 300 I=1,NVALID
+            CKSUM = CKSUM + BDATA(I)
+            IF( CKSUM .GT. KMODPRM )CKSUM = CKSUM - KMODPRM
+ 300     CONTINUE
+         GOTO 201
+ 202   CONTINUE
+C---- END OF LOOP OVER INPUT DATA LINES.
+       IF( DEBUG )THEN
+          WRITE(6,205)NLINES,I
+ 205      FORMAT(1X,'READ ',I8,' LINES. I=',I3)
+       ENDIF
+C
+C---- OUTPUT ANY PARTIALLY FILLED SLR BUFFER. THIS IS WHERE OUTPUT WILL
+C---- ALWAYS OCCUR FOR BINARY FILES AND WHERE THE LAST (OR ONLY) RECORD
+C---- OF CODED FILES WILL ALSO BE WRITTEN.
+C
+       IF( IFTYPE .EQ. KBINARY )THEN
+C---- IF ISHFL .NE. 0, THERE IS A PARTIALLY FILLED WORD TO ADD TO SLR.
+          IF( ISHFL .GT. 0 )THEN
+             CALL WBUFPUT(WBUF(IWOFF),IWORD,BINBUF)
+             IWORD = IWORD + 1
+          ENDIF
+          CWA = IWORD - 1
+       ENDIF
+       IF( CWA .GT. 0 )THEN
+          IF( FBWRITE(FOUT,WBUF(IWOFF),CWA) .LT. 0 )GOTO 590
+       ENDIF
+C
+C---- READ THE CHECKSUM AND BYTE COUNT.
+C
+       READ(8,211)INCKS,INNUM
+ 211   FORMAT(I5,1X,I10)
+       IF( DEBUG )THEN
+          WRITE(6,298)INCKS,INNUM
+ 298      FORMAT(1X,'INCKS=',I5,' INNUM=',I10)
+          WRITE(6,297)CKSUM, NCHARS
+ 297      FORMAT(1X,'CKS=',I5,' NUM=',I10)
+       ENDIF
+       IF( INCKS .NE. CKSUM )GOTO 290
+       IF( INNUM .NE. NCHARS )GOTO 291
+C
+C---- CLOSE THE FILES.
+C
+      IF( FBCLOSE(FOUT, .FALSE.) .LT. 0 )GOTO 95
+      CLOSE(UNIT=8,ERR=93)
+      WRITE(6,122)INNUM,CWA,NEOR
+ 122  FORMAT(1X,'DECODED ',I8,' INPUT BYTES TO ',I6,' WORDS. ',I3,
+     + ' EORS FOUND.')
+      IF( TRUNC )THEN
+         STOP 'COMPLETED WITH TRUNCATED OUTPUT LINES.'
+      ELSE
+         STOP 'NORMAL COMPLETION.'
+      ENDIF
+C
+C---- ERROR STOPS.
+C
+ 934  STOP 'I= IS REQUIRED OPTION.'
+ 935  STOP 'O= IS REQUIRED OPTION.'
+ 99   STOP 'CANNOT OPEN INPUT FILE.'
+ 81   STOP 'FAILED TO REWIND INPUT FILE.'
+ 91   STOP 'ERROR OR EOF READING FILE TYPE.'
+ 97   STOP 'CANNOT CREATE OUTPUT FILE.'
+ 9797 STOP 'SLR BUFFER OVERFLOWED (CODED CASE).'
+ 9798 STOP 'SLR BUFFER OVERFLOWED (BINARY CASE).'
+ 93   STOP 'ERROR CLOSING INPUT FILE.'
+ 95   STOP 'ERROR CLOSING OUTPUT FILE.'
+ 203  STOP 'UNEXPECTED EOF READING DATA LINES.'
+ 290  STOP 'CHECKSUM MISMATCH FAILURE.'
+ 291  STOP 'BYTE COUNT MISMATCH FAILURE.'
+ 590  STOP 'ERROR WRITING OUTPUT FILE.'
+      END
+C
+      SUBROUTINE WBUFPUT(WBUF,IWORD,V)
+C----------------------------------------------------------------------
+C WBUF(IWORD) = V FOR A DYNAMICALLY ALLOCATED ARRAY, WBUF. THIS MUST
+C BE ACCESSED RELATIVE TO AN OFFSET (TO WHERE CMMALF HAS ACTUALLY
+C ALLOCATED SPACE). THUS, WBUF(IWOFF) IS PASSED TO THIS FUNCTION. THIS
+C IS A WORKAROUND FOR FORTRAN NOT HAVING A POINTER VARIABLE TYPE.
+C----------------------------------------------------------------------
+      BOOLEAN WBUF(1), V
+      INTEGER IWORD
+C
+      WBUF(IWORD) = V
+      RETURN
+      END

@@ -1,0 +1,12 @@
+      SUBROUTINE BOUNDS(XLEFT,XRIGHT,YLOW,YUP)
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'BOUNDS'
+C    REROUTE TO INTERNAL FUNCTION
+      CALL DFX120(XLEFT,XRIGHT,YLOW,YUP)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

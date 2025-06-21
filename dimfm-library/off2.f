@@ -1,0 +1,13 @@
+      SUBROUTINE OFF2(X,Y)
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'OFF2'
+C    DIRECT REFERENCE TO OFF2 REROUTED TO DFX111
+      CALL DFX111(X,Y)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

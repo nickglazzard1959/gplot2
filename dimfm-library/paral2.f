@@ -1,0 +1,36 @@
+      SUBROUTINE PARAL2(X0,Y0,ANGLE1,SIDE1,ANGLE2,SIDE2)
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      REAL X(4), Y(4)
+      INCLUDE 'dfxc03.cmn'
+      LOGICAL OUT
+      ROUTIN = 'PARAL2'
+      ICSAVE = ICHECK
+      IF (ICHECK.EQ.2) ICHECK = -2
+      X(1) = X0
+      Y(1) = Y0
+      ALPHA1 = ANGLE1*ANGCON(1,ANGRP(4))
+      ALPHA2 = (ANGLE1 + ANGLE2)*ANGCON(1,ANGRP(4))
+      X(2) = X(1) + SIDE1*COS(ALPHA1)
+      Y(2) = Y(1) + SIDE1*SIN(ALPHA1)
+      X(4) = X(1) + SIDE2*COS(ALPHA2)
+      Y(4) = Y(1) + SIDE2*SIN(ALPHA2)
+      X(3) = X(2) + X(4) - X(1)
+      Y(3) = Y(2) + Y(4) - Y(1)
+      CALL DFX503(.TRUE.,X,Y,4,OUT)
+      ICHECK = ICSAVE
+      IF (.NOT.OUT) GO TO 99
+      IF (ICHECK.EQ.2) WRITE(ERRREC,20)X0,Y0,ANGLE1,SIDE1,ANGLE2,SIDE2
+      CALL DFX130(1)
+   20 FORMAT(1H0,'**DIMFILM WARNING**  OUT OF BOUNDS DETECTED DURING CAL
+     1L OF PARAL2, CALLED WITH -'/1H ,21X,6(E16.8,2X))
+   99 CONTINUE
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

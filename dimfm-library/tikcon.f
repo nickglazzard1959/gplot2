@@ -1,0 +1,34 @@
+      SUBROUTINE TIKCON(TMAJOR,TMINOR,TCOIN)
+      INCLUDE 'dfxc06.cmn'
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'TIKCON'
+      I = 1
+      IF (TMAJOR.LT.0..OR.TMAJOR.GE.1.) GO TO 1
+      I = 2
+      IF (TMINOR.LT.0..OR.TMINOR.GE.1.) GO TO 1
+      I = 3
+      IF (TCOIN.LT.0..OR.TCOIN.GE.1.) GO TO 1
+      TC1 = TMAJOR
+      TC2 = TMINOR
+      TD01 = TCOIN
+      IF (TC1.GT.DC1.OR.TC1.GT.DC2) GO TO 2
+   99 CONTINUE
+      ROUTIN = STARS6
+      RETURN
+    1 IF (ICHECK.GT.0) WRITE(ERRREC,3)I
+    3 FORMAT(1H0,'**DIMFILM WARNING**  TIKCON DETECTS INVALID ',I2,
+     1'TH ARGUMENT - CALL IGNORED')
+      CALL DFX130(0)
+      GO TO 99
+    2 IF (ICHECK.GT.0) WRITE(ERRREC,4)
+    4 FORMAT(1H0,'**DIMFILM WARNING**  TIKCON DETECTS PROBABLE ERROR - T
+     1ICK SIZE EXCEEDS CURRENT GRAPH OR MARGIN AREA')
+      CALL DFX130(0)
+      GO TO 99
+      END
+C
+C----------------------------------------------
+C

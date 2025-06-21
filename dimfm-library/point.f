@@ -1,0 +1,13 @@
+      SUBROUTINE POINT(X,Y)
+      LOGICAL IN, DFX103
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'POINT'
+      CALL DFX129(X,Y)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

@@ -1,0 +1,40 @@
+      SUBROUTINE DFX503(CLOSE,X,Y,N1,OUT)
+      REAL X(N1), Y(N1)
+      LOGICAL CLOSE,OUT
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      INCLUDE 'dfxcd0.cmn'
+      INCLUDE 'dfxcd0s.cmn'
+      OUT = .FALSE.
+      N = N1
+      IF (N.LT.3) GO TO 2
+      ICSAVE = ICHECK
+      IF (ICHECK.EQ.2) ICHECK = -2
+      I1CNT = IOBCNT
+      X1 = XPOS
+      Y1 = YPOS
+      CALL DFX000(200,XSAVE,YSAVE,ZDUMMY,0)
+      CALL DFX110(X(1),Y(1))
+      DO 1 I=2,N
+    1 CALL DFX124(X(I),Y(I))
+      IF (CLOSE) CALL DFX124(X(1),Y(1))
+      CALL DFX000(200,XSAVE,YSAVE,ZDUMMY,1)
+      XPOS = X1
+      YPOS = Y1
+      I2CNT = IOBCNT
+      ICHECK = ICSAVE
+      OUT = (I2CNT.NE.I1CNT)
+C    IMMEDIATE FUNCTION IS PERFORMED BY USER REFERENCED CALLING ROUTINE
+   99 CONTINUE
+      RETURN
+    2 IF (ICHECK.GT.0) WRITE(ERRREC,3) ROUTIN, N
+      CALL DFX130(0)
+    3 FORMAT(1H0,'**DIMFILM WARNING** ',A,' CALLED WITH LESS THAN 3 POIN
+     1TS - CALL WAS FOR ',I6,' POINTS'/1H ,21X,'CALL IGNORED')
+      GO TO 99
+      END
+C
+C----------------------------------------------
+C

@@ -1,0 +1,49 @@
+      SUBROUTINE DFX307(FACTOR,X1,Y1,I,SH)
+C    REFERENCING ROUTINE MUST SET MONO AND SUBSEQUENTLY RESTORE IT
+C    CURRENTLY REFERENCED BY DFX309 AND DFX324
+      INCLUDE 'dfxc01.cmn'
+      INCLUDE 'dfxc01s.cmn'
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      HT = SH
+      X = X1
+      Y = Y1
+      SWH = C1MONO*SH
+      CALL DFX110(X,Y)
+      GO TO (1,2,3,4),I
+    1 DX1 = .5*SWH
+      DX3 = DX1
+      DX2 = 0.0
+      DY1 = 0.5*SH
+      DY2 = DY1
+      DY3 = 0.0
+   10 IDASHS = IDASH
+      IF (SDSYM) IDASH = 0
+C    FORCE SAME INTENSITY/COLOUR AS NUMBERS
+      CALL DFX147(2)
+      CALL DFX106(X+DX1,Y+DY1)
+      CALL DFX110(X+DX2,Y+DY2)
+      CALL DFX106(X+DX3,Y+DY3)
+      CALL DFX147(1)
+      IDASH = IDASHS
+   11 IFACT = INT(FACTOR)
+      CALL DFX204(2,RDUMMY,IFACT,'(''10*+'',I3)')
+      RETURN
+    2 DX1 = -.5*SH
+      DX2 = DX1
+      DX3 = 0.0
+      DY1 = .5*SWH
+      DY3 = DY1
+      DY2 = 0.0
+      GO TO 10
+C********************************************************************
+C    SEEMINGLY REDUNDANT JUMPS VIA 3/4 TO 11 RETAINED TO PRESERVE
+C    PART OF ORIGINAL LOGIC DURING TESTING
+    3 GO TO 11
+C    I = 2 OR 4 EXPECTS ROTATION OF 90 DEGREES TO HAVE BEEN PERFORMED
+C    PRIOR TO CALL OF DFX307
+    4 GO TO 11
+      END
+C
+C----------------------------------------------
+C

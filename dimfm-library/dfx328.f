@@ -1,0 +1,31 @@
+      SUBROUTINE DFX328(Y,TEXT)
+      INCLUDE 'dfxc01.cmn'
+      INCLUDE 'dfxc01s.cmn'
+      INCLUDE 'dfxc06.cmn'
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      CHARACTER*(*) TEXT
+      XD = XTB2 - XTB1
+      XTT0 = XD*DC2
+      AVAILX = XD*DC1
+      YD = YTB2 - YTB1
+      HG = DC5*YD
+      CALL DFX300
+C   AT PRESENT X-TITLES ARE CENTRED IN AVAILABLE SPACE
+C   IF WISH TO FORCE BOTTOM/TOP OF AVAILABLE HEIGHT
+C   MUST ADJUST MODE, BUT THERE IS NO FLAG FOR
+C   UPPER/LOWER TITLES
+      MODE = 0
+      CALL DFX216(TEXT,AVAILX,HG,X,YOFF,H,MODE)
+C   NO TEST FOR ZERO LENGTH STRING - JUST GO AND DO IT
+      X = XTB1 + XTT0 + X
+      YOFF = Y + YOFF
+      HT = H
+      CALL DFX110(X,YOFF)
+      CALL DFX214(TEXT)
+      CALL DFX301
+      RETURN
+      END
+C
+C----------------------------------------------
+C

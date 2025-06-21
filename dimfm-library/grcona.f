@@ -1,0 +1,13 @@
+      SUBROUTINE GRCONA
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'GRCONA'
+      CALL DFX337(.71,.01,.035,.02,.8,.13,.025,.78,.54,.02,.175)
+C    THIS ROUTINE PERMANENTLY RESETS GRAPH DEFAULTS - ITS PRINCIPAL
+C    FUNCTION IS THE INCREASE OF SYMBOL HEIGHTS FOR 35MM SLIDES
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

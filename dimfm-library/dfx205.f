@@ -1,0 +1,10 @@
+      SUBROUTINE DFX205(HTFRAC,DWAS,DIN,K)
+      A = ALOG10(HTFRAC)
+      Z = ALOG10(DWAS/DIN)
+      IK = INT(Z/A)
+      K = MAX0(0,IK)
+      RETURN
+      END
+C
+C----------------------------------------------
+C

@@ -1,0 +1,13 @@
+      SUBROUTINE LUXTIK
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'LUXTIK'
+      CALL DFX311(3,0.0)
+      CALL DFX311(4,0.0)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

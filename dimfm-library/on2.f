@@ -1,0 +1,22 @@
+      SUBROUTINE ON2(X1,Y1)
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'ON2'
+      CALL DFX106(X1,Y1)
+      IF (INTEND.LT.0) GO TO 1
+      INTCH = INTCH + 1
+      IF (INTCH.LT.INTEND) GO TO 1
+C    N.B. BROKEN LINE PATTERN IS PRESERVED ACROSS INTERUPT SYMBOLS
+C    INTERNALLY IN MARKER/DFX200
+      CALL DFX200(IICHAR)
+      INTCH = 0
+    1 CONTINUE
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

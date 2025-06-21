@@ -1,0 +1,23 @@
+      SUBROUTINE DFX326(X,Y,N)
+      REAL X(N),Y(N)
+      INCLUDE 'dfxc02.cmn'
+      INCLUDE 'dfxc02s.cmn'
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      IF (N.LE.NDEG) GO TO 2
+    3 CALL DFX336(X,Y,N)
+      NDEG = 0
+      RETURN
+    2 IF (ICHECK.GT.0) WRITE(ERRREC,10) ROUTIN
+      CALL DFX130(0)
+   10 FORMAT( 1H0,'**DIMFILM WARNING**  POLYNOMIAL INTERPOLATION REQUIRE
+     1S THAT NUMBER OF DATA POINTS SHOULD EXCEED DEGREE OF POLYNOMIAL'/
+     2 1H ,21X,'NO INTERPOLATION WILL BE PERFORMED BY ',A)
+      NDEG = 0
+      GO TO 3
+      END
+C
+C----------------------------------------------
+C

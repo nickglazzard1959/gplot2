@@ -1,0 +1,12 @@
+      REAL FUNCTION SRNUM(RNUMB,FMT)
+      CHARACTER*(*) FMT
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'SRNUM'
+      SRNUM = DFX211(1,RNUMB,IDUMMY,FMT)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

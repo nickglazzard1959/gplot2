@@ -1,0 +1,40 @@
+      REAL FUNCTION DFX146(N)
+C    RETURNS INTENSITY VALUE FOR COLOUR TRIPLET N
+C    THIS ROUTINE MUST TAKE ACCOUNT OF CURRENTLY
+C    DECLARED EQUIVALENCE OPTION
+      INCLUDE 'dfxc04.cmn'
+      INCLUDE 'dfxc17.cmn'
+C
+C    N NON-ZERO, POSITIVE IS R,G,B
+C
+C    N ZERO OR NEGATIVE IS POINTER INTO LUT
+C
+C
+      IF (N.GT.0) THEN
+                     RX = R0(N)
+                     GX = G0(N)
+                     BX = B0(N)
+                  ELSE
+                     RX = RGBLUT(1,-N)
+                     GX = RGBLUT(2,-N)
+                     BX = RGBLUT(3,-N)
+      ENDIF
+    1 CONTINUE
+C
+C    GKS 7.2 SPECIFICATION IS ...
+C     Z=.5*(AMAX1(RX,GX,BX)+AMIN1(RX,GX,BX))
+C
+C    DIMFILM DEFAULT IS ANSI GKS EQUIVALENCE
+C
+      Z = 0.30*RX + 0.59*GX + 0.11*BX
+      DFX146 = Z
+      RETURN
+      ENTRY DFX139(RARG,GARG,BARG)
+      RX = RARG
+      GX = GARG
+      BX = BARG
+      GO TO 1
+      END
+C
+C----------------------------------------------
+C

@@ -1,0 +1,20 @@
+      SUBROUTINE DFX135(X)
+C
+C    **INTERNAL XUNIT FUNCTION**
+C
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+C    DFX135 IS FORCED TO BE LOADED BY REFERENCE IN DFX006
+C
+C    INTERNAL ROUTINE SO ASSUME ALWAYS VALID ARGUMENT
+      B = X/XQ
+      DO 1 I=1,18
+    1 XLINE(I) = XLINE(I)*B
+      XQ = X
+      TL = TL*B
+      CALL DFX105
+      RETURN
+      END
+C
+C----------------------------------------------
+C

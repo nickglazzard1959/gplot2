@@ -1,0 +1,25 @@
+      SUBROUTINE SETSPF(SPF)
+C    SET NON-STANDARD SPACE FACTOR FOR TEXT
+C    ALL SPACES WILL BE FACTORED BY THIS VALUE (MAY BE ZERO TO DELETE
+C    SPACES).  DEFAULT VALUE OF 1.0 RESTORED BY RESTXT.
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc01.cmn'
+      INCLUDE 'dfxc01s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'SETSPF'
+      IF (SPF.LT.0.0) THEN
+              IF (ICHECK.GT.0) WRITE(ERRREC,100) SPF,SPFACT
+      CALL DFX130(0)
+  100 FORMAT(1H0,'**DIMFILM WARNING**  SETSPF CALLED WITH INVALID EXPANS
+     1ION FACTOR ',1PE16.8,' CURRENT VALUE ',E16.8,' RETAINED')
+      ELSE
+              SPFACT = SPF
+      ENDIF
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

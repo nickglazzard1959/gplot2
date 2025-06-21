@@ -1,0 +1,33 @@
+      SUBROUTINE OBLANK
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      INCLUDE 'params.cmn'
+      INCLUDE 'dfxcac.cmn'
+      INCLUDE 'dfxcacs.cmn'
+      INCLUDE 'dfxcbc.cmn'
+      INCLUDE 'dfxcbcs.cmn'
+      ROUTIN = 'OBLANK'
+      IF (.NOT.BLNK) GO TO 3
+      IF (.NOT.BLNKS) GO TO 5
+      CALL DFX502(3,0.0)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+   99 CONTINUE
+      ROUTIN = STARS6
+      RETURN
+    3 IF (ICHECK.GT.0) WRITE(ERRREC,4)
+    4 FORMAT(1H0,'**DIMFILM WARNING**  BLANK OUTLINING CALLED WHILE BLAN
+     1KED AREA NOT SET'/1H ,21X,'CALL OF OBLANK IGNORED')
+      CALL DFX130(0)
+      GO TO 99
+    5 IF (ICHECK.GT.0) WRITE(ERRREC,6)
+    6 FORMAT(1H0,'**DIMFILM WARNING**  BLANK OUTLINING CALLED WHILE BLAN
+     1KED AREA SET BUT INACTIVE AS NOT WITHIN PANE'/1H ,21X,'CALL OF OBL
+     2ANK IGNORED')
+      CALL DFX130(0)
+      GO TO 99
+      END
+C
+C----------------------------------------------
+C

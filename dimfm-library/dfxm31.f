@@ -1,0 +1,16 @@
+      SUBROUTINE DFXM31( VAL )
+C --- -----------------------------------------------------------------
+C
+C --- THIS ROUTINE SETS THE LOW-ORDER BIT IN THE MANTISSA OF THE REAL
+C --- VARIABLE VAL. WE DO IT BY TREATING VAL AS INTEGER AND SETTING
+C --- BIT #16 (VAX FLOAT) OR #0 (IEEE FLOAT, CDC FLOAT).
+C
+      INTEGER VAL, LSB
+      PARAMETER( LSB=0 )
+      INTEGER IBSET
+C
+      VAL = IBSET( VAL, LSB )
+C
+      RETURN
+      END
+C --- -----------------------------------------------------------------

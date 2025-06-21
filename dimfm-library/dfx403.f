@@ -1,0 +1,30 @@
+      SUBROUTINE DFX403(XX,YY,D,X1,Y1,X2,Y2)
+C    INTERPOLATION ROUTINE (CUBIC)
+      INCLUDE 'dfxc11.cmn'
+      P1 = D/FLOAT(NSTEP)
+      P2 = P1*P1
+      P3 = P1*P2
+      P4 = 1./(D*D*D)
+      S3 = ((X1 + X2)*D - XX - XX)*P4
+      R3 = ((Y1 + Y2)*D - YY -YY)*P4
+      S2 = XX*D*P4 - S3*D - X1/D
+      R2 = YY*D*P4 - R3*D - Y1/D
+      S1 = S3*P3 - S2*P2 + X1*P1
+      R1 = R3*P3 - R2*P2 + Y1*P1
+      S2 = 2.*S2*P2
+      R2 = 2.*R2*P2
+      S3 = 6.*S3*P3
+      R3 = 6.*R3*P3
+      DO 1 II=1,NSTEP
+      S1 = S1 + S2
+      R1 = R1 + R2
+      S2 = S2 + S3
+      R2 = R2 + R3
+      XP = XP + S1
+      YP = YP + R1
+    1 CALL DFX106(XP,YP)
+      RETURN
+      END
+C
+C----------------------------------------------
+C

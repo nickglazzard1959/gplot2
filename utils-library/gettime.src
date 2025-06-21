@@ -1,0 +1,17 @@
+          IDENT GETTIME
+          ENTRY GETTIME
+*
+* SUBROUTINE GETTIME( CHARACTER*10 TIME )
+*---------------------------------------------------(NOS I/F)-----------
+*   GET THE CURRENT TIME IN STD FORM.
+*-----------------------------------------------------------------------
+*
+ GETTIME  BSS    1            JUMP WHENCE WE CAME
+          SX0    X1           X0 = &TIME
+          CLOCK  RESULT       MACRO. GET A 10 CHARACTER TIME.
+          SA5    RESULT       X5 = *RESULT
+          BX6    X5           X6 = *RESULT
+          SA6    X0           *TIME = RESULT
+          EQ     GETTIME      RETURN
+ RESULT   BSS    1            MACRO RESULT BUFFER.
+          END

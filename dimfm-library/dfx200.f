@@ -1,0 +1,77 @@
+      SUBROUTINE DFX200(IC)
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc01.cmn'
+      INCLUDE 'dfxc01s.cmn'
+C    MAXBET IS NUMBER OF SIMULTANEOUSLY IN-CORE ALPHABETS
+C    DIMFILM CURRENTLY SUPPORTS MAXBET UP TO A MAXIMUM OF 3
+      PARAMETER (MAXBET=3)
+      INCLUDE 'dfxc20.cmn'
+      INCLUDE 'dfxc20s.cmn'
+C    INTERNAL MARKER CALL
+C    NOTE MARKERS ARE ALWAYS AT CURRENT POSITION, PRESENTLY WITH NO
+C    ROTATION RELATIVE TO FRAME
+      LOGICAL IN,DFX103,S1,S2,SMONSP,SITAL,WCTRS
+      IF (MKVIS.EQ.3) GO TO 1
+      IN = .TRUE.
+      IF (PWIND) IN = DFX103(XPOS,XTB1,XTB2).AND.DFX103(YPOS,YTB1,YTB2)
+      IF (BLNKS) IN = IN.AND..NOT.(DFX103(XPOS,XBB1,XBB2).AND.
+     1                             DFX103(YPOS,YBB1,YBB2))
+      IF (.NOT.IN) GO TO 99
+      IF (MKVIS.EQ.1) THEN
+                          S1 = PWIND
+                          S2 = BLNKS
+                          PWIND = .FALSE.
+                          BLNKS = .FALSE.
+      ENDIF
+    1 N1SAV = N1BLP
+      XLDSAV = XLDONE
+      INTNDS = INTEND
+      INTEND = -1
+      IDASHS = IDASH
+      IF (SDSYM) IDASH = 0
+      ICSAVE = ICHECK
+      IF (IABS(ICHECK).GE.2) ICHECK = -2
+      NBETS = NBET
+      NBET = MAXBET+2
+      SMONSP = NMONSP
+      NMONSP = .TRUE.
+      SITAL = NITAL
+      NITAL = .FALSE.
+      NCOX = 0
+      NCOY = 0
+      CYF = HTMK/FLOAT(HRU(NBET))
+      CXF = CYF
+      CX = XPOS
+      CY = YPOS
+      CSEP = 0.0
+      SXPOS = XPOS
+      SYPOS = YPOS
+      L1 = LBYTEM(IC-1) + 1
+      L2 = LBYTEM(IC)
+      IF (L2.LT.L1) GO TO 3
+C    SKIP IF NULL
+      WCTRS = WCTR
+      WCTR = .FALSE.
+C    NO TRANSFORMATION APPLIED (I.E. AT CURRENT POSITION, NO ROTATION)
+      CALL DFX202(IC,L1,L2)
+      CALL DFX110(SXPOS,SYPOS)
+C    THIS WILL REPOSITION AND RESET XPOS,YPOS
+      WCTR = WCTRS
+    3 NBET = NBETS
+      NMONSP = SMONSP
+      NITAL = SITAL
+      ICHECK = ICSAVE
+      IDASH = IDASHS
+      INTEND = INTNDS
+      XLDONE = XLDSAV
+      N1BLP = N1SAV
+      IF (MKVIS.EQ.1) THEN
+                           PWIND = S1
+                           BLNKS = S2
+      ENDIF
+   99 RETURN
+      END
+C
+C----------------------------------------------
+C

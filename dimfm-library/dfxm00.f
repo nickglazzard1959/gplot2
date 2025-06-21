@@ -1,0 +1,19 @@
+      SUBROUTINE DFXM00( IERR )
+C --- -----------------------------------------------------------------
+C
+C --- THIS ROUTINE TAKES THE APPROPRIATE ACTION AFTER A FATAL DIMFILM
+C --- ERROR.
+C
+C --- IERR = 1 AFTER SUCCESSFUL COMPLETION OF DIMEND IN ERROR STATE.
+C ---      = 2 FAILURE DURING DIMEND - FROM DFX002.
+C
+C
+      CALL PMDSTOP
+      IF( IERR .EQ. 1 ) THEN
+         STOP 'DIMFILM FATAL ERROR.'
+      ELSE
+         STOP 'DIMFILM FATAL ERROR IN DIMEND.'
+      ENDIF
+C
+      END
+C --- -----------------------------------------------------------------

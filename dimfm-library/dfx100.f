@@ -1,0 +1,68 @@
+      SUBROUTINE DFX100(I,XEND,YEND,IN,X,Y,CUTS)
+      LOGICAL OUT
+      LOGICAL CUT, CUTS, DFX103, IN
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+C    IF I=1 USE BOUNDS FOR WINDOW   XTB1 ETC., IF 2 USE BLANKING BOUNDS
+      OUT(Z,Z1,Z2) = (Z.LT.Z1).OR.(Z.GT.Z2)
+      CUT(Z,Z1,Z2,ZZ,ZZ1,ZZ2) = ((Z.GE.Z1).AND.(Z.LE.Z2)).AND.
+     1                               ((ZZ.GE.ZZ1).AND.(ZZ.LE.ZZ2))
+      IF (I.EQ.2) GO TO 2
+      XL = XTB1
+      XR = XTB2
+      YL = YTB1
+      YU = YTB2
+      GO TO 1
+    2 XL = XBB1
+      XR = XBB2
+      YL = YBB1
+      YU = YBB2
+    1 CONTINUE
+      X1 = XPOS
+      Y1 = YPOS
+      X2 = XEND
+      Y2 = YEND
+      XMIN = AMIN1(X1,X2)
+      XMAX = AMAX1(X1,X2)
+      YMIN = AMIN1(Y1,Y2)
+      YMAX = AMAX1(Y1,Y2)
+      IF (Y1.EQ.Y2) GO TO 3
+      IF (X1.EQ.X2) GO TO 4
+      S1 = (Y2-Y1)/(X2-X1)
+      S2 = 1./S1
+      YXL = S1*(XL-X1) + Y1
+      YXR = S1*(XR-X1) + Y1
+      XYL = S2*(YL-Y1) + X1
+      XYU = S2*(YU-Y1) + X1
+      IF (OUT(YXL,YL,YU)) GO TO 11
+      IF (CUT(XL,XMIN,XMAX,YXL,YMIN,YMAX)) CALL DFX101(XL,YXL)
+   11 IF (OUT(YXR,YL,YU)) GO TO 12
+      IF (CUT(XR,XMIN,XMAX,YXR,YMIN,YMAX)) CALL DFX101(XR,YXR)
+   12 IF (OUT(XYL,XL,XR)) GO TO 13
+      IF (CUT(XYL,XMIN,XMAX,YL,YMIN,YMAX)) CALL DFX101(XYL,YL)
+   13 IF (OUT(XYU,XL,XR)) GO TO 5
+      IF (CUT(XYU,XMIN,XMAX,YU,YMIN,YMAX)) CALL DFX101(XYU,YU)
+    5 CALL DFX102(CUTS,X2,Y2)
+      CUTS = .NOT.CUTS
+      X = X2
+      Y = Y2
+      X1 = .5*(X1+X2)
+      Y1 = .5*(Y1+Y2)
+      IN = DFX103(X1,XL,XR).AND.DFX103(Y1,YL,YU)
+      RETURN
+    3 YXL = Y1
+      YXR = Y1
+      IF (.NOT.DFX103(Y1,YL,YU)) GO TO 5
+      IF (DFX103(XL,XMIN,XMAX)) CALL DFX101(XL,Y1)
+      IF (DFX103(XR,XMIN,XMAX)) CALL DFX101(XR,Y1)
+      GO TO 5
+    4 XYL = X1
+      XYU = X1
+      IF (.NOT.DFX103(X1,XL,XR)) GO TO 5
+      IF (DFX103(YL,YMIN,YMAX)) CALL DFX101(X1,YL)
+      IF (DFX103(YU,YMIN,YMAX)) CALL DFX101(X1,YU)
+      GO TO 5
+      END
+C
+C----------------------------------------------
+C

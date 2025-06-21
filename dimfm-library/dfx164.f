@@ -1,0 +1,17 @@
+      SUBROUTINE DFX164(N1,H,S,J)
+      INCLUDE 'dfxc17.cmn'
+      REAL L
+C    FOR HUE H DOES J VALUES OF LIGHTNESS BETWEEN 0. TO 1.
+C    INSERTS COLUMNWISE FROM N
+      N = N1
+      DL = 1.0/FLOAT(J+1)
+      L = DL
+      DO 1 I=1,J
+      CALL DFX160(6,H,L,S,RGBLUT(1,N),RGBLUT(2,N),RGBLUT(3,N),IERR)
+      L = L + DL
+    1 N = N + 16
+      RETURN
+      END
+C
+C----------------------------------------------
+C

@@ -1,0 +1,34 @@
+      SUBROUTINE INQR(IPT,ROUT,IERR)
+C    IERR = 0 IF VALID CALL
+C         = 1 IF IPT INVALID
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc01.cmn'
+      INCLUDE 'dfxc01s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      INTEGER IVAL(12)
+      REAL RVAL(6)
+      REAL CVAL(2,3)
+      REAL BVAL(4,3)
+      EQUIVALENCE (ICHECK,IVAL), (HT,RVAL), (XPOS,CVAL), (XB1,BVAL)
+C    RETURN SIMPLE REAL VALUES OF PARAMETERS ACCORDING TO IPT
+C    1 - HT; 2 - HTMK; 3 - XQ; 4 - ALPHA; 5 - ANGLS; 6 - ANGSTP
+      ROUTIN = 'INQR'
+      IERR = 0
+      IF (IPT.LT.1.OR.IPT.GT.6) GO TO 1
+      ROUT = RVAL(IPT)
+   99 CONTINUE
+      ROUTIN = STARS6
+      RETURN
+    1 IF (ICHECK.GT.0) WRITE(ERRREC,2) ROUTIN,IPT
+      CALL DFX130(0)
+    2 FORMAT(1H0,'**DIMFILM WARNING** ',A,' CALLED WITH ILLEGAL POINTER'
+     1,I4,' - NO RETURNED VALUE')
+      IERR = 1
+C    N.B.  ONLY EVER ACCESSED BY USER
+      GO TO 99
+      END
+C
+C----------------------------------------------
+C

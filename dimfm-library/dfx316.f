@@ -1,0 +1,32 @@
+      SUBROUTINE DFX316(X1,X2,Y1,Y2)
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      SAVE THETA,GAP
+      IF ((X1.EQ.X2).OR.(Y1.EQ.Y2)) RETURN
+C    ZERO WIDTH/HEIGHT BAR NOT HATCHED
+      Z1 = XTB1
+      Z2 = XTB2
+      Z3 = YTB1
+      Z4 = YTB2
+      XX1 = AMIN1(X1,X2)
+      XX2 = AMAX1(X1,X2)
+      YY1 = AMIN1(Y1,Y2)
+      YY2 = AMAX1(Y1,Y2)
+      XX1 = AMAX1(XX1,Z1)
+      XX2 = AMIN1(XX2,Z2)
+      YY1 = AMAX1(YY1,Z3)
+      YY2 = AMIN1(YY2,Z4)
+      IF ((XX1.GE.XX2).OR.(YY1.GE.YY2)) RETURN
+C    MUST ENSURE ONLY THOSE AREAS WITHIN GRAPHICAL AREA ARE HATCHED
+      CALL DFX128(XX1,XX2,YY1,YY2)
+      CALL DFX123(THETA,GAP)
+      CALL DFX128(Z1,Z2,Z3,Z4)
+      RETURN
+      ENTRY DFX315(X1,X2)
+      THETA = X1
+      GAP = X2
+      RETURN
+      END
+C
+C----------------------------------------------
+C

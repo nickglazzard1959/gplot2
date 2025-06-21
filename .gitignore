@@ -1,0 +1,109 @@
+# .gitignore file for various projects.
+#
+# Start by ignoring everything.
+*
+#
+# Stop ignoring directories and anything with an extension.
+# Anything without an extension will be ignored by default.
+# This gets rid of Unix executables, usually, as required.
+!*/
+!*.*
+#
+# Stop ignoring a small subset of files without extensions.
+!README
+!LICENSE
+!COPYING
+!configure
+!depcomp
+!Makefile
+!.gitignore
+#
+# Stop ignoring some autoconf things specifically.
+# Never sure what that mess actually needs TBH.
+!configure.ac
+!config.guess
+!config.sub
+!aclocal.m4
+#
+# Start ignoring specific extensions.
+*.lfstgz
+*.blob
+*.pickle
+*.png
+*.tif
+*.tiff
+*.dpx
+*.exr
+*.sgi
+*.jpg
+*.eps
+*.JPG
+*.EPS
+*.json
+*.gif
+*.dng
+*.raw
+*.ari
+*.cube
+#
+# The following we mostly do not want at all.
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.la
+*.lai
+*.lo
+*.Po
+*.Plo
+*.pyc
+*.exe
+*.zip
+*.tgz
+*.tar
+*.gz
+*.aux
+*.idx
+*.ilg
+*.ind
+*.log
+*.out
+*.toc
+*.dgi
+*.log
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+*.ppm
+*.pdf
+*.bin
+*.curves
+*.pbxproj
+*.dsp
+*.vcproj
+*.html
+*.js
+*.ofx
+*.dmg
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.3dl
+*.transymbols
+*.dSYM
+*.app
+*.icns
+*.bzs
+*.backup
+#
+# Start ignoring more complex specific patterns.
+*~
+*#
+#*#
+*.so.*
+#
+# EOF

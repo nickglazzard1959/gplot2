@@ -1,0 +1,11 @@
+      SUBROUTINE LDABET(IBET,NFONT)
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'LDABET'
+      CALL DFX208(IBET,NFONT)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

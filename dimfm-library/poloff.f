@@ -1,0 +1,12 @@
+      SUBROUTINE POLOFF(R1,THETA)
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'POLOFF'
+      CALL DFX334(.FALSE.,R1,THETA)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

@@ -1,0 +1,13 @@
+      SUBROUTINE SYMTXT(ISYM)
+      CHARACTER*(*) ISYM
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'SYMTXT'
+      CALL DFX214(ISYM)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

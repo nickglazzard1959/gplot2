@@ -1,0 +1,13 @@
+      SUBROUTINE POLAR(R,THETA,N1)
+      REAL R(N1),THETA(N1)
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'POLAR'
+      CALL DFX339(R,THETA,N1)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

@@ -1,0 +1,13 @@
+      SUBROUTINE XYGRID
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'XYGRID'
+      CALL DFX311(11,0.0)
+      CALL DFX311(13,0.0)
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

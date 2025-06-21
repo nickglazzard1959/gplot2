@@ -1,0 +1,33 @@
+      SUBROUTINE DFX136
+C
+C++++++++++++++CODE MUST REPLICATE THAT IN USER ACCESSIBLE FRAME++++++++
+C
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxcd0.cmn'
+      INCLUDE 'dfxcd0s.cmn'
+      INCLUDE 'dfxcbd.cmn'
+C    FRAME ADVANCE FOR ALL ACTIVE WORK STATIONS
+      NWS = 0
+      CALL DFX000(-3,ZDUMMY,ZDUMMY,ZDUMMY,NDUMMY)
+      CALL DFX131(-999)
+C    THIS IS USED TO CHECK ON GENERATION OF ANY DIAGNOSTICS DURING
+C    CURRENT USER FRAME SEQUENCE (NOTE - REPEATS NOT ACCOUNTED, MERELY
+C    NUMBER OF USER EXECUTIONS OF FRAME)
+      XT = XB1 - X0T
+      YT = YB1 - Y0T
+      X = XT*CALPHA + YT*SALPHA
+      Y = YT*CALPHA - XT*SALPHA
+      CALL DFX111(X,Y)
+      INTEND = -1
+      IOBCNT = 0
+      NOFRMS = NOFRMS + 1
+      IF (SPOS) THEN
+              XS = XSPOS
+              YS = YSPOS
+      ENDIF
+      RETURN
+      END
+C
+C----------------------------------------------
+C

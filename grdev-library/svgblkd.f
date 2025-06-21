@@ -1,0 +1,8 @@
+      BLOCK DATA SVGBLKD
+      INCLUDE 'svgcmn.cmn'
+      DATA OPENED/.FALSE./, EMPTYF/.FALSE./, LUN/12/, SVGNL/3/, SLUN/13/
+      DATA WPEN/1.0/, CPEN/0.0,0.0,0.0/, XPOS/0.0/, YPOS/0.0/
+      DATA XMIN/0.0/, YMIN/0.0/, XMAX/0.0/, YMAX/0.0/
+      DATA INGROUP/.FALSE./
+      DATA SVGN/'SVG'/
+      END

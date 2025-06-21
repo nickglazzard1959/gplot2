@@ -1,0 +1,16 @@
+          IDENT IRTIME
+          ENTRY IRTIME
+*
+* INTEGER FUNCTION IRTIME()
+*-------------------------------------------------(NOS I/F)-------------
+*   GET TIME SINCE DEADSTART IN MILLISECONDS.
+*-----------------------------------------------------------------------
+*
+ IRTIME   BSS    1           JUMP WHENCE CAME
+          RTIME  RESULT      CALL MACRO, OUTPUT TO RESULT
+          SA1    RESULT      X1 = *RESULT
+          MX2    -36D        X2 = MASK
+          BX6    -X2*X1      X6 = (.NOT. X2) .AND. X1 (GET MILLISECONDS)
+          EQ     IRTIME      RETURN
+ RESULT   BSS    1           MACRO RESULT BUFFER
+          END

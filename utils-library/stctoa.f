@@ -1,0 +1,75 @@
+      INTEGER FUNCTION STCTOA( CIN, AOUT )
+C-------------------------------------------------(STRING)--------------
+C CONVERT A CHARACTER VARIABLE (6/12 FORMAT) TO AN ASCII CODE STRING.
+C RETURN THE NUMBER OF CODES PLACED INTO AOUT (0 TO KSTMAX)
+C-----------------------------------------------------------------------
+      IMPLICIT CHARACTER*1 (A-Z)
+      INCLUDE 'stringh.cmn'
+      CHARACTER*(*) CIN
+      INTEGER AOUT(KSTDIM)
+C----
+      INTEGER I, IPREFIX, IASC, NOUT
+      LOGICAL SKIP
+C
+      NOUT = 0
+      IPREFIX = 0
+C---- STEP OVER THE INPUT CHARACTERS. CONVERT EACH TO AN ASCII CODE.
+      DO 1 I = 1, LEN(CIN)
+         SKIP = .FALSE.
+         IASC = ICHAR(CIN(I:I)) + 32
+C---- IF NO ACTIVE PREFIX CHARACTER, CHECK IF THIS IS A PREFIX CHARACTER
+         IF( IPREFIX .EQ. 0 )THEN
+            IF( IASC .EQ. KAT )THEN
+               IPREFIX = KAT
+            ELSE IF( IASC .EQ. KCARAT )THEN
+               IPREFIX = KCARAT
+            ENDIF
+C---- WANT TO SKIP THIS CHARACTER IF IT IS A PREFIX OR A COLON.
+C           SKIP = (IPREFIX .NE. 0) .OR. (IASC .EQ. 58)
+            SKIP = (IPREFIX .NE. 0)
+         ENDIF
+C---- IF .NOT. SKIP, OUTPUT THE CHARACTER, POSSIBLY MODIFIED BY ANY
+C---- PREFIX CHARACTER.
+         IF( .NOT. SKIP )THEN
+C---- DEAL WITH CARAT SHIFT TO LOWER CASE WITH SOME EXCEPTIONS.
+            IF( IPREFIX .EQ. KCARAT )THEN
+               IF( IASC .GE. 65 )THEN
+C---- UPPER CASE ALPHABETIC TO LOWER CASE ALPHABETIC.
+                  IASC = IASC + 32
+               ELSE IF( IASC .GE. 48 .AND. IASC .LE. 51 )THEN
+C---- OPEN BRACE, BAR, CLOSE BRACE, TILDE  FROM 0, 1, 2, 3.
+                  IASC = IASC + 75
+               ENDIF
+C---- DEAL WITH AT SHIFT POSSIBILITIES.
+            ELSE IF( IPREFIX .EQ. KAT )THEN
+C---- (AT)A -> (AT)
+               IF( IASC .EQ. 65 )THEN
+                  IASC = 64
+C---- (AT)B -> (CARAT)
+               ELSE IF( IASC .EQ. 66 ) THEN
+                  IASC = 94
+C---- (AT)D -> (COLON)
+               ELSE IF( IASC .EQ. 68 )THEN
+                  IASC = 58
+C---- (AT)G -> (BACK-QUOTE)
+               ELSE IF( IASC .EQ. 71 )THEN
+                  IASC = 96
+               ENDIF
+            ENDIF
+C---- PUT THE ASCII CODE IN THE OUTPUT CODE BUFFER.
+            NOUT = NOUT + 1
+            AOUT(NOUT) = IASC
+C---- RESET THE PREFIX CHARACTER AS A CHARACTER HAS BEEN OUTPUT.
+            IPREFIX = 0
+C---- IF THE OUTPUT BUFFER IS FULL, BREAK.
+            IF( NOUT .EQ. KSTMAX )GOTO 2
+         ENDIF
+ 1    CONTINUE
+ 2    CONTINUE
+C---- TERMINATE THE ASCII CODE STRING. ALWAYS SAFE TO DO THIS HERE.
+      NOUT = NOUT + 1
+      AOUT(NOUT) = KSTEND
+C---- RETURN THE NUMBER OF CODES NOW IN AOUT, EXCLUDING THE KSTEND.
+      STCTOA = NOUT - 1
+      RETURN
+      END

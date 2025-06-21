@@ -1,0 +1,93 @@
+      SUBROUTINE DFX170(PX,PY,QX,QY,IERR)
+      LOGICAL IN
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      INCLUDE 'dfxc24.cmn'
+      INCLUDE 'dfxcp0.cmn'
+      INCLUDE 'dfxcbb.cmn'
+      LOGICAL DFX103
+      IERR = 0
+      IF (WCTR) THEN
+                  PPX = X0T + PX*CALPHA - PY*SALPHA
+                  QQX = X0T + QX*CALPHA - QY*SALPHA
+                  PPY = Y0T + PX*SALPHA + PY*CALPHA
+                  QQY = Y0T + QX*SALPHA + QY*CALPHA
+      ELSE
+                  PPX = PX
+                  QQX = QX
+                  PPY = PY
+                  QQY = QY
+      ENDIF
+      LPAR(1) = PWIND
+      IF (.NOT.PWIND) GO TO 1
+      IF ((MAX(PPX,QQX).LT.XTB1).OR.(MIN(PPX,QQX).GT.XTB2)) GO TO 10
+      IF ((MAX(PPY,QQY).LT.YTB1).OR.(MIN(PPY,QQY).GT.YTB2)) GO TO 10
+      IN = (DFX103(PPX,XTB1,XTB2).AND.DFX103(PPY,YTB1,YTB2))  .AND.
+     1     (DFX103(QQX,XTB1,XTB2).AND.DFX103(QQY,YTB1,YTB2))
+      IF (IN) THEN
+C    SET PRE-CLIPPING ONLY IF CELL ARRAY CLIPPED
+C        N.B. THIS IS ONLY RELEVANT TO CELL ARRAY OUTSIDE OF SEGMENTS
+            LPAR(1) = .FALSE.
+      ELSE
+            RPAR(1) = XOWCND + XTB1*XSWCND
+            RPAR(2) = XOWCND + XTB2*XSWCND
+            RPAR(3) = YOWCND + YTB1*YSWCND
+            RPAR(4) = YOWCND + YTB2*YSWCND
+      ENDIF
+    1 LPAR(2) = BLNKS
+      IF (.NOT.BLNKS) GO TO 2
+      IN = (DFX103(PPX,XBB1,XBB2).AND.DFX103(PPY,YBB1,YBB2))  .AND.
+     1     (DFX103(QQX,XBB1,XBB2).AND.DFX103(QQY,YBB1,YBB2))
+      IF (IN) GO TO 12
+      IF ((MAX(PPX,QQX).LT.XBB1).OR.(MIN(PPX,QQX).GT.XBB2).OR.
+     1    (MAX(PPY,QQY).LT.YTB1).OR.(MIN(PPY,QQY).GT.YTB2)) THEN
+C    SET PRE-BLANKING ONLY IF CELL ARRAY BLANKED
+C        N.B. THIS IS ONLY RELEVANT TO CELL ARRAY OUTSIDE OF SEGMENTS
+            LPAR(2) = .FALSE.
+      ELSE
+            RPAR(5) = XOWCND + XBB1*XSWCND
+            RPAR(6) = XOWCND + XBB2*XSWCND
+            RPAR(7) = YOWCND + YBB1*YSWCND
+            RPAR(8) = YOWCND + YBB2*YSWCND
+      ENDIF
+    2 XPAR(1) = XOWCND + PPX*XSWCND
+      XPAR(2) = XOWCND + QQX*XSWCND
+      YPAR(1) = YOWCND + PPY*YSWCND
+      YPAR(2) = YOWCND + QQY*YSWCND
+C   FLAG WINDOW INITIALISATION FOR DRIVER
+      RASTWN = .TRUE.
+   99 RETURN
+   10 IF (ICHECK.GT.0)
+     1         WRITE(ERRREC,11) ROUTIN,PX,PY,QX,QY,PPX,PPY,QQX,QQY,
+     2                          XTB1,XTB2,YTB1,YTB2
+      CALL DFX130(0)
+   11 FORMAT(1H0,'**DIMFILM WARNING** ',A,' REFERENCED WITH ARRAY DEFINE
+     1D BY POINTS'/
+     2 1H0,37X,'(',1PE14.5,',',E14.5,') AND (',E14.5,',',E14.5,')'/
+     3 1H0,21X,'TRANSFORMING TO (',
+     4          1PE14.5,',',E14.5,') AND (',E14.5,',',E14.5,')'/
+     5 1H0,21X,'LIES OUTSIDE CURRENTLY ACTIVE PANE, THIS BEING -'/
+     6 1H0,21X,1P4E14.5/
+     7 1H0,21X,'CALL IGNORED')
+      IERR = 1
+      GO TO 99
+   12 IF (ICHECK.GT.0)
+     1         WRITE(ERRREC,13) ROUTIN,PX,PY,QX,QY,PPX,PPY,QQX,QQY,
+     2                          XTB1,XTB2,YTB1,YTB2
+      CALL DFX130(0)
+   13 FORMAT(1H0,'**DIMFILM WARNING** ',A,' REFERENCED WITH ARRAY DEFINE
+     1D BY POINTS'/
+     2 1H0,37X,'(',1PE14.5,',',E14.5,') AND (',E14.5,',',E14.5,')'/
+     3 1H0,21X,'TRANSFORMING TO (',
+     4          1PE14.5,',',E14.5,') AND (',E14.5,',',E14.5,')'/
+     5 1H0,21X,'LIES WITHIN CURRENTLY ACTIVE BLANKED AREA, THIS BEING -'
+     6  /1H0,21X,1P4E14.5/
+     7 1H0,21X,'CALL IGNORED')
+      IERR = 2
+      GO TO 99
+      END
+C
+C----------------------------------------------
+C

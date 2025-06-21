@@ -1,0 +1,84 @@
+          IDENT GETCARG
+          ENTRY GETCARG
+*
+* BOOLEAN FUNCTION GETCARG( CHARACTER*(*) CARG, INTEGER ZFILL )
+*-------------------------------------------------------(NOS I/F)-------
+*    FTN5 PASSES CHARACTER ARGUMENTS WITH A 1 WORD DESCRIPTOR. THIS
+*    CONTAINS THE POSITION OF THE FIRST CHARACTER WITHIN A WORD IN
+*    BITS 24-27 AND THE NUMBER OF CHARACTERS IN BITS 30-47. BITS 0-17 (2
+*    CONTAIN THE ADDRESS OF THE FIRST WORD OF THE CHARACTER ARG, AS USUA
+*    THIS FUNCTION COPIES UP TO THE FIRST 10 CHARACTERS FROM THE PASSED
+*    CHARACTER ARGUMENT INTO THE RESULT, LEFT JUSTIFIED, FILLING ANY
+*    UNUSED RESULT CHARACTERS WITH BLANKS (SPACES). THE RESULT CAN BE
+*    USED AS A CHARACTER*10 VARIABLE. THE INPUT CAN BE A SLICE.
+*    IF ZFILL NOT 0, REPLACE ALL TRAILING BLANKS WITH ZEROS. THIS IS
+*    OFTEN USEFUL FOR CONSTRUCTING STRINGS IN WORDS FOR SYSTEM MACROS.
+*-----------------------------------------------------------------------
+*
+ GETCARG  BSS    1           ENTRY.
+          SX0    1           X0 = 1, USED FOR INPUT ADDRESS INCREMENTS.
+          BX2    X1          X2 = DESCRIPTOR WORD.
+          SX3    X2          X3 = FIRST WORD ADDRESS (LS 18 BITS).
+          SB3    A1+1        B3 = ADDRESS OF ARGLIST + 1
+          SB2    24          SHIFT TO 1ST CHAR POS INFO IN DESC
+          AX4    B2,X2
+          MX5    -6          X5 = 6 BIT CHAR MASK.
+          BX4    -X5*X4      X4 = 1ST CHAR POSITION
+          SB2    30          SHIFT TO CHAR COUNT INFO IN DESC.
+          AX2    B2,X2
+          BX2    -X5*X2      X2 = CHAR COUNT
+          SB2    X2          B2 = CHAR COUNT
+          SB4    10          MAXIMUM CHARS COUNT WE WILL HANDLE.
+          LE     B2,B4,LE10  ALREADY 10 OR LESS
+          SB2    B4          MAKE COUNT 10
+ LE10     SA1    X3          X1 = C1
+          SX6    0           X6 = 0 = RESULT
+          SX5    9           X5 = 9
+          IX5    X5-X4       X5 = (9 - CHAR POS)
+          SX7    6           X7 = BITS PER CHAR
+          IX5    X7*X5       X5 = 6 * (9 - CHAR POS)
+          SB7    X5          B7 = INPUT SHIFT
+          SB6    54          B6 = OUTPUT SHIFT
+          MX5    -6          X5 = 6 BIT CHAR MASK.
+* PACK CHARACTERS INTO RESULT.
+ NEXT     AX7    B7,X1       X7 = SHIFT(C1,INPUT SHIFT)
+          BX7    -X5*X7      X7 = C1(INPUTPOS)
+          LX7    B6,X7       X7(OUTPUTPOS) = C1(INPUTPOS)
+          BX6    X6+X7       ADD CHARACTER TO X6 STRING
+          SB6    B6-6        NEW OUTPUT SHIFT
+          SB2    B2-1        DECREMENT CHARACTER COUNT
+          ZR     B2,FILL     NO CHARS LEFT. EXIT CHAR COPY LOOP.
+          SB7    B7-6        NEW INPUT SHIFT. COULD CROSS WORD BOUNDARY.
+          GE     B7,NEXT     NO CROSS. DO NEXT CHAR FROM THIS WORD.
+          IX3    X3+X0       CROSSES. GET NEXT INPUT WORD ADDRESS
+          SA1    X3          X1 = CHARS FROM NEW WORD.
+          SB7    54          INPUT SHIFT = 54 FOR NEW WORD
+          JP     NEXT        DO FIRST CHARACTER FROM NEW WORD.
+* PACK BLANKS INTO UNUSED PART OF RESULT.
+ FILL     SX5    55B         X5 = BLANK CHARACTER CODE.
+ NXTBLN   LT     B6,FIN      IF OUTPUT SHIFT -VE, FINISHED.
+          LX7    B6,X5       X7(OUTPUTPOS) = BLANK CHAR.
+          BX6    X6+X7       ADD BLANK TO X6 STRING.
+          SB6    B6-6        UPDATE OUTPUT SHIFT.
+          JP     NXTBLN      GO TO TOP OF BLANK FILL LOOP.
+* CHECK IF TO REPLACE TRAILING BLANKS WITH ZEROS.
+ FIN      SA2    B3          GET 2ND ARGUMENT ADDRESS IN X2
+          SA2    X2          GET 2ND ARGUMENT IN X2.
+          ZR     X2,FINI     2ND ARG IS 0, SO REALLY DONE
+          SB2    B0          INITIAL SHIFT = 0
+          SB3    60          MAXIMUM SHIFT = 60
+          MX4    -6          X4 = 6 BIT MASK
+          BX4    -X4         X4 = 6 BIT 1S MASK
+* ZERO FILL LOOP.
+ ZFILL    AX3    B2,X6       X3 = X6 >> B2
+          BX3    X4*X3       X3 6 LS BITS
+          IX3    X3-X5       X3 -= 55B
+          NZ     X3,FINI     NOT SPACE, EXIT LOOP
+          LX3    B2,X4       X3 = 77B << B2
+          BX6    -X3*X6      CLEAR X3 BITS IN X6
+          SB2    B2+6        INCREASE SHIFT
+          GT     B2,B3,FINI  ALL CHARS PROCESSED.
+          JP     ZFILL       GO TO TOP OF ZFILL LOOP.
+* DONE. RETURN.
+ FINI     EQ     GETCARG     RETURN
+          END

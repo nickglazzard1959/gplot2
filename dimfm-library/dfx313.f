@@ -1,0 +1,87 @@
+      SUBROUTINE DFX313(FN,FN1,FN2)
+      REAL SAVE(4)
+      LOGICAL ZERO
+      LOGICAL YLOG
+      INCLUDE 'dfxc06.cmn'
+      INCLUDE 'dfxc02.cmn'
+      INCLUDE 'dfxc02s.cmn'
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      YLOG = .FALSE.
+      ZERO = .FALSE.
+      IF (YTYPE.EQ.2) YLOG = .TRUE.
+      X = AMIN1(XGL,XGR)
+      XSTART = AMIN1(XGL,XGR)
+      IF (XTYPE.EQ.2.AND.XSTART.LE.0.0) GO TO 60
+      IF ((YTYPE.EQ.2).AND.(YGL.LE.0.0.OR.YGU.LE.0.0)) GO TO 66
+      ICSAVE = ICHECK
+      IF (ICHECK.GT.1) ICHECK = -2
+      XD = XTB2 - XTB1
+      YD = YTB2 - YTB1
+      DDX = DC2*XD
+      DDY = DC2*YD
+      SAVE(1) = XTB1
+      SAVE(2) = XTB2
+      SAVE(3) = YTB1
+      SAVE(4) = YTB2
+      X1 = XTB1 + DDX
+      X2 = XTB2 - DDX
+      Y1 = YTB1 + DDY
+      Y2 = YTB2 - DDY
+      CALL DFX128(X1,X2,Y1,Y2)
+      FNXGL = FN1(XGL)
+      FNYGL = FN2(YGL)
+      S1 = (DC1*XD)/(FN1(XGR) - FNXGL)
+      S2 = (DC1*YD)/(FN2(YGU) - FNYGL)
+      XEND = AMAX1(XGL,XGR)
+      Y = FN(X,DX)
+      IF (DX.EQ.0.0) ZERO = .TRUE.
+      IF (YLOG.AND.Y.LE.0.0) GO TO 62
+      XP = (FN1(X) - FNXGL)*S1 + X1
+      YP = (FN2(Y) - FNYGL)*S2 + Y1
+      CALL DFX110(XP,YP)
+   10 X = X + DX
+      IF (X.GT.XEND) GO TO 30
+      IF (X.LT.XSTART) GO TO 31
+      Y = FN(X,DX)
+      IF (DX.EQ.0.0.AND.ZERO) GO TO 65
+      ZERO = DX.EQ.0.0
+      IF (YLOG.AND.Y.LE.0.0) GO TO 62
+      XP = (FN1(X) - FNXGL)*S1 + X1
+      YP = (FN2(Y) - FNYGL)*S2 + Y1
+      CALL DFX106(XP,YP)
+      GO TO 10
+   30 X = XEND
+      GO TO 32
+   31 X = XSTART
+   32 Y = FN(X,DX)
+      IF (YLOG.AND.Y.LE.0.0) GO TO 62
+      XP = (FN1(X) - FNXGL)*S1 + X1
+      YP = (FN2(Y) - FNYGL)*S2 + Y1
+      CALL DFX106(XP,YP)
+   65 CALL DFX128(SAVE(1),SAVE(2),SAVE(3),SAVE(4))
+      RETURN
+   60 IF (ICHECK.GT.0) WRITE(ERRREC,61)
+      CALL DFX130(0)
+   61 FORMAT(1H0,'**DIMFILM WARNING**  GRAPHF WITH LOGARITHMIC X-AXIS DE
+     1TECTS NON-POSITIVE VALUE IN X-RANGE'/1H ,21X,'CALL IGNORED')
+      RETURN
+   66 IF (ICHECK.GT.0) WRITE(ERRREC,67)YGL,YGU
+   67 FORMAT(1H0,'**DIMFILM WARNING**  GRAPHF CALLED WITH LOGARITHMIC Y-
+     1AXIS HAS NON-POSITIVE PART OF RANGE -',2E14.6/1H ,21X,
+     2     'CALL IGNORED')
+      CALL DFX130(0)
+      RETURN
+   62 ICHECK = ICSAVE
+      IF (ICHECK.GT.0) WRITE(ERRREC,63)
+      CALL DFX130(0)
+   63 FORMAT(1H0,'**DIMFILM WARNING**  GRAPHF CALLED WITH LOGARITHMIC Y-
+     1AXIS DETECTS A NON-POSITIVE Y VALUE'/1H ,21X,'GRAPH PLOT WILL BE T
+     2ERMINATED AT THIS POINT')
+      GO TO 65
+      END
+C
+C----------------------------------------------
+C

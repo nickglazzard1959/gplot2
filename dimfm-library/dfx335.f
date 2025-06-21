@@ -1,0 +1,75 @@
+      SUBROUTINE DFX335(IXYAX)
+      INCLUDE 'dfxc06.cmn'
+      INCLUDE 'dfxc02.cmn'
+      INCLUDE 'dfxc02s.cmn'
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      CHARACTER*1 IXYAX
+      IF (IXYAX.EQ.'Y') THEN
+               A1 = XGL
+               A2 = XGR
+               A3 = XAT
+               ZD = XTB2 - XTB1
+               ZQ = (YTB2 - YTB1)*DC2
+               ITYPE = XTYPE
+               I = 2
+      ELSE
+               A1 = YGL
+               A2 = YGU
+               A3 = YAT
+               ZD = YTB2 - YTB1
+               ZQ = (XTB2 - XTB1)*DC2
+               ITYPE = YTYPE
+               I = 1
+      ENDIF
+      B1 = AMIN1(A1,A2)
+      B2 = AMAX1(A1,A2)
+      IF ((A3.LT.B1).OR.(A3.GT.B2)) GO TO 10
+      IF (ITYPE.EQ.1) GO TO 4
+      IF (ITYPE.NE.2) GO TO 12
+      IF (B1.LE.0.0) GO TO 14
+      A1 = ALOG10(A1)
+      A2 = ALOG10(A2)
+      A3 = ALOG10(A3)
+    4 Z = ((A3-A1)/(A2-A1))*ZD*DC1
+      CALL DFX300
+C    SET COLOUR/INTENSITY
+      CALL DFX147(1)
+      GO TO (1,2),I
+    1 X1 = XTB1 + ZQ
+      X2 = XTB2 - ZQ
+      Y1 = Z + YTB1 + DC2*ZD
+      Y2 = Y1
+      GO TO 5
+    2 X1 = Z + XTB1 + DC2*ZD
+      X2 = X1
+      Y1 = YTB1 + ZQ
+      Y2 = YTB2 - ZQ
+    5 CALL DFX110(X1,Y1)
+      CALL DFX106(X2,Y2)
+      CALL DFX301
+   99 CONTINUE
+      RETURN
+   10 IF (ICHECK.GT.0) WRITE(ERRREC,11)IXYAX,ROUTIN
+      CALL DFX130(0)
+   11 FORMAT(1H0,'**DIMFILM WARNING** ',A1,'-AXIS DRAWING ATTEMPTED WITH
+     1 AXIS NOT IN RANGE'/1H ,21X,'ORIGINATED IN ',A)
+      GO TO 99
+   12 IF (ICHECK.GT.0) WRITE(ERRREC,13)IXYAX,ROUTIN
+      CALL DFX130(0)
+   13 FORMAT(1H0,'**DIMFILM WARNING** ',A1,'-AXIS DRAWING CALLED WITH IN
+     1CORRECT AXIS TYPE - MUST BE LINEAR OR LOGARITHMIC SCALE ORTHOGONAL
+     2 TO DRAWN AXIS'/1H ,21X,'ORIGINATED IN ',A)
+      GO TO 99
+   14 IF (ICHECK.GT.0) WRITE(ERRREC,15)IXYAX,ROUTIN
+      CALL DFX130(0)
+   15 FORMAT(1H0,'**DIMFILM WARNING** ',A1,'-AXIS DRAWING CALLED WITH LO
+     1GARITHMIC RANGE NON-POSITIVE IN PART FOR AXIS ORTHOGONAL TO DRAWN
+     2AXIS'/1H ,21X,'ORIGINATED IN ',A)
+      GO TO 99
+      END
+C
+C----------------------------------------------
+C

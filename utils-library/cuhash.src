@@ -1,0 +1,48 @@
+          IDENT  CUHASH
+          ENTRY  CUHASH
+*
+* SUBROUTINE CUHASH( INTEGER IUIDX, CHARACTER*4 CHASH )
+*----------------------------------------------------------(NOS I/F)----
+*   CONVERT AN 18 BIT USER INDEX TO A 4 CHARACTER USER INDEX HASH.
+*   STOLEN SHAMELESSLY FROM OPL871 ENQUIRE CODE CIH - COMPUTE USER INDEX
+*     CIH ENTRY  (X7) = 18 BIT USER INDEX (RIGHT JUSTIFIED).
+*     CIH EXIT   (X7) = 4 CHARACTER USER INDEX HASH (LEFT JUSTIFIED
+*                       WITH ZERO FILL).
+*     CIH USES   X - 0, 1, 2, 3, 7.
+*                B - 2, 3.
+*  CUHASH USES   X - 5
+*-----------------------------------------------------------------------
+*
+ CUHASH   BSS    1           JUMP WHENCE WE CAME
+          SX5    X1          X5 = &IUIDX
+          SA5    X5          X5 = IUIDX
+          BX7    X5          X7 = IUIDX
+          SA5    A1+1        X5 = &CHASH
+          SB2    59-11       INITIAL SHIFT COUNT
+          SB3    5
+          MX0    -5
+          LX3    B2,X7       BITS 12-16 OF USER INDEX
+          BX2    -X0*X3      FIRST CHARACTER OF HASH
+          SX2    X2+B1
+          LX2    6
+          SB2    B2+B3       SHIFT COUNT FOR SECOND CHARACTER
+          LX3    B2,X7       BITS 7-11 OF USER INDEX
+          BX1    -X0*X3      SECOND CHARACTER OF HASH
+          SX1    X1+B1
+          BX2    X2+X1
+          LX2    6
+          SB2    B2+B3       SHIFT COUNT FOR THIRD CHARACTER
+          LX3    B2,X7       BITS 2-6 OF USER INDEX
+          BX1    -X0*X3      THIRD CHARACTER OF HASH
+          SX1    X1+B1
+          BX2    X2+X1
+          LX2    6
+          MX0    -2          FOURTH CHARACTER OF HASH
+          BX1    -X0*X7      BITS 1-0 OF USER INDEX
+          LX1    3
+          SX1    X1+B1
+          BX7    X2+X1
+          LX7    59-23       LEFT JUSTIFY USER INDEX HASH
+          SA7    X5          *CHASH = RESULT
+          EQ     CUHASH      RETURN
+          END

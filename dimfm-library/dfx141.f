@@ -1,0 +1,19 @@
+      SUBROUTINE DFX141(I,N)
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc04.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      IF (N.LT.1.OR.N.GE.NRGB) GO TO 1
+      IF ((I.EQ.IRGBN).AND.(N.NE.ICOLPT(I))) CALL DFX140(IRGBN)
+      ICOLPT(I) = N
+    2 RETURN
+    1 IF (ICHECK.GT.0) WRITE(ERRREC,10) ROUTIN,N
+      CALL DFX130(0)
+   10 FORMAT(1H0,'**DIMFILM WARNING**  ROUTINE ',A,' REFERENCED WI
+     1TH INVALID PARAMETER ',I3,'; CALL IGNORED')
+      GO TO 2
+      END
+C
+C----------------------------------------------
+C

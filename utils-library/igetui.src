@@ -1,0 +1,16 @@
+          IDENT IGETUI
+          ENTRY IGETUI
+*
+* INTEGER FUNCTION IGETUI()
+*-------------------------------------------------(NOS I/F)-------------
+*    OBTAIN THE USER INDEX.
+*-----------------------------------------------------------------------
+*
+ IGETUI   BSS    1           JUMP WHENCE WE CAME
+          GETPFP RESULT      MACRO. GET PF INFO. USER INDEX IS BOTTOM 18
+          SA5    RESULT+2    LOAD 3RD WORD OF RESULT INTO X5 (A LOAD IN
+          MX2    -18D        MASK IN X2 WITH BOTTOM 18 BITS 0, REST 1.
+          BX6    -X2*X5      X6 = (.NOT. X2) .AND. X5.
+          EQ     IGETUI      RETURN
+ RESULT   BSS    3           MACRO RESULT BUFFER
+          END

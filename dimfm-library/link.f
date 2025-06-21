@@ -1,0 +1,24 @@
+      SUBROUTINE LINK(X,Y,N1)
+      REAL X(N1), Y(N1)
+      LOGICAL OUT
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      INCLUDE 'dfxcd0.cmn'
+      INCLUDE 'dfxcd0s.cmn'
+      ROUTIN = 'LINK'
+      CALL DFX503(.TRUE.,X,Y,N1,OUT)
+      IF (.NOT.OUT) GO TO 99
+      IF (ICHECK.EQ.2) WRITE(ERRREC,20) ROUTIN
+      CALL DFX130(1)
+   20 FORMAT(1H0,'**DIMFILM WARNING**  OUT OF BOUNDS DETECTED DURING CAL
+     1L OF ',A)
+   99 CONTINUE
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

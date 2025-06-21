@@ -1,0 +1,106 @@
+DOC
+ASCII
+*NOSEQ
+PLPROCS P^R^O^C^E^D^U^R^E^S D^O^C^U^M^E^N^T^A^T^I^O^N
+================================
+
+I^N^T^R^O^D^U^C^T^I^O^N
+------------
+
+PLPROCS ^C^O^N^T^A^I^N^S ^T^H^E ^S^O^U^R^C^E ^O^F ^P^R^O^C^E^D^U^R^E^S ^T^H^A^T ^S^I^M^P^L^I^F^Y ^T^H^E ^U^S^E ^O^F
+CDC NOS 2.8.7 ^F^O^R ^S^M^A^L^L ^S^C^A^L^E ^S^O^F^T^W^A^R^E ^D^E^V^E^L^O^P^M^E^N^T ^A^N^D ^G^E^N^E^R^A^L ^U^S^A^G^E.
+
+I^N^S^T^E^A^D ^O^F ^A ^H^I^E^R^A^C^H^Y ^O^F ^D^I^R^E^C^T^O^R^I^E^S, ^O^F^T^E^N ^C^O^N^T^A^I^N^I^N^G ^V^E^R^Y ^L^A^R^G^E
+^N^U^M^B^E^R^S ^O^F ^F^I^L^E^S, NOS ^O^F^F^E^R^S *^L^I^B^R^A^R^I^E^S* ^A^S ^A ^M^E^T^H^O^D ^O^F ^O^R^G^A^N^I^S^I^N^G
+^P^R^O^G^R^A^M ^S^O^U^R^C^E, ^B^I^N^A^R^I^E^S ^A^N^D ^D^A^T^A.
+
+T^H^E *^P^R^O^G^R^A^M ^L^I^B^R^A^R^Y* ^I^S ^T^H^E ^W^A^Y ^S^O^U^R^C^E ^C^O^D^E, ^D^O^C^U^M^E^N^T^A^T^I^O^N ^A^N^D ^O^T^H^E^R
+^T^E^X^T ^D^O^C^U^M^E^N^T^S ^A^R^E ^I^N^T^E^N^D^E^D ^T^O ^B^E ^S^T^O^R^E^D. T^H^E^S^E ^C^O^N^T^A^I^N ^A^N^Y ^N^U^M^B^E^R ^O^F
+^N^A^M^E^D *^M^O^D^U^L^E^S* ^O^R *^D^E^C^K^S*, ^W^I^T^H ^E^I^T^H^E^R ^T^R^A^D^I^T^I^O^N^A^L 6 ^B^I^T ^C^H^A^R^A^C^T^E^R^S,
+^O^R ^W^I^T^H ^T^H^E ^F^U^L^L 7 ^B^I^T ASCII ^C^H^A^R^A^C^T^E^R ^S^E^T. M^O^D^U^L^E^S ^M^A^R^K^E^D ^A^S *^C^O^M^M^O^N
+^D^E^C^K^S* ^C^A^N ^B^E "^I^N^C^L^U^D^E^D" ^I^N ^O^T^H^E^R ^M^O^D^U^L^E^S, ^A^N^D ^T^H^E^R^E ^I^S ^O^T^H^E^R
+"^P^R^E-^P^R^O^C^E^S^S^O^R" ^F^U^N^C^T^I^O^N^A^L^I^T^Y ^P^E^R^M^I^T^T^I^N^G ^C^O^N^D^I^T^I^O^N^A^L ^C^O^M^P^I^L^A^T^I^O^N ^O^R
+^I^N^C^L^U^S^I^O^N. T^H^E ^T^O^O^L ^U^S^E^D ^T^O ^C^R^E^A^T^E ^A^N^D ^M^A^I^N^T^A^I^N ^P^R^O^G^R^A^M ^L^I^B^R^A^R^I^E^S ^I^S
+^C^A^L^L^E^D $MODIFY$. T^H^I^S ^P^R^O^G^R^A^M ^A^L^S^O ^S^U^P^P^L^I^E^S ^S^O^U^R^C^E ^L^I^N^E ^E^D^I^T^I^N^G ^A^N^D
+^S^O^U^R^C^E ^C^O^D^E ^C^O^N^T^R^O^L ^F^U^N^C^T^I^O^N^A^L^I^T^Y, ^B^U^T ^T^H^E^S^E ^A^S^P^E^C^T^S ^A^R^E ^D^I^F^F^I^C^U^L^T ^T^O
+^U^S^E ^I^N ^A ^M^O^D^E^R^N ^C^O^N^T^E^X^T ^W^I^T^H^O^U^T ^A^D^D^I^T^I^O^N^A^L ^S^U^P^P^O^R^T ^P^R^O^G^R^A^M^S.
+
+T^H^E *^L^I^B^R^A^R^Y* ^I^S ^T^H^E ^W^A^Y "^B^I^N^A^R^Y ^C^O^D^E ^L^I^B^R^A^R^I^E^S" ^B^U^I^L^T ^F^R^O^M ^C^O^M^P^I^L^E^R
+^O^U^T^P^U^T *^A^N^D* ^G^R^O^U^P^S ^O^F ^E^X^E^C^U^T^A^B^L^E ^P^R^O^G^R^A^M^S ^C^A^N ^B^E ^O^R^G^A^N^I^Z^E^D. I^N
+^A^D^D^I^T^I^O^N, *^P^R^O^C^E^D^U^R^E^S* ^I^N C^Y^B^E^R C^O^N^T^R^O^L L^A^N^G^U^A^G^E ^C^A^N ^A^L^S^O ^B^E ^S^T^O^R^E^D ^I^N
+^T^H^E^S^E ^L^I^B^R^A^R^I^E^S. O^N^E ^O^R ^M^O^R^E ^G^I^V^E^N ^L^I^B^R^A^R^I^E^S ^C^A^N ^B^E ^A^D^D^E^D ^T^O ^A *^G^L^O^B^A^L
+^L^I^B^R^A^R^Y ^S^E^T*. A^N^Y ^P^R^O^G^R^A^M^S ^A^N^D ^P^R^O^C^E^D^U^R^E^S ^I^N ^L^I^B^R^A^R^I^E^S ^I^N ^T^H^E ^G^L^O^B^A^L
+^L^I^B^R^A^R^Y ^S^E^T ^C^A^N ^B^E ^R^U^N ^B^Y ^N^A^M^E (^A^K^I^N ^T^O ^P^U^T^T^I^N^G ^T^H^E ^O^N "^T^H^E ^P^A^T^H" ^I^N
+^T^O^D^A^Y'^S ^M^A^I^N^S^T^R^E^A^M ^S^Y^S^T^E^M^S). *L^O^C^A^L ^L^I^B^R^A^R^Y ^S^E^T^S*, ^U^S^U^A^L^L^Y ^C^O^N^T^A^I^N^I^N^G
+"^O^B^J^E^C^T ^C^O^D^E ^L^I^B^R^A^R^I^E^S" (REL ^M^O^D^U^L^E^S ^I^N NOS ^T^E^R^M^I^N^O^L^O^G^Y, ^A^S ^O^P^P^O^S^E^D
+^T^O ^T^H^E ABS ^M^O^D^U^L^E^S ^O^F ^E^X^E^C^U^T^A^B^L^E ^P^R^O^G^R^A^M^S) ^C^A^N ^B^E ^U^S^E^D ^W^I^T^H ^T^H^E C^Y^B^E^R
+L^O^A^D^E^R (^L^I^N^K^E^R) ^I^N ^A ^F^A^M^I^L^I^A^R ^W^A^Y. T^H^E^S^E ^L^I^B^R^A^R^I^E^S ^A^R^E ^C^R^E^A^T^E^D ^A^N^D
+^M^A^I^N^T^A^I^N^E^D ^W^I^T^H ^T^H^E $LIBGEN$ ^A^N^D $LIBRARY$ ^T^O^O^L^S.
+
+A^L^T^H^O^U^G^H ^V^E^R^Y ^C^A^P^A^B^L^E ^A^N^D ^E^F^F^I^C^I^E^N^T, ^U^S^I^N^G ^T^H^E $MODIFY$, $LIBGEN$,
+$LIBRARY$ ^A^N^D ^R^E^L^A^T^E^D ^T^O^O^L^S ^I^N ^A ^M^O^D^E^R^N ^S^E^T^T^I^N^G (^P^A^R^T^I^C^U^L^A^R^L^Y ^W^H^E^R^E
+^W^H^O^L^E ^S^O^U^R^C^E ^C^O^D^E ^M^O^D^U^L^E^S ^A^R^E ^E^D^I^T^E^D ^A^T ^O^N^C^E ^I^N FSE ^A^N^D ^W^H^E^R^E
+^I^N^T^E^R^A^C^T^I^V^E ^W^O^R^K ^I^S ^D^O^M^I^N^A^N^T) ^C^A^N ^B^E ^M^A^D^E ^M^U^C^H ^M^O^R^E ^C^O^N^V^E^N^I^E^N^T ^W^I^T^H ^A
+^F^A^I^R^L^Y ^S^M^A^L^L ^S^E^T ^O^F CCL ^P^R^O^C^E^D^U^R^E^S.
+
+M^O^S^T ^O^F ^T^H^I^S ^L^I^B^R^A^R^Y ^I^S ^S^U^C^H ^A ^S^E^T ^O^F ^P^R^O^C^E^D^U^R^E^S.
+
++ $MOD^X^X^X$ ^P^R^O^C^E^D^U^R^E^S ^A^R^E ^F^O^R ^S^O^U^R^C^E ^C^O^D^E ^A^N^D ^T^E^X^T ^M^O^D^U^L^E ^M^A^I^N^T^E^N^A^N^C^E
+  ^U^S^I^N^G ^P^R^O^G^R^A^M ^L^I^B^R^A^R^I^E^S.
++ $LIB^X^X^X$ ^P^R^O^C^E^D^U^R^E^S ^A^R^E ^F^O^R ^B^I^N^A^R^Y ^P^R^O^G^R^A^M ^A^N^D CCL ^P^R^O^C^E^D^U^R^E ^M^O^D^U^L^E
+  ^L^I^B^R^A^R^I^E^S.
++ $TLB^X^X^X$ ^P^R^O^C^E^D^U^R^E^S ^W^E^R^E ^I^N^T^E^N^D^E^D ^T^O ^M^A^I^N^T^A^I^N ^T^E^X^T ^L^I^B^R^A^R^I^E^S, ^B^U^T
+  ^T^H^E^S^E ^S^E^E^M ^R^E^D^U^N^D^A^N^T ^A^N^D ^A^R^E ^P^R^O^B^A^B^L^Y ^A ^F^A^I^L^E^D ^E^X^E^R^I^M^E^N^T ^A^T ^T^H^I^S
+  ^P^O^I^N^T.
++ $FTNSYS$ ^A^N^D $LINKPGM$ ^A^R^E ^S^I^M^P^L^I^F^I^E^D ^W^A^Y^S ^O^F ^C^O^M^P^I^L^I^N^G FTN5 ^P^R^O^G^R^A^M^S
+  ^A^N^D ^C^R^E^A^T^I^N^G ^E^X^E^C^U^T^A^B^L^E ^B^I^N^A^R^I^E^S.
++ $WPUT$ ^C^O^P^I^E^S ^F^I^L^E^S ^T^O ^T^H^E ^L^O^C^A^L NOS ^W^E^B ^S^I^T^E ^A^N^D ^S^H^O^U^L^D ^B^E ^U^S^E^D ^F^O^R
+  HTML ^F^I^L^E^S ^T^O ^B^E ^S^E^R^V^E^D ^U^P ^B^Y K^E^V^I^N J^O^R^D^A^N'^S NOS ^W^E^B ^S^E^R^V^E^R.
++ $INSTALL$ ^P^U^T^S ^B^I^N^A^R^Y ^E^X^E^C^U^T^A^B^L^E^S ^I^N^T^O ^A *^U^S^E^R ^L^I^B^R^A^R^Y* ^M^A^I^N^T^A^I^N^E^D
+  ^A^S ^A ^D^I^R^E^C^T ^A^C^C^E^S^S ^F^I^L^E ^A^N^D ^I^N^S^E^R^T^E^D ^A^S ^A ^M^E^M^B^E^R ^O^F ^T^H^E ^G^L^O^B^A^L
+  ^L^I^B^R^A^R^Y ^S^E^T.
++ T^H^E ^O^T^H^E^R ^P^R^O^C^E^D^U^R^E^S ^P^R^O^V^I^D^E ^A ^V^A^R^I^E^T^Y ^O^F ^C^O^N^V^E^N^I^E^N^T ^F^U^N^C^T^I^O^N^A^L^I^T^Y.
+
+T^O ^I^N^S^T^A^L^L ^T^H^I^S ^P^R^O^C^E^D^U^R^E^S ^L^I^B^R^A^R^Y ^F^R^O^M ^A $RECLAIM$ ^T^A^P^E ($VSN=PLPROC$)
+^O^N ^A^N ^E^M^P^T^Y ^M^A^C^H^I^N^E, ^U^S^E ^T^H^E ^F^O^L^L^O^W^I^N^G ^C^O^M^M^A^N^D^S@D
+    ^L^T 13,0,1,^R,^T^A^P^E^S/^P^L^P^R^O^C^S.^T^A^P (^I^N D^TC^Y^B^E^R ^O^P^E^R^A^T^O^R ^W^I^N^D^O^W)
+    RECLAIM,DB=0,Z./LIST.
+    RECLAIM,DB=0,Z./LOAD,TN=PLPROC,PF=PLPROCS,FI=^N.
+    GET,PLPROCS.
+    MODIFY,P=PLPROCS,C=BUILD,L=0,S=0,Z./*EDIT BUILD
+    BEGIN,BUILD,BUILD.
+    LIBRARY,USERLIB.
+    ^U^T 13,0,1 (^I^N D^TC^Y^B^E^R ^O^P^E^R^A^T^O^R ^W^I^N^D^O^W)
+
+N^O^T^E ^T^H^A^T ^T^H^E $^N$, ^A^B^O^V^E, ^S^H^O^U^L^D ^B^E ^T^H^E ^H^I^G^H^E^S^T $FI$ ^N^U^M^B^E^R ^S^H^O^W^N ^I^N ^T^H^E
+$RECLAIM$ $/LIST$ ^O^U^T^P^U^T, ^A^S ^T^H^I^S ^W^I^L^L ^B^E ^T^H^E ^L^A^T^E^S^T ^V^E^R^S^I^O^N ^O^N ^T^H^E
+^T^A^P^E.
+
+O^N^C^E ^T^H^E ^L^I^B^R^A^R^Y ^I^S ^I^N^S^T^A^L^L^E^D ^A^N^D ^I^N ^T^H^E ^G^L^O^B^A^L ^L^I^B^R^A^R^Y ^S^E^T (^A^S ^I^T ^W^I^L^L
+^B^E ^A^F^T^E^R ^T^H^E ^A^B^O^V^E), ^I^T ^C^A^N ^B^E ^R^E^B^U^I^L^T ^A^F^T^E^R ^C^H^A^N^G^E^S ^U^S^I^N^G ^O^N^L^Y@D
+    MODEXEC,BUILD,PLPROCS.
+
+T^H^I^S ^D^O^C^U^M^E^N^T^A^T^I^O^N ^C^A^N ^B^E ^R^E^B^U^I^L^T ^A^N^D ^U^P^L^O^A^D^E^D ^T^O ^T^H^E ^L^O^C^A^L ^W^E^B ^S^I^T^E
+^U^S^I^N^G@D
+    MODEXEC,BUILD,PLPROCS,ARG=DOC.
+
+H^O^W^E^V^E^R, ^T^H^I^S ^R^E^Q^U^I^R^E^S ^T^H^E $DOCPROC$ ^A^N^D $PMDHTML$ ^P^R^O^G^R^A^M^S ^W^H^I^C^H ^A^R^E
+^T^O ^B^E ^F^O^U^N^D ^I^N ^T^H^E $PLUTILS$ ^A^N^D $PLMDHTM$ ^P^R^O^G^R^A^M ^L^I^B^R^A^R^I^E^S. T^H^E^S^E
+^M^U^S^T ^B^E ^I^N^S^T^A^L^L^E^D ^F^R^O^M $RECLAIM$ ^T^A^P^E^S ^A^N^D ^B^U^I^L^T ^U^S^I^N^G@D
+    ^L^T 13,0,1,^R,^T^A^P^E^S/^P^L^U^T^I^L^S.^T^A^P (^I^N D^TC^Y^B^E^R ^O^P^E^R^A^T^O^R ^W^I^N^D^O^W)
+    RECLAIM,DB=0,Z./LIST.
+    RECLAIM,DB=0,Z./LOAD,TN=PLUTIL,PF=PLUTILS,FI=^N.
+    MODEXEC,BUILD,PLUTILS.
+    ^U^T 13,0,1 (^I^N D^TC^Y^B^E^R ^O^P^E^R^A^T^O^R ^W^I^N^D^O^W)
+    ^L^T 13,0,1,^R,^T^A^P^E^S/^P^L^M^D^H^T^M.^T^A^P (^I^N D^TC^Y^B^E^R ^O^P^E^R^A^T^O^R ^W^I^N^D^O^W)
+    RECLAIM,DB=0,Z./LIST.
+    RECLAIM,DB=0,Z./LOAD,TN=PLMDHT,PF=PLMDHTM,FI=^N.
+    MODEXEC,BUILD,PLMDHTM.
+    ^U^T 13,0,1 (^I^N D^TC^Y^B^E^R ^O^P^E^R^A^T^O^R ^W^I^N^D^O^W)
+
+T^H^I^S ^I^L^L^U^S^T^R^A^T^E^S ^T^H^E ^O^V^E^R^A^L^L ^P^L^A^N ^F^O^R ^U^S^I^N^G ^T^H^E^S^E ^P^R^O^C^E^D^U^R^E^S ^F^O^R ^S^M^A^L^L
+^S^C^A^L^E ^S^O^F^T^W^A^R^E ^D^E^V^E^L^O^P^M^E^N^T@D "^O^N^E ^P^R^O^J^E^C^T, ^O^N^E ^P^R^O^G^R^A^M ^L^I^B^R^A^R^Y, ^O^N^E
+$RECLAIM$ ^T^A^P^E".
+
+P^R^O^C^E^D^U^R^E U^S^A^G^E
+===============

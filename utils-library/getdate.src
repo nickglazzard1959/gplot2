@@ -1,0 +1,17 @@
+          IDENT GETDATE
+          ENTRY GETDATE
+*
+* SUBROUTINE GETDATE( CHARACTER*10 DATE )
+*----------------------------------------------------(NOS I/F)----------
+*   GET THE CURRENT DATE IN STD FORM.
+*-----------------------------------------------------------------------
+*
+ GETDATE  BSS    1            JUMP WHENCE WE CAME
+          SX0    X1           X0 = &DATE
+          DATE   RESULT       MACRO. GET A 10 CHARACTER DATE.
+          SA5    RESULT       X5 = *RESULT
+          BX6    X5           X6 = *RESULT
+          SA6    X0           *DATE = RESULT
+          EQ     GETDATE      RETURN
+ RESULT   BSS    1            MACRO RESULT BUFFER.
+          END

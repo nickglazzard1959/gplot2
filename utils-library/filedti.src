@@ -1,0 +1,31 @@
+          IDENT  FILEDTI
+          ENTRY  FILEDTI
+*
+* INTEGER FUNCTION FILEDTI( BOOLEAN BNAME, CHARACTER*2 DT )
+*-------------------------------------------------------(NOS I/F)-------
+*   RETURN THE DEVICE TYPE OF A FILE.
+*-----------------------------------------------------------------------
+*
+ FILEDTI  BSS    1           ENTRY.
+          SB4    A1+1
+          SA1    X1          X1 = BNAME
+          MX2    42          X2 = 1S 59 TO 18, 02 17 TO 0
+          BX7    X2*X1       X7 = NAME 59 TO 18
+          SX2    5           X2 = 5 = REQ BLK LEN
+          SB2    12          B2 = SHIFT FOR REQ BLK LEN
+          LX2    B2,X2       X2 = 5 << 12
+          SX0    1           X0 = 1
+          BX7    X7+X2       X7 = NAME, REQ BLK LEN
+          BX7    X7+X0       X7 = NAME, REQ BLK LEN, C
+          SA7    REQBLK      REQBLK[0] = NAME, REQ BLK LEN, C
+          FILINFO REQBLK     MACRO.
+          SB2    1           B2 = OFFSET TO DT.
+          SA3    B2+REQBLK   X3 = DT, STATUS, FT
+          MX4    12          X4 = 59 TO 48 1S
+          BX3    X4*X3       X3 = X3 .AND. 07777
+          BX6    X3          RESULT = X3
+          SA5    B4          X5 = ADDRESS(DT)
+          SA6    X5          DT = RESULT
+          EQ     FILEDTI     RETURN
+ REQBLK   BSS    5           REQUEST BLOCK SPACE
+          END

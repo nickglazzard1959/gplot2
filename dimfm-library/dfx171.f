@@ -1,0 +1,26 @@
+      SUBROUTINE DFX171
+C    USED TO SET UP PSEUDO-CELL ARRAY FOR CELL LINES
+      LOGICAL IN
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      INCLUDE 'dfxc24.cmn'
+      INCLUDE 'dfxcp0.cmn'
+      INCLUDE 'dfxcbb.cmn'
+      LOGICAL DFX103
+      RSTERR =  0
+      IF (RASTDX.EQ.0) GO TO 10
+      CALL DFX170(RASTPX,RASTPY,RASTQX,RASTQY,RSTERR)
+   99 RETURN
+   10 IF (ICHECK.GT.0) WRITE(ERRREC,11) ROUTIN
+      CALL DFX130(0)
+   11 FORMAT(1H0,'**DIMFILM WARNING** ',A,' REFERENCED WITH INVALID OR U
+     1NDEFINED CELMAP'/
+     2 1H0,21X,'THIS AND SUBSEQUENT CELL SCANS WILL BE IGNORED')
+      RSTERR = 3
+      GO TO 99
+      END
+C
+C----------------------------------------------
+C

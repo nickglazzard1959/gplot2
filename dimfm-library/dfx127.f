@@ -1,0 +1,11 @@
+      SUBROUTINE DFX127
+C
+C    **EXTERNAL LIBRARY FLUSH TO DEVICE FUNCTION**
+C             (IN PLACE OF IMM ACTION)
+C
+      CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      RETURN
+      END
+C
+C----------------------------------------------
+C

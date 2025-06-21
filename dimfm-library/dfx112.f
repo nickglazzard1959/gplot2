@@ -1,0 +1,17 @@
+      SUBROUTINE DFX112(IGROUP,JGROUP)
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      IF (IGROUP.LT.1.OR.IGROUP.GT.4) GO TO 20
+      ANGRP(IGROUP) = JGROUP
+      RETURN
+   20 IF (ICHECK.GT.0) WRITE(ERRREC,10) ROUTIN,IGROUP
+      CALL DFX130(0)
+   10 FORMAT(1H0,'**DIMFILM WARNING**  ROUTINE ',A,' REFERENCED WITH INV
+     1ALID PARAMETER ',I3,' - CALL IGNORED')
+      RETURN
+      END
+C
+C----------------------------------------------
+C

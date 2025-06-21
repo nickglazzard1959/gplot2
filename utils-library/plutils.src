@@ -1,0 +1,50 @@
+======================================
+
+T^H^I^S ^P^R^O^G^R^A^M ^L^I^B^R^A^R^Y ^C^O^N^T^A^I^N^S ^T^H^E ^S^O^U^R^C
+^T^H^A^T ^P^R^O^V^I^D^E^S ^S^O^M^E ^S^T^R^I^N^G ^H^A^N^D^L^I^N^G ^A^N^D
+^N^U^M^B^E^R ^O^F ^P^R^O^G^R^A^M^S ^T^H^A^T ^U^S^E ^T^H^E^S^E ^F^U^N^C^T
+
+S^I^M^P^L^E ^U^T^I^L^I^T^Y ^P^R^O^G^R^A^M^S
+-----------------------
+
++ D^A^T^E
+    DATE
+  T^H^I^S ^S^I^M^P^L^Y ^P^R^I^N^T^S ^T^H^E ^C^U^R^R^E^N^T ^D^A^T^E ^A^N^
+  F^O^R ^E^X^A^M^P^L^E@D
+    22/06/07.  18.02.11.
++ U^P^T^I^M^E
+    UPTIME
+  T^H^I^S ^D^I^S^P^L^A^Y^S ^H^O^W ^L^O^N^G ^S^I^N^C^E ^S^Y^S^T^E^M ^D^E^
+  ^S^E^C^O^N^D^S. F^O^R ^E^X^A^M^P^L^E@D
+    UPTIME =  22 DAYS 23 HOURS 16 MINS  3.173 SECS
++ W^H^O^A^M^I
+    WHOAMI
+  T^H^I^S ^D^I^S^P^L^A^Y^S ^T^H^E ^N^A^M^E, ^U^S^E^R ^I^D ^H^A^S^H ^A^N^
+    NICK 000036 AAHQ    AAKV
+
+
+URN^E^T ^U^T^I^L^I^T^Y ^P^R^O^G^R^A^M^S
+----------------------
+
+T^H^E^S^E ^P^R^O^G^R^A^M^S ^A^R^E ^O^N^L^Y ^U^S^E^F^U^L ^W^H^E^N ^R^U^N^
+^S^U^P^P^O^R^T^S "U^N^I^T R^E^C^O^R^D N^E^T^W^O^R^K", ^A^L^O^N^G ^W^I^T^
+^S^C^R^I^P^T^S ^T^H^A^T ^G^O ^A^L^O^N^G ^W^I^T^H ^T^H^A^T. S^E^E ^T^H^E
+^I^N^F^O^R^M^A^T^I^O^N.
+
++ D^E^C^O^D^E ^F^I^L^E
+    DECFL,I=^I^N^F^I^L^E,O=^O^U^T^F^I^L^E.
+  T^H^I^S ^D^E^C^O^D^E^S ^T^H^E ^H^E^X^A^D^E^C^I^M^A^L ^E^N^C^O^D^E^D ^T
+  ^B^I^N^A^R^Y ^F^I^L^E, $^O^U^T^F^I^L^E$. I^T ^I^S ^N^O^R^M^A^L^L^Y ^R^
+  ^U^S^E^D ^F^O^R ^F^I^L^E ^T^R^A^N^S^F^E^R^S ^T^O ^T^H^E ^L^O^C^A^L ^M^
++ E^N^C^O^D^E ^F^I^L^E
+    ENCFL,I=^I^N^F^I^L^E,O=^O^U^T^F^I^L^E,T=^T^Y^P^E,R=^R^O^U^T^E.
+  T^H^I^S ^E^N^C^O^D^E^S ^A ^T^E^X^T ^O^R ^B^I^N^A^R^Y ^F^I^L^E, $^I^N^F
+  ^T^E^X^T ^F^I^L^E, $^O^U^T^F^I^L^E$. T^H^E $^T^Y^P^E$ ^A^R^G^U^M^E^N^T
+  $BINARY$ ^O^R $GUESS$, ^A^N^D ^I^S ^T^H^E ^T^Y^P^E ^O^F ^D^A^T^A ^I^N
+  ^A^R^G^U^M^E^N^T ^I^S ^A ^S^T^R^I^N^G ^D^E^C^O^D^E^D ^B^Y URN^E^T ^H^E
+  D^TC^Y^B^E^R ^H^O^S^T ^M^A^C^H^I^N^E ^A^N^D ^A^L^L^O^W^S ^T^H^E ^F^I^L
+  ^M^O^D^E^R^N ^H^O^S^T ^M^A^C^H^I^N^E ^O^N ^T^H^E LAN ^O^R ^T^O ^A^N^O^
+
+
+LBUTILS L^I^B^R^A^R^Y
+===============

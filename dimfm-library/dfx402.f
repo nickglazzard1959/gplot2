@@ -1,0 +1,137 @@
+      SUBROUTINE DFX402(XX,YY)
+      LOGICAL DFX405
+      LOGICAL ITIME,IPNT
+      INCLUDE 'dfxc11.cmn'
+      INCLUDE 'dfxc15.cmn'
+      LOGICAL CAP
+      LOGICAL DOCAP
+      DATA ITIME/.FALSE./
+      DATA NLIM/15/
+      IF (FIRST) CAP = .FALSE.
+      X = XX*FX
+      Y = YY*FY
+      DOCAP = .FALSE.
+      IF (A1.LT.0.) GO TO 22
+      IF (DHT.GT.A1) GO TO 1
+   22 N2 = N2 - 1
+      IF (LAST.AND..NOT.CAP) GO TO 10
+      IF (N2.GT.0) GO TO 2
+   10 DOCAP = .TRUE.
+      GO TO 2
+    1 IF (FIRST) GO TO 3
+      IF ((N2-3-N).LE.0) GO TO 2
+    3 N2 = N2 - 1
+    2 IF (.NOT.FIRST) GO TO 4
+      CALL DFX110(X,Y)
+      IF (.NOT.INTERP) RETURN
+      IPNT = .TRUE.
+      XP = X
+      XHOLD = X
+      YP = Y
+      YHOLD = Y
+      GO TO 5
+    4 IF (INTERP) GO TO 6
+      CALL DFX106(X,Y)
+      IF (.NOT.CLAB) RETURN
+      IF (.NOT.DOCAP) RETURN
+      X1 = X
+      Y1 = Y
+      GO TO 7
+    6 D2 = (X-XHOLD)**2 + (Y-YHOLD)**2
+      XHOLD = X
+      YHOLD = Y
+C    SEPARATION OF CONTOUR POINTS MUST NOT BE TOO SMALL (EXCEPT FOR
+C    LAST POINT) FOR ROUTINE TO WORK
+      IF (D2.GT.PASS) GO TO 5
+      NPASS = NPASS + 1
+C    NPASS = 4 FOR A CLOSED CONTOUR IMPLIES A SPOT HEIGHT WHICH
+C    WILL BE LABELLED ACCORDINGLY
+      IF (NPASS.NE.4) GO TO 8
+      IF (.NOT.CLAB) RETURN
+      XVAL = X + Z1
+      YVAL = Y + Z2
+      IF (.NOT.DFX405(XVAL,YVAL)) RETURN
+      CALL DFX132(XT,YT)
+      CALL DFX110(XVAL,YVAL)
+      CALL DFX204(1,CHS,IDUMMY,IFMT)
+      CALL DFX110(XT,YT)
+      RETURN
+    8 IF (.NOT.LAST) RETURN
+      XC(3) = X
+      YC(3) = Y
+      ITIME = .TRUE.
+      GO TO 11
+    5 NPASS = 0
+      I = I + 1
+      IF (I.GT.3) GO TO 21
+      XC(I) = X
+      YC(I) = Y
+      GO TO 12
+C    INTERPOLATING POINTS MOVED FOR NEXT INTERPOLATION
+   21 XC(1) = XC(2)
+      YC(1) = YC(2)
+      XC(2) = XC(3)
+      YC(2) = YC(3)
+      XC(3) = X
+      YC(3) = Y
+   12 IF (I.LT.3) RETURN
+   11 IF (.NOT.ITIME) GO TO 13
+      ITIME = .FALSE.
+      GO TO 14
+   13 HOLDX = XC(1)
+      HOLDY = YC(1)
+      X2 = XC(2) - HOLDX
+      Y2 = YC(2) - HOLDY
+      X3 = XC(3) - HOLDX
+      Y3 = YC(3) - HOLDY
+      DD1 = SQRT(X2*X2 + Y2*Y2)
+      HOLDX = X3 - X2
+      HOLDY = Y3 - Y2
+      HOLDD = SQRT(HOLDX*HOLDX + HOLDY*HOLDY)
+      DD2 = DD1 + HOLDD
+      DR1 = 1./(DD1*DD2*HOLDD)
+      DD12 = DD1*DD1
+      DD22 = DD2*DD2
+      IF (.NOT.IPNT) GO TO 15
+      XS = (DD22*X2 - DD12*X3)*DR1
+      XS1 = XS
+      YS = (DD22*Y2 - DD12*Y3)*DR1
+      YS1 = YS
+      IPNT = .FALSE.
+      GO TO 16
+   15 XS1 = XS2
+      YS1 = YS2
+   16 DD1DD2 = 2.*DD1*DD2
+      XS2 = (DD12*X3 + DD22*X2 - DD1DD2*X2)*DR1
+      YS2 = (DD12*Y3 + DD22*Y2 - DD1DD2*Y2)*DR1
+      X1 = XC(1)
+      Y1 = YC(1)
+      IF (.NOT.DOCAP) GO TO 17
+      IF (.NOT.CLAB) GO TO 17
+    7 XVAL = X1 + Z1
+      YVAL = Y1 + Z2
+      IF (.NOT.DFX405(XVAL,YVAL)) GO TO 9
+      CALL DFX132(XT,YT)
+      CALL DFX110(XVAL,YVAL)
+      CALL DFX204(1,CHS,IDUMMY,IFMT)
+      N2 = NLIM
+      CAP = .TRUE.
+      CALL DFX110(XT,YT)
+    9 IF (.NOT.INTERP) RETURN
+   17 CALL DFX403(X2,Y2,DD1,XS1,YS1,XS2,YS2)
+   14 IF (.NOT.LAST.OR.OPEN) GO TO 20
+      XD = XC(3) - XC(2)
+      YD = YC(3) - YC(2)
+      DD1 = SQRT(XD*XD + YD*YD)
+      CALL DFX403(XD,YD,DD1,XS2,YS2,XS,YS)
+      RETURN
+   20 IF (LAST.AND.I.GT.2) CALL DFX403(HOLDX,HOLDY,HOLDD,XS2,YS2,
+     1  (DD1DD2*X3 - DD12*X3 - DD22*X2)*DR1,
+     2    (DD1DD2*Y3 - DD12*Y3 - DD22*Y2)*DR1)
+C    WHEN I < 3 AND THREE POINTS LIE ON EDGE CONTOUR IS NOT PLOTTED
+      IF (LAST.AND.I.GT.2.AND.NPASS.NE.0) CALL DFX106(XC(3),YC(3))
+      RETURN
+      END
+C
+C----------------------------------------------
+C

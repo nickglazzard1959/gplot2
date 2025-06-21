@@ -1,0 +1,13 @@
+      SUBROUTINE LDLUT0
+C     LOADS THE DIMFILM DEFAULT COLOUR LOOK UP TABLE - USER REFERENCE
+C
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'LDLUT0'
+      CALL DFX162
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

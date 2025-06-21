@@ -1,0 +1,22 @@
+      SUBROUTINE SYMANG(THETA)
+C    CODE DUPLICATED IN DFX215 (INTERNAL EQUIVALENT)
+      INCLUDE 'dfxc01.cmn'
+      INCLUDE 'dfxc01s.cmn'
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc03.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'SYMANG'
+C    ANGLS IS PERMANENTLY SAVED ANGLE - ANGL IS FOR CURRENT TRANSFORM
+      ANGLS = THETA*ANGCON(1,ANGRP(1))
+      ANGL = ANGLS
+      IF (.NOT.HS) ANGL = ANGL + ALPHA
+      CANGL = COS(ANGL)
+      SANGL = SIN(ANGL)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

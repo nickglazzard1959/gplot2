@@ -1,0 +1,304 @@
+      SUBROUTINE DFX336(X,Y,N1)
+      EXTERNAL DFX303
+      INTRINSIC ALOG10
+      INTEGER XTYPE1,YTYPE1
+      REAL X(N1),Y(N1),SAVE(4)
+      LOGICAL HSTEP,HSHADE
+      LOGICAL LAST
+      INCLUDE 'dfxc09.cmn'
+      REAL COEFF(6)
+      INCLUDE 'dfxc06.cmn'
+      INCLUDE 'dfxc02.cmn'
+      INCLUDE 'dfxc02s.cmn'
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      CHARACTER*1 KXY
+      CALL DFX300
+      OK = .FALSE.
+      ICSAVE = ICHECK
+      XTYPE1 = XTYPE
+      YTYPE1 = YTYPE
+      N = N1
+      IF (N.LT.2) GO TO 20
+      XD = XTB2 - XTB1
+      YD = YTB2 - YTB1
+      IF (XTYPE.EQ.4) GO TO 23
+      IF (FIXX) GO TO 1
+      XGL = X(1)
+      XGR = X(1)
+      DO 3 I=2,N
+      V = X(I)
+      IF (V.LT.XGL) XGL = V
+      IF (V.GT.XGR) XGR = V
+    3 CONTINUE
+      KXY = 'X'
+      IF (XGL.EQ.XGR) GO TO 32
+    1 IF (YTYPE.EQ.4) GO TO 28
+      IF (FIXY) GO TO 2
+      YGL = Y(1)
+      YGU = Y(1)
+      DO 4 I=2,N
+      V = Y(I)
+      IF (V.LT.YGL) YGL = V
+      IF (V.GT.YGU) YGU = V
+    4 CONTINUE
+      KXY = 'Y'
+      IF (YGL.EQ.YGU) GO TO 32
+    2 IF (XTYPE.NE.1.OR.YTYPE.NE.1) GO TO 40
+      IF (ICHECK.GT.1) ICHECK = -2
+      ICCS = ICHECK
+C    LINEAR-LINEAR
+      DDX = DC2*XD
+      DDY = DC2*YD
+      SAVE(1) = XTB1
+      SAVE(2) = XTB2
+      SAVE(3) = YTB1
+      SAVE(4) = YTB2
+      X1 = XTB1 + DDX
+      X2 = XTB2 - DDX
+      Y1 = YTB1 + DDY
+      Y2 = YTB2 - DDY
+      CALL DFX128(X1,X2,Y1,Y2)
+      S1 = (DC1*XD)/(XGR-XGL)
+      S2 = (DC1*YD)/(YGU-YGL)
+      OK = .TRUE.
+      XW1 = X1
+      XW2 = X2
+      YW1 = Y1
+      YW2 = Y2
+      XXGL = XGL
+      YYGL = YGL
+      SS1 = S1
+      SS2 = S2
+      XP = (X(1) - XGL)*S1 + X1
+      YP = (Y(1) - YGL)*S2 + Y1
+      CALL DFX110(XP,YP)
+      IF (NDEG.GT.0.OR.HIST.GT.-2.) GO TO 200
+      IF (INTNDG.GT.0) CALL DFX200(IICHAR)
+      INTEND = INTNDG
+      DO 60 I=2,N
+      XP = (X(I) - XGL)*S1 + X1
+      YP = (Y(I) - YGL)*S2 + Y1
+      IF (NDEG.EQ.0) THEN
+      CALL DFX124(XP,YP)
+      ELSE
+      CALL DFX110(XP,YP)
+      CALL DFX200(IICHAR)
+      ENDIF
+   60 CONTINUE
+  500 CALL DFX128(SAVE(1),SAVE(2),SAVE(3),SAVE(4))
+      GO TO 100
+  200 IF (HIST.GT.-2.) GO TO 300
+      IF (INTNDG.GT.0) CALL DFX200(IICHAR)
+C    HERE FOR POLYNOMIAL INTERPOLATION
+      I1 = 1
+      I2 = 1
+      I3 = NDEG + 1
+      LAST = .FALSE.
+      IF (I3.EQ.N) LAST = .TRUE.
+      IF = NDEG/2
+      STEP = FLOAT(IXSTEP)
+      LIM = IXSTEP - 1
+      ICHECK = ICSAVE
+      CALL DFX150(NDEG,X,Y,COEFF,ISING)
+      ICHECK = ICCS
+      IF (ISING.NE.0) GO TO 500
+  202 XONE = X(I2)
+      XTWO = X(I2+1)
+      XD = (XTWO - XONE)/STEP
+      DO 201 I=1,LIM
+      XONE = XONE + XD
+      CALL DFX151(NDEG,XONE,YVAL,COEFF)
+      XP = (XONE - XGL)*S1 + X1
+      YP = (YVAL - YGL)*S2 + Y1
+  201 CALL DFX106(XP,YP)
+      XP = (XTWO - XGL)*S1 + X1
+      YP = (Y(I2+1) - YGL)*S2 + Y1
+      INTEND = INTNDG
+      CALL DFX124(XP,YP)
+      INTNDG = INTEND
+      INTEND = -1
+      I2 = I2 + 1
+      IF (.NOT.LAST) GO TO 206
+      IF (I2.EQ.N) GO TO 500
+      IF (I3.EQ.N) GO TO 202
+  206 IF (I2.LE.IF) GO TO 202
+  205 I1 = I1 + 1
+      I3 = I3 + 1
+      ICHECK = ICSAVE
+      CALL DFX150(NDEG,X(I1),Y(I1),COEFF,ISING)
+      ICHECK = ICCS
+      IF (ISING.NE.0) GO TO 500
+      XONE = X(I2)
+      XTWO = X(I2+1)
+      XD = (XTWO - XONE)/STEP
+      DO 204 I=1,LIM
+      XONE = XONE + XD
+      CALL DFX151(NDEG,XONE,YVAL,COEFF)
+      XP = (XONE - XGL)*S1 + X1
+      YP = (YVAL - YGL)*S2 + Y1
+  204 CALL DFX106(XP,YP)
+      XP = (XTWO - XGL)*S1 + X1
+      YP = (Y(I2+1) - YGL)*S2 + Y1
+      INTEND = INTNDG
+      CALL DFX124(XP,YP)
+      INTNDG = INTEND
+      INTEND = -1
+      I2 = I2 + 1
+      IF (I3.LT.N) GO TO 205
+      LAST = .TRUE.
+      GO TO 202
+  300 YL = AMIN1(YGL,YGU)
+      YU = AMAX1(YGL,YGU)
+      IF (YAT.GT.YL.AND.YAT.LT.YU) YL = YAT
+      HSTEP = IABS(IHIST).EQ.2
+      HSHADE = IABS(IHIST).EQ.3
+      IF (HIST.GE.-.5) GO TO 301
+      DIFF = .5*(X(2) - X(1))
+      XL = X(1) - DIFF
+      XP = (XL - XGL)*S1 + X1
+      YP = (YL - YGL)*S2 + Y1
+      CALL DFX110(XP,YP)
+      YA = Y(1)
+      YPP = (YA - YGL)*S2 + Y1
+      IF (IHIST.LT.0.AND.(XP.LE.X1.OR.XP.GE.X2)) CALL DFX110(XP,YPP)
+      CALL DFX106(XP,YPP)
+      XL = X(1) + DIFF
+      XPP = (XL - XGL)*S1 + X1
+      CALL DFX106(XPP,YPP)
+      I = 2
+  302 YB = Y(I)
+      IF (HSTEP) YL = YB
+      IF (HSHADE) CALL DFX316(XP,XPP,YP,YPP)
+      XP = XPP
+      YC = AMAX1(YA,YB,YL)
+      YD = AMIN1(YA,YB,YL)
+      YPP = (YC - YGL)*S2 + Y1
+      CALL DFX110(XPP,YPP)
+      YPP = (YD - YGL)*S2 + Y1
+      IF (IHIST.LT.0.AND.(XPP.LE.X1.OR.XPP.GE.X2)) CALL DFX110(XPP,YPP)
+      CALL DFX106(XPP,YPP)
+      YPP = (YB - YGL)*S2 + Y1
+      CALL DFX110(XPP,YPP)
+      IF (I.EQ.N) GO TO 303
+      DIFF1 = DIFF
+      DIFF = .5*(X(I+1) - X(I))
+      DIFF1 = DIFF1 + DIFF
+      XL = XL + DIFF1
+      XPP = (XL - XGL)*S1 + X1
+      CALL DFX106(XPP,YPP)
+      YA = YB
+      I = I + 1
+      GO TO 302
+  303 XL = X(N) + DIFF
+      XP = (XL - XGL)*S1 + X1
+      CALL DFX106(XP,YPP)
+      IF (IHIST.LT.0.AND.(XP.LE.X1.OR.XP.GE.X2)) CALL DFX110(XP,YP)
+      CALL DFX106(XP,YP)
+      IF (HSHADE) CALL DFX316(XPP,XP,YP,YPP)
+      GO TO 500
+C    HERE FOR SPECIFIED WIDTH
+  301 DIFF = .5*HIST
+      YL = (YL - YGL)*S2 + Y1
+      DO 304 I=1,N
+      XA = X(I) - DIFF
+      YA = Y(I)
+      XP = (XA - XGL)*S1 + X1
+      XPP = XP
+      YP = (YA - YGL)*S2 + Y1
+      CALL DFX110(XP,YL)
+      IF (IHIST.LT.0.AND.(XP.LE.X1.OR.XP.GE.X2)) CALL DFX110(XP,YP)
+      CALL DFX106(XP,YP)
+      IF (DIFF.LE.0.) GO TO 304
+      XA = X(I) + DIFF
+      XP = (XA - XGL)*S1 + X1
+      CALL DFX106(XP,YP)
+      IF (IHIST.LT.0.AND.(XP.LE.X1.OR.XP.GE.X2)) CALL DFX110(XP,YL)
+      CALL DFX106(XP,YL)
+      IF (HSHADE) CALL DFX316(XPP,XP,YL,YP)
+  304 CONTINUE
+      GO TO 500
+   28 Q1 = YGL
+      Q2 = YGU
+      YGL = 0.0
+      GAP = YMONTH - AINT(YMONTH)
+      ADD = GAP
+      MONZ = MONY
+      IF (MONZ.LE.0) MONZ = N
+      IF (MONY.LE.0) MONY = -MONZ
+      IF (GAP.LE.0.0) MONZ = MONZ - 1
+      YGU = FLOAT(MONZ)
+      IF (MONY.GT.0) GO TO 30
+      DO 24 I=1,N
+      Y(I) = ADD
+   24 ADD = ADD + 1.0
+   30 YTYPE = 1
+      GO TO 2
+   23 IF (YTYPE.EQ.4) GO TO 25
+      Q1 = XGL
+      Q2 = XGR
+      XGL = 0.0
+      GAP = XMONTH - AINT(XMONTH)
+      ADD = GAP
+      MONZ = MONX
+      IF (MONZ.LE.0) MONZ = N
+      IF (MONX.LE.0) MONX = -MONZ
+C    MONX OR MONY NEGATIVE INDICATES THEY HAVE BEEN SET BY GRAPH WHILE
+C    AUTO IS IN OPERATION AND SUCH VALUES WILL BE USED FOR TICKING,ETC.
+      IF (GAP.LE.0.0) MONZ = MONZ - 1
+      XGR = FLOAT(MONZ)
+      IF (MONX.GT.0) GO TO 31
+      DO 27 I=1,N
+      X(I) = ADD
+   27 ADD = ADD + 1.0
+   31 XTYPE = 1
+      GO TO 1
+   25 IF (ICHECK.GT.0) WRITE(ERRREC,26) ROUTIN
+      CALL DFX130(0)
+   26 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' CALLED WITH BOTH AXES OF TY
+     1PE MONTH'/1H ,21X,'CALL IGNORED')
+      GO TO 102
+C    NOT LINEAR-LINEAR
+   40 GO TO (51,52),XTYPE
+   51 GO TO (50,53), YTYPE
+   53 CALL DFX314(X,Y,N,DFX303,ALOG10)
+      GO TO 100
+   52 GO TO (54,55),YTYPE
+   54 CALL DFX314(X,Y,N,ALOG10,DFX303)
+      GO TO 100
+   55 CALL DFX314(X,Y,N,ALOG10,ALOG10)
+      GO TO 100
+   50 IF (ICHECK.GT.0) WRITE(ERRREC,49) XTYPE,YTYPE,ROUTIN
+      CALL DFX130(0)
+   49 FORMAT(1H0,'**DIMFILM WARNING**  AXIS TYPES HAVE POSSIBLY BEEN OVE
+     1RWRITTEN - NUMERIC VALUES ARE X - ',I6,' AND Y - ',I6/1H ,21X,
+     2 'CALL HAS BEEN IGNORED, RETURN MADE FROM SUBROUTINE ',A)
+      GO TO 100
+   20 IF (ICHECK.GT.0) WRITE(ERRREC,22)ROUTIN,N
+      CALL DFX130(0)
+   22 FORMAT(1H0,'**DIMFILM WARNING** THIRD PARAMETER IN CALL TO ',A,
+     1 ' HAS ILLEGAL VALUE -',I10/1H ,21X,'CALL IGNORED')
+      GO TO 102
+   32 IF (ICHECK.GT.0) WRITE(ERRREC,33)ROUTIN,KXY
+   33 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' IN AUTO-MODE DETECTS CONSTA
+     1NT ',A1,'-DATA ARRAY'/1H ,25X,'THIS RANGE ZEROED - CALL IGNORED')
+      CALL DFX130(0)
+      GO TO 102
+  100 XTYPE = XTYPE1
+      YTYPE = YTYPE1
+      IF (XTYPE.NE.4) GO TO 101
+      XGL = Q1
+      XGR = Q2
+      GO TO 102
+  101 IF (YTYPE.NE.4) GO TO 102
+      YGL = Q1
+      YGU = Q2
+  102 CALL DFX301
+      ICHECK = ICSAVE
+      RETURN
+      END
+C
+C----------------------------------------------
+C

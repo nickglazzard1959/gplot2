@@ -1,0 +1,19 @@
+      INTEGER FUNCTION DFX3AA(N)
+C    DIMFILM-GKX INTERFACE ROUTINE
+C    RETURN PRIORITY ORDER OF TRANSFORMATION N
+C    NEGATIVE RETURN FOR ERROR
+      INCLUDE 'params.cmn'
+      INCLUDE 'dfxcac.cmn'
+      INCLUDE 'dfxcacs.cmn'
+      DO 1 I=0,MAXTRS
+      IF (N.EQ.NOTRPR(I)) GO TO 2
+    1 CONTINUE
+C    HERE IF ERROR IN REQUESTED TRANSFORMATION NUMBER
+C    FORCE NEGATIVE RETURN
+      I = -100
+    2 DFX3AA = I
+      RETURN
+      END
+C
+C----------------------------------------------
+C

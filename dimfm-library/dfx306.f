@@ -1,0 +1,100 @@
+      SUBROUTINE DFX306(ZL,X1,Y1,ZR,X2,Y2,SH,ICH,I)
+C    REFERENCING ROUTINE MUST SELECT MONO AND SUBSEQUENTLY RESTORE IT
+C    CURRENTLY REFERENCED BY DFX309 AND DFX324
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc01.cmn'
+      INCLUDE 'dfxc01s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      CS1(K) = (FLOAT(K)-1.)*(C1MONO+C1SEP) + C1MONO
+C    FUNCTION DESCRIBED IN DFX309
+      HT = SH
+      ASSIGN 31 TO JUMP
+      XA = X1
+      YA = Y1
+      GO TO 30
+   31 FPN1 = ZL
+      IF (FPN1.EQ.0.0) GO TO 1
+      A1 = DFX302(ALOG10(ABS(FPN1)))
+      B = 10.**A1
+      FPN1 = FPN1/B
+    1 FPN2 = ZR
+      IF (FPN2.EQ.0.0) GO TO 2
+      A2 = DFX302(ALOG10(ABS(FPN2)))
+      B = 10.**A2
+      FPN2 = FPN2/B
+    2 IROOM = 0
+      GO TO (11,12),I
+   11 XD1 = C1MONO*SH
+      XD2 = CS1(10)*SH
+      XD3 = CS1(14)*SH
+      XD4 = CS1(5)*SH
+      YD1 = 0.0
+      YD2 = 0.0
+      YD3 = 0.0
+      YD4 = 0.0
+      IF ((X1+XD3).GE.(X2-XD3)) IROOM = 1
+      IF ((X1+XD3).GE.X2) GO TO 20
+      GO TO 3
+   12 YD1 = C1MONO*SH
+      YD2 = CS1(10)*SH
+      YD3 = CS1(14)*SH
+      YD4 = CS1(5)*SH
+      XD1 = 0.0
+      XD2 = 0.0
+      XD3 = 0.0
+      XD4 = 0.0
+      IF ((Y1+YD3).GE.(Y2-YD3)) IROOM = 1
+      IF ((Y1+YD3).GE.Y2) GO TO 20
+    3 CALL DFX110(X1+XD1,Y1+YD1)
+      IF (FPN1.EQ.0.0) GO TO 4
+      CALL DFX204(1,FPN1,IDUMMY,'(F9.6)')
+C    AVOID FACTOR OF 10**0
+      IF (A1.EQ.0.0) GO TO 5
+      CALL DFX307(A1,X1+XD2,Y1+YD2,I,SH)
+      GO TO 5
+    4 CALL DFX204(1,FPN1,IDUMMY,'(F3.1)')
+    5 IF (IROOM.EQ.1) GO TO 20
+      IF (FPN2.EQ.0.0) GO TO 6
+      CALL DFX110(X2-XD3,Y2-YD3)
+      CALL DFX204(1,FPN2,IDUMMY,'(F9.6)')
+C    AVOID FACTOR OF 10**0
+      IF (A2.EQ.0.0) GO TO 7
+      CALL DFX307(A2,X2-XD4,Y2-YD4,I,SH)
+    7 ASSIGN 32 TO JUMP
+      XA = X2
+      YA = Y2
+      GO TO 30
+   32 RETURN
+    6 CALL DFX110(X2-XD4,Y2-YD4)
+      CALL DFX204(1,FPN2,IDUMMY,'(F3.1)')
+      GO TO 7
+   20 IF (ICHECK.GT.0) WRITE(ERRREC,21)ZL,ZR
+   21 FORMAT(1H0, 57H**DIMFILM WARNING**  INSUFFICIENT ROOM FOR EXTREME
+     1VALUES/1H ,21X, 19HEXTREMITIES WERE - ,1P2E16.8)
+      CALL DFX130(0)
+      RETURN
+C    ICH = 1 UP ARROW, = 2 DOWN ARROW
+   30 CALL DFX147(2)
+      CALL DFX110(XA,YA)
+      IDASHS = IDASH
+      IDASH = 0
+      CALL DFX106(XA,YA+SH)
+      DX = .2*SH
+      DY = .3*SH
+      IF (ICH.EQ.2) GO TO 33
+      CALL DFX110(XA-DX,YA+SH-DY)
+      CALL DFX106(XA,YA+SH)
+      CALL DFX106(XA+DX,YA+SH-DY)
+      GO TO 34
+   33 CALL DFX110(XA-DX,YA+DY)
+      CALL DFX106(XA,YA)
+      CALL DFX106(XA+DX,YA+DY)
+   34 IDASH = IDASHS
+      CALL DFX147(1)
+      GO TO JUMP,(31,32)
+      END
+C
+C----------------------------------------------
+C

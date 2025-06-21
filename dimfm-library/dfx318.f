@@ -1,0 +1,54 @@
+      SUBROUTINE DFX318(I1,GAP,ZINT,ZS,MJ,MONZ)
+      LOGICAL LEFT
+      INCLUDE 'dfxc01.cmn'
+      INCLUDE 'dfxc01s.cmn'
+      INCLUDE 'dfxc06.cmn'
+      CHARACTER*3 IMNTHS(12)
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      DATA IMNTHS/'JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG',
+     1          'SEP','OCT','NOV','DEC'/
+C    N.B. USES USER ACTIVE ALPHABET AND FEATURES
+C         FOR SPACE CALCULATIONS USES 3 MONO CHARACTERS
+      CS3 = 3.*C1MONO + 2.*C1SEP
+      I = I1 - 20
+      M = MONZ
+      MM = INT(GAP)
+      MINC = MJ
+      XD = XTB2 - XTB1
+      YD = YTB2 - YTB1
+      LEFT = .TRUE.
+      IF (I.LT.10) GO TO 3
+      I = I - 10
+      LEFT = .FALSE.
+    3 GO TO (1,2),I
+C    HERE ALONG X-DIRECTION
+    1 SH = AMIN1(DC6*YD,DC7*ABS(ZINT)/CS3)
+      Y = YTB1 + DC8*YD - SH
+      IF (.NOT.LEFT) Y = YTB2 - DC8*YD
+      HT = SH
+C    NOTE..VALUES OF MONTH AXIS REQUIRES VALUES AT EXTREMA
+      X1 = ZS - .5*CS3*SH
+      DO 14 II=1,M,MINC
+      CALL DFX110(X1,Y)
+      CALL DFX214(IMNTHS(MM))
+      X1 = X1 + ZINT
+      MM = MOD(MM+MINC,12)
+   14 IF (MM.LE.0) MM = MM +12
+      GO TO 100
+    2 SH = AMIN1(DC9*XD/CS3,DC6*YD,DC7*ABS(ZINT))
+      X = XTB1 + DC4*XD
+      IF (.NOT.LEFT) X = XTB2 - DC8*XD
+      HT = SH
+      Y1 = ZS - .5*SH
+      DO 16 II=1,M,MINC
+      CALL DFX110(X,Y1)
+      CALL DFX214(IMNTHS(MM))
+      Y1 = Y1 + ZINT
+      MM = MOD(MM+MINC,12)
+   16 IF (MM.LE.0) MM = MM + 12
+  100 RETURN
+      END
+C
+C----------------------------------------------
+C

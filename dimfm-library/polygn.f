@@ -1,0 +1,62 @@
+      SUBROUTINE POLYGN(NSIDES,SIDE,X,Y,PSI)
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc03.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      INCLUDE 'dfxcd0.cmn'
+      INCLUDE 'dfxcd0s.cmn'
+      ROUTIN = 'POLYGN'
+      N = NSIDES
+      S = SIDE
+      IF (N.LT.3.OR.S.LE.0.) GO TO 2
+      XP = XPOS
+      YP = YPOS
+      CALL DFX000(200,XSAVE,YSAVE,ZDUMMY,0)
+      I1CNT = IOBCNT
+      ICSAVE = ICHECK
+      IF (ICHECK.EQ.2) ICHECK = -2
+      X0 = X
+      Y0 = Y
+      CALL DFX110(X0,Y0)
+      BETA = PSI*ANGCON(1,ANGRP(4))
+      CA = COS(BETA)
+      SA = SIN(BETA)
+      BETA = TWOPI/FLOAT(N)
+      C2PIN = COS(BETA)
+      S2PIN = SIN(BETA)
+      X1 = X0 + S*CA
+      Y1 = Y0 + S*SA
+      CALL DFX124(X1,Y1)
+      NM2 = N - 2
+      DO 1 I=1,NM2
+      C = CA*C2PIN - SA*S2PIN
+      SA = CA*S2PIN + SA*C2PIN
+      CA = C
+      X1 = X1 + S*CA
+      Y1 = Y1 + S*SA
+    1 CALL DFX124(X1,Y1)
+      CALL DFX124(X0,Y0)
+      I2CNT = IOBCNT
+      ICHECK = ICSAVE
+      CALL DFX000(200,XSAVE,YSAVE,ZDUMMY,1)
+      XPOS = XP
+      YPOS = YP
+      IF (I2CNT.EQ.I1CNT) GO TO 99
+      IF (ICHECK.EQ.2) WRITE(ERRREC,20) N,S,X0,Y0,PSI
+      CALL DFX130(1)
+   20 FORMAT(1H0,'**DIMFILM WARNING**  OUT OF BOUNDS DETECTED BY POLYGN
+     1, CALLED WITH -'/1H ,21X,I6,4E14.5)
+      GO TO 99
+    2 IF (ICHECK.GT.0) WRITE(ERRREC,3) N,S,X,Y,PSI
+      CALL DFX130(0)
+    3 FORMAT(1H0, 68H**DIMFILM WARNING**  ILLEGAL ARGUMENT IN CALL TO PO
+     1LYGON, CALL WAS -/1H ,21X,I6,4E14.5/1H ,21X, 12HCALL IGNORED)
+   99 CONTINUE
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

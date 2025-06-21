@@ -1,0 +1,17 @@
+          IDENT CGETJN
+          ENTRY CGETJN
+*
+* SUBROUTINE CGETJN( CHARACTER*4 JSN )
+*---------------------------------------------------(NOS I/F)-----------
+*    OBTAIN THE JSN.
+*-----------------------------------------------------------------------
+*
+ CGETJN   BSS    1           JUMP WHENCE WE CAME
+          SX0    X1          SAVE ADDR OF ARG1 IN X0 (NOT CLOBBERED BY M
+          GETJN  RESULT      MACRO. GET JSN 4 CHARS IN 59-36 OF RESULT
+          SA5    RESULT      LOAD VALUE IN RESULT INTO X5 (A LOAD IN REG
+          BX6    X5          COPY RESULT VALUE INTO X6
+          SA6    X0          STORE X6 IN ADDR X0 (X6 IS A STORE OUT REGI
+          EQ     CGETJN      RETURN
+ RESULT   BSS    1           MACRO RESULT BUFFER
+          END

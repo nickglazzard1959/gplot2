@@ -1,0 +1,63 @@
+      SUBROUTINE DFX319
+      INCLUDE 'dfxc02.cmn'
+      INCLUDE 'dfxc02s.cmn'
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc06.cmn'
+      INCLUDE 'dfxc03.cmn'
+      R1 = RGL
+      R2 = RGR
+      IF (RTYPE.NE.2) GO TO 5
+      R1 = ALOG10(R1)
+      R2 = ALOG10(R2)
+    5 A1 = R1*COS(THGL)
+      A2 = R1*COS(THGR)
+      A3 = R2*COS(THGL)
+      A4 = R2*COS(THGR)
+      X1 = AMIN1(A1,A2,A3,A4)
+      X2 = AMAX1(A1,A2,A3,A4)
+      A1 = R1*SIN(THGL)
+      A2 = R1*SIN(THGR)
+      A3 = R2*SIN(THGL)
+      A4 = R2*SIN(THGR)
+      Y1 = AMIN1(A1,A2,A3,A4)
+      Y2 = AMAX1(A1,A2,A3,A4)
+      ANG = 0.0
+      T1 = THGL
+      T2 = THGR
+      IF (T2.LT.T1) T2 = T2 + TWOPI
+      DO 1 I=1,8
+      IF (ANG.LE.T1) GO TO 4
+      IF (ANG.GE.T2) GO TO 4
+      A1 = R1*COS(ANG)
+      A2 = R2*COS(ANG)
+      A3 = R1*SIN(ANG)
+      A4 = R2*SIN(ANG)
+      X1 = AMIN1(X1,A1,A2)
+      X2 = AMAX1(X2,A1,A2)
+      Y1 = AMIN1(Y1,A3,A4)
+      Y2 = AMAX1(Y2,A3,A4)
+    4 ANG = ANG + PIBY2
+    1 CONTINUE
+      DDX = DC2*(XTB2-XTB1)
+      DDY = DC2*(YTB2-YTB1)
+      XX1 = XTB1 + DDX
+      XX2 = XTB2 - DDX
+      YY1 = YTB1 + DDY
+      YY2 = YTB2 - DDY
+      XF = (X2-X1)/(XX2-XX1)
+      YF = (Y2-Y1)/(YY2-YY1)
+      IF (YF.GT.XF) GO TO 2
+C    HERE TO EQUAL FIT X-SIDES
+      RSCALE = 1./XF
+      RXR = XX1 - X1*RSCALE
+      RYR = (YY2 + YY1 - (Y2+Y1)*RSCALE)*.5
+      GO TO 3
+    2 RSCALE = 1./YF
+      RYR = YY1 - Y1*RSCALE
+      RXR = (XX2 + XX1 - (X2+X1)*RSCALE)*.5
+    3 RETURN
+      END
+C
+C----------------------------------------------
+C

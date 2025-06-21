@@ -1,0 +1,21 @@
+      SUBROUTINE SYMHT(HEIGHT)
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'SYMHT'
+      IF (HEIGHT.GT.0.0) THEN
+                 HT = HEIGHT
+C    CHARDEF NOT REQUIRED HERE AS SET IN SYMTXT/SYM
+      ELSE
+                 IF (ICHECK.GT.0) WRITE(ERRREC,1) HEIGHT,HT
+      CALL DFX130(0)
+    1 FORMAT(1H0,'**DIMFILM WARNING**  SYMHT CALLED WITH ILLEGAL ARGUMEN
+     1T ',1PE14.5/1H ,21X,'HEIGHT USED WAS ',1PE14.5)
+      ENDIF
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

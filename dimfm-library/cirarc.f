@@ -1,0 +1,13 @@
+      SUBROUTINE CIRARC(X0,Y0,R1,THETA1,THETA2)
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'CIRARC'
+      CALL DFX500(X0,Y0,R1,THETA1,THETA2,.TRUE.)
+C    LAST PARAMETER (LOGICAL) INDICATES ARC CALL OF DFX500
+      IF (IMM) CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

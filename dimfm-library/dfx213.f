@@ -1,0 +1,23 @@
+      SUBROUTINE DFX213(ITEXT,NA,SLONG)
+C
+C    **INTERNAL STRAIL FUNCTION**
+C
+      CHARACTER*(*) ITEXT
+C    RETURNS LENGTH OF STRING (AT UNIT HEIGHT)
+C    WITH TRAILING BLANKS STRIPPED
+C    SUBSEQUENT CALL TO SYMXT SHOULD BE (ITEXT(1:NA))
+      INCLUDE 'dfxc04.cmn'
+      NA = 0
+      SLONG = 0.0
+      L = LEN(ITEXT)
+      DO 1 I=L,1,-1
+      IF (ITEXT(I:I).NE.' ') GO TO 2
+    1 CONTINUE
+      GO TO 99
+    2 NA = I
+      SLONG = DFX212(ITEXT(1:NA))
+   99 RETURN
+      END
+C
+C----------------------------------------------
+C

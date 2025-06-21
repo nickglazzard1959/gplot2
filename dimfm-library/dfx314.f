@@ -1,0 +1,237 @@
+      SUBROUTINE DFX314(X,Y,N1,FN1,FN2)
+      LOGICAL HSTEP,HSHADE
+      REAL XF(6), YF(6)
+      INCLUDE 'dfxc09.cmn'
+      LOGICAL LAST
+      REAL COEFF(6)
+      REAL X(N1),Y(N1),SAVE(4)
+      INCLUDE 'dfxc06.cmn'
+      INCLUDE 'dfxc02.cmn'
+      INCLUDE 'dfxc02s.cmn'
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      N = N1
+      ICSAVE = ICHECK
+      IF (XTYPE.NE.2) GO TO 10
+      IF (AMIN1(XGL,XGR).GT.0.0) GO TO 10
+      IF (ICHECK.GT.0) WRITE(ERRREC,12) ROUTIN
+      CALL DFX130(0)
+   12 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' HAS DETECTED A NON-POSITIVE
+     1 PART OF X-AXIS RANGE WHEN X-AXIS TYPE IS LOGARITHMIC'/
+     2  1H ,21X,'CALL IGNORED')
+      RETURN
+   10 IF (YTYPE.NE.2) GO TO 11
+C    TEST FOR YGL,YGU FOR LOGY
+      IF (.NOT.FIXY) GO TO 15
+      IF (YGL.GT.0.0.AND.YGU.GT.0.0) GO TO 11
+      IF (ICHECK.GT.0) WRITE(ERRREC,16)ROUTIN,YGL,YGU
+   16 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' CALLED WITH LOGARITHMIC Y-A
+     1XIS HAS NON-POSITIVE PART OF RANGE -',2E14.6/1H ,21X,
+     2  'CALL IGNORED')
+      CALL DFX130(0)
+      RETURN
+   15 DO 20 I=1,N
+      J = I
+      IF (Y(I).LE.0.0) GO TO 13
+   20 CONTINUE
+      GO TO 11
+   13 IF (ICHECK.GT.0) WRITE(ERRREC,14) ROUTIN,J
+      CALL DFX130(0)
+   14 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' CALLED WITH LOGARITHMIC Y-A
+     1XIS DETECTED A NON-POSITIVE Y-VALUE AT ARRAY POINT ',I6/
+     2  1H ,21X,'CALL IGNORED')
+      RETURN
+   11 XD = XTB2 - XTB1
+      IF (ICHECK.GT.1) ICHECK = -2
+      ICCS = ICHECK
+      YD = YTB2 - YTB1
+      DDX = DC2*XD
+      DDY = DC2*YD
+      SAVE(1) = XTB1
+      SAVE(2) = XTB2
+      SAVE(3) = YTB1
+      SAVE(4) = YTB2
+      X1 = XTB1 + DDX
+      X2 = XTB2 - DDX
+      Y1 = YTB1 + DDY
+      Y2 = YTB2 - DDY
+      CALL DFX128(X1,X2,Y1,Y2)
+      FNXGL = FN1(XGL)
+      FNYGL = FN2(YGL)
+      S1 = (DC1*XD)/(FN1(XGR) - FNXGL)
+      S2 = (DC1*YD)/(FN2(YGU) - FNYGL)
+      OK = .TRUE.
+      XW1 = X1
+      XW2 = X2
+      YW1 = Y1
+      YW2 = Y2
+      XXGL = FNXGL
+      YYGL = FNYGL
+      SS1 = S1
+      SS2 = S2
+      XP = (FN1(X(1)) - FNXGL)*S1 + X1
+      YP = (FN2(Y(1)) - FNYGL)*S2 + Y1
+      CALL DFX110(XP,YP)
+      IF (NDEG.GT.0.OR.HIST.GT.-2.) GO TO 200
+      IF (INTNDG.GT.0) CALL DFX200(IICHAR)
+      INTEND = INTNDG
+      DO 60 I=2,N
+      XP = (FN1(X(I)) - FNXGL)*S1 + X1
+      YP = (FN2(Y(I)) - FNYGL)*S2 + Y1
+      IF (NDEG.EQ.0) THEN
+      CALL DFX124(XP,YP)
+      ELSE
+      CALL DFX110(XP,YP)
+      CALL DFX200(IICHAR)
+      ENDIF
+   60 CONTINUE
+  500 CALL DFX128(SAVE(1),SAVE(2),SAVE(3),SAVE(4))
+      RETURN
+  200 IF (HIST.GT.-2.) GO TO 300
+      IF (INTNDG.GT.0) CALL DFX200(IICHAR)
+C    HERE FOR POLYNOMIAL INTERPOLATION
+      I1 = 1
+      I2 = 1
+      LIM2 = NDEG + 1
+      I3 = NDEG + 1
+      LAST = .FALSE.
+      IF (I3.EQ.N) LAST = .TRUE.
+      IF = NDEG/2
+      STEP = FLOAT(IXSTEP)
+      LIM = IXSTEP - 1
+      DO 210 I=1,LIM2
+      XF(I) = FN1(X(I))
+  210 YF(I) = FN2(Y(I))
+      ICHECK = ICSAVE
+      CALL DFX150(NDEG,XF,YF,COEFF,ISING)
+      ICHECK = ICCS
+      IF (ISING.NE.0) GO TO 500
+  202 XONE = FN1(X(I2))
+      XTWO = FN1(X(I2+1))
+      XD = (XTWO - XONE)/STEP
+      DO 201 I=1,LIM
+      XONE = XONE + XD
+      CALL DFX151(NDEG,XONE,YVAL,COEFF)
+      XP = (XONE - FNXGL)*S1 + X1
+      YP = (YVAL - FNYGL)*S2 + Y1
+  201 CALL DFX106(XP,YP)
+      XP = (XTWO - FNXGL)*S1 + X1
+      YP = (FN2(Y(I2+1)) - FNYGL)*S2 + Y1
+      INTEND = INTNDG
+      CALL DFX124(XP,YP)
+      INTNDG = INTEND
+      INTEND = -1
+      I2 = I2 + 1
+      IF (.NOT.LAST) GO TO 206
+      IF (I2.EQ.N) GO TO 500
+      IF (I3.EQ.N) GO TO 202
+  206 IF (I2.LE.IF) GO TO 202
+  205 I1 = I1 + 1
+      I3 = I3 + 1
+      DO 211 I=1,LIM2
+      II = I1 + I - 1
+      XF(I) = FN1(X(II))
+  211 YF(I) = FN2(Y(II))
+      ICHECK = ICSAVE
+      CALL DFX150(NDEG,XF,YF,COEFF,ISING)
+      ICHECK = ICCS
+      IF (ISING.NE.0) GO TO 500
+      XONE = FN1(X(I2))
+      XTWO = FN1(X(I2+1))
+      XD = (XTWO - XONE)/STEP
+      DO 204 I=1,LIM
+      XONE = XONE + XD
+      CALL DFX151(NDEG,XONE,YVAL,COEFF)
+      XP = (XONE - FNXGL)*S1 + X1
+      YP = (YVAL - FNYGL)*S2 + Y1
+  204 CALL DFX106(XP,YP)
+      XP = (XTWO - FNXGL)*S1 + X1
+      YP = (FN2(Y(I2+1)) - FNYGL)*S2 + Y1
+      INTEND = INTNDG
+      CALL DFX124(XP,YP)
+      INTNDG = INTEND
+      INTEND = -1
+      I2 = I2 + 1
+      IF (I3.LT.N) GO TO 205
+      LAST = .TRUE.
+      GO TO 202
+  300 YL = AMIN1(YGL,YGU)
+      YU = AMAX1(YGL,YGU)
+      IF (YAT.GT.YL.AND.YAT.LT.YU) YL = YAT
+      HSTEP = IABS(IHIST).EQ.2
+      HSHADE = IABS(IHIST).EQ.3
+      IF (HIST.GE.-.5) GO TO 301
+      DIFF = .5*(FN1(X(2)) - FN1(X(1)))
+      XL = FN1(X(1)) - DIFF
+      XP = (XL - FNXGL)*S1 + X1
+      YP = (FN2(YL) - FNYGL)*S2 + Y1
+      CALL DFX110(XP,YP)
+      YA = Y(1)
+      YPP = (YA - YGL)*S2 + Y1
+      IF (IHIST.LT.0.AND.(XP.LE.X1.OR.XP.GE.X2)) CALL DFX110(XP,YPP)
+      CALL DFX106(XP,YPP)
+      XL = FN1(X(1)) + DIFF
+      XPP = (XL - FNXGL)*S1 + X1
+      CALL DFX106(XPP,YPP)
+      I = 2
+  302 YB = Y(I)
+      IF (HSTEP) YL = YB
+      IF (HSHADE) CALL DFX316(XP,XPP,YP,YPP)
+      XP = XPP
+      YC = AMAX1(YA,YB,YL)
+      YD = AMIN1(YA,YB,YL)
+      YPP = (FN2(YC) - FNYGL)*S2 + Y1
+      CALL DFX110(XPP,YPP)
+      YPP = (FN2(YD) - FNYGL)*S2 + Y1
+      IF (IHIST.LT.0.AND.(XPP.LE.X1.OR.XPP.GE.X2)) CALL DFX110(XPP,YPP)
+      CALL DFX106(XPP,YPP)
+      YPP = (FN2(YB) - FNYGL)*S2 + Y1
+      CALL DFX110(XPP,YPP)
+      IF (I.EQ.N) GO TO 303
+      DIFF1 = DIFF
+      DIFF = .5*(FN1(X(I+1)) - FN1(X(I)))
+      DIFF1 = DIFF1 + DIFF
+      XL = XL + DIFF1
+      XPP = (XL - FNXGL)*S1 + X1
+      CALL DFX106(XPP,YPP)
+      YA = YB
+      I = I + 1
+      GO TO 302
+  303 XL = FN1(X(N)) + DIFF
+      XP = (XL - FNXGL)*S1 + X1
+      CALL DFX106(XP,YPP)
+      IF (IHIST.LT.0.AND.(XP.LE.X1.OR.XP.GE.X2)) CALL DFX110(XP,YP)
+      CALL DFX106(XP,YP)
+      IF (HSHADE) CALL DFX316(XPP,XP,YP,YPP)
+      GO TO 500
+C    HERE FOR SPECIFIED WIDTH
+  301 IF (HIST.LE.0.0) GO TO 305
+      DIFF = .5*FN1(HIST)
+      GO TO 306
+  305 DIFF = 0.0
+  306 CONTINUE
+      YL = (FN2(YL) - FNYGL)*S2 + Y1
+      DO 304 I=1,N
+      XA = FN1(X(I)) - DIFF
+      YA = FN2(Y(I))
+      XP = (XA - FNXGL)*S1 + X1
+      XPP = XP
+      YP = (YA - FNYGL)*S2 + Y1
+      CALL DFX110(XP,YL)
+      IF (IHIST.LT.0.AND.(XP.LE.X1.OR.XP.GE.X2)) CALL DFX110(XP,YP)
+      CALL DFX106(XP,YP)
+      IF (DIFF.LE.0.) GO TO 304
+      XA = FN1(X(I)) + DIFF
+      XP = (XA - FNXGL)*S1 + X1
+      CALL DFX106(XP,YP)
+      IF (IHIST.LT.0.AND.(XP.LE.X1.OR.XP.GE.X2)) CALL DFX110(XP,YL)
+      CALL DFX106(XP,YL)
+      IF (HSHADE) CALL DFX316(XPP,XP,YL,YP)
+  304 CONTINUE
+      GO TO 500
+      END
+C
+C----------------------------------------------
+C

@@ -1,0 +1,35 @@
+      SUBROUTINE CMODEL(MODEL)
+C
+C    +++++ALL CODE MUST BE REPLICATED IN DFX138+++++
+C
+      CHARACTER*(*) MODEL
+      CHARACTER*3 MODELS(0:7),CMOD
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc04.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      DATA MODELS/'RGB','CMY','YIQ','YUV','YTV','HSV','HLS','USR'/
+C   ++++++++++++N.B. USR NOT YET IMPLEMENTED - INCREASE LOOP COUNT TO 7
+C   ++++++++++++     WHEN RELEASED
+      ROUTIN = 'CMODEL'
+      CALL DFX010(MODEL,CMOD,1,L,IERR)
+      IF (IERR.NE.0) GO TO 3
+      DO 1 I=0,6
+      IF (CMOD.EQ.MODELS(I)) THEN
+                  NCMODE = I
+                  GO TO 2
+      ENDIF
+    1 CONTINUE
+C    NO MATCH FOR MODEL
+    3 IF (ICHECK.GT.0) WRITE(ERRREC,10) MODEL
+   10 FORMAT(1H0,'**DIMFILM WARNING** CMODEL FOUND NO MATCH FOR REQUESTE
+     1D COLOUR MODEL ',A/1H0,21X,'CALL IGNORED')
+      CALL DFX130(0)
+    2 CONTINUE
+      ROUTIN = STARS6
+      RETURN
+      END
+C
+C----------------------------------------------
+C

@@ -1,0 +1,16 @@
+          IDENT IGETOT
+          ENTRY IGETOT
+*
+* INTEGER FUNCTION IGETOT()
+*-------------------------------------------------(NOS I/F)-------------
+*    OBTAIN THE JOB ORIGIN TYPE.
+*-----------------------------------------------------------------------
+*
+IGETOT    BSS    1
+          GETJO  RESULT
+          SA5    RESULT
+          MX2    -6D
+          BX6    -X2*X5
+          EQ     IGETOT
+RESULT    BSS    1
+          END

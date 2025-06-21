@@ -1,0 +1,27 @@
+      SUBROUTINE INTSY(ZZZ)
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc04.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      ROUTIN = 'INTSY'
+      ZZ = ZZZ
+      DO 1 I=1,NRGB
+      ZZ = AMIN1(ZZ,DFX145(I))
+    1 CONTINUE
+      IF (ABS(ZZ-ZZZ).GT.DZINT) GO TO 3
+    4 DO 2 I=1,NRGB
+    2 CALL DFX142(I,ZZ)
+      ROUTIN = STARS6
+      RETURN
+    3 IF (ICHECK.GT.0) WRITE(ERRREC,10) ZZZ,ZZ
+      CALL DFX130(0)
+   10 FORMAT(1H0,'**DIMFILM WARNING**  INTSY CALLED WITH INVALID INTENSI
+     1TY ',1PE16.8/1H ,21X,' THIS EXCEEDS MAXIMUM PERMISSIBLE WITH ALL C
+     2URRENT COLOUR TRIPLETS'/1H ,21X,'INTENSITY ',1PE16.8,' HAS BEEN SU
+     3BSTITUTED')
+      GO TO 4
+      END
+C
+C----------------------------------------------
+C

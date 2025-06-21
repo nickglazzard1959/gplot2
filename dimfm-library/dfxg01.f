@@ -1,0 +1,23 @@
+      SUBROUTINE DFXG01
+C    CLOSE UP GKS
+      INCLUDE 'params.cmn'
+      INCLUDE 'dfxcaa.cmn'
+      INCLUDE 'dfxcac.cmn'
+      INCLUDE 'dfxcacs.cmn'
+      INCLUDE 'dfxcad.cmn'
+      INCLUDE 'dfxcbd.cmn'
+      GKSERR = 2
+      IF (GKSOS.NE.1) GO TO 99
+      GKSERR = 0
+      GKSOS = 0
+      DO 1 I=1,MSOPWS
+      WSAC(I) = .FALSE.
+    1 WSOP(I) = .FALSE.
+C    NOW RELEASE FONT FILE
+      CALL DFXM12(FATPT)
+      IF (FATPT.NE.0) CALL DFX001(' ',19)
+   99 RETURN
+      END
+C
+C----------------------------------------------
+C

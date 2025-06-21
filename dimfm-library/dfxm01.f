@@ -1,0 +1,22 @@
+      INTEGER FUNCTION DFXM01(CHAR)
+C --- -----------------------------------------------------------------
+C
+C --- THIS ROUTINE RETURNS THE DIMFILM INDEX NUMBER OF THE CHARACTER
+C --- CHAR. IF THE NUMBER IN CHAR IS OUTSIDE THE RANGE 1--96, IT IS
+C --- NEGATED.
+C
+      CHARACTER*1 CHAR
+C
+C --- CDC ICHAR BY DEFAULT SHOULD RETURN THE DISPLAY CODE VALUE.
+C --- BUT IT DOES NOT. IT RETURNS THE ASCII CODE - 32.
+C
+      N = ICHAR( CHAR ) + 1
+      IF( (N.LT.1) .OR. (N.GT.96) ) THEN
+        DFXM01 = - N
+      ELSE
+        DFXM01 = N
+      ENDIF
+C
+      RETURN
+      END
+C --- -----------------------------------------------------------------
