@@ -14,16 +14,33 @@ NOS account to use) before this is run.
 Source file extensions currently processed are:
  .f    - FORTRAN source code
  .cmn  - FORTRAN included file. Marked as COMMON in MODIFY source output.
- .src  - Other source.
+ .src  - Other source using UPPER CASE only.
+ .asc  - Other source with lower case marked as ASCII (up to 72 lower case chars = 144 6/12 chars).
 
-By default, the output will create a new MODIFY PL from the source. That OPL
-should not already exist on the NOS system. All the source files (with the above)
-extensions) in the source directory will be used as MODIFY input.
-
-If --modified is used, only files Git indicates have been modified since the
+By default, only files Git indicates have been modified since the
 last Git commit will be included in the MODIFY source. In this case, a MODIFY
 OPL should already exist on the NOS system, and only a subset of its modules
 will be updated (or added).
+
+If --committed is used, files changed in the last commit will be selected instead of files
+modifed since the last commit.
+
+If --all is used, the output will create a new MODIFY PL from the source. That OPL
+should not already exist on the NOS system. All the source files (with the above
+extensions) in the source directory will be used as MODIFY input.
+
+If --noprocess is used, no source code transformations are applied.
+This should be used to keep MODIFY code unchanged, for example if CCL
+procedures are being stored.
+
+If --ftpmode is used, the NOS batch job will be generated based on the MODIFY
+source (genearted her) having been transferred by FTP to the NOS system before
+the batch job is run. This is HIGHLY RECOMMENDED, as it allows lines longer than
+80 characters (needed for 6/12 coded lines longer than 36 characters) to be
+preserved.
+
+Without --ftpmode, the MODIFY source is included in the batch job and lines will
+be truncated at 80 characters. 
 """
 
 import os, argparse, time, sys, fnmatch
@@ -219,7 +236,7 @@ CATLIST.
     n_modules = 0
     n_lines = 0
     filenames = []
-    for filename in all_files(args.indir, patterns='*.cmn;*.f;*.src', single_level=True):
+    for filename in all_files(args.indir, patterns='*.cmn;*.f;*.src;*.asc', single_level=True):
         if not args.all:
             if filename in module_list:
                 filenames.append(filename)
@@ -234,6 +251,9 @@ CATLIST.
             text = fin.readlines()
             fin.close()
 
+            path,fname = os.path.split(filename)
+            stem,ext = os.path.splitext(fname)
+
             if args.noprocess:
                 # Do no conversions on the source. Assume it is valid MODIFY source already.
                 # This should be used with source from modsplit.py processed *with* the --noprocess option.
@@ -245,15 +265,16 @@ CATLIST.
                 fout.writelines(text)
             
             else:
-                # Converting to MODIFY module format. Add module name and type if COMMON (.cmn).
+                # Converting to MODIFY module format. Add module name.
+                # Add type if COMMON (.cmn) or ASCII (.asc).
                 # Convert INCLUDE to *CALL.
                 # This should be used for Fortran (and other) source from modsplit.py processed *without*
                 # the --noprocess option.                    
-                path,fname = os.path.split(filename)
-                stem,ext = os.path.splitext(fname)
                 fout.write(stem.upper()+'\n')
                 if ext == '.cmn':
                     fout.write('COMMON\n')
+                elif ext == '.asc':
+                    fout.write('ASCII\n')
                 for line in text:
                     if 'INCLUDE ' in line:
                         words = line.split()

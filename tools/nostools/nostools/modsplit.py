@@ -1,9 +1,43 @@
 #!/usr/bin/env python3
 """
-Split the SOURCE output of MODIFY into individual files.
-Determine the file type.
-Save either MODIFY SOURCE or Unix compilable code.
-Optionally generate a build script for Unix.
+Split the SOURCE output of MODIFY into individual files. Each MODIFY
+OPL results in a set of files in a single specified directory on Unix
+with --outdir.
+
+Determine the module type (Unknown, FORTRAN, COMMON or ASCII).
+Use that to select a file extension (.src, .f, .cmn or .asc).
+
+If --noprocess is used, no changes are made to the source. It is
+assumed to be MODIFY source for use only on NOS (e.g. CCL procedures).
+
+Otherwise, simple transformations are applied to .f files, converting
+*CALL name to INCLUDE "name", and so on, so the files stored on Unix
+can be (possibly) compiled there, but can be converted back to MODIFY
+format trivially.
+
+If --script is used, a Bash script that will compile the modules with
+gfortran is created.
+
+If --library is additionally used, the build script will then create a
+static .a library.
+
+if --cards is used, the MODIFY SOURCE should have been transferred via
+the "central" card punch. This is NOT RECOMMENDED as lines will be
+truncated at 80 characters (6/12 coded lines could have 144 characters).
+The transfer must also be done "by hand".
+
+Instead, FTP is recommended. Use the nosftp tool for this.
+
+If --upper is used, all input is transformed to UPPER CASE, This is
+usually the best plan for FORTRAN code and other things in practice.
+Lower case characters in *strings only* in NOS FORTRAN can be represented
+in 6/12 code which is upper case compatible. The 72 UPPER CASE character
+limit still applies, so care is needed when doing this. Material
+which is not FORTRAN source (e.g. documentation) can be in modules
+marked as ASCII and can have up to 72 6/12 coded lower case characters
+per lines, represented as up to 144 UPPER CASE characters. In all cases,
+sticking to UPPER CASE "works" when things are only used on NOS. Good
+ways of using 6/12 coded material on Unix is a work in progress.
 """
 
 import os, argparse, time, sys
@@ -45,6 +79,7 @@ def read_module(fin, modsrc):
                         if modsrc:
                             text.append(sline)
                     elif sline.lower() == 'ascii':
+                        extension = '.asc'
                         if modsrc:
                             text.append(sline)                        
                     else:
@@ -225,6 +260,8 @@ MODIFY program library.
             elif modinfo[1] == '.f':
                 mtype = 'fortran'
                 sources.append(modinfo[0])
+            elif modinfo[1] == '.asc':
+                mtype = 'ascii  '
             status = ' '
             if modinfo[0] in omits:
                 status = '(OMITTED)'
