@@ -158,8 +158,22 @@ def get_file(ftp, nosfilename, outfilename, nostype):
         print('... reason:', e)
         return False
 
-if __name__ == '__main__':
+def delete_file(ftp, nosfilename):
+    """
+    Delete a single file.
+    """
+    try:
+        print(ftp.delete(nosfilename))
+        return True
+    except Exception as e:
+        print('delete_file({0}): ftp.delete() failed.'.format(nosfilename))
+        print('... reason:', e)
+        return False        
 
+def main():
+    """
+    Mainline.
+    """
     # Set up minimal readline history functionality.
     history_file = os.path.join(os.path.expanduser("~"), ".nos_ftp_history")
     try:
@@ -237,6 +251,7 @@ if __name__ == '__main__':
         LPWD = 6
         LCD = 7
         LS = 8
+        DEL = 9
         
     commands = {'quit': (0, 0, '', cmds.QUIT, 'Exit NOS FTP.'),
                 'exit': (0, 0, '', cmds.QUIT, 'Exit NOS FTP.'),
@@ -247,7 +262,8 @@ if __name__ == '__main__':
                 'info': (1, 1, 'nosname', cmds.INFO, 'List full information on a single permanent file.'),
                 'lpwd': (0, 0, '', cmds.LPWD, 'Print local working directory name.'),
                 'lcd':  (1, 1, 'localdir', cmds.LCD, 'Change local working directory.'),
-                'ls':   (0, 1, '', cmds.LS, '[string] List local working directory, [names containing string].')}
+                'ls':   (0, 1, '', cmds.LS, '[string] List local working directory, [names containing string].'),
+                'del':  (1, 1, 'nosname', cmds.DEL, 'Delete a permanent file.')}
 
     def parse_cmd( cmdline, commands ):
         """
@@ -388,6 +404,17 @@ if __name__ == '__main__':
                     print('Local directory retrieval failed.')
                     print('... reason:', e)
 
+            elif cmdcode == cmds.DEL:
+                if not valid_nos_name(argslist[0]):
+                    print('NOS file name is invalid.')
+                else:
+                    if not delete_file(ftp, argslist[0]):
+                        print('Failed.')
+
         if args.execute is not None:
             quit_ftp(ftp)
             sys.exit(0)
+
+if __name__ == '__main__':
+    main()
+    

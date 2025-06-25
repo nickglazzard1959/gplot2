@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nostools"
+version = "0.1.0"
+description = "Some tools for working with NOS written in Python"
+readme = "README.md"
+requires-python = ">=3.9"
+keywords = ["NOS","git","MODIFY","retrocomputing"]
+license = {file = "LICENSE"}
+
+authors = [
+{name = "Nick Glazzard", email = "nick@hccc.org.uk"}
+]
+
+maintainers = [
+{name = "Nick Glazzard", email = "nick@hccc.org.uk"}
+]
+
+classifiers = ["Development Status :: 4 - Beta",
+               "Intended Audience :: Science/Research",
+               "License :: OSI Approved :: MIT License",
+               "Operating System :: POSIX :: Linux",
+               "Operating System :: MacOS :: MacOS X",
+               "Programming Language :: Python :: 3"
+              ]
+
+dependencies = [
+               ]
+
+[project.scripts]
+nosftp = "nostools.nosftp:main"
+modsplit = "nostools.modsplit:main"
+modjoin = "nostools.modjoin:main"
+
+[tool.setuptools]
+packages = ["nostools"]
+
+[tool.setuptools.package-data]
+nostools = []  

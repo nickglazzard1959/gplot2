@@ -1,5 +1,0 @@
-export NOSUSER=NICK
-export NOSPW=DLRS2
-export NOSHOST=nuc1
-export RJESPOOL=~/rje-station/spool
-echo "... environment setup done ..."

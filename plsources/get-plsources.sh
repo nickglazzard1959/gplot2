@@ -17,8 +17,8 @@ if [ -z "${NOSHOST}" ]; then
     exit 1
 fi
 #
-python ../tools/nosftp.py -p $NOSPW -e "get SSPROCS plprocs.src display" $NOSUSER $NOSHOST
-python ../tools/nosftp.py -p $NOSPW -e "get SSDIMFM pldimfm.src display" $NOSUSER $NOSHOST
-python ../tools/nosftp.py -p $NOSPW -e "get SSGRDEV plgrdev.src display" $NOSUSER $NOSHOST
-python ../tools/nosftp.py -p $NOSPW -e "get SSUTILS plutils.src display" $NOSUSER $NOSHOST
-python ../tools/nosftp.py -p $NOSPW -e "get SSGPLOT plgplot.src display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "get SSPROCS plprocs.src display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "get SSDIMFM pldimfm.src display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "get SSGRDEV plgrdev.src display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "get SSUTILS plutils.src display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "get SSGPLOT plgplot.src display" $NOSUSER $NOSHOST

@@ -121,7 +121,10 @@ def create_folder_if_not_exists( path ):
     else:
         return True
 
-if __name__ == '__main__':
+def main():
+    """
+    Mainline.
+    """
     epilog_text = """
 
 The input to this program must be MODIFY SOURCE output. This file
@@ -159,7 +162,7 @@ MODIFY program library.
     parser.add_argument("-s","--script", help="Write compile script to this file.")
     parser.add_argument("-l","--library", help="Make a static library with the specified name.")
     parser.add_argument("--omit", help="Comma separated list of modules to not process.")
-    parser.add_argument("-n","--noinclude", help="Do not convert *CALL to INCLUDE, save as MODIFY source.", action="store_true")
+    parser.add_argument("-n","--noprocess", help="Do no conversions, save as MODIFY source.", action="store_true")
     parser.add_argument("-c","--cards", help="Source is from card punch, skip first line.", action="store_true")
 
     args = parser.parse_args()
@@ -202,7 +205,7 @@ MODIFY program library.
     # Process one module at a time.
     n_modules = 0
     while True:
-        modinfo = read_module(fin, args.noinclude)
+        modinfo = read_module(fin, args.noprocess)
 
         # If the name is empty, we have finished.
         if modinfo[0] == '':
@@ -229,7 +232,7 @@ MODIFY program library.
                 status = ' '
             print('Module: {:7s}  Type: {:7s}  Lines: {:5d} {:7s}'.format(modinfo[0],mtype,modinfo[2],status))
             #print 'Module:',modinfo[0],'Type:',mtype,'Lines:',modinfo[2] 
-            write_module(modinfo, args.upper, outdir, omits, args.noinclude)
+            write_module(modinfo, args.upper, outdir, omits, args.noprocess)
             n_modules += 1
 
     # Optionally, write a compile script.
@@ -239,3 +242,6 @@ MODIFY program library.
     # Close the input module.
     fin.close()
     sys.exit(0)
+
+if __name__ == '__main__':
+    main()

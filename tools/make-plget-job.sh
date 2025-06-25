@@ -7,8 +7,8 @@
 # it can be transferred by FTP without losing the record
 # structure.
 #
-if [ "$#" != 3 ]; then
-    echo "Usage: make-plget-job.sh plname nos-user-name nos-user-password"
+if [ "$#" != 4 ]; then
+    echo "Usage: make-plget-job.sh plname nos-user-name nos-user-password jobfilename"
     exit 1
 fi
 LIBNAMEPL=$1
@@ -21,8 +21,7 @@ if [[ "${#LIBNAME5}" -lt "1" ]]; then
     echo "Expected library name to have something after PL"
     exit 1
 fi
-LOWER1=`echo $1 | tr '[:upper:]' '[:lower:]'`
-JOBFILENAME=get-${LOWER1}-src.job
+JOBFILENAME=$4
 (
 sed -e "s/libname/${LIBNAME5}/g" <<EOF
 BAlibname.
@@ -42,7 +41,3 @@ SCOPY,SRlibname,SSlibname.
 REPLACE,SSlibname.
 EOF
 ) | sed -e "s/nosuser/${2}/g" | sed -e "s/nospassword/${3}/g" > ${JOBFILENAME}
-echo '-----'
-echo "Now SUBMIT ${JOBFILENAME} with RJE and then"
-echo "get SS${LIBNAME5} with FTP (use nosftp.py)."
-echo '-----'
