@@ -75,7 +75,28 @@ def create_folder_if_not_exists( path ):
             print('Cannot create folder %s' % path)
             return False
     else:
-        return True        
+        return True
+
+def to_612( line ):
+    """
+    Convert a line of ASCII to 6/12 Display Code.
+    This is only applied to modules marked as ASCII and undoes the
+    conversion to ASCII performed on those by modsplit.py.
+    """
+    specialmap = { ':':'@D', '@':'@A', '^':'@B', "`":'@G', '{':'^0',
+                   '|':'^1', '}':'^2', '~':'^3' }
+    retline = ''
+    for achar in line:
+        if achar.isprintable():
+            if achar in specialmap:
+                retline += specialmap[achar]
+            else:
+                if achar.islower():
+                    retline += '^'
+                retline += achar.upper()
+
+    retline += '\n'
+    return retline
 
 def main():
     """
@@ -122,8 +143,11 @@ def main():
         try:
             retstring = subprocess.check_output(cmd, universal_newlines=True)
         except Exception as e:
-            print('git ls-files -m failed.')
-            print(e)
+            if args.committed:
+                print('git diff-tree -r --no-commit-id --name-only HEAD failed.')
+            else:
+                print('git ls-files -m failed.')
+            print('Reason:', e)
             sys.exit(1)
         retlist = retstring.splitlines()
         module_list = []
@@ -266,22 +290,29 @@ CATLIST.
             
             else:
                 # Converting to MODIFY module format. Add module name.
-                # Add type if COMMON (.cmn) or ASCII (.asc).
-                # Convert INCLUDE to *CALL.
                 # This should be used for Fortran (and other) source from modsplit.py processed *without*
                 # the --noprocess option.                    
+                # Add type if COMMON (.cmn) or ASCII (.asc).
+                # Convert INCLUDE to *CALL if not ASCII.
+                # Convert ASCII characters to 6/12 Display Code if ASCII.
                 fout.write(stem.upper()+'\n')
                 if ext == '.cmn':
                     fout.write('COMMON\n')
                 elif ext == '.asc':
                     fout.write('ASCII\n')
-                for line in text:
-                    if 'INCLUDE ' in line:
-                        words = line.split()
-                        if len(words) == 2:
-                            fout.write('*CALL '+ words[1].upper()[1:-5] + '\n')
-                    else:
-                        fout.write(line)                
+                    
+                if ext == '.asc':
+                    for line in text:
+                        line612 = to_612(line)
+                        fout.write(line612)
+                else:
+                    for line in text:
+                        if 'INCLUDE ' in line:
+                            words = line.split()
+                            if len(words) == 2:
+                                fout.write('*CALL '+ words[1].upper()[1:-5] + '\n')
+                        else:
+                            fout.write(line)                
 
             # Information and statistics.
             n_modules += 1

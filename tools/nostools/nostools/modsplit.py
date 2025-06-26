@@ -91,12 +91,60 @@ def read_module(fin, modsrc):
     # Should never get here, but just in case.
     return (modname, extension, numlines, text)
 
+def to_ascii( line ):
+    """
+    Convert a line of 6/12 Display Code to ASCII.
+    This is only done with modules marked as ASCII (extension .asc).
+    """
+    topmap = { '0':'{', '1':'|', '2':'}', '3':'~' }
+    atmap = { 'A':'@', 'B':'^', 'G':"`", 'D':':' }
+    retline = ''
+    len_line = len(line)
+    i = 0
+    while i < len_line:
+        j = i + 1
+        achar = line[i]
+        
+        if achar == '^':
+            if j < len_line:
+                print('^')
+                nextchar = line[j]
+                if nextchar.isprintable():
+                    if nextchar.isalpha():
+                        retline += nextchar.lower()
+                    else:
+                        if nextchar in topmap:
+                            retline += topmap[nextchar]
+                        else:
+                            retline += '*'  # Should not happen.
+                i = j
+
+        elif achar == '@':
+            if j < len_line:
+                nextchar = line[j]
+                if nextchar.isprintable():                
+                    if nextchar in atmap:
+                        retline += atmap[nextchar]
+                    else:
+                        retline += '*'  # Should not happen.
+                i = j
+            
+        else:
+            retline += achar
+
+        i += 1
+
+    return retline
+
 def write_module(modinfo, upcase, outdir, omits, modsrc):
     """
     Write out a module as a file. 
     If upcase, make all code UPPER CASE.
     Convert *call xxx to INCLUDE 'xxx'
     Prepend outdir to the output filename.
+
+    ASCII (.asc) data is treated specially. It is converted from 6/12 Display Code
+    to ASCII here and that is written out. The upcase argument is ignored.
     """
     name = modinfo[0]
     extension = modinfo[1]
@@ -107,15 +155,20 @@ def write_module(modinfo, upcase, outdir, omits, modsrc):
         incstr = 'INCLUDE '
     else:
         incstr = 'include '
-    for line in text:
-        if (line[:5].lower() == '*call') and (not modsrc):
-            incname = line[6:].lower() + '.cmn'
-            fout.write('      '+incstr+"'"+incname+"'"+'\n')
-        else:
-            if upcase:
-                fout.write(line.upper()+'\n')
+    if extension == '.asc':
+        for line in text:
+            ascii_line = to_ascii(line)
+            fout.write(ascii_line+'\n')
+    else:
+        for line in text:
+            if (line[:5].lower() == '*call') and (not modsrc):
+                incname = line[6:].lower() + '.cmn'
+                fout.write('      '+incstr+"'"+incname+"'"+'\n')
             else:
-                fout.write(line+'\n')
+                if upcase:
+                    fout.write(line.upper()+'\n')
+                else:
+                    fout.write(line+'\n')
     fout.close()
 
 def write_script(sources, script, outdir, library, omits):
@@ -170,7 +223,7 @@ The following batch job will create a suitable output file. That file
 must be transferred by FTP (using "nosftp.py" is easiest).
 
 BADIMFM.
-USER,NICK,DLRS2.
+USER,GUEST,GUEST.
 *
 * GET SOURCE FROM A MODIFY LIBRARY PLDIMFM.
 * THE RESULT IS SSDIMFM.
@@ -195,7 +248,7 @@ MODIFY program library.
     parser.add_argument("-d","--outdir", help="Set the output directory name.")
     parser.add_argument("-u","--upper", help="Convert to UPPER CASE.", action="store_true")
     parser.add_argument("-s","--script", help="Write compile script to this file.")
-    parser.add_argument("-l","--library", help="Make a static library with the specified name.")
+    parser.add_argument("-l","--library", help="Make a static library with the specified name (omit .a).")
     parser.add_argument("--omit", help="Comma separated list of modules to not process.")
     parser.add_argument("-n","--noprocess", help="Do no conversions, save as MODIFY source.", action="store_true")
     parser.add_argument("-c","--cards", help="Source is from card punch, skip first line.", action="store_true")
