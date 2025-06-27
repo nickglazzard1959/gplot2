@@ -63,5 +63,18 @@ make-plget-job.sh PL${LIBNAME_UPPER} ${NOSUSER} ${NOSPW} ${JOBNAME}
 runrbf.sh ${JOBNAME}
 lastspool.sh cat
 nosftp -p $NOSPW -e "get SS${LIBNAME_UPPER} plsources/pl${LIBNAME_LOWER}.src display" $NOSUSER $NOSHOST
+rc=$?
+if [ rc -ne 0 ]; then
+    exit 1
+fi
 nosftp -p $NOSPW -e "del SS${LIBNAME_UPPER}" $NOSUSER $NOSHOST
+rc=$?
+if [ rc -ne 0 ]; then
+    exit 1
+fi
 modsplit -u -d ${LIBNAME_LOWER}-library ${EXTRA_ARGS} plsources/pl${LIBNAME_LOWER}.src
+rc=$?
+if [ rc -ne 0 ]; then
+    exit 1
+fi
+exit 0

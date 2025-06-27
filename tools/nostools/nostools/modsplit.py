@@ -107,7 +107,6 @@ def to_ascii( line ):
         
         if achar == '^':
             if j < len_line:
-                print('^')
                 nextchar = line[j]
                 if nextchar.isprintable():
                     if nextchar.isalpha():

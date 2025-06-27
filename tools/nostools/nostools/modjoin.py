@@ -267,6 +267,12 @@ CATLIST.
         else:
             filenames.append(filename)
 
+    # Perhaps there is nothing to be done (e.g. because nothing has been modified).
+    # If not, exit with a special condition code, so the caller can stop now.
+    if len(filenames) == 0:
+        print('No modules need to be processed.')
+        sys.exit(213)
+
     # Loop, processing each selected input source file. Read a whole file at a time.
     n_filenames = len(filenames)
     for filename in filenames:
@@ -292,7 +298,7 @@ CATLIST.
                 # Converting to MODIFY module format. Add module name.
                 # This should be used for Fortran (and other) source from modsplit.py processed *without*
                 # the --noprocess option.                    
-                # Add type if COMMON (.cmn) or ASCII (.asc).
+                # Add type line if COMMON (.cmn) or ASCII (.asc).
                 # Convert INCLUDE to *CALL if not ASCII.
                 # Convert ASCII characters to 6/12 Display Code if ASCII.
                 fout.write(stem.upper()+'\n')

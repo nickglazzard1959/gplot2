@@ -221,7 +221,7 @@ def main():
 
     # Open FTP connection.
     print('Contacting NOS FTP server on host:', args.hostname)
-    ntries = 20
+    ntries = 40
     for i in range(ntries):
         try:
             ftp = FTP(args.hostname)
