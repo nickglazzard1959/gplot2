@@ -55,8 +55,8 @@ if [ ! -d ${LIBNAME} ]; then
 fi
 modjoin -f ${SRCNAME} ${EXTRA_ARGS} ${LIBNAME} ${JOBNAME} PL${LIBNAME_UPPER}
 rc=$?
-if [ rc -ne 0 ]; then
-    if [ rc -eq 213 ]; then
+if [ $rc -ne 0 ]; then
+    if [ $rc -eq 213 ]; then
         exit 0
     else
         exit 1
@@ -64,7 +64,7 @@ if [ rc -ne 0 ]; then
 fi
 nosftp -p $NOSPW -e "put ${SRCNAME}.plsrc SR${LIBNAME_UPPER} display" $NOSUSER $NOSHOST
 rc=$?
-if [ rc -ne 0 ]; then
+if [ $rc -ne 0 ]; then
     exit 1
 fi
 runrbf.sh ${JOBNAME}
