@@ -89,6 +89,3 @@ C    FIRST ROW FINISHED HERE
       CALL DFX164(N,0.0,0.0,15)
       RETURN
       END
-C
-C----------------------------------------------
-C

@@ -1,0 +1,6 @@
+{
+    "BOOLEAN":"BYTE",
+    "PARAMETER (NA12WD=12)":"PARAMETER (NA12WD=128)",
+    "O\"37\"":"31",
+    "SHIFT":"ISHFT"
+}

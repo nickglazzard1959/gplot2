@@ -73,6 +73,3 @@ C    SET COLOUR/INTENSITY
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

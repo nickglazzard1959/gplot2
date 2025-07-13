@@ -7,10 +7,13 @@ C --- NEGATED.
 C
       CHARACTER*1 CHAR
 C
-C --- CDC ICHAR BY DEFAULT SHOULD RETURN THE DISPLAY CODE VALUE.
+C --- CDC ICHAR BY DEFAULT SHOULD RETURN THE ASCII CODE VALUE.
 C --- BUT IT DOES NOT. IT RETURNS THE ASCII CODE - 32.
 C
       N = ICHAR( CHAR ) + 1
+#ifdef PORTF77
+      N = N - 32
+#endif
       IF( (N.LT.1) .OR. (N.GT.96) ) THEN
         DFXM01 = - N
       ELSE
@@ -19,4 +22,3 @@ C
 C
       RETURN
       END
-C --- -----------------------------------------------------------------

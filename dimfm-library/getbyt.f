@@ -1,3 +1,4 @@
+#ifndef PORTF77
       INTEGER FUNCTION GETBYT( WORD, BYTE )
 C --- ------------------------------------------------------------------
 C
@@ -73,11 +74,16 @@ C
           BX6    X1*X3       IGETB8 = ( V >> ( 8 * B ) ) .AND. 377B
           EQ     IGET8B
           END
+#else
+      INTEGER FUNCTION GETBYT( WORD, BYTE )
+C --- ------------------------------------------------------------------
 C
+C --- EXTRACT BYTE NUMBER BYTE FROM INTEGER WORD.
+C --- UNIX VERSION.
 C
-C
-C ==================================================
-C === STUB ROUTINES = FUNCTIONALITY NOT REQUIRED ===
-C ==================================================
-C
-C --- -----------------------------------------------------------------
+      INTEGER WORD, BYTE
+      GETBYT = IAND( ISHFT( WORD, -8*BYTE ), 255 )
+      IF( GETBYT .GT. 127 )GETBYT = GETBYT - 256
+      RETURN
+      END
+#endif

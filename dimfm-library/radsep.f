@@ -14,6 +14,3 @@ C    POSITIVE OR ZERO IS ACTUAL SPECIFIED SEPARATION
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

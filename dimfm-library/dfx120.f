@@ -86,6 +86,3 @@ C    CHARACTER HEIGHT/BROKEN LINE SCALING PERFORMED IN DFX1AA
 C    CHARDEF NOT REQUIRED AS SET IN SYMTXT/SYM
       RETURN
       END
-C
-C----------------------------------------------
-C

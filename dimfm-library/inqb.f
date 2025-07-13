@@ -31,6 +31,3 @@ C    1 - BOUNDS; 2 - (WINDOW)PANE; 3 - BLANKING
 C    N.B.  ONLY EVER ACCESSED BY USER
       GO TO 99
       END
-C
-C----------------------------------------------
-C

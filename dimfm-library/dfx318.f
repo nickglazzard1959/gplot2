@@ -6,6 +6,7 @@
       CHARACTER*3 IMNTHS(12)
       INCLUDE 'dfxc00.cmn'
       INCLUDE 'dfxc00s.cmn'
+      SAVE IMNTHS
       DATA IMNTHS/'JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG',
      1          'SEP','OCT','NOV','DEC'/
 C    N.B. USES USER ACTIVE ALPHABET AND FEATURES
@@ -49,6 +50,3 @@ C    NOTE..VALUES OF MONTH AXIS REQUIRES VALUES AT EXTREMA
    16 IF (MM.LE.0) MM = MM + 12
   100 RETURN
       END
-C
-C----------------------------------------------
-C

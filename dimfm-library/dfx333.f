@@ -60,6 +60,3 @@ C      (NOT IN DFX300/DFX301 SEQUENCE SO CANNOT USE DFX137 TO FORCE)
       CALL DFX130(0)
       GO TO 99
       END
-C
-C----------------------------------------------
-C

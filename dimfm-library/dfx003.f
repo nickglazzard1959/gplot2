@@ -10,6 +10,3 @@ C    NOW OUTPUT STRING TO JOB-LOG/DAYFILE ETC
       CALL DFXMS0(NA,TEXT)
    99 RETURN
       END
-C
-C----------------------------------------------
-C

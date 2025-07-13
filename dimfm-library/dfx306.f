@@ -95,6 +95,3 @@ C    ICH = 1 UP ARROW, = 2 DOWN ARROW
       CALL DFX147(1)
       GO TO JUMP,(31,32)
       END
-C
-C----------------------------------------------
-C

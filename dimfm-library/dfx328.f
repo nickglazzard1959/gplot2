@@ -26,6 +26,3 @@ C   NO TEST FOR ZERO LENGTH STRING - JUST GO AND DO IT
       CALL DFX301
       RETURN
       END
-C
-C----------------------------------------------
-C

@@ -125,6 +125,3 @@ C    IADJ MUST BE 1 HERE OR ERROR
       CALL DFX110(X,Y)
       GO TO JUMP,(40,41)
       END
-C
-C----------------------------------------------
-C

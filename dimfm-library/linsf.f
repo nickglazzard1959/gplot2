@@ -11,6 +11,3 @@ C    ENSURE DIAGNOSTIC ONLY ONCE
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

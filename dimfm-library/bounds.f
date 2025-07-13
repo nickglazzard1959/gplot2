@@ -7,6 +7,3 @@ C    REROUTE TO INTERNAL FUNCTION
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

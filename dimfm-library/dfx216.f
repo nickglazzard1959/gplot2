@@ -49,6 +49,9 @@ C    Z IS LENGTH AT UNIT HEIGHT
       Y = 0.0
       IF (Z.LE.0.0) GO TO 999
 C    IN CASE NULL STRING - RETURN WITH SENSIBLE PARAMETERS
+      IF( ABS(YFIT1 - YFIT2) .LE. 0.0001 )THEN
+         YFIT2 = YFIT1 + 1.0
+      ENDIF
       YMIN = YFIT1/HT
       YMAX = YFIT2/HT
 C    GET MAXIMUM HEIGHT -
@@ -88,6 +91,3 @@ C    FLUSH TO TOP (MY=2)
       CALL DFX130(0)
       GO TO 999
       END
-C
-C----------------------------------------------
-C

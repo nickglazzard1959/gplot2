@@ -18,6 +18,3 @@ C    NOW RELEASE FONT FILE
       IF (FATPT.NE.0) CALL DFX001(' ',19)
    99 RETURN
       END
-C
-C----------------------------------------------
-C

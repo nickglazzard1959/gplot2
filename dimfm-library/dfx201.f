@@ -9,6 +9,7 @@ C    DIMFILM CURRENTLY SUPPORTS MAXBET UP TO A MAXIMUM OF 3
       CHARACTER*6 THIS
       CHARACTER*10 C1
       CHARACTER*24 MESS(2:5)
+      SAVE MESS
       DATA MESS(2)/'WAS TRUNCATED'/
       DATA MESS(3)/'HAD EXCESS ENTRIES'/
       DATA MESS(4)/'HAD INSUFFICIENT ENTRIES'/
@@ -38,6 +39,3 @@ C                   IERR +1 IS FONT NOT KNOWN
       CALL DFX130(0)
   999 RETURN
       END
-C
-C----------------------------------------------
-C

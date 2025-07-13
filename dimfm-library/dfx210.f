@@ -16,6 +16,3 @@ C    DIMFILM CURRENTLY SUPPORTS MAXBET UP TO A MAXIMUM OF 3
       IB = MAXBET + 1
       CALL DFX201(IB,NFONT,THIS,C1)
       END
-C
-C----------------------------------------------
-C

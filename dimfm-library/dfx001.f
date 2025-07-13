@@ -15,6 +15,7 @@ C           RECURSION WHEN INITIATED BY DFX005 (ERROR 024)
       INCLUDE 'dfxcbcs.cmn'
       INCLUDE 'dfxcbd.cmn'
       CHARACTER*14 M15(3)
+      SAVE M15
       DATA M15/'DEACTIVATE W/S','CLOSE W/S','CLOSE GKS'/
   997 IF (ERRNUM.GE.0) WRITE(ERRREC,800) ERRNUM,NAME
   800 FORMAT('*****DIMFILM FATAL ERROR ',I3.3,' (DETECTED BY ',A,
@@ -203,6 +204,3 @@ C    ELSE TERMINATE AT LEVEL 2
      1 A6)
       GO TO 950
       END
-C
-C----------------------------------------------
-C

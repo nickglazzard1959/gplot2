@@ -1,35 +1,3 @@
-C
-      INTEGER FUNCTION CTOI( CIN )
-C-------------------------------------------------
-C CONVERT CHARACTER TO INTEGER
-C-------------------------------------------------
-      CHARACTER*(*) CIN
-      CHARACTER*12 DIGS
-      INTEGER IVAL, IISIGN, IDX, I, L
-      DIGS = '0123456789-+'
-      L = LEN(CIN)
-      IISIGN = 1
-      IVAL = 0
-      DO 1 I=1,L
-         IDX = INDEX(DIGS,CIN(I:I))
-         IF(IDX.EQ.0)GOTO 2
-         IF((IDX.EQ.11).OR.(IDX.EQ.12))THEN
-            IF(I.EQ.1)THEN
-               IF(IDX.EQ.11)THEN
-                  IISIGN = -1
-               ENDIF
-            ELSE
-               GOTO 2
-            ENDIF
-         ELSE
-            IVAL = 10 * IVAL + (IDX-1)
-         ENDIF
-  1   CONTINUE
-  2   CONTINUE
-      CTOI = IISIGN * IVAL
-      RETURN
-      END
-C
       SUBROUTINE A12GO( UNIT )
 C-------------------------------------------------
 C PREPARE TO SEND "8-IN-12" DATA (E.G. ASCII) TO
@@ -43,10 +11,12 @@ C-------------------------------------------------
 C--- SET ALL BUFFER 60 BIT WORDS TO 0.
       DO 1 I=1,NA12WD
          BUF(I) = 0
-  1   CONTINUE
+ 1    CONTINUE
+#ifndef PORTF77      
 C--- TO START "8-IN-12" THE FIRST 12 BITS OF THE OUTPUT
 C--- MUST BE 0007.
       BUF(1) = SHIFT(O"0007",48)
+#endif
       IWP = 1
       ICP = 1
       RETURN
@@ -57,8 +27,18 @@ C--------------------------------------------------
 C SEND AN 8 BIT VALUE, VAL8, TO THE "8-IN-12" OUTPUT
 C STREAM.
 C--------------------------------------------------
-      BOOLEAN VAL8
       INCLUDE 'a12cmn.cmn'
+#ifdef PORTF77
+      INTEGER VAL8
+C--- JUST INSERT IN TO THE BUFFER (WHICH IS BYTE SIZED).
+      BUF(IWP) = INT(IAND(VAL8,255),1)
+      IWP = IWP + 1
+C--- FLUSH THE BUFFER TO OUTPUT WHEN ALL BYTES USED.
+      IF( IWP .GT. NA12WD )THEN
+         CALL A12FLS
+      ENDIF      
+#else
+      BOOLEAN VAL8
       BOOLEAN VAL12
 C--- THE 12 BITS MUST BEGIN WITH 0100 IN TOP 4 BITS
 C--- INSERT 12 BITS IN RIGHT CHUNK OF 60 BIT WORD.
@@ -74,9 +54,29 @@ C--- FLUSH THE BUFFER TO OUTPUT WHEN ALL WORDS USED.
             CALL A12FLS
          ENDIF
       ENDIF
+#endif
       RETURN
       END
 C
+#ifdef PORTF77
+      SUBROUTINE A12OUTB( VAL8 )
+C--------------------------------------------------
+C SEND AN 8 BIT VALUE, VAL8, TO THE "8-IN-12" OUTPUT
+C STREAM.
+C--------------------------------------------------
+      BYTE VAL8
+      INCLUDE 'a12cmn.cmn'
+C--- JUST INSERT IN TO THE BUFFER (WHICH IS BYTE SIZED).
+      BUF(IWP) = VAL8
+      IWP = IWP + 1
+C--- FLUSH THE BUFFER TO OUTPUT WHEN ALL BYTES USED.
+      IF( IWP .GT. NA12WD )THEN
+         CALL A12FLS
+      ENDIF
+      RETURN
+      END
+C
+#endif
       SUBROUTINE A12SEQ( VAL8S, NVAL8 )
 C---------------------------------------------------
 C SEND A SEQUENCE OF NVAL8 8 BIT VALUES, VAL8S.
@@ -85,7 +85,7 @@ C---------------------------------------------------
       BOOLEAN VAL8S(NVAL8)
 C
       DO 1 I=1,NVAL8
-         CALL A12OUT(VAL8S(I))
+         CALL A12OUT(INT(VAL8S(I)))
   1   CONTINUE
       RETURN
       END
@@ -96,6 +96,18 @@ C FLUSH THE "8-IN-12" OUTPUT STREAM.
 C---------------------------------------------------
       INCLUDE 'a12cmn.cmn'
 C--- IF THERE IS ANY DATA IN THE BUFFER, SEND IT.
+#ifdef PORTF77
+      IF(IWP.GT.1)THEN
+         ITOP = MIN(IWP,NA12WD)
+         CALL SNDBYT(BUF,ITOP)
+C         BUFFER OUT (A12UNT,1) (BUF(1),BUF(ITOP))
+      ENDIF
+C--- RE-INITIALIZE THE BUFFER.
+      IWP = 1
+      DO 1 I=1,NA12WD
+         BUF(I) = 0
+  1   CONTINUE      
+#else
       IF((IWP.EQ.1 .AND. ICP.GT.1).OR.IWP.GT.1)THEN
          ITOP = MIN(IWP,NA12WD)
          BUFFER OUT (A12UNT,1) (BUF(1),BUF(ITOP))
@@ -107,6 +119,7 @@ C--- RE-INITIALIZE THE BUFFER.
          BUF(I) = 0
   1   CONTINUE
       BUF(1) = SHIFT(O"0007",48)
+#endif      
       RETURN
       END
 C
@@ -288,8 +301,10 @@ C----------------------------------------------------
       READ(5,101,END=9,ERR=9)C
  101  FORMAT(A1)
       IF( C(1:1) .EQ. 'N' )GOTO 8
-   9  CONTINUE
+ 9    CONTINUE
+#ifndef PORTF77
       IWEOF = EOF(5)
+#endif
       CALL GTCLR
       RETURN
       END
@@ -406,8 +421,10 @@ C----------------------------------------------------
       READ(5,101,END=9,ERR=9)C
  101  FORMAT(A1)
       IF( C(1:1) .EQ. 'N' )GOTO 8
-   9  CONTINUE
+ 9    CONTINUE
+#ifndef PORTF77
       IWEOF = EOF(5)
+#endif
       CALL TEKCLR
       RETURN
       END

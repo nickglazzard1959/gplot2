@@ -11,6 +11,3 @@ C    FINAL ARGUMENT (LOGICAL) FLAGS AS ARC REFERENCE
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

@@ -232,6 +232,3 @@ C    HERE FOR SPECIFIED WIDTH
   304 CONTINUE
       GO TO 500
       END
-C
-C----------------------------------------------
-C

@@ -8,6 +8,3 @@ C    FUNCTION IS THE INCREASE OF SYMBOL HEIGHTS FOR 35MM SLIDES
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

@@ -1,6 +1,5 @@
       SUBROUTINE DFX171
 C    USED TO SET UP PSEUDO-CELL ARRAY FOR CELL LINES
-      LOGICAL IN
       INCLUDE 'dfxc00.cmn'
       INCLUDE 'dfxc00s.cmn'
       INCLUDE 'dfxc05.cmn'
@@ -8,7 +7,6 @@ C    USED TO SET UP PSEUDO-CELL ARRAY FOR CELL LINES
       INCLUDE 'dfxc24.cmn'
       INCLUDE 'dfxcp0.cmn'
       INCLUDE 'dfxcbb.cmn'
-      LOGICAL DFX103
       RSTERR =  0
       IF (RASTDX.EQ.0) GO TO 10
       CALL DFX170(RASTPX,RASTPY,RASTQX,RASTQY,RSTERR)
@@ -21,6 +19,3 @@ C    USED TO SET UP PSEUDO-CELL ARRAY FOR CELL LINES
       RSTERR = 3
       GO TO 99
       END
-C
-C----------------------------------------------
-C

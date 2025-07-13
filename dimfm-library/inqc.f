@@ -31,6 +31,3 @@ C    1 - XPOS,YPOS; 2 - XS,YS; 3 - X0T,Y0T
 C    N.B.  ONLY EVER ACCESSED BY USER
       GO TO 99
       END
-C
-C----------------------------------------------
-C

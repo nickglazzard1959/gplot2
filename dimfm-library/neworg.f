@@ -29,6 +29,3 @@ C    NOTE IF OTHER TRANSFORMS ALLOWED MODIFY WCTRN TO TAKE ACCOUNT
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

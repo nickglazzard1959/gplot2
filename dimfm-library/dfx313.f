@@ -82,6 +82,3 @@
      2ERMINATED AT THIS POINT')
       GO TO 65
       END
-C
-C----------------------------------------------
-C

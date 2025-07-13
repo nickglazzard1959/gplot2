@@ -25,6 +25,3 @@ C    INTERPOLATION ROUTINE (CUBIC)
     1 CALL DFX106(XP,YP)
       RETURN
       END
-C
-C----------------------------------------------
-C

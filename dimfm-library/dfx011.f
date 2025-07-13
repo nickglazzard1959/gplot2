@@ -10,6 +10,3 @@ C    INITIALISATION (VIA DFX006)
       SYSIA = IA.NE.0
       RETURN
       END
-C
-C----------------------------------------------
-C

@@ -57,6 +57,3 @@ C   NOTE - X AND Y TRANSPOSED IN THIS CALL TO DFX216 (Y-LABELS)
       SANGL = 1.0
       GO TO 6
       END
-C
-C----------------------------------------------
-C

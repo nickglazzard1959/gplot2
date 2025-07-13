@@ -7,6 +7,3 @@ C PANE CHANGE 1
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

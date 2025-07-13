@@ -7,6 +7,3 @@ C    CLOSE ALL OPEN/ACTIVE WORK STATIONS AND CLOSE DIMFILM/GKS
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

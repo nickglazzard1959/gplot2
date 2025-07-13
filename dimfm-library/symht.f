@@ -16,6 +16,3 @@ C    CHARDEF NOT REQUIRED HERE AS SET IN SYMTXT/SYM
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

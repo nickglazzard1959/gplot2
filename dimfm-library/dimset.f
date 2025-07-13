@@ -10,6 +10,3 @@ C    MAY ONLY BE ENTERED WHEN SYSTEM CLOSED.
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

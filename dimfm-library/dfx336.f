@@ -299,6 +299,3 @@ C    NOT LINEAR-LINEAR
       ICHECK = ICSAVE
       RETURN
       END
-C
-C----------------------------------------------
-C

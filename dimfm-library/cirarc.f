@@ -8,6 +8,3 @@ C    LAST PARAMETER (LOGICAL) INDICATES ARC CALL OF DFX500
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

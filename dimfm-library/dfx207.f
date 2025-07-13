@@ -23,6 +23,7 @@ C        -10-N  BLANK FIELD, DELIMITER N FOUND
       CHARACTER*1 C
       CHARACTER*10 DIG
       LOGICAL FIRST,BLANK,NB
+      SAVE DIG
       DATA DIG/'0123456789'/
       NB = .FALSE.
       FIRST = .TRUE.
@@ -163,6 +164,3 @@ C    TRAILING BLANKS PERMITTED HERE
       IF (IPT.LE.0) GO TO 102
       GO TO 99
       END
-C
-C----------------------------------------------
-C

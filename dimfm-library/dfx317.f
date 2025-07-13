@@ -87,6 +87,3 @@ C    FORCE TRANSFORM
   100 CALL DFX301
       RETURN
       END
-C
-C----------------------------------------------
-C

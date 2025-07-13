@@ -39,6 +39,3 @@ C    MUST SET POSITION AND COLOUR
       ACTFN = .TRUE.
    99 RETURN
       END
-C
-C----------------------------------------------
-C

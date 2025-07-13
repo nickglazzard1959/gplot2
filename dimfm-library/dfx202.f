@@ -83,6 +83,7 @@ C    DIMFILM CURRENTLY SUPPORTS MAXBET UP TO A MAXIMUM OF 3
       INTEGER XYDATA(2,DATBUF)
       EQUIVALENCE (ICDATA,XYDATA)
       INTEGER LXM(9),RXM(9),LYM(9),UYM(9)
+      SAVE LXM, RXM, LYM, UYM
       DATA LXM/1,1,1,6*0/
       DATA RXM/6*0,1,1,1/
       DATA LYM/1,0,0,1,0,0,1,0,0/
@@ -270,6 +271,3 @@ C    DUMMY (OFF) IF ABSOLUTE (MUST ALL BE ABSOLUTE)
       ENDIF
       GO TO 10
       END
-C
-C----------------------------------------------
-C

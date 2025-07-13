@@ -88,6 +88,3 @@ C   FLAG WINDOW INITIALISATION FOR DRIVER
       IERR = 2
       GO TO 99
       END
-C
-C----------------------------------------------
-C

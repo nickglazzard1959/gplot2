@@ -98,6 +98,3 @@ C    LINEAR-LINEAR
      2 57HCALL HAS BEEN IGNORED, RETURN MADE FROM SUBROUTINE GRAPHF)
       GO TO 40
       END
-C
-C----------------------------------------------
-C

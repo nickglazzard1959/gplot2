@@ -54,6 +54,3 @@ C    MARGIN RELATIVE TO BLANK
      3  1P4E14.5/1H ,21X,'CALL IGNORED')
       GO TO 99
       END
-C
-C----------------------------------------------
-C

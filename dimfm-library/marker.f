@@ -44,6 +44,3 @@ C    CHECK RANGE OF ARGUMENT
      3S ',I4)
       GO TO 2
       END
-C
-C----------------------------------------------
-C

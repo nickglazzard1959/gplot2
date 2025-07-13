@@ -58,6 +58,3 @@ C NG- OTHER THINGS THAT LOOK LIKE THEY REALLY OUGHT TO BE INITIALIZED.
       DATA SCALE/0.0/, SCALE1/0.0/
       DATA LINSYM/0/, ISAVE/0/, INTCH/0/, IICHAR/0/
       END
-C
-C----------------------------------------------
-C

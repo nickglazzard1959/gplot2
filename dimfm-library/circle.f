@@ -9,6 +9,3 @@ C    LAST PARAMETER (LOGICAL) INDICATES CALL OF DFX500 IS WHOLE CIRCLE
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

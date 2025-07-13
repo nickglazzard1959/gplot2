@@ -9,6 +9,7 @@
       LOGICAL SWCTR
       INCLUDE 'dfxc03.cmn'
       CHARACTER*24 RTXT
+      SAVE RTXT
       DATA RTXT/' FOR LOGARITHMIC RADIAL '/
       T = THETA*ANGCON(1,ANGRP(2))
       R = R1
@@ -61,6 +62,3 @@ C     (NOT IN DFX300/DFX301 SEQUENCE SO CANNOT USE DFX137 TO FORCE)
       CALL DFX130(0)
       GO TO 99
       END
-C
-C----------------------------------------------
-C

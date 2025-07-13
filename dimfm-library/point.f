@@ -1,5 +1,4 @@
       SUBROUTINE POINT(X,Y)
-      LOGICAL IN, DFX103
       INCLUDE 'dfxc05.cmn'
       INCLUDE 'dfxc12.cmn'
       ROUTIN = 'POINT'
@@ -8,6 +7,3 @@
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

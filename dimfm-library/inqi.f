@@ -31,6 +31,3 @@ C    11 - ANGRP(3); 12 - ANGRP(4)
 C    N.B.  ONLY EVER ACCESSED BY USER
       GO TO 99
       END
-C
-C----------------------------------------------
-C

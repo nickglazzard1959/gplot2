@@ -58,6 +58,3 @@ C    HERE TO EQUAL FIT X-SIDES
       RXR = (XX2 + XX1 - (X2+X1)*RSCALE)*.5
     3 RETURN
       END
-C
-C----------------------------------------------
-C

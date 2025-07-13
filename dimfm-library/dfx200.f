@@ -72,6 +72,3 @@ C    THIS WILL REPOSITION AND RESET XPOS,YPOS
       ENDIF
    99 RETURN
       END
-C
-C----------------------------------------------
-C

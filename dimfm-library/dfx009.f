@@ -24,8 +24,5 @@ C     TRACEBACK ON SOME SYSTEMS)
   100 DO 3 I=1,6
     3 ERRREC(I) = '*'
       RETURN
-   10 FORMAT(A)
+   10 FORMAT(A120)
       END
-C
-C----------------------------------------------
-C

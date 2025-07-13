@@ -135,11 +135,13 @@ def to_ascii( line ):
 
     return retline
 
-def write_module(modinfo, upcase, outdir, omits, modsrc):
+def write_module(modinfo, upcase, outdir, modsrc):
     """
     Write out a module as a file. 
     If upcase, make all code UPPER CASE.
-    Convert *call xxx to INCLUDE 'xxx'
+    If modsrc is False apply the following conversions, otherwise leave untouched.
+    Convert *call xxx to INCLUDE 'xxx'.
+    Convert *if def,x / undef,x / eq,x,num / ne,x,num to C preprocessor equivalents. 
     Prepend outdir to the output filename.
 
     ASCII (.asc) data is treated specially. It is converted from 6/12 Display Code
@@ -159,10 +161,54 @@ def write_module(modinfo, upcase, outdir, omits, modsrc):
             ascii_line = to_ascii(line)
             fout.write(ascii_line+'\n')
     else:
+        if not modsrc:
+            # Trim trailing comment lines.
+            # If the MODIFY source is reconstructed by modjoin.py so that the
+            # last module in the whole file has trailing comment lines, FTN5 will
+            # try to compile the comments as a new sub-program, find no start (SUBROUTINE, etc.)
+            # or END and issue a FATAL error. This will only happen if they are there in the
+            # very last module, but they may be (and have been) unless they are always trimmed.
+            n_lines = nt_lines = len(text)
+            for i_line in range(n_lines-1,-1,-1):
+                c1 = text[i_line][0]
+                if (c1 != 'C') and (c1 != 'c'):
+                    break
+                nt_lines -= 1
+            if nt_lines == 0:
+                print('WARNING: Empty file after trailing comment line stripping!')
+                fout.close()
+                return
+            text = text[:nt_lines]
+            
         for line in text:
             if (line[:5].lower() == '*call') and (not modsrc):
                 incname = line[6:].lower() + '.cmn'
                 fout.write('      '+incstr+"'"+incname+"'"+'\n')
+            elif (line[:3].lower() == '*if') and (not modsrc):
+                ifparms = line[3:].strip().split(',')
+                if len(ifparms) == 2:
+                    if ifparms[0].lower() == 'def':
+                        fout.write('#ifdef '+ifparms[1]+'\n')
+                    elif ifparms[0].lower() == 'undef':
+                        fout.write('#ifndef '+ifparms[1]+'\n')
+                    else:
+                        print('WARNING: Invalid *IF (defined), making comment:',line.strip())
+                        fout.write('C '+line+'\n')                    
+                elif len(ifparms) == 3:
+                    if ifparms[0].lower() == 'eq':
+                        fout.write('#if '+ifparms[1]+' == '+ifparms[2]+'\n')
+                    elif ifparms[0].lower() == 'ne':
+                        fout.write('#if '+ifparms[1]+' != '+ifparms[2]+'\n')
+                    else:
+                        print('WARNING: Invalid *IF (compare), making comment:',line.strip())
+                        fout.write('C '+line+'\n')  
+                else:
+                    print('WARNING: Invalid *IF (unknown), making comment:',line.strip())
+                    fout.write('C '+line+'\n')
+            elif (line[:5].lower() == '*else') and (not modsrc):
+                fout.write('#else\n')
+            elif (line[:6].lower() == '*endif') and (not modsrc):
+                fout.write('#endif\n')
             else:
                 if upcase:
                     fout.write(line.upper()+'\n')
@@ -321,7 +367,7 @@ MODIFY program library.
                 status = ' '
             print('Module: {:7s}  Type: {:7s}  Lines: {:5d} {:7s}'.format(modinfo[0],mtype,modinfo[2],status))
             #print 'Module:',modinfo[0],'Type:',mtype,'Lines:',modinfo[2] 
-            write_module(modinfo, args.upper, outdir, omits, args.noprocess)
+            write_module(modinfo, args.upper, outdir, args.noprocess)
             n_modules += 1
 
     # Optionally, write a compile script.

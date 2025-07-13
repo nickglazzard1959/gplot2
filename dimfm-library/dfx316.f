@@ -27,6 +27,3 @@ C    MUST ENSURE ONLY THOSE AREAS WITHIN GRAPHICAL AREA ARE HATCHED
       GAP = X2
       RETURN
       END
-C
-C----------------------------------------------
-C

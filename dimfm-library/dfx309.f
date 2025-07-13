@@ -13,10 +13,11 @@
       INCLUDE 'dfxc10.cmn'
       INCLUDE 'dfxc10s.cmn'
       INTEGER DFX020
+      SAVE DL10
+      DATA DL10/1.0/
       CS1(I) = (FLOAT(I)-1.0)*(C1MONO+C1SEP) + C1MONO
 C    STATEMENT FUNCTION CS1 GIVES LENGTH OF MONO STRING OF
 C    I CHARACTERS AT UNIT HEIGHT
-      DATA DL10/1.0/
       SMONSP = MONSP
 C    FORCE MONO FOR VALUES
       MONSP = .TRUE.
@@ -300,6 +301,3 @@ C*******************************************************************
    99 MONSP = SMONSP
       RETURN
       END
-C
-C----------------------------------------------
-C

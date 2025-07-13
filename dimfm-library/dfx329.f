@@ -138,6 +138,3 @@ C    FORCE TRANSFORM
      1T (OR ZERO RANGE) ORTHOGONAL AXIS'/1H ,21X,'ORIGINATED IN ',A)
       GO TO 99
       END
-C
-C----------------------------------------------
-C

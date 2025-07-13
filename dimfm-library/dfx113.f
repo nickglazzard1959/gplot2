@@ -30,6 +30,3 @@ C    NOTE IF OTHER TRANSFORMS ALLOWED MODIFY WCTRN TO TAKE ACCOUNT
       IF (NOTR.EQ.1) CALL DFX4AA
       RETURN
       END
-C
-C----------------------------------------------
-C

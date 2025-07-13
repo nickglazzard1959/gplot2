@@ -26,6 +26,3 @@ C   SUPPRESS DIAGNOSTICS
       ENDIF
       RETURN
       END
-C
-C----------------------------------------------
-C

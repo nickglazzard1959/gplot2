@@ -16,6 +16,3 @@ C    INTERNALLY IN MARKER/DFX200
     1 CONTINUE
       RETURN
       END
-C
-C----------------------------------------------
-C

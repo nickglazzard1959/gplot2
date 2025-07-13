@@ -7,6 +7,7 @@
       INCLUDE 'dfxc06.cmn'
       REAL PART(7)
       INCLUDE 'dfxc03.cmn'
+      SAVE X, Y, PART
       DATA PART/0.,0.,-1.,-1.,0.,0.,-1./
       DATA X/-1.,0.,-1.,-2.,-1.,-2.,-1.,0./
       DATA Y/-1.,-.5,0.,-.5,0.,-.5,-1.,-.5/
@@ -49,6 +50,3 @@ C    HERE FOR 90/270
       DY = Y(II)*SSH + DY
       RETURN
       END
-C
-C----------------------------------------------
-C

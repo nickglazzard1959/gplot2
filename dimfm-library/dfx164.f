@@ -12,6 +12,3 @@ C    INSERTS COLUMNWISE FROM N
     1 N = N + 16
       RETURN
       END
-C
-C----------------------------------------------
-C

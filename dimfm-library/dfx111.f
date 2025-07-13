@@ -45,6 +45,3 @@ C--- BOUNDS/WC WINDOW CHECKING PERFORMED NOW - MAY NEED AMENDING
       YS = Y
       CALL DFX001('OFF2',7)
       END
-C
-C----------------------------------------------
-C

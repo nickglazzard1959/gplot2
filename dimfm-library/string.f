@@ -21,12 +21,12 @@ C
       LENGTH = .TRUE.
       CALL DFX214(ITEXT)
       LENGTH = .FALSE.
+      IF( ABS(HT) .LT. 0.0001 )THEN
+         HT = 1.0
+      ENDIF
       Z = XPASS/HT
       STRING = Z
       XPASS = 100.0
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

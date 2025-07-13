@@ -15,6 +15,3 @@ C    ANGLS IS PERMANENTLY SAVED ANGLE - ANGL IS FOR CURRENT TRANSFORM
       SANGL = SIN(ANGL)
       RETURN
       END
-C
-C----------------------------------------------
-C

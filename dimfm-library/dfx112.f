@@ -12,6 +12,3 @@
      1ALID PARAMETER ',I3,' - CALL IGNORED')
       RETURN
       END
-C
-C----------------------------------------------
-C

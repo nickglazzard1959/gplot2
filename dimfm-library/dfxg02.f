@@ -1,7 +1,7 @@
       SUBROUTINE DFXG02(ID,CONID,WSEXT)
 C    OPEN WS
       INTEGER ID,CONID
-      EXTERNAL WSEXT
+C      EXTERNAL WSEXT SHOULD NOT BE EXTERNAL AND ARGUMENT.
       INCLUDE 'params.cmn'
       INCLUDE 'dfxcaa.cmn'
       INCLUDE 'dfxcac.cmn'
@@ -40,6 +40,3 @@ C    DISPLAY SURFACE EMPTY
       IF (GKSOS.EQ.1) GKSOS = 2
    99 RETURN
       END
-C
-C----------------------------------------------
-C

@@ -29,7 +29,7 @@ C
       ROUTIN = 'DSVGCL'
 C
 C      PRINT 100,1
-  100  FORMAT(1X,'AT ',I3)
+C  100  FORMAT(1X,'AT ',I3)
       CALL DFX122
 C      PRINT 100,2
       CALL DFXG02( 05, 0, DFXD05 )

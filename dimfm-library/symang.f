@@ -17,6 +17,3 @@ C    ANGLS IS PERMANENTLY SAVED ANGLE - ANGL IS FOR CURRENT TRANSFORM
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

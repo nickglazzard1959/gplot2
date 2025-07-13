@@ -38,6 +38,3 @@
       CALL DFX000(-4,ZDUMMY,ZDUMMY,ZDUMMY,NDUMMY)
    99 RETURN
       END
-C
-C----------------------------------------------
-C

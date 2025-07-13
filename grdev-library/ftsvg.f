@@ -105,8 +105,10 @@ C     WRITE(LUN,9)'<^B^O^D^Y>'
 C
 C---- SET BOUNDS TRACKING VARIABLES.
 C
-      XMIN = YMIN = 801.0
-      XMAX = YMAX = -1.0
+      XMIN = 801.0
+      YMIN = 801.0
+      XMAX = -1.0
+      YMAX = -1.0
 C
       END
 C
@@ -192,7 +194,7 @@ C----
       DATA STYWID /'^S^T^R^O^K^E-^W^I^D^T^H:'/
 C     DATA MATRIX /'^T^R^A^N^S^F^O^R^M="^M^A^T^R^I^X(1 0 0 -1 0 800)"'/
       DATA MATRIX /'^T^R^A^N^S^F^O^R^M="^M^A^T^R^I^X(1 0 0  1 0   0)"'/
-      DATA LB /'<^L^I^N^E ^X1="'/
+      DATA LB /'<^L^I^N^E*^X1="'/
       IF( ON )THEN
 C
 C---- IF NOT IN A GROUP, OPEN A GROUP SETTING COLOUR AND WIDTH.
@@ -216,24 +218,21 @@ C---- DO FIXED WIDTH OUTPUT TO CFMT, THEN REMOVE SPACES TO COUT.
          WRITE(CFMT,100)LB,XPOS,800.0-YPOS,X,800.0-Y
          IOUT = 0
          DO 2 I=1,68
-            IF( (I .GE. 16 .AND. I .LT. 19) .OR.
-     +          (I .GE. 30 .AND. I .LT. 33) .OR.
-     +          (I .GE. 44 .AND. I .LT. 47) .OR.
-     +          (I .GE. 58 .AND. I .LT. 61) )THEN
-               IF( CFMT(I:I) .NE. ' ' )THEN
-                  IOUT = IOUT + 1
-                  COUT(IOUT:IOUT) = CFMT(I:I)
-               ENDIF
-            ELSE
+            IF( CFMT(I:I) .NE. ' ' )THEN
                IOUT = IOUT + 1
                COUT(IOUT:IOUT) = CFMT(I:I)
             ENDIF
  2       CONTINUE
+         DO 3 I=1,IOUT
+            IF( COUT(I:I) .EQ. '*' )THEN
+               COUT(I:I) = ' '
+            ENDIF
+ 3       CONTINUE
          WRITE(SLUN,101)COUT(1:IOUT)
  101     FORMAT(A)
          EMPTYF = .FALSE.
       ENDIF
- 100  FORMAT(A,F7.3,'" ^Y1="',F7.3,'" ^X2="',F7.3,'" ^Y2="',F7.3,'" />')
+ 100  FORMAT(A,F7.3,'"*^Y1="',F7.3,'"*^X2="',F7.3,'"*^Y2="',F7.3,'" />')
 C
 C--- KEEP TRACK OF WHERE WE ARE AND THE BOUNDS OF WHERE WE'VE BEEN.
       XPOS = X

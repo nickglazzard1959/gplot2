@@ -38,6 +38,3 @@ C    THE CURRENT DFX300/DFX301 SEQUENCE WILL RETAIN THE APPROPRIATE
 C    TRANSFORMATION
       RETURN
       END
-C
-C----------------------------------------------
-C

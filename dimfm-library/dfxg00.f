@@ -93,6 +93,3 @@ C****************
 C     ERROR RETURN HERE FOR NOT CLOSED ON ENTRY
 C****************
       END
-C
-C----------------------------------------------
-C

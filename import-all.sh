@@ -12,18 +12,18 @@
 # CCL procedures PLPROCS --> procs-library
 # Keep this as "pure" MODIFY source with no source code conversions.
 # This code is only relevant to NOS.
-import-modify.sh procs -n
+IM_ALLOW_OVERWRITES=1 import-modify.sh procs -n
 #
 # Utilities library PLUTILS --> utils-library
-import-modify.sh utils
+IM_ALLOW_OVERWRITES=1 import-modify.sh utils
 #
 # Graphics devices library PLGRDEV --> grdev-library
-import-modify.sh grdev
+IM_ALLOW_OVERWRITES=1 import-modify.sh grdev
 #
 # DIMFILM library PLDIMFM --> dimfm-library
 # Create a Unix build script for this, as the code should compile
 # on Unix with few exceptions.
-import-modify.sh dimfm -s build-unix.sh --omit getbyt -l dimfilm.a
+IM_ALLOW_OVERWRITES=1 import-modify.sh dimfm "-s build-unix.sh --omit getbyt -l dimfilm.a"
 #
 # GPLOT program. PLGPLOT --> gplot-library
-import-modify.sh gplot
+IM_ALLOW_OVERWRITES=1 import-modify.sh gplot

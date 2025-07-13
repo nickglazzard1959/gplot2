@@ -27,6 +27,3 @@ C    OTHERWISE IS APPLIED TO CURRENT TRANSFORM (E.G. FROM GRAPHING)
       IF (NOTR.EQ.NTRAN) CALL DFX4AA
       RETURN
       END
-C
-C----------------------------------------------
-C

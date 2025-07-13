@@ -8,6 +8,3 @@ C    RESET CELL MAPPED AREA POINTER
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

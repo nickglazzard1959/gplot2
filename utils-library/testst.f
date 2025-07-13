@@ -18,7 +18,7 @@ C
 C
       WRITE(6,*)'CSTRING = ',CSTRING(1:NCC)
 C
-      NAC = STCTOA( 'This is a string.', ASTRING )
+      NAC = STCTOA( 'T^H^I^S ^I^S ^A ^S^T^R^I^N^G.', ASTRING )
       WRITE(6,*)'NAC = ',NAC
 C
       LENA = STLEN(ASTRING)

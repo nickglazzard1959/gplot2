@@ -774,6 +774,7 @@ C-----------------------------------------------------------------------
 C***********************************************************************
       INTEGER DEFALF(5)
       REAL XLSET(18),DCSET(17),DCEQ(17)
+      SAVE XLSET, DCSET, DEFALF, DEFINT
       EQUIVALENCE (DCEQ(1),DC1)
 C    EQUIVALENCE USED TO ENABLE PRESETTING
       DATA XLSET/10*1.0,1.0,-1.0,0.0,-1.0,1.0,-1.0,0.0,-1.0/
@@ -986,6 +987,3 @@ C    FLAG CELL MAPPED AREA AS UNSET
       RASTDX = 0
       RETURN
       END
-C
-C----------------------------------------------
-C

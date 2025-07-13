@@ -44,6 +44,3 @@ C    I = 2 OR 4 EXPECTS ROTATION OF 90 DEGREES TO HAVE BEEN PERFORMED
 C    PRIOR TO CALL OF DFX307
     4 GO TO 11
       END
-C
-C----------------------------------------------
-C

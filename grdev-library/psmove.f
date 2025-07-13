@@ -9,7 +9,6 @@ C
       REAL X, Y
       LOGICAL ON
 C
-      CHARACTER*5 C
       REAL XPS, YPS
 C
       INCLUDE 'dfxpsn.cmn'

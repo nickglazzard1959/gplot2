@@ -37,6 +37,3 @@ C    IF OWNDSH IN OPERATION - RESET TO BEGINNING OF PATTERN
       N3 = 10
       GO TO 3
       END
-C
-C----------------------------------------------
-C

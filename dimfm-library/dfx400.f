@@ -84,6 +84,3 @@ C    SEARCH FOR CLOSED CONTOUR - INDICATED BY SET MARKER BIT
     1 CONTINUE
       RETURN
       END
-C
-C----------------------------------------------
-C

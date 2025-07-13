@@ -19,6 +19,3 @@ C    SET COLOUR/INTENSITY
       CALL DFX301
       RETURN
       END
-C
-C----------------------------------------------
-C

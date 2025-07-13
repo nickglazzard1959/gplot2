@@ -50,6 +50,3 @@ C    FLAG AS RUN-LENGTH
      2T OCCURS')
       GO TO 99
       END
-C
-C----------------------------------------------
-C

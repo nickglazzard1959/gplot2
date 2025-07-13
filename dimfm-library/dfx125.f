@@ -6,6 +6,3 @@ C    DIRECT REFERENCE TO OFF2 REROUTED TO DFX111
       CALL DFX111(X,Y)
       RETURN
       END
-C
-C----------------------------------------------
-C

@@ -209,6 +209,3 @@ C    HERE FOR ACTUAL PLOTTING AND CENTRE DETERMINATION
       CALL DFX130(0)
       GO TO 12
       END
-C
-C----------------------------------------------
-C

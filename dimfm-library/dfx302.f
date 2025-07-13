@@ -10,6 +10,3 @@ C    (IF WITHIN .001)  NORMAL CALL IS FOR EXACT CASE +OR- N.0000
       DFX302 = S1
       RETURN
       END
-C
-C----------------------------------------------
-C

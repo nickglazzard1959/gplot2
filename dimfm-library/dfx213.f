@@ -18,6 +18,3 @@ C    SUBSEQUENT CALL TO SYMXT SHOULD BE (ITEXT(1:NA))
       SLONG = DFX212(ITEXT(1:NA))
    99 RETURN
       END
-C
-C----------------------------------------------
-C

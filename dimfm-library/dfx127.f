@@ -6,6 +6,3 @@ C
       CALL DFX000(-6,DUMMY,DUMMY,DUMMY,NDUMMY)
       RETURN
       END
-C
-C----------------------------------------------
-C

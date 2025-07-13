@@ -45,7 +45,7 @@ C    DIMFILM CURRENTLY SUPPORTS MAXBET UP TO A MAXIMUM OF 3
       PARAMETER (MAXBET=3)
       INCLUDE 'dfxc20.cmn'
 CDC*CALL DFXC20S
-      REAL SAVE(13)
+      REAL SSAVE(13)
       REAL GSAVE(14)
       LOGICAL HSSAV
       LOGICAL SSYMCO
@@ -56,19 +56,19 @@ C    ENSURE ALL DATA SAVED IN THIS ROUTINE
       IF (CANCL) GO TO 100
 C    AVOID MULTIPLE STATUS PRESERVATION BY REPEATED ENTRY
       CANCL = .TRUE.
-      SAVE(1) = X0T
-      SAVE(2) = Y0T
-      SAVE(3) = XPOS
-      SAVE(4) = YPOS
-      SAVE(5) = XS
-      SAVE(6) = YS
-      SAVE(7) = ANGL
-      SAVE(8) = ALPHA
-      SAVE(9) = CALPHA
-      SAVE(10) = SALPHA
-      SAVE(11) = HT
-      SAVE(12) = CANGL
-      SAVE(13) = SANGL
+      SSAVE(1) = X0T
+      SSAVE(2) = Y0T
+      SSAVE(3) = XPOS
+      SSAVE(4) = YPOS
+      SSAVE(5) = XS
+      SSAVE(6) = YS
+      SSAVE(7) = ANGL
+      SSAVE(8) = ALPHA
+      SSAVE(9) = CALPHA
+      SSAVE(10) = SALPHA
+      SSAVE(11) = HT
+      SSAVE(12) = CANGL
+      SSAVE(13) = SANGL
       SWCTR = WCTR
       SWCTRN = WCTRN(NOTR)
       SCLIP = PRECLP(NOTR)
@@ -138,19 +138,19 @@ C    MULTIPLE ENTRY TO DFX301 TO RESET STATUS IS PERMISSIBLE
 C    WILL RESET TO LAST SAVED STATE - ONLY ERRONEOUS IF DFX300 NEVER
 C    REFERENCED
       CANCL = .FALSE.
-      X0T = SAVE(1)
-      Y0T = SAVE(2)
-      XPOS = SAVE(3)
-      YPOS = SAVE(4)
-      XS = SAVE(5)
-      YS = SAVE(6)
-      ANGL = SAVE(7)
-      ALPHA = SAVE(8)
-      CALPHA = SAVE(9)
-      SALPHA = SAVE(10)
-      HT = SAVE(11)
-      CANGL = SAVE(12)
-      SANGL = SAVE(13)
+      X0T = SSAVE(1)
+      Y0T = SSAVE(2)
+      XPOS = SSAVE(3)
+      YPOS = SSAVE(4)
+      XS = SSAVE(5)
+      YS = SSAVE(6)
+      ANGL = SSAVE(7)
+      ALPHA = SSAVE(8)
+      CALPHA = SSAVE(9)
+      SALPHA = SSAVE(10)
+      HT = SSAVE(11)
+      CANGL = SSAVE(12)
+      SANGL = SSAVE(13)
       WCTR = SWCTR
       WCTRN(NOTR) = SWCTRN
       PRECLP(NOTR) = SCLIP
@@ -189,6 +189,3 @@ C    FROM BEGINNING, TEXT STRINGS RESUME WITH INITIAL FEATURES SET
       ICHECK = ICSAVE
       RETURN
       END
-C
-C----------------------------------------------
-C

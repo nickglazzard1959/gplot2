@@ -10,6 +10,3 @@ C    SUBSEQUENT CALL TO SYMXT SHOULD BE (ITEXT(1:NA))
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

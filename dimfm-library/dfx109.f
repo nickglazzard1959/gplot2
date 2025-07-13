@@ -37,6 +37,3 @@ C    AND FORCE CHANGE FLAG
   999 CALL DFX000(2,X,Y,ZDUMMY,NDUMMY)
       RETURN
       END
-C
-C----------------------------------------------
-C

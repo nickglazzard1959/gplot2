@@ -10,6 +10,3 @@ C    OF COLOUR TRIPLET ELEMENTS
       DFX145 = F*ZINT0(N)
       RETURN
       END
-C
-C----------------------------------------------
-C

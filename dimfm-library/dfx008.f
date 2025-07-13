@@ -17,6 +17,3 @@ C    IF NOT OPEN FLAG AS KNOWN BUT NOT OPEN
       IF (.NOT.WSOP(IWS)) IWS = -IWS
    99 RETURN
       END
-C
-C----------------------------------------------
-C

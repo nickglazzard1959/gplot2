@@ -8,6 +8,3 @@ C    DIRECT REFERENCE TO OFF2 REROUTED TO DFX111
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

@@ -3,6 +3,7 @@
       LOGICAL LF,LT
       INCLUDE 'dfxc00.cmn'
       INCLUDE 'dfxc00s.cmn'
+      SAVE LT, LF
       DATA LT,LF/.TRUE.,.FALSE./
       X2 = XEND
       X1 = XPOS
@@ -50,6 +51,3 @@
    20 XPOS = X2
       RETURN
       END
-C
-C----------------------------------------------
-C

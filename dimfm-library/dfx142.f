@@ -24,6 +24,3 @@ C    SKIP DIAGNOSTIC IF VIA DFX148 - SHOULD BE CHECKED ELSEWHERE
      3 1PE16.8,' USED INSTEAD')
       GO TO 2
       END
-C
-C----------------------------------------------
-C

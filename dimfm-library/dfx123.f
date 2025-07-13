@@ -64,6 +64,3 @@ C    REPEATED STATEMENT NECESSARY TO GET RESULT IN QUADRANTS 1 OR 4
    99 CONTINUE
       RETURN
       END
-C
-C----------------------------------------------
-C

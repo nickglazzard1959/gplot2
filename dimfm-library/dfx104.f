@@ -63,7 +63,7 @@ C    IS FORCED BY MACHINE ACCURACY CHECKS IN DFX100.
       IF (N1.GT.NO2) N1 = NO1
       XLDONE = 0.0
       GO TO 20
-   18 J = D/TL
+   18 J = INT(D/TL)
       D1 = J*TL
 C   SOME COMPILERS PERFORM I=X/Y AS I=X*(1./Y)
 C   THIS MAY YIELD AN INTEGER RESULT THAT IS 1 TOO SMALL
@@ -81,6 +81,3 @@ C   THIS IS CORRECT ONLY FOR POSITIVE D AND TL (AS HERE)
       XLDONE = 0.0
       RETURN
       END
-C
-C----------------------------------------------
-C

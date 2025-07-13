@@ -11,6 +11,3 @@ C    ENSURE DIAGNOSTIC CAN ONLY BE ISSUED ONCE
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

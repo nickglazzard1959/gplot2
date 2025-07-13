@@ -6,6 +6,7 @@
       INCLUDE 'dfxc00s.cmn'
       INCLUDE 'dfxc05.cmn'
       INCLUDE 'dfxc12.cmn'
+C      PRINT *,'DFX106: ',X1,Y1
       XEND = X1
       YEND = Y1
       IF (.NOT.WCTR) GO TO 1
@@ -74,6 +75,3 @@ C--- BOUNDS/WC WINDOW CHECKING PERFORMED NOW - MAY NEED AMENDING
       YPOS = YEND
     5 RETURN
       END
-C
-C----------------------------------------------
-C

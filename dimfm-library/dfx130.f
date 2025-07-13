@@ -3,6 +3,7 @@
       INCLUDE 'dfxc00s.cmn'
       INCLUDE 'dfxc05.cmn'
       INCLUDE 'dfxc12.cmn'
+      SAVE MAXWRN, LSTFRM, NUSFRM
       DATA MAXWRN/100/
       DATA LSTFRM/0/,NUSFRM/0/
 C    IF STARTF IS MODIFIED TO CALL FRAME THEN THE INITIALISATION
@@ -40,6 +41,3 @@ C    IF FINIF IS MODIFIED TO CALL FRAME THEN THIS COUNT SHOULD BE
 C    AMENDED.
       RETURN
       END
-C
-C----------------------------------------------
-C

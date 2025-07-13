@@ -15,6 +15,3 @@
      1',1PE16.8,' A VALUE OF ',F5.2,' HAS BEEN SUBSTITUTED')
       GO TO 1
       END
-C
-C----------------------------------------------
-C

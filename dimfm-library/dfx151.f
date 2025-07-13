@@ -10,6 +10,3 @@ C    FOR POLYNOMIAL EVALUATION WHERE DEGREE LESS THAN 6
       Y = Y*XX
       GO TO 1
       END
-C
-C----------------------------------------------
-C

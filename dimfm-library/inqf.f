@@ -49,6 +49,3 @@ C 10+(1-(MAXBET+2)) - FONT NUMBER OF RESIDENT ALPHABET
 C    N.B.  ONLY EVER ACCESSED BY USER
       GO TO 100
       END
-C
-C----------------------------------------------
-C

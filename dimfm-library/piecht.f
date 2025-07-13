@@ -41,6 +41,9 @@ C    TO THE COMPUTATION OF SIZE
       TOT = .TRUE.
       PERTOT = 1.0
       IF (PERS.GT.0) GO TO 20
+      IF( ABS(SUM) .LT. 0.0001 )THEN
+         SUM = 1.0
+      ENDIF
       PERTOT = 100./SUM
       GO TO 21
    20 IF (SUM.GT.100.1) GO TO 10
@@ -76,6 +79,9 @@ C    LAST PARAMETER (LOGICAL) INDICATES CALL OF DFX500 IS WHOLE CIRCLE
       SSEMI = AMIN1(SEMI,1.0)
 C    NEED ONLY ENSURE SEMI SUCH THAT ARG1 < RS ACCOUNTED FOR
       ARG1 = RLOW*TAN(SSEMI)*1.5
+      IF(ABS(ZS) .LT. 0.0001)THEN
+         ZS = 1.0
+      ENDIF
       ARG2 = RLEN/ZS
       SIZE = AMIN1(ARG1,ARG2)
       IF (PERC) NO = NO - 5
@@ -130,6 +136,3 @@ C  PERFORM EQUIVALENT OF ENSYMC
      2 21X,'CALL IGNORED')
       GO TO 99
       END
-C
-C----------------------------------------------
-C

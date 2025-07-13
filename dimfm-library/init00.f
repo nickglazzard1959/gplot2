@@ -1,0 +1,127 @@
+      SUBROUTINE INIT00
+C
+C     THIS SETS VARIABLES IN COMMON BLOCKS THAT SHOULD
+C     BE SET BY BLOCK DATA SUBPROGRAMS. IT IS LIKELY THAT
+C     THIS SHOULD NOT BE NEEDED, BUT ON SOME SYSTEMS, IT MAY
+C     BE USEFUL, IF ONLY FOR TEST PURPOSES.
+C      
+      INCLUDE 'params.cmn'
+      INCLUDE 'dfxc00.cmn'
+      INCLUDE 'dfxc00s.cmn'
+      INCLUDE 'dfxc05.cmn'
+      INCLUDE 'dfxc12.cmn'
+      INCLUDE 'dfxcaa.cmn'
+      INCLUDE 'dfxcba.cmn'
+      INCLUDE 'dfxcad.cmn'
+      INCLUDE 'dfxc16.cmn'
+      INCLUDE 'dfxc17.cmn'
+      REAL LTVRGB(27), LRGBTV(27)
+      SAVE LTVRGB, LRGBTV
+      DATA LTVRGB/
+     1   1.00 , 1.00 , 1.00 , 0.95 ,-0.28 ,-1.11 , 0.62 ,-0.64 ,1.73 ,
+     2   1.000, 1.000, 1.000, 0.000,-0.394, 2.020, 0.140,-0.581, 0.000,
+     3     9*0.0/
+      DATA LRGBTV/
+     1   0.30 , 0.60 , 0.21 , 0.59 ,-0.28 ,-0.52 , 0.11 ,-0.32 , 0.31 ,
+     2   0.299,-0.148, 5.007,0.587,-0.291,-4.193, 0.114, 0.439,-0.814,
+     3   9*0.0/
+C
+C    DIMFILM VERSION IS OF FORM NN.NA (WITHOUT LEADING BLANKS)
+C
+C      DATA VERSN/'0.1A '/
+      VERSN = '0.1A '
+C
+C    ROUTIN MUST BE INITIALISED TO DASH6 - AND RESET ON TERMINATION
+C
+C     DATA ROUTIN/'------'/
+      ROUTIN = '------'
+C      DATA DASH6/'------'/
+      DASH6 = '------'
+C      DATA STARS6/'******'/
+      STARS6 = '******'
+C      DATA SYSTEM/'*******'/
+      SYSTEM = '*******'
+C
+C      DATA USEFLG/' '/
+      USEFLG = ' '
+C    IF USEFLG IS BLANK THEN USER FIELD WILL BE
+C    SUPPLIED FROM SYSTEM IF POSSIBLE
+C    ELSE A USER REFERENCE WILL BE TAKEN FROM FIELD USER
+C    (UP TO 20 CHARACTERS) AND USED BY APPROPRIATE
+C    DEVICES.  ROUTINE USEREF MAY BE USED TO SET THIS.
+C
+C     DATA ERRREC/6*'*'/
+      DO 2 I=1,6
+         ERRREC(I) = '*'
+ 2    CONTINUE
+C      DATA IEFILE/-1/
+      IEFILE = -1
+C      DATA GKSOS/0/
+      GKSOS = 0
+C      DATA WSAC/MSOPWS*.FALSE./
+C      DATA WSOP/MSOPWS*.FALSE./
+      DO 1 I=1,MSOPWS
+         WSAC(I) = .FALSE.
+         WSOP(I) = .FALSE.
+ 1    CONTINUE
+C    PRESET BLANKING TO AVOID FORTRAN OPTIMISATION ERRORS
+C      DATA XBB1,XBB2,YBB1,YBB2/4*0.0/
+      XBB1 = 0.0
+      XBB2 = 0.0
+      YBB1 = 0.0
+      YBB2 = 0.0
+C    PRESET TV TO RGB CONVERSIONS
+C      DATA TVRGB/
+C     1   1.00 , 1.00 , 1.00 , 0.95 ,-0.28 ,-1.11 , 0.62 ,-0.64 ,1.73 ,
+C     2   1.000, 1.000, 1.000, 0.000,-0.394, 2.020, 0.140,-0.581, 0.000,
+C     3     9*0.0/
+C      DATA RGBTV/
+C     1   0.30 , 0.60 , 0.21 , 0.59 ,-0.28 ,-0.52 , 0.11 ,-0.32 , 0.31 ,
+C     2   0.299,-0.148, 5.007,0.587,-0.291,-4.193, 0.114, 0.439,-0.814,
+C     3     9*0.0/
+      L = 1
+      DO 4 I=1,3
+         DO 41 J=1,3
+            DO 42 K=1,3
+               TVRGB(I,J,K) = LTVRGB(L)
+               RGBTV(I,J,K) = LRGBTV(L)
+               L = L + 1
+ 42         CONTINUE
+ 41      CONTINUE
+ 4    CONTINUE
+C    PRESET LUT - SPECIFICALLY NEEDED FOR PACKAGE INTERFACE WHEN
+C                 DFX162 DUMMIED
+C      DATA RGBLUT/768*0.0/
+      DO 5 I=1,3
+         DO 51 J=0,255
+            RGBLUT(I,J) = 0.0
+ 51      CONTINUE
+ 5    CONTINUE
+C    PRESET NUMWRN AND ICHECK FOR BENEFIT OF ROUTINES ACCESSED
+C    PRIOR TO DIMFILM INITIALISATION
+C      DATA ICHECK,NUMWRN/+2,0/
+      ICHECK = 2
+      NUMWRN = 0
+C    PRESET USE TAPE FLAGS
+C     DATA UTFLAG/MSOPWS*0/
+      DO 6 I=1,MSOPWS
+         UTFLAG(I) = 0
+ 6    CONTINUE
+C NG- OTHER THINGS THAT LOOK LIKE THEY REALLY OUGHT TO BE INITIALIZED.
+C      DATA X0T/0.0/, Y0T/0.0/
+C      DATA XTB1/0.0/, XTB2/0.0/, YTB1/0.0/, YTB2/0.0/
+C      DATA SCALE/0.0/, SCALE1/0.0/
+C      DATA LINSYM/0/, ISAVE/0/, INTCH/0/, IICHAR/0/
+      X0T = 0.0
+      Y0T = 0.0
+      XTB1 = 0.0
+      XTB2 = 0.0
+      YTB1 = 0.0
+      YTB2 = 0.0
+      SCALE = 0.0
+      SCALE1 = 0.0
+      LINSYM = 0
+      ISAVE = 0
+      INTCH = 0
+      IICHAR = 0
+      END

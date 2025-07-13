@@ -45,6 +45,3 @@ C    FLAG AS NOT RUN-LENGTH
      2 OCCURS')
       GO TO 99
       END
-C
-C----------------------------------------------
-C

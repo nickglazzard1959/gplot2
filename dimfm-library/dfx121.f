@@ -49,6 +49,3 @@ C    FOR COMPLETENESS CLEAR 'JUMP' TABLE IN DFXM06
       RETURN
  1000 CALL DFX001('DIMEND',15)
       END
-C
-C----------------------------------------------
-C

@@ -15,6 +15,3 @@ C    INTERNAL ROUTINE SO ASSUME ALWAYS VALID ARGUMENT
       CALL DFX105
       RETURN
       END
-C
-C----------------------------------------------
-C

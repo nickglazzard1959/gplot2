@@ -10,6 +10,3 @@ C    PLOT IS TERMINATED
 C    EXECUTION IS TERMINATED
       CALL DFXM00(2)
       END
-C
-C----------------------------------------------
-C

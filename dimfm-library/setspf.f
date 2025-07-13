@@ -20,6 +20,3 @@ C    SPACES).  DEFAULT VALUE OF 1.0 RESTORED BY RESTXT.
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

@@ -70,6 +70,3 @@ C    SET COLOUR/INTENSITY
      2AXIS'/1H ,21X,'ORIGINATED IN ',A)
       GO TO 99
       END
-C
-C----------------------------------------------
-C

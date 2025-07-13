@@ -9,6 +9,7 @@ C
       INCLUDE 'dfxc04.cmn'
       INCLUDE 'dfxc05.cmn'
       INCLUDE 'dfxc12.cmn'
+      SAVE MODELS
       DATA MODELS/'RGB','CMY','YIQ','YUV','YTV','HSV','HLS','USR'/
 C   ++++++++++++N.B. USR NOT YET IMPLEMENTED - INCREASE LOOP COUNT TO 7
 C   ++++++++++++     WHEN RELEASED
@@ -30,6 +31,3 @@ C    NO MATCH FOR MODEL
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

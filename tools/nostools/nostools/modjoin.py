@@ -300,6 +300,7 @@ CATLIST.
                 # the --noprocess option.                    
                 # Add type line if COMMON (.cmn) or ASCII (.asc).
                 # Convert INCLUDE to *CALL if not ASCII.
+                # Convert C pre-processor #if / #ifdef / #ifndef to MODIFY equivalents, if not ASCII.
                 # Convert ASCII characters to 6/12 Display Code if ASCII.
                 fout.write(stem.upper()+'\n')
                 if ext == '.cmn':
@@ -313,10 +314,43 @@ CATLIST.
                         fout.write(line612)
                 else:
                     for line in text:
-                        if 'INCLUDE ' in line:
+                        is_comment = (line[0] == 'C') or (line[0] == 'c')
+                        if (not is_comment) and ('INCLUDE ' in line):
                             words = line.split()
                             if len(words) == 2:
                                 fout.write('*CALL '+ words[1].upper()[1:-5] + '\n')
+                            else:
+                                print('WARNING: INCLUDE has unexpected format. Dropping.')
+                        elif line[0] == '#':
+                            if line[:4].lower() == '#if ':
+                                ifparms = line[4:].strip().split()
+                                if len(ifparms) == 3:
+                                    if ifparms[1] == '==':
+                                        fout.write('*IF EQ,'+ifparms[0].strip().upper()+','+ifparms[2].strip().upper()+'\n')
+                                    elif ifparms[1] == '!=':
+                                        fout.write('*IF NE,'+ifparms[0].strip().upper()+','+ifparms[2].strip().upper()+'\n')
+                                    else:
+                                        print('WARNING: Malformed #if (bad operator), dropped.')
+                                else:
+                                    print('WARNING: Malformed #if (bad parameter count), dropped.')
+                            elif line[:7].lower() == '#ifdef ':
+                                ifparms = line[7:].strip().split()
+                                if len(ifparms) == 1:
+                                    fout.write('*IF DEF,'+ifparms[0].strip().upper()+'\n')
+                                else:
+                                    print('WARNING: Malformed #ifdef (bad parameter count), dropped.')
+                            elif line[:8].lower() == '#ifndef ':
+                                ifparms = line[8:].strip().split()
+                                if len(ifparms) == 1:
+                                    fout.write('*IF UNDEF,'+ifparms[0].strip().upper()+'\n')
+                                else:
+                                    print('WARNING: Malformed #ifndef (bad parameter count), dropped.')
+                            elif line[:5].lower() == '#else':
+                                fout.write('*ELSE\n')
+                            elif line[:6].lower() == '#endif':
+                                fout.write('*ENDIF\n')
+                            else:
+                                print('WARNING: Unhandled pre-processor line detected. Dropped.')
                         else:
                             fout.write(line)                
 

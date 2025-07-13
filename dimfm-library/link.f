@@ -1,4 +1,4 @@
-      SUBROUTINE LINK(X,Y,N1)
+      SUBROUTINE LINKK(X,Y,N1)
       REAL X(N1), Y(N1)
       LOGICAL OUT
       INCLUDE 'dfxc00.cmn'
@@ -7,7 +7,7 @@
       INCLUDE 'dfxc12.cmn'
       INCLUDE 'dfxcd0.cmn'
       INCLUDE 'dfxcd0s.cmn'
-      ROUTIN = 'LINK'
+      ROUTIN = 'LINKK'
       CALL DFX503(.TRUE.,X,Y,N1,OUT)
       IF (.NOT.OUT) GO TO 99
       IF (ICHECK.EQ.2) WRITE(ERRREC,20) ROUTIN
@@ -19,6 +19,3 @@
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

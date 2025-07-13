@@ -10,5 +10,3 @@ C-----------------------------------------------------------------------
 C    DIMENSIONS OF RSCAN,SCAN,DSCAN SHOULD BE MAXIMUM OF PIXELS/SCAN
 C    FOR SPECIFIC DEVICE
       SAVE /DFXK05/
-C-----------------------------------------------------------------------
-C

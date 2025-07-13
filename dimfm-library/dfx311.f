@@ -104,6 +104,3 @@ C    NOTE ALL AXIS TYPES > 2 ARE CONSIDERED TO BE MONTH TYPE
      1XIS'/1H ,21X,'CALL IGNORED')
       RETURN
       END
-C
-C----------------------------------------------
-C

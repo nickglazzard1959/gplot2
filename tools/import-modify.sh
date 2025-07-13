@@ -52,6 +52,16 @@ if [ ${#LIBNAME_UPPER} -gt "5" ]; then
     echo "Supplied libname is too long. 5 characters max."
     exit 1
 fi
+if [ -z "${IM_ALLOW_OVERWRITES}" ]; then
+    N_MOD=`git ls-files -m | grep ${LIBNAME_LOWER}-library | wc -l`
+    if [ "${N_MOD}" -ne "0" ]; then
+        echo "There are ${N_MOD} modified files that would be overwritten."
+        echo "IM_ALLOW_OVERWRITES is not defined, so exiting now."
+        exit 1
+    fi
+else
+    echo "IM_ALLOW_OVERWRITES is defined. Modified files may be overwritten."
+fi
 if [ ! -d plget-jobs ]; then
     mkdir plget-jobs
 fi

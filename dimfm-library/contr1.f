@@ -55,6 +55,3 @@ C    NEAREST NEIGHBOUR
       CALL DFX130(0)
       GO TO 99
       END
-C
-C----------------------------------------------
-C

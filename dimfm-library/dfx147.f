@@ -13,6 +13,3 @@ C    CHANGE IS ACTUAL CHANGE HAVING REGARD TO ICOLPT SETTING
     2 IRGBN = N
       RETURN
       END
-C
-C----------------------------------------------
-C

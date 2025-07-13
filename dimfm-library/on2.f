@@ -17,6 +17,3 @@ C    INTERNALLY IN MARKER/DFX200
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

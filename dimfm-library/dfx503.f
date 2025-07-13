@@ -35,6 +35,3 @@ C    IMMEDIATE FUNCTION IS PERFORMED BY USER REFERENCED CALLING ROUTINE
      1TS - CALL WAS FOR ',I6,' POINTS'/1H ,21X,'CALL IGNORED')
       GO TO 99
       END
-C
-C----------------------------------------------
-C

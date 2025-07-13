@@ -21,6 +21,3 @@ C    DIMFILM CURRENTLY SUPPORTS MAXBET UP TO A MAXIMUM OF 3
      1OF RANGE PARAMETER ',I3/1H ,21X,'EXISTING VALUE ',I3,' RETAINED')
       GO TO 999
       END
-C
-C----------------------------------------------
-C

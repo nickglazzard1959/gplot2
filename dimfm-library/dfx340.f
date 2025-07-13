@@ -32,6 +32,3 @@ C    FLAG POINTS ONLY
       CALL DFX130(0)
       GO TO 3
       END
-C
-C----------------------------------------------
-C

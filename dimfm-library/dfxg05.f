@@ -36,6 +36,3 @@ C****PLUS OTHER DEACTIVATION ACTIONS*****
     2 IF (NCACWS.EQ.0) GKSOS = 2
    99 RETURN
       END
-C
-C----------------------------------------------
-C

@@ -1,4 +1,4 @@
-      INTEGER FUNCTION IBCNT(X)
+      INTEGER FUNCTION IBCNT()
       INCLUDE 'dfxc00.cmn'
       INCLUDE 'dfxc00s.cmn'
       INCLUDE 'dfxc05.cmn'
@@ -8,6 +8,3 @@
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

@@ -41,6 +41,3 @@ C    CHANGE TO +0.1 WHEN CHARACTER HEIGHTS AVAILABLE
       NESC = .TRUE.
       RETURN
       END
-C
-C----------------------------------------------
-C

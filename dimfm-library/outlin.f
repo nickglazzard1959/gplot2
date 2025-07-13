@@ -16,6 +16,3 @@ C    ALL WORK STATIONS
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

@@ -29,6 +29,3 @@ C    INPUT RASTER IS COLOUR
    99 CONTINUE
       RETURN
       END
-C
-C----------------------------------------------
-C

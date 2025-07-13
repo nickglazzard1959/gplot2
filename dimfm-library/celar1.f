@@ -63,6 +63,3 @@ C    INPUT RASTER IS COLOUR
      2 1H0,21X,'CALL IGNORED')
       GO TO 99
       END
-C
-C----------------------------------------------
-C

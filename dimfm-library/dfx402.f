@@ -5,8 +5,14 @@
       INCLUDE 'dfxc15.cmn'
       LOGICAL CAP
       LOGICAL DOCAP
+      SAVE ITIME, NLIM, IPNT, D2, XHOLD, YHOLD, NPASS
       DATA ITIME/.FALSE./
       DATA NLIM/15/
+      DATA IPNT/.FALSE./
+      DATA D2/0.0/
+      DATA XHOLD/0.0/
+      DATA YHOLD/0.0/
+      DATA NPASS/0/
       IF (FIRST) CAP = .FALSE.
       X = XX*FX
       Y = YY*FY
@@ -132,6 +138,3 @@ C    WHEN I < 3 AND THREE POINTS LIE ON EDGE CONTOUR IS NOT PLOTTED
       IF (LAST.AND.I.GT.2.AND.NPASS.NE.0) CALL DFX106(XC(3),YC(3))
       RETURN
       END
-C
-C----------------------------------------------
-C

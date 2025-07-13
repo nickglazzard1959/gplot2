@@ -42,6 +42,3 @@ C    OTHERWISE IS APPLIED TO CURRENT TRANSFORM (E.G. FROM GRAPHING)
       ENDIF
       RETURN
       END
-C
-C----------------------------------------------
-C

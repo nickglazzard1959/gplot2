@@ -6,6 +6,3 @@ C    GET RADIANS INTO RANGE 0,TWOPI
       DFX004 = T
       RETURN
       END
-C
-C----------------------------------------------
-C

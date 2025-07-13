@@ -220,6 +220,3 @@ C    B = 0., A > 0.   TRY AND PLOT SEMI-MAJOR AXIS
       CALL DFX130(0)
       GO TO 100
       END
-C
-C----------------------------------------------
-C

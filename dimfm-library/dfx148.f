@@ -11,6 +11,3 @@ C    COPY ICOLPT(I) TO 4 (I.E. NRGB) AND MODIFY INTENSITY TO Z
       SFSPOT(NRGB) = SFSPOT(J)
       RETURN
       END
-C
-C----------------------------------------------
-C

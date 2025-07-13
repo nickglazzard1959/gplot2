@@ -34,6 +34,8 @@ dependencies = [
 nosftp = "nostools.nosftp:main"
 modsplit = "nostools.modsplit:main"
 modjoin = "nostools.modjoin:main"
+asciify = "nostools.asciify:main"
+trimcends = "nostools.trimcends:main"
 
 [tool.setuptools]
 packages = ["nostools"]

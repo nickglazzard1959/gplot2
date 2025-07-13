@@ -13,6 +13,7 @@ C
       CHARACTER*1 C
       CHARACTER*26 LOW,UP
       INTEGER IN,UT,ERR
+      SAVE UP, LOW
       DATA  UP/'ABCDEFGHIJKLMNOPQRSTUVWXYZ'/
       DATA LOW/'ABCDEFGHIJKLMNOPQRSTUVWXYZ'/
       ERR = 0
@@ -34,6 +35,3 @@ C
     2 ERR = 1
       GO TO 3
       END
-C
-C----------------------------------------------
-C

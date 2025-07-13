@@ -5,6 +5,7 @@ C MANY WRITTEN BY DR. ADRIAN CLARK SOMETIME IN THE EARLY-MID 1980'S.
 C MODIFIED FOR CDC NOS COMPATIBILITY AND ADDITIONS BY NICK GLAZZARD.
 C================================================================
 C
+#ifndef PORTF77
       INTEGER FUNCTION IACHAR(C)
 C----------------------------------------------------(CHARS)-----------
 C RETURN THE ASCII CODE FOR C REGARDLESS OF THE LOCAL CHARACTER SET.
@@ -44,6 +45,7 @@ C----
           BX6    -X5*X6      X6 = C1(INPUTPOS)
           EQ     IDCHAR      RETURN
           END
+#endif
 C
       INTEGER FUNCTION LNBC(S,B,R)
 C----------------------------------------------------(CHARS)-----------
@@ -223,7 +225,7 @@ C
 C----
 C
       CHARACTER*1 CLIST, CITEM
-      INTEGER NCIT, NC, ILIST, IT, M, MATCH, IC
+      INTEGER NCIT, NC, ILIST, IT, MATCH, IC
 C
 C --- FUNCTIONS.
 C
@@ -514,36 +516,36 @@ C----------------------------------------------------------------------
 C----
       INTEGER I, J, IACHAR, L
 C
-*IF UNDEF,PORTF77
+#ifndef PORTF77
       INCLUDE 'cmchars.cmn'
       CHARACTER*(MAXLN) ST
       J = 1
-*ENDIF
+#endif
       L = LEN(S)
-*IF UNDEF,PORTF77
+#ifndef PORTF77
       L = MIN(L,MAXLN)
-*ENDIF
+#endif
       DO 1 I = 1, L
-*IF DEF,PORTF77
+#ifdef PORTF77
          J = IACHAR( S(I:I) )
          IF( J .GE. 97 .AND. J .LE. 122 )THEN
             J = J - 32
             S(I:I) = CHAR( J )
          ENDIF
-*ELSE
+#else
          IF( S(I:I) .NE. '^' )THEN
             ST(J:J) = S(I:I)
             J = J + 1
          ENDIF
-*ENDIF
+#endif
 1     CONTINUE
 C
-*IF UNDEF,PORTF77
+#ifndef PORTF77
       S(1:J-1) = ST(1:J-1)
       DO 2 I = J, LEN(S)
          S(I:I) = ' '
 2     CONTINUE
-*ENDIF
+#endif
       RETURN
       END
 C

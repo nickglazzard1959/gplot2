@@ -63,6 +63,3 @@ C    IF I=1 USE BOUNDS FOR WINDOW   XTB1 ETC., IF 2 USE BLANKING BOUNDS
       IF (DFX103(YU,YMIN,YMAX)) CALL DFX101(X1,YU)
       GO TO 5
       END
-C
-C----------------------------------------------
-C

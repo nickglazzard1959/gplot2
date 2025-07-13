@@ -39,6 +39,3 @@ C    ALLOW FOR SIGN
       DFX020 = IDIG
       RETURN
       END
-C
-C----------------------------------------------
-C

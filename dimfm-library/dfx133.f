@@ -30,6 +30,3 @@ C    STORE AXIS ROTATION
       IF (NOTR.EQ.NTRAN) CALL DFX4AA
       RETURN
       END
-C
-C----------------------------------------------
-C

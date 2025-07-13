@@ -47,6 +47,3 @@ C   NOW CHECK FOR VALIDITY
       RASTDX = 0
       GO TO 99
       END
-C
-C----------------------------------------------
-C

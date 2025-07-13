@@ -23,6 +23,7 @@ C
       EQUIVALENCE (PQTV(1),P),(PQTV(2),Q),(PQTV(3),T),(PQTV(4),V)
       EQUIVALENCE (RRGGBB(1),RR),(RRGGBB(2),GG),(RRGGBB(3),BB)
       INTEGER RPQTV(0:5),GPQTV(0:5),BPQTV(0:5)
+      SAVE MODEL, RPQTV, GPQTV, BPQTV
       DATA MODEL/'RGB','CMY','YIQ','YUV','YTV','HSV','HLS','OWN'/
       DATA RPQTV/4,2,1,1,3,4/
       DATA GPQTV/3,4,4,2,1,1/
@@ -194,6 +195,3 @@ C    USER MODEL - CONVERT THEN CHECK VALID CONVERSION
 C     ***NOT YET IMPLEMENTED**   ASSUMES RGB
       GO TO 10
       END
-C
-C----------------------------------------------
-C

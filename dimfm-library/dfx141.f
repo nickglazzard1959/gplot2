@@ -14,6 +14,3 @@
      1TH INVALID PARAMETER ',I3,'; CALL IGNORED')
       GO TO 2
       END
-C
-C----------------------------------------------
-C

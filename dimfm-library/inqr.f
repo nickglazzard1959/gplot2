@@ -29,6 +29,3 @@ C    1 - HT; 2 - HTMK; 3 - XQ; 4 - ALPHA; 5 - ANGLS; 6 - ANGSTP
 C    N.B.  ONLY EVER ACCESSED BY USER
       GO TO 99
       END
-C
-C----------------------------------------------
-C

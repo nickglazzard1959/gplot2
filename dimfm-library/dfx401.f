@@ -72,6 +72,3 @@ C    CHECKS OTHER EDGES OF GRID CELL TO FIND NEXT INTERSECTION
    12 FIRST = .FALSE.
       GO TO 1
       END
-C
-C----------------------------------------------
-C

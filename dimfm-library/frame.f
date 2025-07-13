@@ -32,6 +32,3 @@ C    NUMBER OF USER EXECUTIONS OF FRAME)
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

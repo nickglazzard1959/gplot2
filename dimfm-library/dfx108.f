@@ -3,6 +3,7 @@
       LOGICAL DFX103
       INCLUDE 'dfxc00.cmn'
       INCLUDE 'dfxc00s.cmn'
+      SAVE LT, LF
       DATA LT,LF/.TRUE.,.FALSE./
       Y2 = YEND
       Y1 = YPOS
@@ -50,6 +51,3 @@
    20 YPOS = Y2
       RETURN
       END
-C
-C----------------------------------------------
-C

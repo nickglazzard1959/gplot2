@@ -14,6 +14,3 @@ C    FORCE NEGATIVE RETURN
     2 DFX3AA = I
       RETURN
       END
-C
-C----------------------------------------------
-C

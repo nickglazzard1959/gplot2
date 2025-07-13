@@ -17,6 +17,3 @@ C    NOW SET CURRENT COLOUR/INTENSITY TO BASE SET
       IF (ICOLPT(IRGBN).EQ.N) CALL DFX140(IRGBN)
       RETURN
       END
-C
-C----------------------------------------------
-C

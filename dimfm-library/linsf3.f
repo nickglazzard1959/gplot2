@@ -6,9 +6,3 @@
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C
-C
-C    +++++ALL CODE MUST BE REPLICATED IN DFX113+++++
-C

@@ -6,6 +6,7 @@
       INCLUDE 'dfxc05.cmn'
       INCLUDE 'dfxc12.cmn'
       CHARACTER*17 C
+      SAVE C
       DATA C/'FIRSTSECONDBOTHS '/
       ROUTIN = 'LOGLIM'
       N1 = 1
@@ -33,6 +34,3 @@
       CALL DFX130(0)
       GO TO 99
       END
-C
-C----------------------------------------------
-C

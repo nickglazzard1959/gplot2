@@ -11,6 +11,3 @@ C    ISSUE ERROR 024 AND ABORT
 C    N.B. DFX001 ACCESSES DFX009 DIRECT - SO NO RECURSION
       RETURN
       END
-C
-C----------------------------------------------
-C

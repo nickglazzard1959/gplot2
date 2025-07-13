@@ -8,6 +8,3 @@ C    TEXT SETTINGS TO INITIAL STATE
       ROUTIN = STARS6
       RETURN
       END
-C
-C----------------------------------------------
-C

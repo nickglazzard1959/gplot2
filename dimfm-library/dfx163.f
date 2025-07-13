@@ -22,6 +22,3 @@ C    **LUTSIZ NEVER EXCEEDED**
     1 H = H + DH
       RETURN
       END
-C
-C----------------------------------------------
-C

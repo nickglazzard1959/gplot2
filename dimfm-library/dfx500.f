@@ -94,6 +94,3 @@ C    HERE FOR POINT
    99 CONTINUE
       RETURN
       END
-C
-C----------------------------------------------
-C

@@ -28,6 +28,3 @@ C    NUMBER OF USER EXECUTIONS OF FRAME)
       ENDIF
       RETURN
       END
-C
-C----------------------------------------------
-C
