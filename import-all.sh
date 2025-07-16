@@ -27,3 +27,6 @@ IM_ALLOW_OVERWRITES=1 import-modify.sh dimfm "-s build-unix.sh --omit getbyt -l 
 #
 # GPLOT program. PLGPLOT --> gplot-library
 IM_ALLOW_OVERWRITES=1 import-modify.sh gplot
+#
+# DIMTS program. PLDIMTS --> dimts-library
+IM_ALLOW_OVERWRITES=1 import-modify.sh dimts

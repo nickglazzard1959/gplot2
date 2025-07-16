@@ -341,7 +341,7 @@ modgitedit.sh
 ```
 also as described above.
 
-There are five major parts to GPLOT/DIMFILM and the environment on NOS
+There are six major parts to GPLOT/DIMFILM and the environment on NOS
 needed to build it.
 
 1. A set of CCL procedures which establish new commands (in effect) which
@@ -365,8 +365,10 @@ needed to build it.
 4. The DIMFILM graphics library. This is `PLDIMFM`. It contains over 500 modules
    with around 25,000 lines of code altogether.
 5. The GPLOT program and vector fonts for DIMFILM. This is `PLGPLOT`. 
+6. A pair of test and example programs for DIMFILM (separate from GPLOT).
+   This is `PLDIMTS`.
 
-To transfer all five PLs from "Unix" to NOS, the Bash shell script:
+To transfer all six PLs from "Unix" to NOS, the Bash shell script:
 ```
 ./export-all.sh
 ```
@@ -508,6 +510,73 @@ The second result is the creation of a file called `DADIMFO` which
 contains data that defines the vector fonts used by DIMFILM.
 
 
+### Build the DIMFILM test programs
+
+It is possible to use DIMFILM to provide graphical output from programs
+other than GPLOT, of course, by writing a program (usually in FORTRAN-77)
+and linking it with the DIMFILM library and support libraries.
+
+Two "test programs" are supplied both to help verify DIMFILM is working
+correctly and to serve as examples of how to write programs that call it.
+
+- DIMTEST produces 10 frames of output, exercising much of the graph
+  plotting functionality of DIMFILM.
+- LSTDFON produces 24 frames, one for each available font. Each frame
+  is a font table and the full set is a complete font catalog.
+  
+To build these programs on NOS:
+```
+GET,PLDIMTS.
+MODEXEC,BUILD,PLDIMTS,OPT=2.
+```
+
+To run them, first `ATTACH` the fonts file (GPLOT does this internally,
+so the user doesn't have to remember to do this) then run them by name.
+```
+ATTACH,DADIMFO.
+ATTACH,DIMTEST.
+ATTACH,LSTDFON.
+DIMTEST.
+LSTDFON.
+```
+The output of DIMTEST is a set of EPS files named `NW001` to
+`NW010`. The output of LSTDFON is also a set of EPS files called
+`FON001` to `FON024`.
+
+
+Using EPS and SVG files created on NOS
+--------------------------------------
+
+There is no direct way of viewing EPS or SVG files on NOS. They must
+be viewed on systems which can display PostScript or PostScript converted
+to PDF for EPS files, or in a browser for SVG files.
+
+On NOS systems running the NOS HTTP server, the SVG files could be transferred
+to the WWW account and viewed with any web browser on almost any other system.
+There is another piece of NOS software which implements a Markdown-like scheme
+for writing and posting "notes" on the NOS HTTP server which integrates with
+GPLOT using SVG output from graphs and diagrams. This is not described here,
+though.
+
+However, it will often be useful to copy both EPS and SVG output as files
+to "mainstream" systems for further use. This is most easily done with
+`NOSFTP`. These files contain lower case characters and should be treated
+as ASCII. For example:
+```
+$ nosftp tester nuc1
+Password for NOS account: 
+Contacting NOS FTP server on host: nuc1
+230 USER LOGGED IN, PROCEED.
+220 SERVICE READY FOR NEW USER.
+Local cwd now: /Volumes/qemu-main/gitprojects/gplot2
+
+NOS FTP> get nw009 nw009.eps ascii
+... retrieving file: nw009
+226 CLOSING DATA CONNECTION.
+
+NOS FTP> bye
+```
+
 Further developing this software
 --------------------------------
 
@@ -528,7 +597,7 @@ this project, all these systems are almost identical.
 The main requirement is that `gfortran` is installed and working,
 along with the usual C/C++ development environment that is always
 available on these systems. As part of the GNU Compiler Collection,
-`gfortran` is also readily available.
+`gfortran` is also readily available. 
 
 Note that the "Unix" versions of DIMFILM and GPLOT are *ports* of
 the NOS version. The NOS code is quite portable (well, to a 
@@ -624,9 +693,54 @@ GPLOT documentation, except that arguments are separated by spaces
 rather than commas. The same `keyword=value` and `keyword` format
 is retained, as used on NOS.
 
+### Build the DIMFILM test programs
 
-GPLOT "cheat sheet"
--------------------
+```
+./make-dimts.sh
+```
+This pre-processes the source in `dimts-library` to a newly created
+source directory `dimts-source`, then compiles the contents with
+`gfortran`, creating two relocateable object files which are
+linked with all the above libraries to create the `dimtest` and 
+`lstdfon` programs.
+
+These can then be run in the usual way:
+```
+./dimtest
+./lstdfon
+```
+
+These should create the same EPS files described above for the 
+NOS versions of these programs.
+
+### Using EPS files on macOS
+
+Unfortunately, recent versions of macOS can no longer view EPS
+and other PostScript files just by opening them (double-clicking 
+or whatever), for reasons best known to Apple. 
+
+A script called `epsview.sh` is included in the `tools` directory
+and installed along with the other tools by `install.sh` in that
+location. This uses programs in the `ghostscript` package to
+convert EPS to PDF and then open the PDF version. This displays
+output in macOS Preview. It also produces a `.png` image version 
+using Imagemagick tools. This script takes steps to ensure that
+EPS files output by DIMFILM can be opened correctly and displayed
+in good quality.
+
+For this to work, `ghostscript` and `imagemagick` must be installed
+with Homebrew or MacPorts. Once this is done, EPS files can be displayed
+from the command line :
+```
+$ epsview.sh NW009 
+```
+will open new Preview window or tab displaying the contents of the
+given EPS file (the name of which need not have the `.eps` extension).
+
+
+
+GPLOT cheat sheet
+-----------------
 
 GPLOT has quite a few commands and facilities. It is fully documented
 in a PDF format manual (LaTeX source for this can be found in the 

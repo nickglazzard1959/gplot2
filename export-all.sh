@@ -19,3 +19,6 @@ export-modify.sh dimfm -a
 #
 # gplot-library --> PLGPLOT
 export-modify.sh gplot -a
+#
+# dimts-library --> PLDIMTS
+export-modify.sh dimts -a
