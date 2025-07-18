@@ -100,23 +100,27 @@ def guess_if_file_is_binary(filename):
         print('WARNING: Cannot open file:', filename)
         return False
 
-def send_file(ftp, filename, nosoutfilename, cs_string):
+def send_file(ftp, filename, nosoutfilename, cs_string, is_binary=None, indirect_binary=None):
     """
     Send a single file.
     """
     # See if it is binary.
-    is_binary = guess_if_file_is_binary(filename)
+    if is_binary is None:
+        is_binary = guess_if_file_is_binary(filename)
     print('Sending file: {0} ({1}) ...'.format(filename, 'binary' if is_binary else 'text'))
 
     # Try STORing the file as nosoutfilename. Deal appropriately according to binary or not.
-    # Binary files are always stored as DA (direct access).
+    # Binary files are stored as DA (direct access) unless indirect_binary is True.
     # Coded (non-binary) files are always stored IA (indirect access).
     # For coded files, the data is interpreted according to character set cs_string (DIS or ASCII).
     try:
         with open(filename, 'rb') as fin:
             print('... storing file as:', nosoutfilename)
             if is_binary:
-                cmd = 'STOR {0},DA'.format(nosoutfilename)
+                if (indirect_binary is None) or (not indirect_binary):
+                    cmd = 'STOR {0},DA'.format(nosoutfilename)
+                else:
+                    cmd = 'STOR {0},IA'.format(nosoutfilename)
                 print(ftp.storbinary(cmd, fin))
             else:
                 cmd = 'STOR {0},IA,CS={1}'.format(nosoutfilename, cs_string)
@@ -252,6 +256,7 @@ def main():
         LCD = 7
         LS = 8
         DEL = 9
+        BPUT = 10
         
     commands = {'quit': (0, 0, '', cmds.QUIT, 'Exit NOS FTP.'),
                 'exit': (0, 0, '', cmds.QUIT, 'Exit NOS FTP.'),
@@ -263,7 +268,8 @@ def main():
                 'lpwd': (0, 0, '', cmds.LPWD, 'Print local working directory name.'),
                 'lcd':  (1, 1, 'localdir', cmds.LCD, 'Change local working directory.'),
                 'ls':   (0, 1, '', cmds.LS, '[string] List local working directory, [names containing string].'),
-                'del':  (1, 1, 'nosname', cmds.DEL, 'Delete a permanent file.')}
+                'del':  (1, 1, 'nosname', cmds.DEL, 'Delete a permanent file.'),
+                'bput': (2, 3, 'localname nosname [direct]', cmds.BPUT, 'Send a binary file to the server, indirect by default.')}
 
     def parse_cmd( cmdline, commands ):
         """
@@ -410,6 +416,15 @@ def main():
                 else:
                     if not delete_file(ftp, argslist[0]):
                         print('Failed.')
+
+            elif cmdcode == cmds.BPUT:
+                if not valid_nos_name(argslist[1]):
+                    print('NOS file name is invalid.')
+                else:
+                    as_indirect = (len(argslist) < 3) or (argslist[2] != 'direct')
+                    if not send_file(ftp, argslist[0], argslist[1], 'none',
+                                     is_binary=True, indirect_binary=as_indirect):
+                        print('Failed')                        
 
         if args.execute is not None:
             quit_ftp(ftp)

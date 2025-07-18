@@ -1,0 +1,268 @@
+C
+C     SUPPORT FUNCTIONS NEEDED TO BUILD DIMFILM ON
+C     COS SYSTEMS WITH KFTC.
+C
+
+C*************************
+C RANDOM NUMBER FUNCTIONS      
+C*************************
+      
+      REAL FUNCTION RANF()
+C----
+C     RANDOM FLOAT IN RANGE 0 to 1
+C----
+      REAL R4_UNI
+      LOGICAL FIRST
+      INTEGER SEED, S2
+      SAVE
+      COMMON /RANFSD/ SEED, S2
+      DATA FIRST/.TRUE./
+C
+      IF( FIRST )THEN
+         SEED = 1384793
+         S2   = 17
+      ENDIF
+      RANF = R4_UNI(SEED, S2)
+      FIRST = .FALSE.
+      RETURN
+      END
+
+      SUBROUTINE RANSET( N )
+C----
+C     SEED THE RANDOM NUMBER GENERATOR.
+C     ONLY SEED (ABOVE) IS SET HERE, NOT S2, SO NOT SURE HOW
+C     THAT WILL AFFECT RANDOMNESS IN DETAIL.
+C----
+      INTEGER N
+C
+      REAL JUNK
+      INTEGER SEED, S2
+      SAVE
+      COMMON /RANFSD/ SEED, S2
+C
+      JUNK = RANF()
+      SEED = N
+      S2 = 17
+      JUNK = RANF()
+      RETURN
+      END
+      
+
+      FUNCTION R4_UNI ( S1, S2 )
+C*********************************************************************72
+C
+CC R4_UNI RETURNS A PSEUDORANDOM NUMBER BETWEEN 0 AND 1.
+C
+C  DISCUSSION:
+C
+C    THIS FUNCTION GENERATES UNIFORMLY DISTRIBUTED PSEUDORANDOM NUMBERS
+C    BETWEEN 0 AND 1, USING THE 32-BIT GENERATOR FROM FIGURE 3 OF
+C    THE ARTICLE BY L'ECUYER.
+C
+C    THE CYCLE LENGTH IS CLAIMED TO BE 2.30584E+18.
+C
+C  MODIFIED:
+C
+C    08 JULY 2008
+C
+C  AUTHOR:
+C
+C    PASCAL ORIGINAL VERSION BY PIERRE L'ECUYER
+C    MODIFICATIONS BY JOHN BURKARDT
+C
+C  REFERENCE:
+C
+C    PIERRE LECUYER,
+C    EFFICIENT AND PORTABLE COMBINED RANDOM NUMBER GENERATORS,
+C    COMMUNICATIONS OF THE ACM,
+C    VOLUME 31, NUMBER 6, JUNE 1988, PAGES 742-751.
+C
+C  PARAMETERS:
+C
+C    INPUT/OUTPUT, INTEGER S1, S2, TWO VALUES USED AS THE
+C    SEED FOR THE SEQUENCE.  ON FIRST CALL, THE USER SHOULD INITIALIZE
+C    S1 TO A VALUE BETWEEN 1 AND 2147483562;  S2 SHOULD BE INITIALIZED
+C    TO A VALUE BETWEEN 1 AND 2147483398.
+C
+C    OUTPUT, REAL R4_UNI, THE NEXT VALUE IN THE SEQUENCE.
+C
+      IMPLICIT NONE
+
+      INTEGER K
+      REAL R4_UNI
+      INTEGER S1
+      INTEGER S2
+      INTEGER Z
+    
+      K = S1 / 53668
+      S1 = 40014 * ( S1 - K * 53668 ) - K * 12211
+      IF ( S1 .LT. 0 ) THEN
+        S1 = S1 + 2147483563
+      END IF
+
+      K = S2 / 52774
+      S2 = 40692 * ( S2 - K * 52774 ) - K * 3791
+      IF ( S2 .LT. 0 ) THEN
+        S2 = S2 + 2147483399
+      END IF
+
+      Z = S1 - S2
+      IF ( Z .LT. 1 ) THEN
+        Z = Z + 2147483562
+      END IF
+
+      R4_UNI = REAL ( Z ) / 2147483563.0E+00
+
+      RETURN
+      END
+
+C*****************************
+C BIT MANIPULATION FUNCTIONS.
+C*****************************
+      
+      INTEGER FUNCTION IBSET(VAL, LSB)
+      INTEGER VAL, LSB
+      IBSET = VAL .OR. (SHIFTL(1, LSB))
+      RETURN
+      END
+
+      INTEGER FUNCTION IBCLR(VAL, LSB)
+      INTEGER VAL, LSB
+      IBCLR = VAL .AND. (.NOT. SHIFTL(1, LSB))
+      RETURN
+      END
+      
+      INTEGER FUNCTION IBTEST(VAL, LSB)
+      INTEGER VAL, LSB
+      INTEGER O
+      IF( (VAL .AND. SHIFTL(1, LSB)) .NE. 0 )THEN
+         O = 1
+      ELSE
+         O = 0
+      ENDIF
+      IBTEST = O
+      RETURN
+      END
+
+      INTEGER FUNCTION ISHFT(I1, I2)
+      INTEGER I1, I2
+      INTEGER O
+      IF (I2 .GE. 0) THEN
+        O = SHIFTL(I1, I2)
+      ELSE
+        O = SHIFTR(I1, -I2)
+      ENDIF
+      ISHFT = O
+      RETURN
+      END
+
+      INTEGER FUNCTION IAND(IA, IB)
+      INTEGER IA, IB
+      IAND = IA .AND. IB
+      RETURN
+      END
+
+C***********************
+C GRAPHICS DEVICE STUBS
+C***********************      
+      
+      SUBROUTINE GTMOVE(X,Y)
+      RETURN
+      END
+
+      SUBROUTINE GTCOL(R,G,B)
+      RETURN
+      END
+
+      SUBROUTINE GTWIDTH(WIDTH)
+      RETURN
+      END
+
+      SUBROUTINE GTPEN(X,Y,IPEN)
+      RETURN
+      END
+
+      SUBROUTINE GTINI(LUN)
+      RETURN
+      END
+
+      SUBROUTINE GTCLR
+      RETURN
+      END
+
+      SUBROUTINE GTFILL
+      RETURN
+      END
+
+      SUBROUTINE GTFLUSH
+      RETURN
+      END
+
+      SUBROUTINE GTDRAW(X,Y)
+      RETURN
+      END
+
+      SUBROUTINE TEKPEN(X,Y,IPEN)
+      RETURN
+      END
+
+      SUBROUTINE TEKINI(LUN)
+      RETURN
+      END
+
+      SUBROUTINE TEKGRAF
+      RETURN
+      END
+
+      SUBROUTINE TEKCLR
+      RETURN
+      END
+
+      SUBROUTINE TEKTEXT
+      RETURN
+      END
+
+      SUBROUTINE TEKDRAW(IX,IY,IPEN)
+      RETURN
+      END
+
+      SUBROUTINE SVGNAM( SFNAME )
+      RETURN
+      END
+
+      SUBROUTINE SVGCLR
+      RETURN
+      END
+
+      SUBROUTINE SVGWID( WIDTH )
+      RETURN
+      END
+
+      SUBROUTINE SVGRGBC( R, G, B )
+      RETURN
+      END
+
+      SUBROUTINE SVGBEGN
+      RETURN
+      END
+
+      SUBROUTINE SVGEND
+      RETURN
+      END
+
+      SUBROUTINE SVGMOVE( X, Y, ON )
+      RETURN
+      END
+
+      SUBROUTINE CONNEC( I )
+      RETURN
+      END
+
+      SUBROUTINE DISCON( I )
+      RETURN
+      END
+
+      SUBROUTINE PMDSTOP
+      RETURN
+      END
+

@@ -1,18 +1,20 @@
 #!/bin/bash
 #
-# Process PLDIMFM source in dimfm-library to create gfortran
-# compatible code, then compile that code and build a static
-# library, dimfm.a
+# Process PLDIMFM source in dimfm-library to create kftc
+# compatible code, then cross-compile that code and build a static
+# library, dimfilm.lib
 #
 function get_file() {
     echo "... getting $1"
-    asciify ../../dimfm-library/$1 dimfm-source/$1
+    asciify -c cosdefs.json ../../dimfm-library/$1 dimfm-source/$1
     return 0
 }
 
 function compile() {
-    echo "... compiling $1"
-    gfortran -g -c -O${OPT} -Wall -Wno-unused-dummy-argument -Wno-unused-label -std=legacy -cpp -DPORTF77 $1
+    echo "... compiling $1 ..."
+    FNOF="${1%.f}"
+    kftc -l ${FNOF}.lst -o ${FNOF}.cal -s -a static ${FNOF}.f
+    cal -x -o ${FNOF}.o -l - -i ${FNOF}.cal >> ${FNOF}.lst
     return 0
 }
 
@@ -581,6 +583,7 @@ dfxk05.cmn
 params.cmn
 )
 #
+# Get the source files, pre-processing them along the way.
 for i in "${!F_LIST[@]}"; do
     get_file "${F_LIST[$i]}"
 done
@@ -589,13 +592,27 @@ for i in "${!C_LIST[@]}"; do
     get_file "${C_LIST[$i]}"
 done
 #
+# Cross-compile with kFTC.
 cd dimfm-source
+#
 for i in "${!F_LIST[@]}"; do
     compile "${F_LIST[$i]}"
 done
 #
-echo "... creating static library dimfm.a"
-ar rcs ../lib/dimfm.a *.o
+echo "... creating static library dimfilm.lib."
+#
+# Process the source file list to an object file list.
+O_LIST=()
+for i in "${!F_LIST[@]}"; do
+    F_NAME="${F_LIST[$i]}"
+    O_NAME="${F_NAME%.f}.o"
+    O_LIST+=("${O_NAME}")
+done
+echo "${O_LIST[@]}"
+#
+# Create the library.
+lib -l dimliblist.lst -o ../lib/dimfilm.lib "${O_LIST[@]}"
+#
 cd ..
 #
 echo "... done."
