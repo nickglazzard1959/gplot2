@@ -1,0 +1,22 @@
+{
+    "source_files" : [
+        "DIMFORM.SG",
+        "DIMINTRO.SG",
+        "DIMPART1.SG",
+        "DIMPART2.SG",
+        "DIMPART3.SG",
+        "DIMPART4.SG",
+        "DIMAPP1.SG",
+        "DIMAPP2.SG",
+        "DIMAPP3.SG",
+        "DIMAPP4.SG"
+    ],
+
+    "source_dir" : "../../historic/DIMFILM/DOCS",
+
+    "specific_date_string" : "1984,06,23",
+
+    "output_stem" : "dimfilm-manual",
+
+    "output_dir" : "."
+}
