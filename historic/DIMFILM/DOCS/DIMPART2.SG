@@ -1,0 +1,1439 @@
+ .PART GRAPHING
+ .CHAPTER Basic Graphing
+ .SECTION Introduction
+  DIMFILM includes a collection of subprograms to facilitate the
+ production of graph plots, while retaining the advantages of the
+ overall system. The graphing routines may be freely intermixed with
+ the general plotting
+ routines. The system is designed to permit the user
+ considerable freedom, and although this must inevitably introduce some
+ pitfalls for the unwary, a large amount of checking is performed, and
+ warning messages are included. These are controlled as are those in
+ the general plotting
+ routines, through the check level. Users interested
+ primarily in graphing output should first familiarise themselves
+ with the earlier sections on basic plotting.
+  Graphing may be freely intermixed with calls to all other
+ plot routines. DIMFILM attempts to ensure that on exit from
+ any graphing routine, all internal parameters are set to their
+ values on entry. The beam is also positioned so that general
+ plotting may be resumed easily. Such properties as intensity,
+ orientation and height of symbol strings, broken lines etc., will
+ be maintained. It is possible therefore, to interrupt a diagrammatic
+ plot to perform graphical plotting and then to resume. A few
+ limitations are, however, necessary. Primarily, on return, a broken
+ line pattern will commence at the beginning of its sequence (the
+ consequence of a beam off movement). Symbol strings will commence
+ with _all_ their initial features active. If TXTCON has previously
+ been called, it will be operable on all but the first subsequent calls
+ to SYMTXT.
+  Except where otherwise indicated, all graphical drawing routines are
+ performed as CSType 1 operations. All graph textual annotation will
+ be treated as CSType 2, while non-textual annotation is a CSType 3
+ operation.  All graph titling and labelling (user supplied) will be
+ subject to any escape sequences as described in Section 3.
+ Graphs will also be
+ subject to interruption by markers, when the routine INTRPT has
+ been called. This applies only to plots where a set of data values
+ has been supplied; when interpolation is used the interrupt only
+ applies to the supplied data points ie. a call of INTRPT(N,CHAR)
+ would cause each Nth data point to be marked with character CHAR.
+ The height used would be that currently used outside the graph plot.
+  The use of intermixed general and graph plotting will be
+ illustrated in a later section. It is emphasised that this mixing
+ may be performed freely within a frame, and at the simplest level it
+ may mean only the changing of intensity for axes etc.
+
+ .SECTION Graph Location
+  The overall size of a graph is taken to be identical to the current
+ pre-clipping rectangle. That is, the user by making a call to PANE
+ (or through the default pre-clipping rectangle being the same
+ as the overall bounds) has set the area to be occupied by the graph.
+ This area includes a margin for captions
+ and values, and the proportions used are preset in DIMFILM.
+  Of specific interest to the user, is the area occupied by the actual
+ graph plot, excluding margins etc. This is 83% of the pre-clipping
+ rectangle in each direction. The graph labels
+ and values will be in the margins between this rectangle
+ and the actual graph plot. Each margin in the X(or Y)-direction
+ will be 8.5% of the corresponding X(or Y)-dimension of the rectangle.
+  This enables the user to position the graph plot anywhere within the
+ bounds and graphs in equal area will appear identical, whilst those of
+ similar areas would be reduced or enlarged accordingly. This ensures
+ continuity over a large number of plots and assists the user in
+ making more than one plot in an area, but changing axis scales as
+ required. The actual co-ordinates used in calls to PANE etc. are
+ not referred to by the user during the course of graphical plotting
+ All scaling of graphs is accomplished internally. The X-axis of a
+ graph will always by parallel to the X-direction of the frame and
+ the Y-axis parallel to the Y-direction. Hence, the orientation of
+ a plot is determined by the current mode of the device.
+ .SECTION Axis determination _
+  In any graphical work the user is obliged to determine the axis types
+ required before commencing a plot. There are few conditions imposed
+ on the user performing graph plotting with DIMFILM, and these are
+ summarised below. The axis type need only be declared if a change
+ is to be made, and clearly this must be done before plotting or
+ assigning values to the axis etc. is performed. By default, it is
+ assumed that both X-and Y- axes are linear. A number of routines
+ are available for changing or resetting axis types, at present the
+ user will only be concerned with:
+
+ .TT
+
+ $TLINX$Ito set a linear X-axis.
+
+ $TLINY$Ito set a linear Y-axis.
+
+ $TLINXY$Ito set linear X- and Y-axis.
+
+ $TLOGX$Ito set a logarithmic (base 10) X-axis.
+
+ $TLOGY$Ito set a logarithmic (base 10) Y-axis.
+
+ $TLOGXY$Ito set logarithmic (base 10) X- and Y-axis.
+
+ .EE
+  Any combination of these calls is permissible, the last declared
+ type for each axis being accepted.
+  For a basic graph, the user will have a set of (X,Y) co-ordinates
+ that are to be plotted. It may be that the plot is to be made along
+ axes that have ranges automatically determined by the X- and Y-
+ ranges of the data, or alternatively along axes having predefined
+ ranges. The default is for automatic range determination along both
+ axes to be performed as in the former requirement. For the latter
+ requirement, the user may supply a range along either or both axes
+ by the following.
+
+ .TT
+
+ $TXAXIS(XL,XR)
+
+ $TYAXIS(YL,YR)
+
+ $Iwhere XL is the left bound and XR the right bound for the X-axis
+ and YL is the low bound and YU the upper bound for the Y-axis.
+ In each case the bounds are given in terms of the user's graph units.
+
+ .EE
+  Should both bounds be equal in a call to one of these routines,
+ then DIMFILM will go into auto mode for that axis.
+  Axis ranges set in this way remain set until such time as they are
+ either set to some other value or auto mode is restored using the
+ following routines:
+
+ .TT
+
+ $TAUTOX$Ito set auto range determination on the X-axis.
+
+ $TAUTOY$Ito set auto range determination on the Y-axis.
+
+ $TAUTOXY$Ito set auto range determination on both axes.
+
+ .EE
+ .SECTION Drawing the Graph _
+  Having determined axis types and ranges as required, a single call
+ to the routine
+ .TT
+
+ $TGRAPH(X,Y,N)
+
+ $Iwill accomplish the plotting. X and Y are REAL arrays (of dimension
+ at least N) holding the N  X- and Y- coordinates respectively. This
+ will join consecutive co-ordinates by straight line segments. The
+ co-ordinates should be supplied monotonically in X. N must be at
+ least 2.
+
+ .EE
+  To complete the graph with labels, values and to frame it, the
+ following routine may be called:
+
+ .TT
+
+ $TGRDEF(TITLE,XLAB,YLAB,IXY)
+
+ $Iwhere TITLE,XLAB and YLAB are all _strings_ of type CHARACTER
+ with an appropriate length:
+
+ $T###TITLE$Iis the title to appear at the base of the graph.
+
+ $T###XLAB$Iis the label to appear below the X edge of the plot.
+
+ $T###YLAB$Iis the label to appear to the left of the Y edge of the
+ plot.
+
+ $T###IXY$Iis used to control the presence or absence of axes,
+ according to its value -
+ .NL
+ =0#:- neither axis will appear,
+ .NL
+ =1#:- the X-axis only will appear and be ticked,
+ .NL
+ =2#:- the Y-axis only will appear and be ticked,
+ .NL
+ =any other value#:- both axes will appear and be ticked.
+
+ .EE
+
+  In addition to these titles, labels and axes, the plot will be
+ framed (i.e. the actual graph will be boxed), all edges will be
+ ticked and values will appear adjacent to the ticks.
+  (It should be noted that any axis can only be plotted if it lies
+ within the range of the orthogonal co-ordinate. For example the
+ X-axis at y=0 can only be plotted if zero is included in the
+ Y-range.)
+  Essentially, this routine is present to offer a default set for
+ the annotation of the plot. It is not expected that all users will
+ wish for this set of annotations and consequently a large number of
+ routines are included to perform the individual parts. It is
+ suggested that each user constructs his own standard set of calls in
+ a single subroutine and references this at the end of each plot. Of
+ course, he may wish to annotate each plot differently and in this
+ case, the full range of routines may be accessed. These routines will
+ now be described.
+  A simple convention is used to refer to the sides of any line. For
+ lines in the X-direction there is a lower (L) and upper (U) side,
+ referring to the normal Y-values which are orthogonal to this line.
+  Similarly, for a line in the Y-direction there is a left (L) and
+ right (R) side. The graph itself may, or may not have the axes
+ included in it and is bounded by four edges, surrounding which are
+ the margins; the whole being contained exactly within the pane.
+  For all the following routines that perform titling or labelling,
+ the symbol strings are passed through the SYMTXT routine and all the
+ facilities described in section 3.1 are available (although it should
+ be noted that text continuation will not operate, each string
+ commencing with the selected features). Text strings will be
+ appropriately centred.
+  Titles may be placed below the lower edge or above the upper edge
+ by the following.
+
+ .TT
+
+ $TLTITLE(TITLE)
+
+ $Ifor titling below the lower edge
+
+ $TUTITLE(TITLE)
+
+ $Ifor titling above the upper edge
+
+ .EE
+  TITLE is a _string_ of type CHARACTER of the appropriate length,
+ which contains the text to be passed to SYMTXT.
+  Labels may be placed against any edge or either axis, although for
+ the latter option it is necessary for the axis to be within the
+ orthogonal axis range.
+
+ .TT
+
+ $TLXLAB(LABEL)
+
+ $Ilabels the lower edge
+
+ $TUXLAB(LABEL)
+
+ $Ilabels the upper edge
+
+ $TLYLAB(LABEL)
+
+ $Ilabels the left edge
+
+ $TRYLAB(LABEL)
+
+ $Ilabels the right edge
+
+ $TLXALAB(LABEL)
+
+ $Ilabels below the X-axis
+
+ $TUXALAB(LABEL)
+
+ $Ilabels above the X-axis
+
+ $TLYALAB(LABEL)
+
+ $Ilabels to the left of the Y-axis
+
+ $TRYALAB(LABEL)
+
+ $Ilabels to the right of the Y-axis
+
+ .EE
+  In each of these calls LABEL is a _string_ of type CHARACTER
+ of the appropriate length, which contains the text to be used as
+ the label.
+  The edges and axes may be ticked as required, the ticks corresponding
+ to steps in the range in the appropriate direction and taking
+ account of the axis type. The spacing of ticks etc., will be
+ considered below.
+
+ .TT
+
+ $TLXTIK$Iwill cause ticking of the lower edge
+
+ $TUXTIK$Iwill cause ticking of the upper edge
+
+ $TLUXTIK$Iwill cause ticking of both the lower and upper edges
+
+ $TLYTIK$Iwill cause ticking of the left edge
+
+ $TRYTIK$Iwill cause ticking of the right edge
+
+ $TLRYTIK$Iwill cause ticking of both the left and right edges
+
+ .EE
+  In each of these cases the ticking would be directed inwards.
+
+ .TT
+
+ $TLXATIK$Iwill cause ticking on the lower side of the X-axis
+
+ $TUXATIK$Iwill cause ticking on the upper side of the X-axis
+
+ $TLYATIK$Iwill cause ticking on the left of the Y-axis
+
+ $TRYATIK$Iwill cause ticking on the right of the Y-axis
+
+ .EE
+  Values corresponding to the ticking of edges and axes may be
+ plotted.
+
+ .TT
+
+ $TLXVAL$Iplots values below the lower edge
+
+ $TUXVAL$Iplots values above the upper edge
+
+ $TLUXVAL$Iplots values below the lower edge and above the upper edge
+
+ $TLYVAL$Iplots values to the left of the left edge
+
+ $TRYVAL$Iplots values to the right of the right edge
+
+ $TLRYVAL$Iplots values to the left of the left edge and to the right
+ of the right edge
+
+ .EE
+
+  Similarly for the axes,
+
+ .TT
+
+ $TLXAVAL$Iplots values below the X-axis
+
+ $TUXAVAL$Iplots values above the X-axis
+
+ $TLYAVAL$Iplots values to the left of the Y-axis
+
+ $TRYAVAL$Iplots values to the right of the Y-axis
+
+ .EE
+
+  The axes themselves may be drawn by the following
+
+ .TT
+
+ $TDRAWXA$Ito plot the X-axis
+
+ $TDRAWYA$Ito plot the Y-axis
+
+ .EE
+  As an alternative to ticking the edges etc., the user may grid the
+ plot entirely using the following
+
+ .TT
+
+ $TXGRID$Iwill plot grid lines normal to the X-axis (i.e. parallel
+ to the Y-axis )
+
+ $TYGRID$Iwill plot grid lines normal to the Y-axis
+
+ $TXYGRID$Iwill completely grid the plot in both directions
+
+ .EE
+  It is clear that when ticking (or gridding) and valuing are applied,
+ or labelling an axis, it is essential that the ranges for each axis
+ are defined first. They may either be explicitly defined by calls to
+ XAXIS and YAXIS, or if auto mode is in operation on either axis,they
+ will be known internally _after_ the plotting of the graph (i.e. as
+ described in this section through a call to GRAPH ). Clearly then a
+ sequence for these calls has been formulated. This may be summarised
+ in priority, after the definition of the pre-clipping area:
+
+ .TT
+
+ $T##1) axis type declarations
+
+ $T##2) axis range specifications
+
+ $T##3) ticking, valuing, gridding or labelling axes
+
+ .EE
+
+  Titling and edge labelling may occur at any point. If automatic
+ mode is in operation on either axis then the graph call which
+ fulfills the function of range determination must occur at step 2,
+ otherwise it may appear anywhere after stage 1. Steps 1 and 2 will be
+ retained from any previous graph plot and so do not need redefinition
+ for subsequent plots. Of course, if auto mode is active then the
+ _previously_ determined range(s) will hold until reset by a call to a
+ graph plot routine.
+  Although the user has considerable freedom, it is suggested that the
+ safest course is :
+
+ .TT
+
+ $T##1) axis type declarations (if changes to be made)
+
+ $T##2) axis range specifications (if non-auto, or to be reset)
+
+ $T##3) graph plot
+
+ $T##4) all annotations (in any order)
+
+ .EE
+
+  The edges of the graph area may be plotted by
+
+ .TT
+
+ $TGRFRAM
+
+ .EE
+
+ This will be required in nearly all cases. The frame is drawn
+ as CSType 3.
+  To outline the current pane, call
+
+ .TT
+
+ $TOPANE$I(as described in section 2 - CSType 3.)
+
+ .EE
+
+ The determination of value intervals (also used for ticking and
+ gridding) is performed automatically (although see section 4.2
+ later) depending on the axis ranges.
+  For linear axes with a range of length  d x 10**i  with
+ d greater or equal to 1.0 and less than 10.0 (i.e. d in [1.0,10.0))
+ an interval between
+ values will be chosen according to the value of d as shown below:
+
+ .CONTIG INLINE
+
+ .TT
+
+ $T##d in [1.0,3.0)####   interval =   2.0 x 10**(i-1)
+
+ $T##d in [3.0,7.0)####   interval =   5.0 x 10**(i-1)
+
+ $T##d in [7.0,10.0)###   interval =   1.0 x 10**i
+
+ .EE
+
+ .ENDC
+
+  The values marked will be integral multiples of the interval, thus
+ ensuring that 0.0 would be a value point. The choice of these
+ intervals maintains a reasonable number of divisions without
+ overcrowding (always more than 4 and less than 16). The
+ values themselves will be plotted in a format to maintain the
+ maximum accuracy without excessive digits appearing. Where possible
+ a common power of ten factor will be removed (and indicated
+ adjacent to the edge or axis being 'valued').
+  The same value points are used for the tick spacing, the tick
+ lengths being one hundredth of the size of the shorter pane side.
+  For logarithmic axes, to ensure clarity, if there are less than
+ two cycles along the axis values of the _logarithm_ (base 10)
+ the values
+ will be plotted and determined as for the linear axes. If at
+ least two cycles are contained along the axes then the values as
+ integer powers of 10 will be appropriately placed at cycle boundaries.
+  Ticking will occur at these boundary points, and if fewer than five
+ cycles are contained on the axis, then intermediate half-size, faint
+ ticks will be plotted (these correspond to the normal intermediate
+ divisions of a log cycle).
+  When gridding is specified the spacing is the same as the
+ corresponding ticking as described above.
+
+
+
+
+
+
+
+
+ .CHAPTER Refined Graphing
+ The features described in the previous section enable the user to plot
+ straight line graphs from a set of co-ordinate pairs, against linear or
+ logarithmic axes.  The immediate extension of this is for some form of
+ interpolation to be performed between consecutive data points to give
+ a smooth curve for the finished plot.  DIMFILM provides the choice of
+ two polynomial interpolations - third or fifth degree. To effect
+ either of these the call to GRAPH should be replaced by
+
+ .TT
+
+ $TPOLY3(X,Y,N)
+
+ $Ifor third degree polynomial interpolation
+
+ $TPOLY5(X,Y,N)
+
+ $Ifor fifth degree polynomial interpolation
+
+ .EE
+  X and Y are REAL arrays (of dimension at least N) holding the N pairs
+ of co-ordinates to be graphed.  There is a proviso that N must exceed
+ the degree of the polynomial interpolation being performed.  Plotting
+ of an interpolated graph will terminate should a singularity be found
+ during the interpolation process.
+  By default the number of steps between consecutive abscissae at which
+ interpolated values will be found is 5.  The larger this value, the
+ smoother the resultant curve, although execution time for the program
+ will increase correspondingly.  The number of steps for this
+ interpolation may be altered by
+
+ .TT
+
+ $TINTERP(NSTEPS)
+
+ $Iwhere NSTEPS is the number of intermediate steps at which the
+ interpolation polynomial will be evaluated.
+
+ .EE
+  An alternative output that might be required from a set of co-ordinate
+ pairs might be a simple point plot, when no join is made between the
+ points.  To accomplish this,
+
+ .TT
+
+ $TPTPLOT(X,Y,N,NCHAR)
+
+ $Iwhere X,Y and N are as before, and NCHAR is the number of the
+ required marker symbol at each point (from the current Marker Font),
+ NCHAR is an integer
+ in the inclusive range 1 to 48 . As for the normal call to GRAPH,
+ N must be at least 2.
+
+ .EE
+
+  When discrete co-ordinate pairs are provided, it may be desired to
+ produce a histogram bar chart.  The bars will in each case be in the Y-
+ direction, and correspond to each abscissa input.  The appropriate
+ instruction is
+
+ .TT
+
+ $THISTGR(X,Y,N,BAR)
+
+ $IX,Y and N being as before.
+
+ .EE
+  The fourth parameter, BAR, controls the type of histogram that will be
+ produced.
+
+ .CONTIG INLINE
+
+ .TT
+
+ $TBAR = -1.$I- auto-width histograms will be produced,
+ so that adjacent bars touch.
+
+ $T####= #0.$I- histogram lines are produced (i.e. a special
+ case of fixed width bars).
+
+ $T####> #0.$I- histogram bars width BAR (in user _axis_
+ units) will be plotted.
+
+ .EE
+
+ .ENDC
+
+  Several variations of histogram bar charts are possible.
+  A step histogram may be plotted by
+
+ .TT
+
+ $TSTEPGR(X,Y,N)
+
+ $Ithe three arguments being the same as the first three arguments for
+ HISTGR.
+
+ .EE
+  The effect is to produce an auto-width histogram with common verticals
+ removed.  This is the common staircase type of histogram.
+  It is possible to shade the histogram bars (when bars of a finite
+ width are to be produced).  This is performed by
+
+ .TT
+
+ $TSHDEGR(X,Y,N,BAR,THETA,GAP)
+
+ $IThe first four arguments are those for HISTGR, with the limitation
+ that for BAR = 0.0 histogram lines (i.e. bars of zero width) only will
+ be produced.  The last two arguments are used to define the type of
+ shading, and correspond to the arguments for HATCH (section *.x)
+
+ $T###THETA$Iis the angle (AGroup1, default degrees - see I.1.9)
+ the shading lines make with the
+ positive X-direction, and should be in the range (-90.0,90.0)[degrees].
+
+ $T###GAP$Iis the perpendicular distance, in user overall units,
+ between consecutive shading lines.
+
+ .EE
+
+  The shading of each bar is performed separately, and is defined under
+ HATCH.  The user may force two histogram bar charts, each with
+ different shading types, to be plotted with bars of the two data sets
+ adjacent for comparison by the appropriate positive specification for
+ BAR, and a shift in X range (by BAR) between the calls to SHDEGR for
+ the two data sets.
+  With all the histograms, it is the case that a vertical line may
+ coincide with an edge of the graphical area.  DIMFILM has no knowledge
+ of whether the user will draw the edges, and consequently the default
+ is to plot such verticals.  However, when the Y edges are plotted, such
+ verticals will be superimposed, which may not be desired.
+
+ .TT
+
+ $THREP$Icauses the suppression of histogram verticals that
+ coincide with the Y-edges, while
+
+ $THPER$Irestores the default, whereby the plotting of such
+ verticals is permitted.
+
+ .EE
+  It will often be the case that a graphical plot of a known function
+ is to be made.  In this case the appropriate call would be
+
+ .TT
+
+ $TGRAPHF(FN)
+
+ $Iwhere FN is a REAL FUNCTION, supplied by the user, and which should
+ be declared EXTERNAL in the calling program.  The function should have
+ two REAL arguments and be referenced as
+ $IY = FN(X,DX)
+
+ $Iwhere the value returned in the function is the function value (i.e.
+ Y co-ordinate) at X.  The argument DX on return should be the increment
+ in the X direction to be made for the next plotted point.  These
+ values are all in terms of the axis co-ordinate scales.
+
+ .EE
+  GRAPHF starts at the minimum X-axis value, and proceeds until the
+ maximum is reached or , in the case of a curve which becomes double
+ valued in X , the minimum is passed.  That is, plotting commences until
+ the graph leaves the X-axis range.  Alternatively, the graphing will
+ cease when two consecutive zero values for DX are returned.  The
+ general comments under Part I, section 4 relating to FNPLOT apply,
+ with references to X and Y ranges being, in the case of GRAPHF,
+ references to the axis ranges.
+  With GRAPHF it is obvious that automatic axis scaling cannot be
+ applied; hence both axis ranges must have previously been determined.
+ If either axis is in auto mode at the initiation of a call to GRAPHF,
+ then the current axis range for that axis will hold, ie. it will be the
+ range used for the immediately preceding graph plot (possibly
+ determined under auto-mode).  Should no previously defined range exist
+ then an error condition will occur and no plot will result.
+  All the above graph plotting routines take full account of the various
+ axis types.
+  A further axis type is available, and is of particular use for
+ commercial plots.  This is the month axis.
+ .TT
+
+ $TMONTHX(SMONTH)
+
+ $Iwill set the X-axis to months,
+
+ $TMONTHY(SMONTH)
+
+ $Iwill set the Y-axis to months.
+
+ .EE
+  In either case, the REAL argument SMONTH is used to indicate the
+ starting month along the appropriate axis.  The months January to
+ December running from 1. to 12. respectively, a fractional value is
+ permitted to denote the plot is to commence at a fraction of a month.
+ The left limit will be the 1st of this month.
+  E.g. February 7th would be 2.25 for SMONTH, and the axis would
+ commence at February 1st with the first plot occurring at February 7th.
+  The value of SMONTH must be in the range 1.0 to 13.0 . If an
+ illegal value is requested, 1.0 will be substituted.
+  A subsequent call to GRAPH, POLY3, POLY5, PTPLOT, or HISTGR with
+ arguments (X,Y,N) (and BAR in the case of HISTGR, and NCHAR in the case
+ of PTPLOT) will cause plotting with the appropriate month axis from
+ the starting point SMONTH at monthly intervals for the N values along
+ the orthogonal axis.  This is the auto-mode month axis, the argument N
+ being the number of months to be as plotted.  The orthogonal axis
+ values should be held in the REAL array X or Y as appropriate, the
+ other array being a scratch array that will be used during the call,
+ and its contents lost.
+  This situation will be clarified by example:
+
+ .TT
+
+ $TLOGY$IY-axis set as a log axis
+
+ $TMONTHX(3.0)$IX-axis a month axis, commencing at March 1st
+
+ $TGRAPH(X,Y,N)
+
+ .EE
+  This will plot the N values from REAL array Y at monthly intervals
+ starting at March 1st, i.e. Y(1) will be the Y value plotted against
+ March 1st, Y(2) against April 1st, etc.  REAL array X must be available
+ for use by GRAPH.  The X axis will be divided into months.
+  Similarly,
+
+ .TT
+
+ $TLINX$IX-axis set as linear axis
+
+ $TMONTHY(3.0)$IY-axis a month axis, starting at March 1st
+
+ $TGRAPH(X,Y,N)
+
+ .EE
+  will plot N values from REAL array X at monthly intervals commencing
+ with March 1st, i.e. X(1) will be the X-value plotted against March
+ 1st, X(2) against April 1st, etc... REAL array Y must be available for
+ use by GRAPH.  The Y axis will be divided into months.
+  After a call of MONTHX or MONTHY the relevant axis will remain a month
+ axis until reset (for example, by a reference to LINx or LOGx).
+ It is not permissible for both axes to be of type
+ month for any plot.
+  Ticking and valuing will apply to month axes with each month being
+ ticked when 12 or fewer months are plotted along the axis.  For greater
+ numbers of months not every month will be marked, as indicated:
+
+ .CONTIG INLINE
+
+ .TABSET 10,30
+
+ $T_Number of months_$T_Month interval for_
+ $T$T##__#ticking, etc._
+
+ .TABSET 15,40
+
+ $T_<_12$T1
+ $T(12,24]$T2
+ $T(24,36]$T4
+ $T(36,60]$T6
+ $T>60$T12
+
+ .ENDC
+
+  The above methods have shown the use of automatic month plotting, when
+ each successive data point is exactly a month from the previous point.
+  It may be necessary to plot at intervals other than exact months, in
+ which case it is necessary to define the number of months that are to
+ be plotted along the month axis.
+ .TT
+
+ $TMONSX(NMNTHS)
+
+ $Isets the number of months along the X-axis
+
+ $TMONSY(NMNTHS)
+
+ $Isets the number of months along the Y-axis
+
+ $T###NMNTHS is the number (INTEGER) of months to be plotted along the
+ appropriate axis.  These calls do not replace the calls to MONTHX or
+ MONTHY, which should also be made.  Any subsequent call of AUTOX, AUTOY
+ or AUTOXY will reset the relevant month axis to auto mode.
+
+ .EE
+  When this mode of fixing the month range is in operation the
+ previously scratch array in the X,Y arguments to GRAPH etc., is used
+ differently.  It should now hold the offset, in months, from the
+ beginning of the starting month (as set by MONTHX etc).  An example
+ will illustrate this:
+
+ .TT
+
+ $TLOGY$Isets logarithmic Y-axis
+
+ $TMONTHX(2.5)$Isets X-axis to months, beginning February 14th
+ for auto mode month plots.
+
+ $TMONSX(10)$Iindicates fixed number (10) months along X-axis
+
+ $TGRAPH(X,Y,N)
+
+ .EE
+  N points will be plotted, Y(I) will hold the Y-value of the Ith point
+ (I=1,N) and X(I) holds the offset, in months, from the 1st February
+ (this being the start month), although the axis will start at the
+ 14th (as set).
+  Suppose X(1)=1.25 , X(2)=1.50 , X(3)=2.00 , ....
+  Y(1) would be plotted as March  7th  (1.25 months after Feb 1st)
+  Y(2) would be plotted as March 14th  (1.50 months after Feb 1st)
+  Y(3) would be plotted as April  1st  (2.00 months after Feb 1st)
+  etc.
+  When discrete data is provided to a graphical routine (excepting,
+ therefore, GRAPHF) the user may wish symmetric or asymmetric error
+ bars to appear for each data point in the X and/or Y directions.
+  Separate calls exist for this purpose, and are listed below:
+
+ .TT
+
+ $TGRAPHE(X,Y,N,MX,MY)
+
+ $Iwhich corresponds to GRAPH, producing straight line joins between
+ data points.
+
+ $TPTPLTE(X,Y,N,NCHAR,MX,MY)
+
+ $Icorresponding to PTPLOT, each data point being plotted with the
+ marker designated by NCHAR
+
+ $TPOLY3E(X,Y,N,MX,MY)
+
+ $TPOLY5E(X,Y,N,MX,MY)
+
+ $Icorresponding to POLY3,POLY5 respectively with polynomial
+ interpolation between data points
+
+ .EE
+  The arguments are of somewhat different form than the corresponding
+ routines.
+  X and Y are real arrays of dimension X(N,MX), Y(N,MY), where N is the
+ number of data points.
+  MX and MY may each have the value 1, 2 or 3.
+  Considering the array Z(N,MZ); Z=X,Y, then in each case Z(I,1) holds
+ the Ith Z data value which will be plotted.
+  For MZ=1 no error bars will be produced in the Z-direction.
+  MZ=2 implies symmetric error bars should appear in the Z-direction,
+ and for the Ith data point, the Z error bar will be +/- Z(I,2) in
+ magnitude.
+  MZ=3 implies asymmetric error bars in the Z direction, in which case
+ the Ith data point will have Z error bar given by +ABS(Z(I,2)),
+ -ABS(Z(I,3)).
+  The error bars are plotted with the same line type as the graph,
+ although the tick heads to each bar will be solid.  It should be noted
+ that MX need not equal MY, and for error bars in one direction only
+ the other MZ should be set to 1.  Tick heads will have the same size
+ as other graphical ticks.
+  To force the error bars to be of different line type it is necessary
+ to make a standard call to GRAPH etc. followed by the required line
+ type change and then a call to PTPLTE with NCHAR set to 0 (unless
+ some character is required at the data points additional to the error
+ bars).
+  It is possible for axes to be drawn at any particular X- or Y-value,
+ i.e. at other than the normal zero lines.  To set this
+
+ .TT
+
+ $TAXCUT(XO,YO)
+
+ $Iwhere (XO,YO) is the co-ordinate pair at axis intersection.  By
+ default this will be at (0.,0.).  The axis intersection point will
+ then define axis positions for all subsequent axis drawing, ticking
+ labelling etc., until reset.
+
+ .EE
+  The user may wish, for linear axes, to control the interval between
+ ticks, and hence values.
+
+ .TT
+
+ $TDIVUNI(DIVX,DIVY)
+
+ $I(with DIVX,DIVY 0.0) will cause all subsequent linear axis ticking
+ etc., to be at intervals of DIV- in the axis units for the relevant
+ axis.  If this value is found not to be sensible automatic ticking etc.,
+ will be performed. The condition for DIV- to be used is that it is less
+ than one-half and not less than one-hundredth of the relevant axis
+ range.  It may be specified for only one axis by setting the other
+ DIV- non-positive.
+
+ .EE
+  To return to automatic division determination on both axes
+ .TT
+
+ $TAUTD
+
+ .EE
+  There is also provision for controlling the intensity step for the
+ intermediate logarithmic axis ticks.
+
+ .TT
+
+ $TLOGTIK(RSTP)
+
+ $Iwill result in a step down in intensity of RSTP for the
+ intermediate ticks. Note that RSTP is a real value in the range 0.0 to
+ 1.0 . The default value is 0.2
+
+ .EE
+  The user may also control the criteria used for determining whether
+ log cycles should be ticked.  Section 1 (of Chapter 4) indicated that
+ if less than two cycles appeared along an axis, then values of the
+ logarithm would be plotted, while if five or more cycles were contained
+ on an axis, no intermediate ticks would appear.  To change these values:
+
+ .TT
+
+ $TLOGLIM(ZMIN,ZMAX)
+
+ $Iwhere ZMIN and ZMAX are the real values of these criteria.  ZMIN
+ being the minimum number of cycles for cycle values etc., to appear,
+ ZMAX the number of cycles at and above which intermediate ticking will
+ not appear.
+
+ .EE
+  When automatic mode is selected, each graph has individually
+ determined axis ranges (on either or both as specified AUTOX, AUTOY
+ etc.).  It is often the case that while automatic range determination
+ may be used for the first graph, it may be wished to plot subsequent
+ graphs against the same axis ranges.  This may be forced by:
+
+ .TT
+
+ $TSAMEX$Iwhich fixes the X-range as that currently held
+  e.g. after a call to a graphical range that X range is retained
+ (as though the relevant call to XAXIS had been made) for all
+ following graphs, and automatic X-range determination is turned off.
+
+ $TSAMEY$Iacting on the Y range
+
+ $TSAMEXY$Iacting on both X and Y ranges
+
+ .EE
+  By default axis values are plotted in a real format (i.e. including
+ the decimal point).  It is possible, when the range permits, for
+ integer values to be plotted by linear axes or edges.
+
+ .TT
+
+ $TIXAX$Ispecifies that future valuing of linear X-axes should, when
+ possible,  be in integer format
+
+ $TIYAX$Iacts similarly for subsequent linear Y-axes
+
+ .EE
+  Real values may be restored for all subsequent valuing by:
+
+ .TT
+
+ $TRXAX$Ifor real values on X-axes
+
+ $TRYAX$Ifor real values on Y-axes
+
+ .EE
+  Common scale factors may well be included for integer values axes
+ where necessary, and it should be appreciated that ranges such as
+ (10.0,10.9) are incapable of being valued integrally.  Also, the
+ user should note that the X and Y values passed to GRAPH etc.,
+ should still be _real_ numbers.
+
+ .CHAPTER Alternative Co-ordinate Systems
+  In addition to the rectangular co-ordinate systems described above,
+ DIMFILM provides the means to plot against polar axis systems, i.e.
+ radial plots.
+  The area occupied by a polar plot is the same portion of the window
+ as used for cartesian plots.  In the case of polar plots, however,
+ the total area is not used, the scaling and positioning of the axis
+ system being performed to maximise the area used.
+  The calls are closely analogous to those previously described for
+ rectangular co-ordinate systems, and the priorities for ordering of
+ calling sequences as given in Section 1 still hold.
+  The radial axis type may be specified by:
+
+ .TT
+
+ $TLINR$Ito set linear radial axis (this is default)
+
+ $TLOGR$Ito set logarithmic radial axis
+
+ .EE
+  The units of angular measure for angles to the radial plotting
+ routines belong to AGroup2 (therefore being radians by default).
+ The section on Angular Measure within the part on Basic Plotting
+ gives further information and describes ways of changing the
+ default.
+  Axis ranges may be supplied by the user:
+
+ .TT
+
+ $TRRANGE(RMIN,RMAX)
+
+ $Iwill set the radial range to be RMIN to RMAX, where
+ RMAX is greater than RMIN which is greater than or equal to 0.0
+
+ $TTRANGE(THETA1,THETA2)
+
+ $Iwill set the angular range from THETA1 to THETA2, both angles
+ being AGroup2 (default radians) and should each be in the
+ range [0.0,2pi][radians].
+
+ .EE
+  If either of these calls is made the appropriate axis range is fixed
+ until reset.  By default, automatic range determination is provided.
+ This may be reselected at any time:
+
+ .TT
+
+ $TAUTOR$Isets automatic radial range determination
+
+ $TAUTOT$Isets automatic angular range determination
+
+ $TAUTORT$Isets automatic range determination for both axes
+
+ .EE
+  Having determined axis types, ranges as required:
+
+ .TT
+
+ $TPOLAR(R,THETA,N)
+
+ $Iwill plot the N co-ordinate pairs from R, THETA (both REAL arrays of
+ minimum dimension N), where R holds the radial values, and THETA holds
+ the angular values (AGroup2, default radians).
+
+ .EE
+  The graph may be completed by
+
+ .TT
+
+ $TPOLDEF(TITLE,RLAB)
+
+ $Iwhere TITLE and RLAB are _CHARACTER_ arrays (of appropriate length)
+ holding captions to be passed to SYMTXT
+
+ $T###TITLE$Iis the title to appear at the base of the plot
+
+ $T###RLAB$Iis the label to appear below the plot
+
+ .EE
+  The polar boundary will be included with radii at 90 degrees, each
+ radius will be ticked and valued, and angular values will be plotted
+ around the circumference.
+  Titling etc., may be performed through LTITLE, UTITLE, LXLAB,
+ UXLAB, LYLAB, RYLAB as for rectangular plots.  Due to the varied
+ boundary shapes and positions that may apply to radial plots it is not
+ sensible to provide any rigid labelling format.  Generally, the -XLABEL
+ should be satisfactory for describing the radial axis, and -YLABEL for
+ the angular values.
+  Ticking and valuing may be independently controlled.  In the following
+ description it should be borne in mind that in the general case the
+ extremities of a plot will not be coincident (only in the exceptional
+ case of the angular range 2pi [=360 degrees]
+ will this be so), and between
+ the extremities (i.e. going from THETA1 to THETA2, the angular range
+ limiters) one or more principal radii may be included (i.e. those at
+ integral multiples of pi/2 radians, viz. 0, pi/2, pi, 3pi/2, 2pi
+ [equivalent to 0., 90., 180., 270. degrees]).
+
+ .TT
+
+ $TPOLOUT$Iwill produce the bounding outline of the polar plot area -
+ i.e. the arcs of minimum and maximum radius, and the radii at the
+ bounding angles will be plotted.
+
+ $TPOLFR$Iwill produce the bounding outline (as POLOUT) and also
+ plot the included principal radii.
+
+ $TRXVAL$Iwill plot the radial values at the extreme radii.
+
+ $TRVAL$Iwill plot the radial values at the extreme radii and at
+ included principal radii.
+
+ $TRXTIK$Iwill tick the radial values on the extreme radii.
+
+ $TRTIK$Iwill tick the radial values on the extreme radii and on
+ included principal radii.
+
+ .EE
+  It should be noted that, generally, the tick length is taken into
+ account when valuing radii to avoid any overlap of tick and value.
+ The user may exercise some control over this by:
+
+ .TT
+
+ $TRADSEP(ANGLE)
+
+ $IANGLE is specified as AGroup2 (default radians). It controls
+ the appearance of ticks for principal radii.  If a principal
+ radius is closer than
+ ABS(ANGLE) to an extreme it will not be ticked.  For non-coincident
+ radii of angular range extremities to be separately valued there is a
+ minimum necessary angular separation.  If ANGLE >0.0, this separation
+ is ANGLE.  For zero or negative ANGLE automatic computation taking
+ account of value positioning and character size is made.  At less
+ than the (fixed or computed) separation angle only the radius of
+ least angle will be valued.  While for less than twice the
+ separation angle, values will not be spaced by the tick size
+ from the radius, i.e. values will be adjacent to radii.  The default
+ value of ANGLE is -0.1 (radians), i.e. automatic computation of
+ separation angle is made, but included principal radii closer than 0.1
+ radians to an extrema are not ticked.
+
+ $TPOLGRD$Iwill grid the polar plot.
+
+ .EE
+  The gridding of a polar plot comprises the plotting of radial lines
+ and circular arcs at certain radii.  Due to the concentration of
+ radii at the centre of a polar plot it is generally necessary to
+ incorporate some thinning of radial lines as the centre is approached.
+  This is done by dividing the maximum radius, and each division having
+ a separate angular increment between radial grid lines.  The circular
+ arcs that appear are dictated by the ticking (and valuing) of the
+ radii, consequently the division points must be adjusted to coincide
+ with these arcs.  The number of divisions fixes the size of each
+ division, and the tick point along a radius following nearest
+ to each division is selected to bound a division.  However, a
+ spacing less than .4 of the fixed division is ignored to prevent
+ nonsensical thinning of radii.
+  By default 3 divisions are used with angular separation of radii
+ being pi/2, pi/4, pi/12 (radians) [equivalent to 90, 45, 15
+ degrees].  These may be changed by the
+ user by
+
+ .TT
+
+ $TTLEVS(XLEV,N)
+
+ $Iwhere N, INTEGER, is the number of levels to be used for the
+ thinning of gridding radii - a maximum of 4 is permitted 1_<_N_<_4
+ and XLEV is a REAL array of dimension 4, with the first N elements
+ holding the angular intervals between radii at each division (from 1 at
+ the centre to N at the maximum radius).  The angles belong to AGroup2
+ (default radians).
+
+ .EE
+  To cause angular values to be plotted along the arc of maximum radius,
+
+ .TT
+
+  $TTVAL
+
+ .EE
+  The angles so plotted will always be in degrees, and will occur at the
+ interval specified for the highest level set (i.e. by default at pi/12
+ radians).
+  Ticking of the outer arc may be done at the angular intervals by
+
+ .TT
+
+ $TTTIK
+
+ .EE
+  for linear intervals on the radii, overriding of the automatic
+ division control is possible by
+
+ .TT
+
+ $TRDIV(D)
+
+ $Iwhen D, REAL, will be the interval between ticks etc., on the
+ radii. This is subject to the same conditions as the similar feature
+ for cartesian plots.
+
+ .EE
+  Automatic division may be restored by:
+
+ .TT
+
+ $TAUTORD
+
+ .EE
+  Logarithmic axis ticking is controlled as for cartesian plots, and
+ the call to LOGLIM (described in section 2) controls logarithmic
+ limits for both types of plot.
+  Analagous with the calls for interpolation, point and function
+ plotting against rectangular axes (as described in section 2) are
+ calls for the similar purpose with polar plots.
+
+ .TT
+
+  $TPOLPY3(R,THETA,N)
+
+  $Ifor third degree polynomial interpolation.
+
+  $TPOLPY5(R,THETA,N)
+
+  $Ifor fifth degree polynomial interpolation.
+
+ .EE
+  R and THETA are REAL arrays (of dimension at least N) holding the N
+ pairs of co-ordinates to be plotted.  N must exceed the degree of the
+ interpolation polynomial.  The number of interpolating steps between
+ consecutive THETA values is controlled by INTERP (see section 2), and
+ by default is 5.  THETA is of AGroup2 (default radians).
+  Plotting a symbol at each co-ordinate pair with no connecting line
+ is accomplished by
+
+ .TT
+
+ $TPOLPTS(R,THETA,N,NCHAR)
+
+ $Iwhere R, THETA and N are as before, and NCHAR (1_<_NCHAR_<_48) is
+ the desired marker symbol from the Marker Font.  (N>2).
+
+ .EE
+  To plot a polar function,
+
+ .TT
+
+ $TPOLFN(FN)
+
+ $Iwhere FN is a REAL FUNCTION, supplied by the user, and which should
+ be declared EXTERNAL in the calling program.  The function should
+ have two REAL arguments and be referenced as
+
+ $I####R=FN(THETA,DTHETA)
+
+ $Iwhere the value returned in the function is the radial value
+ (i.e. R) at angle THETA, and DTHETA, on return is the increment to be
+ made in the angle for the next plotted point.  THETA and DTHETA are
+ both in AGroup2 (default radians).
+
+ .EE
+  The general details of this call and its operation are directly
+ analagous to GRAPHF, the description of which is in section 2, and
+ to which the user is referred.
+  Analagous to SAMEX, SAMEY, SAMEXY are the references
+
+ .TT
+
+  $TSAMER$Iwhich fixes the R range at the current range
+
+  $TSAMET$Ifixing the angular range
+
+  $TSAMERT$Ifixing both the radial and angular ranges
+
+ .EE
+  A different form of plot concludes this section.  This is the "pie
+ chart" plot.  In this, data is apportioned a sector of a circle in
+ direct proportion to its fraction of the total.  As with all graphical
+ plots, the piechart occupies a portion of the current window.  Within
+ this space the chart is centred.
+
+ .TT
+
+ $TPIECHT(R,CAP,PERCNT,N,IPERS)
+
+ $T###R$Iis the radius of the chart, in current users
+ units, and this must not exceed half of 83% (the graph area) of the
+ minimum pane dimension.
+
+ $T###N$Iis the number of data items to be plotted.
+
+ $T###CAP$Iis a _CHARACTER_ array of dimension N, containing the N
+ captions of the data items.
+ When percentages are to be
+ plotted for each data item, this will be appended to each caption.
+
+ $T###IPERS$Iindicates the form of data input, and whether
+ percentages are to be plotted.
+
+ $T$IIf IPERS is negative, the actual data value of each item is input
+ through PERCNT, in which case there will be exactly N sectors.
+ When IPERS is positive, the actual percentages associated with each
+ are input through PERCNT.  In this case, a check is made by
+ totalling the percentages 1 to N, and if a total in excess of 100.1
+ is found an error is recorded and the call ignored.  Conversely, a
+ total less than 99.9 will result in a blank sector appearing to
+ force the total to 100.
+
+ $T$IWhen the absolute value of IPERS is 1 no percentage will accompany
+ the data names on the plot, while an absolute value of 2 causes
+ percentages to be plotted.
+
+ $T###PERCNT$Iis a REAL array of dimension N, holds the percentages or
+ values (as determined by IPERS) associated with each item.
+
+ .EE
+
+
+
+ .CHAPTER Graphing in depth
+
+  This section contains details of a handful of routines that will
+ probably be accessed only infrequently by the user. They do, however,
+ offer the means for the more ambitious to obtain superior graphical
+ plots. Unless specifically stated, the following facilities refer
+ only to plots against rectangular axes, i.e. those discussed in
+ sections 1 and 2.
+  Although DIMFILM is able to provide ticking of the various bounds
+ and axes, as described in II 1.4,
+ it has no prior knowledge of whether axes will in fact
+ be drawn. Where axes are included, a tick at the axis point will
+ result in a heavier density or a colour "change"
+ where axis and tick coincide.
+ Conversely, if the axis tick were omitted _and_
+ the axis not drawn then
+ a seemingly nonsensical gap in the ticking would appear. By default
+ ticking is suppressed at the axis as it is felt that generally an
+ axis will be incorporated if it falls within range. To reverse this,
+ so that ticking occurs at the axis point the following routine may
+ be called :
+
+ .TT
+
+ $TAXTIK
+
+ .EE
+
+  The default condition may be restored by :
+
+ .TT
+
+ $TNOAXT
+
+ .EE
+  It is obviously the user who must consider whether or not his axis
+ will be contained in the plot.
+  The ticking of bounding edges is directed inwards. A set of routines
+ exist to place outward pointing ticks on the bounding edges:
+
+ .TT
+
+ $TLXOPT$Ifor outward ticking of the lower edge
+
+ $TUXOPT$Ifor outward ticking of the upper edge
+
+ $TLUXOPT$Ifor outward ticking of both upper and lower edges
+
+ $TLYOPT$Ifor outward ticking of the left edge
+
+ $TRYOPT$Ifor outward ticking of the right edge
+
+ $TLRYOPT$Ifor outward ticking of both left and right edges
+
+ .EE
+  It is also possible to plot any combination of edges (rather than
+ the complete frame of four edges, through GRFRAM - see II.1.4).
+ The ticking of
+ the open ends of the plotted edges may also be controlled.
+
+ .TT
+
+ $TEDGES(LKJI,ITICK)
+
+ $T###LKJI$Iis a four digit INTEGER, each digit being 0 or 1.
+ There is a 1:1 correspondence between the digits and the four edges,
+ and a value 1 causes the relevant edge to be plotted, while for 0
+ it is not plotted.
+
+ $IThe correspondence is:
+
+ $II - lowest edge
+
+ $IJ - left hand edge
+
+ $IK - uppermost edge
+
+ $IL - right hand edge
+
+
+ $T###ITICK$Icontrols the ticking of the open ends of the
+ plotted edges (i.e. at ends of the plotted edges not meeting another
+ plotted edge). The values ITICK may have are :
+
+ $I+1 - inward ticks
+
+ $I-1 - outward ticks
+
+ $I+2 - in/out double ticks
+
+ $I 0 - no ticks
+
+ .EE
+
+  For example CALL EDGES(0011,2) would produce the lower and left
+ edges with double ticks.
+  It may sometimes be more convenient to know the actual plotting
+ co-ordinates (in the users overall frame system) of a point known
+ in terms of currently used graphing axes. This is necessary when
+ one wishes to overplot text on a graph, or, possibly, to blank
+ out a section of the graph (where it is known that no relevant
+ data will occur) for future use as a legend box.
+  To obtain the actual plot co-ordinates (XA,YA) of a point with
+ current graph co-ordinates (XG,YG) , call the following:
+
+ .TT
+
+ $TGRTOAC(XG,YG,XA,YA)
+
+ .EE
+
+
+
+  Note: the desired coordinates (XA,YA) are actual coordinates in
+ terms of the users (world) coordinates (e.g. as determined through
+ a reference to BOUNDS).  They take _no_ account of any rotation or
+ temporary origin.  As such they are suitable for use as
+ blanking/clipping parameters, and should only be used for plotting
+ when rotation and temporary origin are both zero.
+  There is provision for movement from the current position to a point
+ referred to by its graph coordinate (XG,YG); this may be either a
+ positional or drawing move.
+
+ .TT
+
+ $TGRON(XG,YG)
+
+ $Iis equivalent to ON2; drawing will occur from the current plot
+ position to the _actual_ point with graph coordinates (XG,YG) at
+ the current colour/intensity and in the current style (i.e.
+ CSType 1).
+
+ $TGROFF(XG,YG)
+
+ $Iis equivalent to OFF2; the current plot position will be
+ repositioned to the _actual_ point with graph coordinates (XG,YG)
+ without drawing any line.
+
+ .EE
+
+  Note: in these cases the movement is to the _actual_ point with
+ graph coordinates (XG,YG).  This point will become the current plot
+ position.  Effectively rotations and temporary origin are accounted
+ for (although there is _no_ rotation within the graphing area).
+ .DISPLAY
+  The sequence
+      CALL GRTOAC(XG,YG,XA,YA)
+      CALL ON2(XA,YA)
+ will not generally have the same result as
+      CALL GRON(XG,YG)
+ .ENDD
+  When there is no rotation and no temporary origin the results will
+ be identical, otherwise the coordinates (XA,YA), which are actual
+ world coordinates, will be transformed by ON2 according to the
+ existing rotation and temporary origin before the move is made.
+ It is emphasised that (XA,YA) are the actual coordinates relative
+ to the user's bounds; they are not relative to the current
+ plotting axes.
+  Directly analogous routines exist for polar plots.  These are
+
+ .TT
+
+ $TPOLTOA(R,THETA,XA,YA)
+
+ $Iwhich will convert the given coordinates (R,THETA) on the polar
+ plot to actual coordinates (XA,YA).
+
+ $TPOLON(R,THETA)
+
+ $Ito draw a line (CSType 1) from the current plot position to
+ polar point (R,THETA).
+
+ $TPOLOFF(R,THETA)
+
+ $Ito reposition the current plot position to polar point (R,THETA).
+
+ .EE
+
+  The notes pertaining to the equivalent cartesian routines apply
+ equally to those for polar coordinates.
+
+
+
+
+

@@ -1,0 +1,23 @@
+*DECK CMSMS2 F
+      SUBROUTINE DFXMS2(TIME)
+***********************************************************************
+*                                                                     *
+*      TIME:                                                          *
+*                                                                     *
+*        RETURNS CURRENT TIME TO CALLER AS 8-BYTE FIELD OF FORM:      *
+*                                                                     *
+*                      HH.MM.SS                                       *
+*                                                                     *
+*                                                                     *
+***********************************************************************
+      CHARACTER*2 HOUR,MINUTE,SECOND
+      CHARACTER*8 TIME
+      INTEGER NOW(8)
+      CALL DATIM(NOW)
+      WRITE(HOUR  ,100) NOW(5)
+      WRITE(MINUTE,100) NOW(4)
+      WRITE(SECOND,100) NOW(3)
+ 100  FORMAT(I2.2)
+      TIME = HOUR//':'//MINUTE//':'//SECOND
+      RETURN
+      END

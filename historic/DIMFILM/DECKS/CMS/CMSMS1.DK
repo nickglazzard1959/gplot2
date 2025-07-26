@@ -1,0 +1,24 @@
+*DECK CMSMS1 F
+      SUBROUTINE DFXMS1(DATE)
+***********************************************************************
+*                                                                     *
+*    DFXMS1:                                                          *
+*                                                                     *
+*        RETURNS CURRENT DATE TO CALLER AS 8-BYTE FIELD OF FORM:      *
+*                                                                     *
+*                      DD/MM/YY      (U.K. FORMAT)                    *
+*                                                                     *
+*                                                                     *
+***********************************************************************
+      CHARACTER*2 YEAR,MONTH,DAY
+      CHARACTER*8 DATE
+      INTEGER NOW(8)
+      CALL DATIM(NOW)
+      NOW(8) = MOD(NOW(8),100)
+      WRITE(YEAR ,100) NOW(8)
+      WRITE(MONTH,100) NOW(7)
+      WRITE(DAY  ,100) NOW(6)
+ 100  FORMAT(I2.2)
+      DATE = DAY//'/'//MONTH//'/'//YEAR
+      RETURN
+      END

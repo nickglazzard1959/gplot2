@@ -1,0 +1,4 @@
+#!/bin/bash
+ln -s /usr/local/share/dimfilm/DADIMFO ./DADIMFO
+gplot "${@}"
+unlink ./DADIMFO

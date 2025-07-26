@@ -1,0 +1,194 @@
+*DECK CMSMAA F
+DFXMAA   TITLE  'File reading routines for Dimfilm fonts'               DFX00010
+         PRINT ON,GEN                                                   DFX00020
+DFXMAA    CSECT
+*           DYNAMIC ALLOCATION ROUTINES FOR DIMFILM
+*
+*                                                                       DFX00030
+*      Three entry points:                                              DFX00040
+*                                                                       DFX00050
+*        DFXMAB(FN,FT,FM,IERR)           Open a file of a given name    DFX00060
+*        DFXMAC (BUFF,IBSIZE,NREAD,IERR) Read a record from the file    DFX00070
+*        DFXMAD(IERR)                    Close the file                 DFX00080
+*                                                                       DFX00090
+*        (A rewind can be achieved by closing the file and then         DFX00100
+*        opening it again.)                                             DFX00110
+*                                                                       DFX00120
+DFXMAA   AMODE ANY                                                      DFX00140
+DFXMAA   RMODE ANY                                                      DFX00150
+*                                            M WHEELER.  Sep 1990       DFX00160
+         ENTRY    DFXMAB                                                DFX00170
+         ENTRY    DFXMAC                                                DFX00170
+         ENTRY    DFXMAD                                                DFX00180
+*                                                                       DFX00190
+*            ***************  DFXMAB  ***************                   DFX00200
+*                Open a file of a given name                            DFX00210
+*                                                                       DFX00220
+*  Calling sequence is:                                                 DFX00230
+*          CALL DFXMAB( FNAME , FTYPE , FMODE , IERR)                   DFX00240
+*                                                                       DFX00250
+*            FNAME   File Name - Must be CHARACTER*8 !                  DFX00260
+*            FTYPE   File Type - Must be CHARACTER*8 !                  DFX00270
+*            FMODE   File Mode - Must be CHARACTER*1 !                  DFX00280
+*            IERR    Error code returned :                              DFX00290
+*                 (Decimal Integer)                                     DFX00300
+*                     0 - OK                                            DFX00310
+*                    20 - Invalid fileid.                               DFX00320
+*                    24 - Invalid filemode.                             DFX00330
+*                    28 - File not found / does not exist.              DFX00340
+*                    36 - Disk not accessed.                            DFX00350
+*                    80 - I/O error accessing OS data set.              DFX00360
+*              81,82,83 - OS data set errors (N/A).                     DFX00370
+*                    88 - FORM=E was not specified for an EDF file      DFX00380
+*                         with an item count greater than 65535 or      DFX00390
+*                         more than 65535 blocks.                       DFX00400
+*                                                                       DFX00410
+DFXMAB   B        12(15)             Branch around identifier           DFX00430
+         DC       X'06'                                                 DFX00440
+         DC       CL7'DFXMAB '                                          DFX00450
+*                                                                       DFX00460
+         STM      14,12,12(13)       Save regs in FORTRAN SA            DFX00470
+         LR       10,15                                                 DFX00480
+         USING    DFXMAB,10                                             DFX00490
+         LR       11,13                                                 DFX00500
+         LA       13,SAVA                                               DFX00510
+         ST       11,4(13)                                              DFX00520
+         ST       13,8(11)                                              DFX00530
+*                                                                       DFX00540
+         LM       2,5,0(1)           Get parameter addresses            DFX00550
+*                                                                       DFX00560
+         MVC      FSCBD(FSCBL),FFILE Initialise FSCB                    DFX00570
+         MVC      FSCBFN(8),0(2)     Move FN to FSCB (8 Chars !)        DFX00580
+         MVC      FSCBFT(8),0(3)     Move FT to FSCB (8 Chars !)        DFX00590
+         MVC      FSCBFM(1),0(4)     Move FM to FSCB (1 Char  !)        DFX00600
+* Existence check:                                                      DFX00610
+         FSSTATE  FSCB=FSCBD,MSG=YES Check if file exists               DFX00620
+         LTR      15,15                                                 DFX00630
+         BNZ      REPERR             No : Report error                  DFX00640
+*                                                                       DFX00650
+OPN      FSOPEN   FSCB=FSCBD,ERROR=REPERR  Open file                    DFX00660
+*                                                                       DFX00670
+REPERR   ST       15,0(5)            Return any error code              DFX00680
+*                                                                       DFX00690
+         L        13,4(13)                                              DFX00700
+         LM       14,12,12(13)       Restore registers                  DFX00710
+         MVI      12(13),X'FF'                                          DFX00720
+         SLR      15,15                                                 DFX00730
+         BR       14                 Return                             DFX00740
+*                                                                       DFX00750
+*             *************  DFXMAC  *************                      DFX00760
+*                Reads a record from the file                           DFX00770
+*                                                                       DFX00780
+*  Calling sequence is:                                                 DFX00790
+*          CALL DFXMAC (BUFF, IBSIZE, NREAD, IERR)                      DFX00800
+*                                                                       DFX00810
+*            BUFF    Buffer into which record will be read.             DFX00820
+*            IBSIZE  Buffer size in bytes (Integer)                     DFX00830
+*            NREAD   Number of bytes actually read (Integer)            DFX00840
+*            IERR    Error code returned :                              DFX00850
+*                 (Decimal Integer)                                     DFX00860
+*                     0 - OK                                            DFX00870
+*                     1 - File not found.                               DFX00880
+*                     2 - Invalid Buffer address.                       DFX00890
+*                     3 - Permanent I/O error.                          DFX00900
+*                     5 - Number of records to be read LE 0 OR GT 32768 DFX00910
+*                     7 - Invalid record format (Only checked when      DFX00920
+*                         file is first opened for reading)             DFX00930
+*                     8 - Incorrect length - the buffer size is too     DFX00940
+*                         small for the item read. Record is truncated. DFX00950
+*                     9 - File open for output (for 800 byte fmtd disk) DFX00960
+*                    11 - Number of records > 1 for variable length fil DFX00970
+*                    12 - END OF FILE  !                                DFX00980
+*                    13 - Variable length file has invalid displacement DFX00990
+*                         in active file table.                         DFX01000
+*                    14 - Invalid character in filename.                DFX01010
+*                    15 - Invalid character in filetype.                DFX01020
+*                    19 - An I/O error occurred on an FBA device ...    DFX01030
+*                    25 - Insufficient free storage available ...       DFX01040
+*                    26 - Requested item number LT 0 or GT system cap.  DFX01050
+* Note:                                                                 DFX01060
+*  If variable length record is longer than buffer size, FSREAD         DFX01070
+*  truncates the record.                                                DFX01080
+*  If variable length record is shorter than buffer size, FSREAD        DFX01090
+*  reads the record WITHOUT clearing the buffer first.                  DFX01100
+*                                                                       DFX01110
+*                                                                       DFX01120
+DFXMAC   B        12(15)             Branch around identifier           DFX01130
+         DC       X'06'                                                 DFX01140
+         DC       CL7'DFXMAC  '                                         DFX01150
+*                                                                       DFX01160
+         STM      14,12,12(13)       Save registers                     DFX01170
+         LR       10,15                                                 DFX01180
+         USING    DFXMAC,10                                             DFX01190
+         LR       11,13                                                 DFX01200
+         LA       13,SAVA                                               DFX01210
+         ST       11,4(13)                                              DFX01220
+         ST       13,8(11)                                              DFX01230
+*                                                                       DFX01240
+         LM       2,5,0(1)           Get parameters                     DFX01250
+         L        3,0(3)             R3 = buffer size                   DFX01260
+*                                                                       DFX01270
+         FSREAD   FSCB=FSCBD,BUFFER=(2),BSIZE=(3)  Read record          DFX01280
+         ST       15,0(5)            Store any error code in IERR       DFX01290
+         ST       0,0(4)             Store bytes actually read in NREAD DFX01300
+*                                                                       DFX01310
+*                                                                       DFX01320
+         L        13,4(13)           Restore registers                  DFX01330
+         LM       14,12,12(13)                                          DFX01340
+         MVI      12(13),X'FF'                                          DFX01350
+         SLR      15,15                                                 DFX01360
+         BR       14                 Return                             DFX01370
+*                                                                       DFX01380
+*               **************  DFXMAD  ****************                DFX01390
+*                             Closes file                               DFX01400
+*   Calling sequence is:                                                DFX01410
+*          CALL DFXMAD(IERR)                                            DFX01420
+*                                                                       DFX01430
+*            IERR    Error code returned :                              DFX01440
+*                 (Decimal Integer)                                     DFX01450
+*                     0 - OK                                            DFX01460
+*                     6 - The file is not open or no read or write      DFX01470
+*                         was issued to the file.                       DFX01480
+*                                                                       DFX01490
+DFXMAD   B        12(15)             Branch around identifier           DFX01500
+         DC       X'06'                                                 DFX01510
+         DC       CL7'DFXMAD '                                          DFX01520
+*                                                                       DFX01530
+         STM      14,12,12(13)       Save registers                     DFX01540
+         LR       10,15                                                 DFX01550
+         USING    DFXMAD,10                                             DFX01560
+         LR       11,13                                                 DFX01570
+         LA       13,SAVA                                               DFX01580
+         ST       11,4(13)                                              DFX01590
+         ST       13,8(11)                                              DFX01600
+*                                                                       DFX01610
+         L        2,0(1)             Get parameter                      DFX01620
+*                                                                       DFX01630
+         FSCLOSE  FSCB=FSCBD         Close file                         DFX01640
+*                                                                       DFX01650
+         ST       15,0(2)            Put any error code into IERR       DFX01660
+*                                                                       DFX01670
+         L        13,4(13)           Restore registers                  DFX01680
+         LM       14,12,12(13)                                          DFX01690
+         MVI      12(13),X'FF'                                          DFX01700
+         SLR      15,15                                                 DFX01710
+         BR       14                 Return                             DFX01720
+*                                                                       DFX01730
+*********************************************************************** DFX01740
+*                                                                       DFX01750
+*   (Dummy name which will be overwritten later:)                       DFX01760
+FFILE    FSCB     'DIMFILM  FONTFILE A ',RECFM=V                        DFX01770
+FSCBL    EQU      *-FFILE                                               DFX01780
+*                                                                       DFX01790
+*********************************************************************** DFX01800
+*                                                                       DFX01810
+FSCBD    DS       0F,(FSCBL)C                                           DFX01820
+FSCBFN   EQU      FSCBD+8                                               DFX01830
+FSCBFT   EQU      FSCBD+16                                              DFX01840
+FSCBFM   EQU      FSCBD+24                                              DFX01850
+*                                                                       DFX01860
+*********************************************************************** DFX01870
+*                                                                       DFX01880
+*                                                                       DFX01890
+SAVA     DS       18F                                                   DFX01900
+         END                                                            DFX01910

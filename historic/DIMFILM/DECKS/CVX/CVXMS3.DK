@@ -1,0 +1,56 @@
+*DECK CVXMS3 F
+      SUBROUTINE DFXMS3(USERID)
+      CHARACTER*(*) USERID
+      CHARACTER*20 EVALUE
+C    RETURNS CONVEX USERID
+C
+C    USES DFXMSF (RETURNS EFFECTIVE USER + NAME FIELD
+C                 OR - IF EFFECTIVE = root - ACTUAL USER/NAME)
+C
+      CHARACTER*64 USEID,NAME
+      INTEGER*4 LUSEID,LNAME
+C
+C    IF BATCH adds first character of qsub request name
+C
+C    CALLED AS    CALL DFXMS3(JOBNAM)
+C                 CHARACTER*8 JOBNAM
+C
+*CALL ,DFXC12
+C
+C    For both batch and interactive acquire effective
+C    user + name (from password database).
+C    If effective user is root then acquire actual
+C    user + name.
+C
+C    (Originally used GETLOG if interactivem else
+C     assumed batch and used QSUB_USER.  This fails
+C     for cron or jtmp originated jobs.  Additionally,
+C     the environment variables are open to abuse/corruption.)
+C
+C
+      CALL DFXMSF(USEID,NAME,LUSEID,LNAME)
+      USERID = USEID(1:LUSEID)
+C    FOR CONSISTENCY WITH OTHER SYSTEMS FORCE LOGAME TO UPPER CASE
+C    (ULTIMATELY THIS COULD BE DONE ON THE DICOMED JUST FOR THE
+C     MAIN BANNER HEADING - FOR NOW DO IT HERE)
+      DO 1 I=1,8
+      IC = ICHAR(USERID(I:I))
+C    FORCE a-z to A-Z
+      IF ((IC.GE.97).AND.(IC.LE.122)) THEN
+            IC = IC - 32
+            USERID(I:I) = CHAR(IC)
+      ENDIF
+    1 CONTINUE
+      IF (.NOT.SYSIA) THEN
+C    IF BATCH -
+C        ADD FIRST LETTER OF JOB REQUEST PARAMETER
+            CALL GETENV('QSUB_REQNAME',EVALUE)
+C    This may be blank (e.g. if cron)
+C
+C    FIND FIRST BLANK (IF ANY)
+            I = INDEX(USERID,' ')
+            IF ((I.GT.1).AND.(I.LE.8)) USERID(I:I) = EVALUE(1:1)
+      ENDIF
+      RETURN
+      END
+

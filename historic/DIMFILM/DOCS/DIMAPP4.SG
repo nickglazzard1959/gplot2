@@ -1,0 +1,327 @@
+ .APPENDIX Conversion to the new DIMFILM
+  This chapter tabulates user accessible routines in the original
+ DIMFILM and indicates, where relevant, the new name and any change
+ in arguments.  The major parameter change is associated with
+ character strings.  Implementation under Fortran 77 has required
+ the replacement of (hollerith string,character count) by a single
+ parameter of type character.
+ .DISPLAY
+    Thus, for example, the _old_ coding
+         CALL SYMTEXT(6HABCDEF,6)
+    becomes
+         CALL SYMTXT('ABCDEF')
+ .ENDD
+  The other general change affecting
+ parameters is the change from an integer intensity to a real value
+ (normalised in the range 0. to 1.).
+  Other than subroutine name changes, the major difference the user
+ will encounter is the replacement of the single character alternators
+ (user assignable) by a predetermined set of escape sequences.
+ This has the advantage of only removing two characters from normal
+ usage in strings and simultaneously offering even greater flexibility
+ to the user in formatting and controlling his textual output.
+  New features are not generally described in this Appendix unless they
+ directly replace an original feature.  Thus, for instance, colour
+ specification and raster plotting is not described here - nor are
+ the device nomination routines appropriate to them.
+ .SECTION Routine name conversion
+
+
+ _Notes:_
+ .table 11
+ $In/a - indicates routine or equivalent is no longer available
+
+ $Iblank in second column if no change
+
+ $I+C+  Hollerith string, count parameter pair(s) replaced by
+ character type parameter(s)
+
+ $I+R+  integer intensity value replaced by real value
+
+ .ENDTABLE
+ .DISPLAY
+ .TABSET 6,20
+ .BLANK 2
+ $T_Original_$T_New routine name_
+ .BLANK
+ $TACCENT$Tn/a - but see new text description
+ $TAUTODIV$TAUTD
+ $TAUTOR$T
+ $TAUTORTH$TAUTORT
+ $TAUTOTH$TAUTOT
+ $TAUTOX$T
+ $TAUTOXY$T
+ $TAUTOY$T
+ $TAUTRDIV$TAUTORD
+ $TAXISCUT$TAXCUT
+ $TAXTIKON$TAXTIK
+ $TBLANK$T
+ $TBLNKFRM$TOBLANK
+ $TBNDRY$TINQB
+ $TBOUNDS$T
+ $TBOX$TRECT      - see also new routine BOX
+ $TBRKSYM$T
+ $TCALPNT$Tn/a
+ $TCAM16MM$TD16
+ $TCAM35MM$TD35
+ $TCASEALT$Tn/a - but see new text description
+ $TCFMT$T          +C+
+ $TCHAR$TMARKER     - but see new description
+ $TCHARA$Tn/a
+ $TCHARL$Tn/a
+ $TCHECK$T
+ $TCHHALF$T
+ $TCINE$Tn/a
+ $TCINTERP$TCINTER
+ $TCIRCLE$T
+ $TCIRCSEG$TCIRARC
+ $TCLABEL$T
+ $TCLABHT$T
+ $TCOMIC$Tn/a
+ $TCONTOUR$TCONTR
+ $TCONTR1$T          - see description re last parameter
+ $TCONTR2$T
+ $TCOORDS$TINQC
+ $TCQUAD$T
+ $TCSCALE$T
+ $TCVHALF$T
+ $TCWHOLE$T
+ $TDASH$T
+ $TDASHDOT$TDSHDOT
+ $TDASHOFF$TDSHOFF
+ $TDEFALTS$Tn/a
+ $TDEFINT$Tn/a - but see general description
+ $T$Tof intensities
+ $TDEFMATH$Tn/a - but see new text description
+ $TDEGREES$TDEGREE
+ $TDEGSEP$TRADSEP
+ $TDIVUNIT$TDIVUNI
+ $TDOT$T
+ $TDRAWXAX$TDRAWXA
+ $TDRAWYAX$TDRAWYA
+ $TDTHETA$T
+ $TEDGES$T
+ $TELLIPSE$TELLIPS
+ $TELLSEG1$TELARC1
+ $TELLSEG2$TELARC2
+ $TENDBLNK$TENBLNK
+ $TENDCONT$TENSYMC
+ $TENDFILM$TDIMEND
+ $TENDWIND$TENPANE
+ $TFNPLOT$T
+ $TFRACTNS$Tn/a - but see new text description
+ $TFULL16$Tn/a
+ $TGRAFCON$TGRCON
+ $TGRAFDEF$TGRDEF     +C+
+ $TGRAPHER$TGRAPHE
+ $TGRAPHFN$TGRAPHF
+ $TGRAPHIC$TGRAPH
+ $TGREEK$Tn/a - but see new text description
+ $TGRFRAME$TGRFRAM
+ $TGROFF$T
+ $TGRON$T
+ $TGRSLIDE$TGRCONA
+ $TGRTOAC$T
+ $THATCH$T
+ $THISTGRM$THISTGR
+ $THPER$T
+ $THREP$T
+ $THVYALT$Tn/a - but see new text description
+ $THVYINT$T          +R+
+ $THVYTYPE$THVYTYP
+ $TIBACK$Tn/a - but see general description
+ $T$Tof intensities
+ $TIBCOUNT$TIBCNT
+ $TIDEF$Tn/a - but see general description
+ $T$Tof intensities
+ $TINTERP$T
+ $TINTREND$TINTRND
+ $TINTRUPT$TINTRPT
+ $TINTSTY$TINTSY    +R+ - single real parameter (0.,1.),
+ $T$Tsee description
+ $TITALIC$T
+ $TITALT$Tn/a - but see new text description
+ $TIVAL$TINQR/INQI
+ $TIXAX$T
+ $TIYAX$T
+ $TIZVAR$TINTVAR    +R+
+ $TJOIN$T
+ $TLIMIT$Tn/a
+ $TLINALT$Tn/a
+ $TLINESYM$Tn/a
+ $TLINK$T
+ $TLINR$T
+ $TLINX$T
+ $TLINXY$T
+ $TLINY$T
+ $TLNUM$Tn/a
+ $TLOGLIM$T
+ $TLOGR$T
+ $TLOGTIK$T          +R+
+ $TLOGX$T
+ $TLOGXY$T
+ $TLOGY$T
+ $TLOWCASE$TLOWER
+ $TLRYOPPT$TLRYOPT
+ $TLRYTICK$TLRYTIK
+ $TLRYVAL$T
+ $TLTITLE$T          +C+
+ $TLUXOPPT$TLUXOPT
+ $TLUXTICK$TLUXTIK
+ $TLUXVAL$T
+ $TLXAXLAB$TLXALAB    +C+
+ $TLXAXTIK$TLXATIK
+ $TLXAXVAL$TLXAVAL
+ $TLXLABEL$TLXLAB     +C+
+ $TLXOPPT$TLXOPT
+ $TLXTICK$TLXTIK
+ $TLXVAL$T
+ $TLYAXLAB$TLYALAB    +C+
+ $TLYAXTIK$TLYATIK
+ $TLYAXVAL$TLYAVAL
+ $TLYLABEL$TLYLAB     +C+
+ $TLYOPPT$TLYOPT
+ $TLYTICK$TLYTIK
+ $TLYVAL$T
+ $TMARGIN$T
+ $TMATHEXP$Tn/a - but see new text description
+ $TMONTHSX$TMONSX
+ $TMONTHSY$TMONSY
+ $TMONTHX$T
+ $TMONTHY$T
+ $TNEWFRAM$TFRAME
+ $TNEWORIG$TNEWORG
+ $TNEXTONE$Tn/a - but see new text description
+ $TNOACCNT$Tn/a - but see new text description
+ $TNOAXTIK$TNOAXT
+ $TNOCHECK$TNOCHCK
+ $TNOCINT$T
+ $TNOCLAB$T
+ $TNOFRACT$Tn/a - but see new text description
+ $TNOITAL$T
+ $TNOIZVAR$TNOIVAR
+ $TNOMATH$Tn/a - but see new text description
+ $TNONEXT$Tn/a - but see new text description
+ $TNOROT$T
+ $TNOSPEC$Tn/a - but see new text description
+ $TNOSPOS$T
+ $TNOSUB$Tn/a - but see new text description
+ $TNOSUPER$Tn/a - but see new text description
+ $TNOTXTCN$TENTXTC
+ $TNOUNLIN$TNOUNLN
+ $TNRMTYPE$TNRMTYP
+ $TNUM$TRNUM/INUM  - real/integer value, format as
+ $T$Tcharacter type
+ $TOFFTOXY$TOFF2
+ $TOLDORIG$TOLDORG
+ $TONTOXY$TON2
+ $TOPMESS$Tn/a
+ $TOUTLINE$TOUTLIN
+ $TOUTSLDE$Tn/a
+ $TOWNDASH$TOWNDSH
+ $TPARALL1$TPARAL1
+ $TPARALL2$TPARAL2
+ $TPIECHRT$TPIECHT - caption now singly dimensioned
+ $T$Tcharacter array
+ $TPOINT$T
+ $TPOLRDEF$TPOLDEF    +C+
+ $TPOLYGON$TPOLYGN
+ $TPOLY3$T
+ $TPOLY3ER$TPOLY3E
+ $TPOLY5$T
+ $TPOLY5ER$TPOLY5E
+ $TPOSN$T
+ $TPTPLOT$T
+ $TPTPLTER$TPTPLTE
+ $TRADIANS$TRADIAN
+ $TRELAXES$TRELAX
+ $TRELFRAM$TRELFR
+ $TREPEAT$Tn/a - to be implemented in more versatile
+ $T$Tmanner
+ $TROMAN$Tn/a - but see new text description
+ $TROMGRK$Tn/a - but see new text description
+ $TROTATE$T
+ $TRRANGE$T
+ $TRTHDIV$TRDIV
+ $TRTHETA$TPOLAR
+ $TRTHFN$TPOLFN
+ $TRTHFRAM$TPOLFR
+ $TRTHGRID$TPOLGRD
+ $TRTHLEVS$TTLEVS
+ $TRTHOFF$TPOLOFF
+ $TRTHON$TPOLON
+ $TRTHOUT$TPOLOUT
+ $TRTHPLY3$TPOLPY3
+ $TRTHPLY5$TPOLPY5
+ $TRTHPTS$TPOLPTS
+ $TRTHTOAC$TPOLTOA
+ $TRTIKS$TRTIK
+ $TRVALS$TRVAL
+ $TRXAX$T
+ $TRXTIK$T
+ $TRXVAL$T
+ $TRYAX$T
+ $TRYAXLAB$TRYALAB    +C+
+ $TRYAXTIK$TRYATIK
+ $TRYAXVAL$TRYAVAL
+ $TRYLABEL$TRYLAB     +C+
+ $TRYOPPT$TRYOPT
+ $TRYTICK$TRYTIK
+ $TRYVAL$T
+ $TSAMER$T
+ $TSAMERTH$TSAMERT
+ $TSAMETH$TSAMET
+ $TSAMEX$T
+ $TSAMEXY$T
+ $TSAMEY$T
+ $TSERIAL$Tn/a
+ $TSETDASH$TSETDSH
+ $TSETITAL$TSETITL
+ $TSETUP$Tn/a
+ $TSHDEGRM$TSHDEGR
+ $TSLDSYM$T
+ $TSLIDE$Tn/a
+ $TSNUM$TSRNUM/SINUM - real/integer value, format
+ $T$Tas character type
+ $TSPECHAR$Tn/a - but see new text description
+ $TSTEP$Tn/a
+ $TSTEPGRM$TSTEPGR
+ $TSTRAIL$T          +C+
+ $TSTRING$T          +C+
+ $TSUB$Tn/a - but see new text description
+ $TSUBALT$Tn/a - but see new text description
+ $TSUPALT$Tn/a - but see new text description
+ $TSUPER$Tn/a - but see new text description
+ $TSYMANGL$TSYMANG
+ $TSYMCONT$TSYMCON
+ $TSYMHT$T
+ $TSYMINT$T - to be made available (renamed)
+ $TSYMPOS$T
+ $TSYMTEXT$TSYMTXT    +C+
+ $TTEXTCON$TTXTCON
+ $TTHRANGE$TTRANGE
+ $TTHTIKS$TTTIK
+ $TTHVALS$TTVAL
+ $TTICKCON$TTIKCON
+ $TTITLE$Tn/a
+ $TTMPORIG$TTMPORG
+ $TUNLIN$T
+ $TUPCASE$TUPPER
+ $TUTITLE$T          +C+
+ $TUXAXLAB$TUXALAB    +C+
+ $TUXAXTIK$TUXATIK
+ $TUXAXVAL$TUXAVAL
+ $TUXLABEL$TUXLAB     +C+
+ $TUXOPPT$TUXOPT
+ $TUXTICK$TUXTIK
+ $TUXVAL$T
+ $TWINDFRM$TOPANE
+ $TWINDOW$TPANE
+ $TXAXIS$T
+ $TXGRID$T
+ $TXUNIT$T
+ $TXYGRID$T
+ $TYAXIS$T
+ $TYGRID$T
+ .ENDD
+

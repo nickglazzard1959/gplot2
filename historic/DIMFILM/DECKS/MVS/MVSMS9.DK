@@ -1,0 +1,34 @@
+*DECK MVSMS9 F
+      SUBROUTINE DFXMS9(C)
+C    CENTRES 20 CHARACTER FIELD RETURNED BY DFXMS6 IN C
+C
+C    OR IF USER HAS PREVIOUSLY DECLARED A 'USER REFERENCE'
+C    THIS WILL BE USED
+      CHARACTER*(*) C
+      CHARACTER*20 C20
+*CALL,DFXC05
+      IF (USEFLG.EQ.'*') THEN
+            C20 = USER
+      ELSE
+            CALL DFXMS6(C20)
+      ENDIF
+      L = LEN(C)
+      DO 1 I1=1,20
+      IF (C20(I1:I1).NE.' ') GO TO 2
+    1 CONTINUE
+      C = C20
+      GO TO 100
+    2 DO 3 I2=20,1,-1
+      IF (C20(I2:I2).NE.' ') GO TO 4
+    3 CONTINUE
+    4 J = I2 - I1 + 1
+C    J IS STRIPPED STRING LENGTH
+      C = ' '
+      IF (J.GE.L) THEN
+             C = C20(I1:)
+      ELSE
+             NB = (L-J)/2
+             C(NB+1:NB+J) = C20(I1:)
+      ENDIF
+  100 RETURN
+      END

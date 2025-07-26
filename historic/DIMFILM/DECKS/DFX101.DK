@@ -1,0 +1,25 @@
+*DECK DFX101 F
+      SUBROUTINE DFX101(X,Y)
+      LOGICAL CUTS, CUT
+      SAVE CUTS,DX1,X1,Y1
+*CALL,DFXC00
+      DATA CUTS/.FALSE./
+      A = X - XPOS
+      B = Y - YPOS
+      DX = A*A + B*B
+      IF (DX.EQ.0.0) RETURN
+      IF (.NOT.CUTS) GO TO 1
+      IF (DX.GE.DX1) RETURN
+    1 CUTS = .TRUE.
+      X1 = X
+      Y1 = Y
+      DX1 = DX
+      RETURN
+      ENTRY DFX102(CUT,X,Y)
+      CUT = CUTS
+      CUTS = .FALSE.
+      IF (.NOT.CUT) RETURN
+      X = X1
+      Y = Y1
+      RETURN
+      END

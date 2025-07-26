@@ -1,0 +1,11 @@
+*DECK AUTD F
+      SUBROUTINE AUTD
+*CALL,DFXC02
+*CALL,DFXC05A
+      ROUTIN = 'AUTD'
+*CALL,XIN
+      DIV1 = -10.0
+      DIV2 = -10.0
+*CALL,XOUT
+      RETURN
+      END

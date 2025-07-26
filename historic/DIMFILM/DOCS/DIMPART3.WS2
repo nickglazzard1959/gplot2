@@ -1,0 +1,228 @@
+ WS2000ÿ1.00ÿÿÿÿ PSTIMES2.PDFÿÿÿ      0 !Releaseÿ3.00ÿÿÿ !,   18162       13,+1993  1 28+*1989  2  3*-ÿ -.ÿ ./ÿ /0ÿ ÿ ÿ ÿ ÿ 01ÿ ÿ ÿ ÿ ÿ 12ÿ 2u 0  1i 0  0i^  6^_  1_[Aÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ<$).38=BGLQV[`ejoty~ƒˆ’—ÿÿ[a 67a\ 10\] 10]b11be1ef1fg1gh00h`1  3  2`:133:s011111sE0     0   0     0     0E&%PAGE&
+E0     0   2    12   999E
+v
+.jcgPART CONTOURING
+
+.jcgCHAPTER Basic Contouring
+
+.jcgSECTION Introduction
+DIMFILM includes a collection of subprograms for the production of basic contour plots.  These may be used in conjunction with all other facilities of the overall system.  As with the graphing routines, the user has considerable freedom.  Error checking is performed and warning messages included, these being controlled through the check level.  Users interested primarily in contour plots should first familiarise themselves with the earlier sections on basic plotting.
+Contour plots may be freely intermixed with calls to the general plotting routines.  DIMFILM attempts to ensure that on exit from any contour routine, all internal parameters are set to their values on entry.  The beam is also positioned so that diagrammatic plotting may be resumed easily.  Such properties as intensity, orientation and height of symbol strings, broken lines etc., will be maintained.  It is possible therefore, to interrupt a diagrammatic plot to perform graphical plotting and then to resume.  A few limitations are, however, necessary.  Primarily, on return, a broken line pattern will commence at the beginning of its sequence (the consequence of a beam off movement).  Symbol strings will commence with all their initial features active.  If TXTCON has previously been called, it will be operable on all but the first subsequent calls to SYMTXT.
+Except where otherwise indicated, all contour plotting routines are performed as CSType 1 operations and all textual annotation will be treated as CSType 2.  Additional annotations and framing may be incorporated through use of the graphical annotation routines described in Part II.
+At present, all DIMFILM contouring routines require regularly spaced input data.  However, it is intended that fuller contouring facilities will be made available in due course.
+
+.jcgSECTION Contour Location
+The contour plot is positioned in precisely the same way as graphing output, thereby permitting the use of the graphical annotation routines.  Thus, the contoured data will be fitted into the current pre-clipping rectangle with appropriate margins allowed for titles.  By default the sub-area will be centred as 83% of the pre-clipping rectangle in either direction.  The contour grid will be scaled to fit this area.  This enables the user to position the contour anywhere within the current bounds, and to generate multiple contour plots per frame (through respecification of PANE).  Orientation of the contour plot is determined by the current mode of the device.
+
+.jcgSECTION Contouring Regularly Spaced Data
+Contours are constructed based on a number of datum points.  This section is concerned with contouring regularly spaced data.  In this case a rectangular base mesh is provided with datum points at each intersection.  The numeric data is passed via a two-dimensional real array GRID defined as:
+
+.jcgTT
+
+	REAL GRID(NX,NY)
+
+.jcgEE
+
+This defines a mesh of NX by NY elements, whereby the value of the (i,j)th element of the array GRID is the value of the mapping variable (e.g.  for a physical relief map this would be the height) at the (i,j)th intersection of the base defining mesh.  Pictorially, this is shown as:
+
+.jcgDISPLAY
+
+ (1,NY)                                           (NX,NY)
+   *-------*------  . . . . . . -----*-------*-------*
+   |       |                         |       |       |
+   |       |                         |       |       |
+ (1,NY-1)--*-------*- . . . . . . ---*-------*-------*
+   |       |       |                 |       |       |
+   |       |       .                 .       |       |
+   .       .       .                 .       .       .
+   .       .       .                 .       .       .
+   .       .       .                 .       .       |
+   |       |       .                 |       |       |
+ (1,3)-----*-------*--- . . . . . . -*-------*-------*
+   |       |       |                 |       |       |
+   |       |       |                 |       |       |
+ (1,2)---(2,2)-----*----  . . . .  --*-------*----(NX,2)
+   |       |       |                 |       |       |
+   |       |       |                 |       |       |
+   *-------*-------*------  . . . ---*-------*-------*
+ (1,1)   (2,1)   (3,1)                  (NX-1,1)  (NX,1)
+
+
+
+.jcgENDD
+
+The rectangular mesh defined by the regularly spaced data will be mapped onto the contouring (i.e.  graphing) sub-area of the current pre-clipping rectangle.  That is, the (NX-1) intervals in the X-direction are exactly scaled to the contouring area X-dimension, while the (NY-1) intervals in the Y-direction are scaled to exactly fit the contouring area Y-dimension.  Consequently, unless the proportion of the contouring area X:Y dimensions equals (NX-1):(NY-1) grid dimensions there will not be identical X- and Y-scales.  If, for example, measurements have been conducted at different intervals in the X and Y directions it will be possible to reflect this in the definition of the pre-clipping rectangle (via PANE) to force equal scaling in the output plot.
+For example, where the data is defined via GRID(6,3), and sampling was at equal intervals in both the X and Y directions, the pre-clipping rectangle should be redefined with its X-dimension a factor of 5/2 [=(6-1)/(3-1)] of its Y-dimension.  {This assumes equal annotation margins - the default.}
+Alternatively, GRID(7,4) with X sample interval half the Y sample interval reflects data from a square base mesh (6/3, but each X interval is half each Y interval), requiring a square contouring area; i.e.  a pre-clipping rectangle with equal X and Y dimensions.  {Same assumption.}
+Note: DIMFILM routines are written to ensure the integrity of all arguments (except, obviously, the case of arguments provided for the return of information to the calling program; for example, inquiry routines).  However, in the case of contouring from a grid of data the values passed in array GRID may be modified in their least significant bit only.  This obviates the provision of scratch space to the routines, but should be borne in mind if subsequent calculations are to be performed on the data (the effect is likely to be minimal).  This effect is not cumulative between successive calls to contouring routines.
+
+.jcgSUBSECTION Basic Contouring
+At the basic level, the user will have his regularly spaced data stored in an array and will know the values at which contour lines are required.  The most basic routine will compute contour intersections with the mesh lines (via linear interpolation between mesh points) and generate specified contours.  This routine is intended as a quick preview facility and produces contours that are straight lines between these points.  The production of smoothed contours is described in the next section (Refined Contouring).  By default, contour values (where possible) will be automatically included across the lines.
+
+.jcgTT
+
+	CONTR(GRID,NX,NY,NC,CVALS)
+ 
+	 GRID	is a two dimensional REAL array of dimensions (NX,NY).  This holds the datum values that define the rectangular mesh with NX columns and NY rows.
+  
+	  NX	is the number of columns of data (NX>1).
+  
+	  NY	is the number of rows of data (NY>1).
+  
+	  NC	is the number of contour levels that it is desired to plot (NC>0).
+  
+	  CVALS	is a singly dimensioned REAL array of dimension (NC) which holds the NC values at which contours are to be plotted.
+
+.jcgEE
+
+The contoured area may be boxed in the same manner as for
+graphical routines; that is, by a reference to GRFRAM.  Other
+titling or labelling may be applied as for the graphical
+routines.
+
+.jcgSUBSECTION Refined Contouring
+
+The user is able to control many defaults such as contour annotation and interpolation.  This latter is used to generate smooth contours.  Once a default is changed it will remain in effect until reset by the user.
+The cubic interpolation of contours may be simply controlled by the user via:
+
+.jcgTT
+
+	CINTER(ISTEPS)
+ 
+	which will turn on the cubic interpolation of contours, where ISTEPS is the number of subintervals of the basic mesh that are to be used in evaluating the interpolating curve.  (ISTEPS>0)
+ 
+	NOCINT	to turn off this interpolation.
+
+.jcgEE
+
+The contours plotted will be generated using a cubic interpolation.  It should be noted that on some data forms unacceptable oscillations and inaccuracies may be introduced.  This should be borne in mind when interpreting results.  The number of steps at which the interpolating function is evaluated will affect the smoothness of the plots - but will also be reflected in the degree of computation involved.  Clearly the size of the data grid will be a relevant criterion when setting this value, as will the physical size of the contour area in the frame.
+The user has considerable freedom in specifying the way in which contour values may be plotted across the generated contours.  The default is for such labelling to be produced wherever possible (proximity to an edge, or next contour, may prohibit production of these labels).
+
+.jcgTT
+
+	NOCLAB	will turn off the plotting of contour values.
+  
+	CLABEL	will turn on the plotting of contour values.
+  
+	CLABHT(HT,ANGLE)
+
+.jcgEE
+
+The user may specify the character height at which contour values will be plotted and the orientation.  The default character size is computed at 1/50 of the least dimension of the current pre-clipping rectangle (and may be further scaled if CQUAD or CxHALF is active), and values to be generated horizontally with respect to the frame.
+
+.jcgTT
+
+	CLABHT(HT,ANGLE)
+ 
+	will set the character height and orientation for contour values used in evaluating the interpolating curve.
+  
+	  HT	is the character height in overall user units.  (HT>0.0 sets height, other values will cause the default height to be effective)
+ 
+	 ANGLE	is the angle at which values will be produced, and is measured counter-clockwise from the positive X-direction of the frame (AGroup 1, default degrees).
+
+.jcgEE
+
+The contour values that are output are, by default, produced according to the Fortran format specification G9.3.  This format may be changed by the user.  Additionally, in deriving the plotted contour value a scale factor may be applied to the actual contour values.
+
+
+.jcgTT
+
+	CFMT(JFMT)
+ 
+	will set the format for outputting contour values to that passed in JFMT (type CHARACTER, of length <11).  This parameter should hold the required real format as a character string commencing with an open parenthesis and terminating with a close parenthesis.  E.g.  a valid parameter would be '(F10.3)'.
+  
+	CSCALE(SCALE)
+ 
+	non-zero values of SCALE will be used as a factor by which all contour values will be pre-scaled before plotted as annotation.
+
+.jcgEE
+
+Frequently, contour data may be symmetrical (for example, plots of some electromagnetic fields).  In these cases, the user need supply only a quarter or half of the total pattern and the various contouring routines will fill out the whole area by a series of mirrorings.
+
+.jcgDISPLAY
+
+
+     A-----------------S-----------------B
+     |                 |                 |
+     |                 |                 |
+     |                 |                 |
+     |                 |                 |
+     |                 |                 |
+     |                 |                 |
+     P-----------------Q-----------------R
+     |                 |                 |
+     |                 |                 |
+     |                 |                 |
+     |                 |                 |
+     |                 |                 |
+     |                 |                 |
+     D-----------------T-----------------C
+
+
+.jcgENDD
+The total area that is to be contoured is given, in every case, by ABCD.  The user may provide a data grid for either the upper-right quadrant, the upper half or the right half and have the complete area symmetrically contoured by appropriate reflection(s).
+
+.jcgTT
+
+	CQUAD	will assume subsequent GRID data corresponds to the upper-right quadrant SBCQ, and reflect about both axes in turn.
+  
+	CVHALF	will assume subsequent GRID data corresponds to the vertical half SBCT, and reflect about ST.
+  
+	CHHALF	will assume subsequent GRID data corresponds to the horizontal half ABRP, and reflect about PR.
+  
+	CWHOLE	will restore subsequent GRIDs to accommodate the whole area ABCD (this is the default).
+
+.jcgEE
+
+All the foregoing default modifiers should be referenced before any contour for which they are to take effect.
+There are alternate forms of contouring routines, applicable to regularly spaced data, that may be used.  These permit contours at equal intervals to be plotted or for closer control of the line colour/intensity for different contours.
+
+.jcgTT
+
+	CONTR2(GRID,NX,NY,NC,CSTART,CSTEP)
+ 
+	will generate contours at regular intervals.
+  
+	  GRID	is the two dimensional REAL array of dimensions (NX,NY).  This holds the datum values that define the rectangular mesh with NX columns and NY rows.
+  
+	  NX	is the number of columns of data (NX>1).
+  
+	  NY	is the number of rows of data (NY>1).
+  
+	  NC	is the number of contour levels that it is desired to plot (NC>0).
+  
+	  CSTART	is the value of the first contour to be plotted.
+  
+	  CSTEP	is the value by which the contour value will be incremented for successive contours.
+  
+	CONTR1(GRID,NX,NY,NC,CVALS,ICSG)
+ 
+	will generate contours at specified intervals, each being of independently set CSGroup colour/style.
+  
+	  GRID	is a two dimensional REAL array of dimensions (NX,NY).  This holds the datum values that define the rectangular mesh with NX columns and NY rows.
+  
+	  NX	is the number of columns of data (NX>1).
+  
+	  NY	is the number of rows of data (NY>1).
+  
+	  NC	is the number of contour levels that it is desired to plot (NC>0).
+  
+	  CVALS	is a singly dimensioned REAL array of dimension (NC) which holds the NC values at which contours are to be plotted.
+  
+	  ICSG	is a singly dimensioned INTEGER array of dimension (NC).  The absolute value of all elements in ICSG must be in the range [1,3].  The absolute value of ICSG(i) will be used as the CSGroup identifier determining the colour/style in which contour of value CVALS(i) will be plotted.  When the actual value of ICSG is positive the corresponding contour will be labelled in the same colour/style.
+  
+	CONTR3(GRID,NX,NY,NC,CVALS,ICLUT)
+ 
+	will generate contours at specified intervals, each being plotted according to a different colour look-up-table reference.  All arguments, bar the last, are identical with those for CONTR1.
+  
+	  ICLUT	is a singly dimensioned INTEGER array of dimension (NC).  The absolute value of all elements in ICLUT is a reference to the colour look-up-table entry that will be used in plotting the corresponding contour and, when the actual value is positive, the value label(s) for that contour.  Each element must have an absolute value not exceeding 255.
+
+.jcgEE
+
+If the user requires even greater control of contour line/annotation style all the above CONTRx routines may be repeatedly called for the plotting of single contour lines, with change of colour/style between each.  However, no account of adjacent contours can be taken when determining where annotations are produced.
+
+
+
+
+
+ Û  	    	  ð 'S ü-X X ÿ·Sÿÿÿ'    ÛNW-  	ÿ¯³>ÿÿÿAFGZÿ¯Ûÿÿÿ          E_      %   E_   7   )   E_    `      E_  Q °   ‹H!U

@@ -1,0 +1,53 @@
+*DECK WSTPE F
+      SUBROUTINE WSTPE(NWS,VSN,LABEL)
+C
+C    THIS ROUTINE ASSOCIATES DEVICE NWS WITH MAGNETIC TAPE (OR DATASET)
+C    IDENTIFIED BY VSN
+C
+C        - FOR SYSTEM DEVELOPMENT USE THERE IS A SPECIAL CONVENTION:
+C          IF VSN = !FT<XX> OUTPUT IS TO FORTRAN CHANNEL FT<XX>
+C                                  AS SENT TO THE SYSTEM QUEUE
+C                                  (I.E. BEFORE STACKING)
+C          IF VSN = @FT<XX> OUTPUT IS TO FORTRAN CHANNEL FT<XX>
+C                                  AS SENT TO THE PLOTTER
+C                                  (I.E. AFTER STACKING - THIS
+C                                   BEING IDENTICAL TO DATA ON
+C                                   USE TAPE)
+C          IF VSN = ?FT<XX> OUTPUT IS TO FORTRAN CHANNEL FT<XX>
+C                                  AS SENT TO THE PLOTTER
+C                                  **BUT**    **BUT**    **BUT**
+C                                  ULCC SHORT BLOCKS ARE SUPPRESSED
+C                                  (MUST ALSO INHIBIT DDC EXTENSIONS)
+C             = <ANY OTHER>    WILL BE DUMPED TO MAGNETIC TAPE USING
+C                              IDENTIFICATION AS TAPE VSN(S)
+C                              (NOMINALLY EQUIVALENT TO @FT)
+C                              HOWEVER, ?<ANY OTHER> WILL BE AS FOR
+C                              ?FT AND THE MAGNETIC TAPE WILL HAVE
+C                              NO ULCC SHORT BLOCKS AND ATTEMPT WILL
+C                              BE MADE TO INHIBIT DDC EXTENSIONS
+C
+C      FOR SINGLE VSN     CALL WSTPE(NWS,'VSN1',LABEL)
+C
+C      FOR MULTI-VOLUME   CALL WSTPE(NWS,'(VSN1,VSN2,VSN3)',LABEL)
+C            EACH VSN MAY BE UP TO 6 CHARACTERS - THERE MAY BE
+C            NO INCLUDED BLANKS OR QUOTES IN THIS IMPLEMENTATION
+C            (CRAY DISPOSE WILL INCLUDE ...VOL=SER=<VSN AS SUPPLIED>..)
+C
+C      FOR MAGNETIC TAPE OUTPUT LABEL SHOULD BE
+C            'SL' - STANDARD LABELS
+C            'NL' - NO LABELS
+C
+C
+C********** !FT<XX> IS HANDLED WITHIN NORMAL OUTPUT PATH AND
+C********** CONSEQUENTLY WILL HAVE OUTPUT LIMITS APPLIED TO IT)
+C
+C
+C
+      CHARACTER*(*) VSN,LABEL
+*CALL,DFXC05A
+      ROUTIN = 'WSTPE'
+*CALL,RIN
+      CALL DFXUT1(NWS,VSN,LABEL)
+*CALL,ROUT
+      RETURN
+      END

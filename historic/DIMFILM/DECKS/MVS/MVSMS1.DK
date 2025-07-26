@@ -1,0 +1,120 @@
+*DECK MVSMS1 F
+DFXMS1   TITLE 'DFXMS1 - UK DATE ROUTINE FOR DIMFILM'
+DFXMS1   CSECT
+***********************************************************************
+*                                                                     *
+*    DFXMS1:                                                          *
+*                                                                     *
+*        RETURNS CURRENT DATE TO CALLER AS 8-BYTE FIELD OF FORM:      *
+*                                                                     *
+*                      DD/MM/YY      (U.K. FORMAT)                    *
+*                                                                     *
+*        ***** AMDAHL-PROVIDED SUBROUTINE ****                        *
+*                                                                     *
+*                                                                     *
+*     MODIFIED AT ULCC    AANDI INSTON     30 APR 82                  *
+*     ORIGINALLY GAVE US FORMAT ( MM/DD/YY ) WHICH IS STUPID.         *
+*     MODIFIED TO FIX LEAP YEAR BUG   MATTHEW WHEELER  * 2 MAR 83 *   *
+*                                                                     *
+***********************************************************************
+*
+         SPACE
+R0       EQU   0
+R1       EQU   1
+R2       EQU   2
+R3       EQU   3
+R4       EQU   4
+R5       EQU   5
+R6       EQU   6
+R7       EQU   7
+R8       EQU   8
+R9       EQU   9
+R10      EQU   10
+R11      EQU   11
+R12      EQU   12
+R13      EQU   13
+R14      EQU   14
+R15      EQU   15
+F0       EQU   0
+*
+         STM   R14,R12,12(R13)     SAVE REGISTERS
+         LR    R12,R15             GR12 IS BASE REGISTER.
+         USING DFXMS1,R12          ESTABLISH ADDRESSABILITY.
+         LA    R0,100              SIZE FOR GETMAIN.
+         GETMAIN R,LV=(0)          GET DYNAMIC WORK AREA.
+         LR    R15,R1              GR15 -> WORK AREA.
+         LM    R0,R1,20(R13)       RELOAD PARAMETER REGS.
+         ST    R15,8(R13)          RELINK SAVE AREAS.
+         ST    R13,4(R15)
+         LR    R13,R15             GR13 -> NEW SAVE/WORK AREA.
+         USING MAP,R13             ADDRESS.
+*
+         L     R6,0(R1)            GR6 -> PARM.
+         LA    R6,0(R6)            CLEAR HI-BYTE.
+*
+         TIME  DEC                 GET DATE AND TIME.
+*
+         ST    R1,DATEX            STORE DATE.
+         UNPK  WORK(5),DATEX+1(3)   UNPACK.
+*
+         MVC   6(2,R6),WORK        SET 'YY'.
+         MVC   WORK(8),ZEROP       PRIME PACKED FIELD.
+         MVC   MDS(12),MONTHS      SET UP MONTH TABLE.
+         MVO   WORK+6(2),DATEX(2)  YEAR IN PACKED.
+         CVB   R0,WORK             BINARY DATE.
+         ST    R0,DATEX            STORE
+         TM    DATEX+3,X'03'       TEST FOR LEAP YEAR.
+         BZ    LEAP                BRANCH IF LEAP
+         MVI   MDS+10,28           ELSE RESET FEBRUARY CONSTANT.
+*
+LEAP     ST    R1,DATEX            RESTORE FULL FIELD.
+         MVC   WORK+6(2),DATEX+2   SET UP PACKED DAYS.
+         CVB   R0,WORK             CONVERT TO BINARY.
+         LA    R2,MDS+11           GR2 -> JANUARY CONSTANT.
+         SLR   R3,R3               PRIME REGISTER.
+*
+DLOOP    IC    R3,0(R2)            LOAD MONTH CONSTANT.
+         CLR   R0,R3               MONTH REACHED ?
+         BNH   MFOUND              YES.
+         SLR   R0,R3               NO - DECREMENT.
+         BCT   R2,DLOOP            DECREMENT POINTER AND LOOP.
+*
+MFOUND   LA    R4,MDS+12           GR4 -> PAST MONTH CONSTS.
+         SLR   R4,R2               GR4 = MONTH NUMBER.
+         CVD   R0,WORK             DAY IN PACKED.
+         OI    WORK+7,X'0F'        ENSURE PROPER PACKED.
+         UNPK  2(3,R6),WORK+6(2)   SET DAY.
+         MVC   0(2,R6),3(R6)       SET IN PLACE.
+         CVD   R4,WORK             MONTH IN PACKED.
+         OI    WORK+7,X'0F'
+         UNPK  2(3,R6),WORK+6(2)
+         MVI   2(R6),C'/'          SET SEPERATORS.
+         MVI   5(R6),C'/'
+*
+         LR    R1,R13
+         L     R13,4(R1)           RESTORE CALLER'S GR13.
+         LA    R0,100
+         FREEMAIN R,LV=(0),A=(1)
+         LM    R14,R12,12(R13)     RESTORE REGISTERS.
+         BR    R14                 RETURN.
+*
+*
+         EJECT
+*
+*        CONSTANTS
+*
+         SPACE
+MONTHS   DC    AL1(31,30,31,30,31,31,30,31,30,31,29,31)
+ZEROP    DC    PL8'0'
+*
+*
+*        DYNAMIC SAVE/WORK AREA MAP.
+*
+         SPACE
+MAP      DSECT
+         DS    18F
+DATEX    DS    F
+TIMEX    DS    F
+WORK     DS    2F
+MDS      DS    3F
+         END

@@ -1,0 +1,14 @@
+*DECK SAMEX F
+      SUBROUTINE SAMEX
+*CALL,DFXC02
+*CALL,DFXC05A
+      ROUTIN = 'SAMEX'
+*CALL,RIN
+      IF (XGL.EQ.XGR) THEN
+            CALL DFX304
+      ELSE
+            FIXX = .TRUE.
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

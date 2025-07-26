@@ -1,0 +1,74 @@
+*DECK CMSM04 F
+DFXM04      TITLE  'RE-ROUTING SUBROUTINES FOR DIMFILM'
+          PRINT ON,NOGEN
+DFXM04      CSECT
+DFXM04      AMODE ANY
+DFXM04      RMODE ANY
+*
+*  DFXM06 - ESTABLISHES A LINK BETWEEN A GIVEN WORKSTATION NUMBER N
+*           AND A PARTICULAR BACK-END ROUTINE.
+*  DFXM05 - IS THEN CALLED TO CALL THE BACK-END ROUTINE DEFINED BY
+*           THE VALUE OF N IN THE COMMON BLOCK DFXCBD
+*            A DUMMY/ERROR ROUTINE DFX007 SHOULD ALSO BE AVAILABLE
+*           WHICH IS CALLED BY DFXM05 IF DFXM06 HAS NOT BEEN CALLED
+*
+*     WORKS WITH FHQ,FVS,F77
+*                                            M WHEELER.  JUN 1983
+          ENTRY    DFXM06
+          ENTRY    DFXM05
+*
+*             ***************  DFXM06  ***************
+*  PLUGS THE FIRST PARAMETER - A SUBROUTINE *ADDRESS*
+*  INTO THE N'TH TABLE ENTRY TO BE USED BY DFXM05
+*  N PRESENTLY ASSUMED TO BE VALUE IN RANGE 1 TO 5
+*  (EXTRA TABLE ENTRIES COULD BE ADDED IF REQUIRED AFTER SUBADD1 )
+*
+*  CALLING SEQUENCE IS:
+*          EXTERNAL SUBNAM
+*          CALL DFXM06( SUBNAM , <N> )
+*
+*
+*
+DFXM06    SAVE     (2,3)              SAVE REGS 2,3
+          USING    DFXM06,15          ESTABLISH BASE REG
+          LM       2,3,0(1)           GET ADDR OF PARAMETERS
+          L        3,0(3)             GET VALUE - N
+          SLL      3,2                MULT N BY 4
+          LA       3,SUBADD1-4(3)     POINT TO APPROPRIATE SUB ADDR.
+          MVC      0(4,3),0(2)        OVERWRITE SUBROUTINE ADDRESS
+          RETURN   (2,3)              RETURN
+          DROP     15                 FREE R15
+*
+*              *************  DFXM05  *************
+*  RE-ROUTES CALL TO SUBROUTINE NOMINATED BY PREVIOUS CALL TO DFXM06
+*  ACCORDING TO VALUE OF N IN COMMON BLOCK /DFXCBD/
+*
+* CALLING SEQUENCE IS:
+*        COMMON /DFXCBD/ N
+*        N = I     <I = 1,5>
+*
+*        CALL DFXM05( <PARAMS> )
+*                      WHICH BECOMES ====>
+*                                  CALL <SUBNAM..N >  ( <PARAMS> )
+*
+DFXM05    DS       0H
+          USING    DFXM05,15          ESTABLISH BASE REG
+          ST       14,12(13)          SAVE R14
+          L        14,=V(DFXCBD)      POINTER TO 1ST COMMON VALUE
+          L        14,0(14)           GET VALUE N
+          SLL      14,2               MULT BY 4
+          L        15,SUBADD1-4(14)   POINT TO SUBROUTINE ADDRESS -
+          DROP     15                 FREE R15
+          L        14,12(13)          RESTORE R14
+          BR       15                   AND JUMP TO SUBROUTINE
+*                               (ROUTINE WILL RETURN DIRECTLY)
+*
+* NB.  ONE TABLE ENTRY FOR EACH POSSIBLE BACKEND NOMINATION
+SUBADD1   DC       V(DFX007)          INITIAL ADDRESS OF SUBROUTINE
+          DC       V(DFX007)          INITIAL ADDRESS OF SUBROUTINE
+          DC       V(DFX007)          INITIAL ADDRESS OF SUBROUTINE
+          DC       V(DFX007)          INITIAL ADDRESS OF SUBROUTINE
+          DC       V(DFX007)          INITIAL ADDRESS OF SUBROUTINE
+*
+          DC       V(DFX007)           1 EXTRA AS TRAP
+          END

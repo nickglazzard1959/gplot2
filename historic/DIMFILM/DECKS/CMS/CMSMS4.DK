@@ -1,0 +1,29 @@
+*DECK CMSMS4 F
+      SUBROUTINE DFXMS4(SYSREF)
+      CHARACTER*(*) SYSREF
+C    UNDER MVS RETURNED JES ID
+C    FOR CMS IS BLANK FOR INTERACTIVE JOBS (UNLESS SENSIBLE
+C    EQUIVALENT IDENTIFIED - SEE BELOW FOR PSEUDO VALUE)                CMSMS4.6
+C    BUT FOR BATCH JOBS RETURNS NAME - JOBNNNN
+C
+C    CALLED AS    CALL DFXMS4(JESNO)
+C                 CHARACTER*8 JESNO
+C
+*CALL DFXC12
+      CHARACTER*40 REPLY
+      CHARACTER*25 CPUCH                                                TIM00130
+      REAL*8 CPU                                                        TIM00140
+      SYSREF = ' '
+      IF (.NOT.SYSIA) THEN
+           CALL DFXMSB('NAME    ',REPLY,LENRET,IERR)
+           IF (LENRET.GT.0) SYSREF = REPLY(1:LENRET)
+      ELSE
+C   IF INTERACTIVE CREATE PSEUDO CMS ID (CONSTRUCTED FROM
+C   PROCESSOR CLOCK)
+      CALL CLOCKX(CPU)                                                  TIM00150
+      WRITE(CPUCH,10) CPU                                               TIM00160
+10    FORMAT(E25.15E4)                                                  TIM00170
+      SYSREF = 'CMS'//CPUCH(15:19)                                      TIM00180
+      ENDIF
+      RETURN
+      END

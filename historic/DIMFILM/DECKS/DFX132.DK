@@ -1,0 +1,16 @@
+*DECK DFX132 F
+      SUBROUTINE DFX132(X,Y)
+C
+C    **INTERNAL POSN FUNCTION**
+C
+*CALL,DFXC00
+      X = XPOS
+      Y = YPOS
+      IF (.NOT.WCTR) GO TO 1
+      XT = XPOS - X0T
+      YT = YPOS - Y0T
+      X = XT*CALPHA + YT*SALPHA
+      Y = YT*CALPHA - XT*SALPHA
+    1 CONTINUE
+      RETURN
+      END

@@ -1,0 +1,91 @@
+*DECK COSMAC F
+         IDENT      DFXMAC
+*
+*      ACCESS THE DEFAULT FONT DATASET
+*
+*      CALL FROM CFT:   CALL DFXMAC(IERR,FDN)
+*
+*         FDN   :  LOCAL DN TO USE FOR READING FONTS
+*         IERR  :  ERROR CODE.  SET TO 0 IF ALL OK
+*                  OTHERWISE SET TO PDM STATUS CODE
+*
+*       DIMFILM MACHINE DEPENDENT INTERFACE - CRAY VERSION
+*       VERSION 1.0        01/02/84        STEVE WISE,ULCC
+*               1.0A       17/12/86        JOHN G.,ULCC
+*                                          W@PMID BECOMES W@PMOWN
+*               1.0B       14/11/88        JOHN G.,ULCC
+*                                          NOW ON PUBLIC (NOT TRIAL)
+*       +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*       +                                                     +
+*       +                 ***NOTE***                          +
+*       +       THIS CODE FAILS UNDER COS1.14 DUE TO          +
+*       +       CHANGE IN LENGTH OF SOME PDD PARAMETERS.      +
+*       +       TO FIX, THE PDD MACRO SHOULD BE USED.         +
+*       +       THIS ROUTINE IS NOT CURRENTLY USED -          +
+*       +       FORTRAN REFERENCE TO ACCESS HAS BEEN          +
+*       +       SUBSTITUTED IN SOLE REFERENCE IN              +
+*       +       DFXM10 (IN COSM11).       19/03/87 JCG        +
+*       +                                                     +
+*       +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*
+*IF -DEF,UNICOS
+*   CODE ONLY APPLICABLE TO COS
+PDD      BSSZ       LE@PDD                PDD TABLE
+ODN      BSSZ       LE@ODN                ODN TABLE
+PDDPARMS DATA       'HERSHEYFONTS'L       FONT PDN
+         DATA       'PUBLIC'L              FONT ID/OWN
+DFXMAC   ENTER      NP=2
+*
+*   FILL PDD TABLE AND ODN TABLE
+*
+         A1           PDD
+         A3           ODN
+         S1           1
+         S2           0
+         SET,S1       S2&S3,PMSG    SUPPRESS COMPLETION MESSAGE
+         SET,S1       S2&S3,PMERR   SUPPRESS ERROR MESSAGE
+         S1           PMFCAU        REQUEST ACCESS
+         SET,S1       S2&S3,PMFC
+         0,A1         S2
+         ARGADD       A2,2           FETCH DN FROM CALL
+         S2           ,A2
+         W@PMDN,A1    S2
+         A2           PDDPARMS
+         S2           0,A2           FONT PDN
+         W@PMPDN1,A1  S2
+         S2           1,A2
+         W@PMPDN2,A1  S2
+         S2           2,A2           FONT ID
+         W@PMOWN,A1   S2
+         W@ODDN,A3    S2
+*
+*   DO ACCESS
+*
+         S0         F$PDM
+         S1         PDD
+         EX
+*
+*   FETCH STATUS CODE - IN THE CASE WHERE IT IS 1
+*   SET TO ZERO (NORMAL COMPLETION) - OTHERWISE
+*   RETURN IT AS IT IS
+*
+         A1         PDD
+         GETF,S1    S2,PMST,A1
+         A1         S1
+         A0         A1-1
+         JAN        SETERR
+*
+*    OPEN DATASET
+*
+         S1         ODN        ADDRESS OF ODN TABLE
+         S2         SB         BIT 0=1 FOR INPUT ONLY
+         S1         S1!S2
+         S0         F$OPN      OPEN FUNCTION CODE
+         EX
+         S1         0
+SETERR   =          *
+         ARGADD     A3,1
+         ,A3        S1
+         EXIT
+*ENDIF
+         END

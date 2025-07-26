@@ -1,0 +1,77 @@
+*DECK MVSMS6 F
+DFXMS6   TITLE  'GET 20 CHARACTER USERS NAME FROM JOB CARD'
+*                                                                       00000010
+*              D F X M S 6                                              00000020
+*                                                                       00000030
+*  A FORTRAN CALLABLE ROUTINE TO RETURN THE 20 CHARACTER USERS NAME     00000040
+*  ASSUMING STANDARD ULCC BATCH JOB STATEMENT OF THE FORM :             00000050
+*       //JOBNAME  JOB  'USERS NAME ' , . . . .
+*
+*  (IF INTERACTIVE, THE FIELD WILL CONTAIN THE JOBNAME INSTEAD)
+*
+*               MATTHEW WHEELER         MAY 82                          00000060
+*                                                                       00000070
+*  RETURNS A TWENTY BYTE VALUE TO THE FIRST ARGUMENT.                   00000080
+*                                                                       00000090
+*  EXAMPLES:                                                            00000100
+*                                                                       00000110
+*  FORTRAN H --                                                         00000120
+*                                                                       00000130
+*      LOGICAL*1 NM(20)                                                 00000140
+*      CALL DFXMS6 ( NM )                                               00000150
+*                                                                       00000160
+*  VS FORTRAN --                                                        00000170
+*      CHARACTER*20 NM                                                  00000180
+*      CALL DFXMS6 ( NM )                                               00000190
+*                                                                       00000200
+*  PASCAL --                                                            00000210
+*    PROCEDURE DFXMS6 ( VAR JN : ALFA );  FORTRAN ; ....                00000220
+         SPACE 4                                                        00000230
+DFXMS6   CSECT                                                          00000240
+         SPACE 2                                                        00000250
+*  SAVE CALLING PROGRAM'S REGISTERS                                     00000260
+         STM   14,12,12(13)                                             00000270
+         LR    12,15
+         USING  DFXMS6,12
+         SPACE 2                                                        00000280
+*  COPY USERS NAME (20 CHARACTERS) FROM THE 'ACT' TO THE USERS FIRST
+*  (AND PROBABLY ONLY) PARAMETER. ALWAYS 20 CHARACTERS PLANTED.         00000300
+         L     2,16          CVT                                        00000310
+         L     2,0(2)        TCBWRDS                                    00000320
+         L     2,4(2)        TCB                                        00000330
+         L     2,X'B4'(2)    JSCB
+         L     2,X'104'(2)   JCT
+         L     2,X'37'(2)    ACT (ALLOWING FOR LEFT JUST.)
+         SPACE 1                                                        00000350
+         MVC   NAME(20),X'31'(2)   STORE NAME (20 CHARS)                00000370
+*
+*     (NOTE OFFSET IS X'31' FOR ULCC STANDARD , FIELD AT +X'18'
+*      WOULD BE USED WITH SOME JOB STATEMENT FORMATS.)
+         SPACE 2                                                        00000380
+*     (NOTE THAT NAME FIELD MAY HAVE ZERO BYTES)
+*           REPLACE ZERO BYTES WITH BLANKS
+         LA    8,NAME              ADDRESS OF START OF NAME
+         LA    9,NAME+19           ADDRESS OF END OF NAME
+LOOP     CLI   0(8),X'00'          IS THIS CHAR ZERO
+         BNE   NEXT                IF NOT CONTINUE
+         MVI   0(8),X'40'          ELSE REPLACE WITH BLANK
+NEXT     CLR   8,9                 IS THIS THE LAST CHAR
+         BNL   DONE                IF SO JUMP TO FINISH
+         LA    8,1(8)              INCREMENT CHAR ADDRESS
+         B     LOOP                GO TEST CHAR
+         SPACE 2
+DONE     L     3,0(1)              ADDRESS OF PARAM 1
+         MVC   0(20,3),NAME        PASS NAME BACK TO CALLING PROG
+*
+* RESTORE SAVED REGISTERS                                               00000390
+         LM    2,12,28(13)                                              00000400
+         L     14,12(13)                                                00000410
+         MVI   12(13),X'FF'                                             00000420
+         SR    15,15                                                    00000430
+         SPACE 2                                                        00000440
+* RETURN TO CALLING PROGRAM                                             00000450
+         BR    14                                                       00000460
+*
+NAME     DC    CL20' '             TEMPORARY STORAGE
+*
+         END                                                            00000470

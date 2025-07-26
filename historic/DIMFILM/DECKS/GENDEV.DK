@@ -1,0 +1,1118 @@
+*DECK GENDEV F
+// SEE COMMENT UNDER DFXD.. BELOW
+//    SUBROUTINE <DEVICE>
+C    DEVICE NOMINATION ROUTINE
+*CALL,DFXC00
+*CALL,DFXC05A
+*CALL,DFXCBD
+//    EXTERNAL DFXD..
+      IF ((ROUTIN.NE.STARS6).AND.(ROUTIN.NE.DASH6)) GO TO 1
+C    SKIP IF INDIRECT REFERENCE
+//    ROUTIN = '<DEVICE NAME>'
+*CALL,RIN
+C    HERE IF DIRECT USER CALL - OPEN DIMFILM AND SET DEVICE AS WS1 ETC
+      CALL DFX122
+//    CALL DFXG02(1,0,DFXD..)
+      IF (GKSERR.NE.0) GO TO 98
+      CALL DFXG04(1)
+      IF (GKSERR.NE.0) GO TO 98
+C    ACTIVATE WS AND SUBSEQUENT OPERATIONS SHOULD BE OK AFTER
+C    SUCCESSFUL DIMFILM OPEN
+      CALL DFX5AA(1,DCXSIZ,DCYSIZ)
+      CALL DFXG55(1,0.,DCXSIZ,0.,DCYSIZ)
+      FRAC = 1.0/(AMAX1(DCXSIZ,DCYSIZ))
+      DCXFR = DCXSIZ*FRAC
+      DCYFR = DCYSIZ*FRAC
+      CALL DFXG54(1,0.,DCXFR,0.,DCYFR)
+      CALL DFXG50(1,0.,DCXFR,0.,DCYFR)
+      CALL DFX120(0.,DCXSIZ,0.,DCYSIZ)
+      GO TO 99
+C    NOW DO INDIRECT INTERNAL WS OPEN
+//  1 CALL DFXG02(NWS,NCON,DFXD..)
+      IF (GKSERR.EQ.0) GO TO 99
+C    ONLY GKS ERRORS 21, 24 AND 26 POSSIBLE VIA DIMFILM
+// 98 CALL DFX001('<DEVICE NAME>',16)
+   99 CONTINUE
+*CALL,IMM
+      IF (ROUTIN.EQ.'<DEVICE NAME>') THEN
+*CALL,ROUT
+      ENDIF
+      RETURN
+      END
+//    SUBROUTINE DFXD..(IF,XARG,YARG,ZARG,NARG)
+C    GENERALIZED TEMPLATE FOR DIMFILM DEVICE DRIVER
+C
+C              *******VERSION 0.1********
+C
+C                                    JOHN C. GILBERT
+C                                        AUGUST 1986
+C
+C    THIS CODE IS NOT OPTIMISED FOR ANY PARTICULAR SYSTEM - IT IS
+C    INTENDED TO BE REPRESENTATIVE OF THE STEPS NEEDED TO PRODUCE
+C    A FUNCTIONING DEVICE DRIVER FOR DIMFILM.
+C    IN PARTICULAR, THE SAMPLE RASTER CODE MAY WELL BE REDUNDANT
+C    FOR SOME DEVICES.  IT IS UP TO THE IMPLEMENTOR TO DETERMINE
+C    WHETHER THIS FULL IMPLEMENTATION (INCLUDING BLANKING/CLIPPING)
+C    SHOULD BE USED ON HIS SYSTEM.  IF THE DEVICE PROVIDES CELL
+C    ARRAY OPERATIONS THESE MAY BE USED.  HOWEVER, IT MAY BE
+C    DIFFICULT TO INCORPORATE THE FULL DIMFILM CLIPPING/BLANKING
+C    ON SUCH DEVICES - IF THE FULL FACILITIES ARE NOT OFFERED THE
+C    USER SHOULD BE ADVISED ACCORDINGLY.
+C
+C    IN THE TEMPLATE PROVIDED A DOUBLE SLASH AT THE BEGINNING OF
+C    THE LINE INDICATES SOME CODE IS REQUIRED OR A VALUE MUST
+C    BE INSERTED.  SUCH VALUES ARE GENERALLY SHOWN AS STRINGS OF
+C    ASTERISKS, AND CODE REQUIRED AS <.....>
+C
+C
+C    .. SHOULD BE 2 DIGITS ASSIGNED TO DRIVER
+C
+C    DRIVER VERSION IS OF FORM NN.N
+C
+      CHARACTER*4 DVERSN
+      PARAMETER (DVERSN=' 0.1')
+      REAL XARG(*),YARG(*),ZARG(*)
+      INTEGER NARG(*)
+C
+C    SET UP DEVICE DIMENSIONS (IN DEVICE COORDINATES)
+C    DEVICE DISPLAY WILL BE TAKEN AS (0.0 - XDCMAX) IN X-DIRECTION,
+C                                    (0.0 - YDCMAX) IN Y-DIRECTION,
+C    THE ORIGIN OF THIS DISPLAY AREA WILL BE AT (XDCORG,YDCORG)
+C    ALTHOUGH (XDCORG,YDCORG) WILL TYPICALLY BE (0,0) THE FACILITY
+C    IS PROVIDED TO FORCE A MARGIN ON THE DISPLAY SURFACE, OR TO
+C    OTHERWISE PERMANENTLY MOVE THE USABLE AREA ON THE PHYSICAL DEVICE
+C
+//    PARAMETER (XDCMAX=******,YDCMAX=******,XDCORG=****,YDCORG=*****)
+C
+C    USES DFX..A,B,C ETC FOR I/O AND INTERNAL FUNCTIONS
+*CALL,DFXPAB
+*CALL,DFXCBA
+*CALL,DFXCBD
+*CALL,DFXCBF
+*CALL,DFXCAC
+*CALL,DFXCAD
+*CALL,DFXC04
+*CALL,DFXC05
+*CALL,DFXC17
+*CALL,DFXCBE
+*CALL,DFXCP0
+C
+C    COMMON BLOCK /DFXK../ IS AVAILABLE FOR COMMUNICATION WITH
+C    INTERNAL DEVICE ROUTINES DFX..A,B,C ETC
+C    FOLLOWING SAMPLE BLOCK IS FOR RASTER OPERATIONS
+C-----------------------------------------------------------------------
+      INTEGER SCAN,RSCAN,DSCAN
+      COMMON /DFXK../XRAST0,YRAST0,XRAST1,YRAST1,XRAST2,YRAST2,
+     1               XRAST3,YRAST3,HRAST,VRAST,IHSC,ISCAN,
+//   2               RSCAN(****),SCAN(****),DSCAN(4,****)
+C    DIMENSIONS OF RSCAN,SCAN,DSCAN SHOULD BE MAXIMUM OF PIXELS/SCAN
+C    FOR SPECIFIC DEVICE
+//    SAVE /DFXK../
+C-----------------------------------------------------------------------
+C
+*CALL,DFXC00
+C
+C    BUFFERS AND POINTERS MUST BE ASSIGNED
+C
+C
+C    PIXEL ELEMENT SPACING IS HELD ALSO AS
+C                    HESDC -  HORIZONTAL ELEMENT SPACING IN DC UNITS
+C                    VESDC -  VERTICAL ELEMENT SPACING IN DC UNITS
+      REAL HESDC,VESDC
+C    SCAN DIRECTION AND VALUE AS SHOWN:
+C
+C
+C                          X2Y2    X2Y2          X1Y1               X1Y1
+C                    O........      ........O     .........    .........
+C                    ..      .      .      ..     .      ..    ..      .
+C                    . .     .      .     . .     .     . .    . .     .
+C                    .  .    .      .    .  .     .    .  .    .  .    .
+C      ISCAN         .   0   .      .   1   .     .   2   .    .   3   .
+C                    .    .  .      .  .    .     .  .    .    .    .  .
+C                    .     . .      . .     .     . .     .    .     . .
+C                    .      ..      ..      .     ..      .    .      ..
+C                    .........      .........     O........    ........O
+C                   X1Y1                  X1Y1          X2Y2  X2Y2
+C
+C                     L TO R         R TO L         L TO R       R TO L
+C                     T TO B         T TO B         B TO T       B TO T
+C
+C                                     ALL HORIZONTAL SCANS
+C
+C
+C   WSCL IS PRE-CLIPPING RECTANGLE IN DC (E.G. FOR PIXEL ARRAYS)
+C   WSBL IS PRE-BLANKING RECTANGLE IN DC (E.G. FOR PIXEL ARRAYS)
+      REAL WSCL(4),WSBL(4)
+C   CELL ARRAY IS STORED LOCALLY WHEN FIRST USED
+C   XRAST,YRAST HOLD   0 - START/CURRENT SCAN LINE
+C                      1 - LOWER LIMITS OF CELL ARRAY IN DC UNITS
+C                      2 - UPPER LIMITS OF CELL ARRAY IN DC UNITS
+C                      3 - END OF SCAN LINES
+      REAL XRAST(0:3),YRAST(0:3)
+C   CELOUT IS SET TRUE IF CELL AREA IS WHOLLY INVISIBLE
+C   (FOR LINE MODE IS SET ON INITIAL ENTRY AND USED ON SUBSEQUENT ONES)
+C    BLANK IS SET TRUE IF LCAP(2) IS TRUE AND BLANKING IS POSSIBLE
+      LOGICAL CELOUT,BLANK
+      REAL Z3(3)
+      INTEGER IZ(3)
+      LOGICAL LCOL,RASTEX
+C
+C    LOOK UP TABLE VALUES STORED AS
+C    0-255 ENTRIES    FOR R,G,B,B/W (N.B. INTEGERS USUALLY)
+C    SET FOR DEVICE MAXIMUM LUT
+//    PARAMETER (MAXLUT=***)
+      INTEGER DEVLUT(4,0:MAXLUT)
+      LOGICAL RGB0
+      SAVE
+C    FUNCTION TO ROUND UP POSITIVE REALS INTO AN INTEGER
+      IRNDUP(RX) = INT(RX+1) - INT(FLOAT(INT(RX+1))-RX)
+      X = XARG(1)
+      Y = YARG(1)
+      Z = ZARG(1)
+      N = NARG(1)
+      IF (IF.LE.0) GO TO 1000
+      IF (IF.EQ.4) GO TO 1
+      IF (IF.LT.4) GO TO 3
+      IF (IF.EQ.10) GO TO 10
+      IF (IF.GT.100) GO TO 100
+C    IGNORE ALL OTHER ENTRIES
+      GO TO 9999
+C
+C    IF = 1 POINT PLOT, IF = 2 OFF MOVE
+C
+C    TRANSFORM FROM NDC TO DEVICE COORDINATES
+    3 XD = XDCO + X*DSCALE
+      YD = YDCO + Y*DSCALE
+C    SET LOCAL FLAG FOR POSITIONING
+//    <ACTFLAG = OFFMOVE>
+      IF (IF.EQ.2) GO TO 4
+      IF (N.EQ.0) GO TO 4
+C    SET LOCAL FLAG FOR MOVE AND POINT PLOT
+//    <ACTFLAG = POINT>
+C    DERIVE DEVICE SPOT SIZE IN SS FROM SFSPOT(ICOLPT(IRGBN))
+//    SS = .FUNCTION.<...(SFSPOT(ICOLPT(IRGBN)))...>
+      IF (SS.NE.SSLAST) THEN
+C    IF NEW CURRENT SPOT SIZE (SS) DIFFERS FROM LAST SET
+C    MUST SEND NEW SPOT SIZE SS TO DEVICE (OR USE IT)
+//                 <................>
+C    SAVE CURRENT SPOT SIZE AS LAST USED
+                   SSLAST = SS
+      ENDIF
+      GO TO 2
+C    IF = 4 ON MOVE
+C
+C    TRANSFORM FROM NDC TO DEVICE COORDINATES
+    1 XD = XDCO + X*DSCALE
+      YD = YDCO + Y*DSCALE
+C    SET LOCAL FLAG FOR DRAW
+//    <ACTFLAG = DRAW>
+    2 IF (.NOT.DEVCOL(NWS)) GO TO 4
+      II = ICOLPT(IRGBN)
+      NC = NLUT(II)
+C    DERIVE DEVICE LINE WIDTH IN MW FROM SFLIN(ICOLPT(IRGBN))
+//    MW = .FUNCTION.<...(SFSPOT(ICOLPT(IRGBN)))...>
+C   ACCOUNT FOR POSSIBILITY OF LOOK UP TABLE
+      IF (NC.LT.0) THEN
+C+++++++++++++++++++++
+C    IF COLOUR DEVICE FOR EACH OF R,G,B  I.E. I=1,3 DO
+//                    Z = RGBRGB(II,I)*ZRGB(II)
+//  IZ(I) = <...CONVERT FROM NORMALISED REAL Z3(I) TO DEVICE VALUE...>
+C+++++++++++++++++++++
+C---------------------
+C    IF MONOCHROME DEVICE DERIVE INTENSITY ONLY
+//                    Z = ZINT(II)*ZRGB(II)
+//  IZ = <...CONVERT FROM NORMALISED REAL Z TO DEVICE VALUE...>
+C---------------------
+      ELSE
+                      IF (NC.GT.MAXLUT) NC = 1
+C    INVALID LUT POINTER ACCESSES FOREGROUND
+C+++++++++++++++++++++
+C    IF COLOUR DEVICE FOR EACH OF R,G,B  I.E. I=1,3 DO
+//                    IZ(I) = DEVLUT(I,NC)
+C+++++++++++++++++++++
+C---------------------
+C    IF MONOCHROME DEVICE DERIVE INTENSITY ONLY
+//                    IZ = DEVLUT(4,NC)
+C---------------------
+      ENDIF
+C    IF TRANSITION FROM OFF TO ON MUST POSITION
+C+++++++++++++++++++++
+C    IN THE FOLLOWING - FOR COLOUR IZ IS ALL COMPONENTS R,G,B
+C                       I.E. IZ(I),I=1,3
+C+++++++++++++++++++++
+      IF (RGB0.AND.(IZ.NE.0)) THEN
+C    MUST POSITION TO (XDLAST,YDLAST)
+//            <.............>
+      ENDIF
+      RGB0 = IZ.EQ.0
+      IF (IZ.EQ.0) GO TO 10003
+C    SET INTENSITY/COLOUR ACCORDING TO IZ/IZ(I),I=1,3
+//    <...............>
+C    IF BEAM ON MUST SET LINE MULTI-WIDTH IF RELEVANT
+      IF (MW.NE.MWLAST) THEN
+C    IF NEW CURRENT WIDTH (MW) DIFFERS FROM LAST SET
+C    MUST SEND NEW WIDTH MW TO DEVICE (OR USE IT)
+//   <................>
+C    SAVE CURRENT WIDTH AS LAST USED
+                   MWLAST = MW
+      ENDIF
+10003 CONTINUE
+      DEVCOL(NWS) = .FALSE.
+    4 IF (RGB0) GO TO 10004
+C    ISSUE MOVE/DRAW/POINT ACCORDING TO LOCAL FLAG ACTFLAG
+C    TO THE POINT (XD,YD)
+//      <.............>
+10004 CONTINUE
+      XDLAST = XD
+      YDLAST = YD
+//    IF (<..ACTFLAG WAS OFFMOVE..>) GO TO 9999
+C    IF DRAW/POINT THEN SET NON-EMPTY FLAG
+C
+C    DISPLAY SURFACE NON-EMPTY
+ 9998 WSDSE(NWS) = .FALSE.
+ 9999 IFLAST = IF
+      RETURN
+10032 RASTEX = .TRUE.
+      GO TO 9999
+C                PIXEL CODE
+   10 CONTINUE
+C    NPAR = 0 IS CELL ARRAY OPTION
+C    NPAR > 0 IS LINE CELL  OPTION
+      IF ((NPAR.GT.1).AND.(IFLAST.EQ.10)) THEN
+C    IF CONTINUATION ENTRY FOR LINE CELL CHECK IF TOTALLY VALID
+        IF (RASTEX) GO TO 9999
+C    OR SEE IF OUT OF VALID RANGE
+        IF (NPAR.GT.NRAST2) GO TO 10032
+C    OR NOT YET INTO VALID RANGE
+        IF (NPAR.LT.NRAST1) GO TO 9999
+      ELSE
+        RASTEX = .FALSE.
+C    CONVERT CLIP AREA TO WS DC
+        WSCL(1) = XDCO + NDCL(1)*DSCALE
+        WSCL(2) = XDCO + NDCL(2)*DSCALE
+        WSCL(3) = YDCO + NDCL(3)*DSCALE
+        WSCL(4) = YDCO + NDCL(4)*DSCALE
+        IF (LPAR(2)) THEN
+C    CONVERT BLANKING AREA TO WS DC (IF APPLICABLE AND NOT SEGMENT)
+             WSBL(1) = XDCO + NDBL(1)*DSCALE
+             WSBL(2) = XDCO + NDBL(2)*DSCALE
+             WSBL(3) = YDCO + NDBL(3)*DSCALE
+             WSBL(4) = YDCO + NDBL(4)*DSCALE
+        ENDIF
+C    CONVERT CELL ARRAY AREA TO WS DC
+C    (NO TRANSFORMATION CURRENTLY PERMITTED)
+        XRAST(1) = XDCO + XPAR(1)*DSCALE
+        XRAST(2) = XDCO + XPAR(2)*DSCALE
+        YRAST(1) = YDCO + YPAR(1)*DSCALE
+        YRAST(2) = YDCO + YPAR(2)*DSCALE
+C    NOW GET SCAN IN WS DC (CURRENTLY NO TRANSFORMATION)
+C
+C
+C    ALLOW FOR PRECLIPPING IN GETTING START/END POSITIONS
+C    DO HORIZONTAL SCANS FIRST
+        CELOUT = .TRUE.
+C    COMBINE WITH CHECK ON VALIDITY AFTER CLIPPING
+        IF (XRAST(1).LE.XRAST(2)) THEN
+C    LEFT TO RIGHT
+             ISCAN = 0
+             XRAST(0) = MAX(XRAST(1),WSCL(1))
+             XRAST(3) = MIN(XRAST(2),WSCL(2))
+C    FORCE XRAST(0) TO NEXT ADDRESSABLE (VECTOR) POINT (L TO R)
+C      - IF WANT FIXED RASTER REFERENCE SHOULD MOD THIS
+C        ACCORDING TO RASTER ELEMENT SPACING
+             IX0 = IRNDUP(XRAST(0))
+             XRAST(0) = IX0
+             IF (XRAST(0).GT.XRAST(3)) GO TO 10032
+             X1 = XRAST(0)
+             X2 = XRAST(3)
+        ELSE
+C    RIGHT TO LEFT
+             ISCAN = 1
+             XRAST(0) = MIN(XRAST(1),WSCL(2))
+             XRAST(3) = MAX(XRAST(2),WSCL(1))
+C    FORCE XRAST(0) TO LAST ADDRESSABLE (VECTOR) POINT (R TO L)
+C      - IF WANT FIXED RASTER REFERENCE SHOULD MOD THIS
+C        ACCORDING TO RASTER ELEMENT SPACING (FROM R)
+             IX0 = XRAST(0)
+             XRAST(0) = IX0
+             IF (XRAST(3).GT.XRAST(0)) GO TO 10032
+             X1 = XRAST(3)
+             X2 = XRAST(0)
+        ENDIF
+C    THEN DO VERTICAL SCAN
+        IF (YRAST(1).LE.YRAST(2)) THEN
+C    TOP TO BOTTOM
+             YRAST(0) = MIN(YRAST(2),WSCL(4))
+             YRAST(3) = MAX(YRAST(1),WSCL(3))
+C    FORCE YRAST(0) TO LAST ADDRESSABLE (VECTOR) POINT (T TO B)
+C      - IF WANT FIXED RASTER REFERENCE SHOULD MOD THIS
+C        ACCORDING TO RASTER ELEMENT SPACING (FROM T)
+             IY0 = YRAST(0)
+             YRAST(0) = IY0
+             IF (YRAST(3).GT.YRAST(0)) GO TO 10032
+             Y1 = YRAST(3)
+             Y2 = YRAST(0)
+        ELSE
+C    BOTTOM TO TOP
+             ISCAN = ISCAN + 2
+             YRAST(0) = MAX(YRAST(2),WSCL(3))
+             YRAST(3) = MIN(YRAST(1),WSCL(4))
+C    FORCE YRAST(0) TO NEXT ADDRESSABLE (VECTOR) POINT (B TO T)
+C      - IF WANT FIXED RASTER REFERENCE SHOULD MOD THIS
+C        ACCORDING TO RASTER ELEMENT SPACING
+             IY0 = IRNDUP(YRAST(0))
+             YRAST(0) = IY0
+             IF (YRAST(0).GT.YRAST(3)) GO TO 10032
+             Y1 = YRAST(0)
+             Y2 = YRAST(3)
+        ENDIF
+C    X1 = MIN(XRAST(0),XRAST(3))
+C    X2 = MAX(XRAST(0),XRAST(3))
+C    Y1 = MIN(YRAST(0),YRAST(3))
+C    Y2 = MAX(YRAST(0),YRAST(3))
+C    NOW CHECK VALIDITY OF AREA AGAINST BLANKING (IF ANY)
+        BLANK = LPAR(2)
+        IF (LPAR(2)) THEN
+          IF ((X1.GE.WSBL(1)).AND.(X2.LE.WSBL(2)).AND.
+     1    (Y1.GE.WSBL(3)).AND.(Y2.LE.WSBL(4))) GO TO 10032
+C    NOT TOTALLY OCCLUDED, SO CHECK FOR ANY POSSIBLE BLANKING
+          IF ((X1.GT.WSBL(2)).OR.(X2.LT.WSBL(1)).OR.
+     1    (Y1.GT.WSBL(4)).OR.(Y2.LT.WSBL(3))) BLANK = .FALSE.
+        ENDIF
+        CELOUT = .FALSE.
+C    IXR,IYR IS START COORDINATE FOR RASTER DATA
+        IXR = IX0
+        IYR = IY0
+        IF (NPAR.GT.0) THEN
+C    FOR SETUP GET VALID LINE RANGE
+             DYRAST = (YRAST(1)-YRAST(2))/FLOAT(IPAR(6))
+             NRAST1 = INT((YRAST(0)-YRAST(2))/DYRAST) + 1
+             NRAST2 = INT((YRAST(3)-YRAST(2))/DYRAST) + 1
+C    IF TOTALLY OUTSIDE RANGE EXIT WITH FLAG SETR
+             IF (NPAR.GT.NRAST2) GO TO 10032
+C    IF NOT YET IN RANGE EXIT
+             IF (NPAR.LT.NRAST1) GO TO 9999
+        ENDIF
+      ENDIF
+C    NOW GET LINE BY LINE RASTER SCAN
+      HRAST = HESDC
+      VRAST = VESDC
+      XRAST0 = XRAST(0)
+      YRAST0 = YRAST(0)
+      XRAST1 = XRAST(1)
+      YRAST1 = YRAST(1)
+      XRAST2 = XRAST(2)
+      YRAST2 = YRAST(2)
+      XRAST3 = XRAST(3)
+      YRAST3 = YRAST(3)
+C    (NOTE - XRAST0,YRAST0 NEED NOT BE IDENTICAL WITH XRAST1,YRAST1
+C          - CLIPPING MAY REQUIRE SUBAREA ONLY TO BE DISPLAYED)
+ 
+C++++++++++++++++++++++++++++
+C    FOR COLOUR DEVICE OUTPUT RASTER IS COLOUR IF INPUT RASTER IS COLOUR
+      LCOL = LPAR(4)
+C++++++++++++++++++++++++++++
+C----------------------------
+C    FOR B/W DEVICE OUTPUT RASTER IS ALWAYS MONOCHROME SO SET
+C     LCOL = .FALSE.
+C----------------------------
+C
+C
+C    DFX..F USED TO HANDLE RASTER OUTPUT FOR DEVICE
+//    CALL DFX..F(XARG,YARG,ZARG,NARG,IPAR(1),IPAR(2),DEVLUT,MAXLUT,
+     1    LCOL,BLANK,WSBL)
+C    SAVE NEXT SCAN LINE POSITION
+      YRAST(0) = YRAST0
+C    (IF NOR RASTER PLOTTING DONE BY DFX..F THEN MMAY JUMP TO 9999
+C     FROM HERE - DISPLAY SURFACE MAY NOT BE NON-EMPTY AND COLOUR
+C     SELECTION MAY NOT NEED FORCING BY RGB0)
+      RGB0 = .TRUE.
+      WSDSE(NWS) = .FALSE.
+C
+      GO TO 9998
+  100 IF (IF.GT.200) GO TO 200
+C     HERE FOR 101-199
+C
+      IF (IF.EQ.101) THEN
+C
+C    101 IS GLOBAL LUT ENTRY (BLOCK)
+C
+         J1 = MAX(0,NARG(1))
+         J2 = MIN(NARG(2),MAXLUT)
+         IF (J1.LE.J2) THEN
+              DO 10034 I=J1,J2
+              DO 10035 J=1,3
+              Z3(J) = RGBLUT(J,I)
+//  IZ = <...CONVERT FROM NORMALISED REAL Z3(I) TO DEVICE VALUE...>
+10035         DEVLUT(J,I) = IZ
+              Z = DFX139(Z3(1),Z3(2),Z3(3))
+//  IZ = <...CONVERT FROM NORMALISED REAL Z TO DEVICE VALUE...>
+10034         D48LUT(4,I) = IZ
+              DEVCOL(NWS) = .TRUE.
+         ENDIF
+      ELSE IF (IF.EQ.102) THEN
+C
+C    102 IS LUT ENTRY (BLOCK) FROM ARGUMENTS
+C
+         J1 = MAX(0,NARG(1))
+         J2 = MIN(NARG(2),MAXLUT)
+         IF (J1.LE.J2) THEN
+              DO 10036 I=J1,J2
+              Z3(1) = XARG(I)
+              Z3(2) = YARG(I)
+              Z3(3) = ZARG(I)
+              DO 10037 J=1,3
+//  IZ = <...CONVERT FROM NORMALISED REAL Z3(I) TO DEVICE VALUE...>
+10037         DEVLUT(J,I) = IZ
+              Z = DFX139(Z3(1),Z3(2),Z3(3))
+//  IZ = <...CONVERT FROM NORMALISED REAL Z TO DEVICE VALUE...>
+10036         DEVLUT(4,I) = IZ
+              DEVCOL(NWS) = .TRUE.
+         ENDIF
+      ENDIF
+      GO TO 9999
+  200 IF (IF.NE.204) GO TO 9999
+C     HERE FOR 204
+C
+  204 XD = X + XDCOR0
+      YD = Y + YDCOR0
+      IF (N.EQ.0) THEN
+//                    <..SET ACTFLAG TO OFF MOVE..>
+                      GO TO 4
+                  ELSE
+//                    <..SET ACTFLAG TO DRAW..>
+                      GO TO 2
+      ENDIF
+ 1000 II = -IF
+C       -1000 OR LOWER ARE SPECIAL ACTIONS
+      IF (II.GE.1000) GO TO 2000
+      GO TO (1001,1002,1003,1004),II
+C    OPEN DEVICE (I.E. ACTIVATE LINK/OPEN FILES ETC)
+ 1001 CONTINUE
+//     <.....................>
+C
+//    <..INITIALISE BUFFERS/POINTERS..>
+C E.G.  CALL DFX..A(----)
+//    IF (<..SUCCESSFUL..>) GO TO 10001
+C    GKS ERROR 21 24 26 POSSIBLE
+      GKSERR = 26
+      GO TO 9999
+10001 CONTINUE
+C
+C     SET LUT AT OPEN TO DIMFILM DEFAULT LUT
+C
+      JJ = MIN(MAXLUT,LUTSIZ-1)
+      DO 10023 I=0,JJ
+      DO 10024 J=1,3
+      Z3(J) = RGBLUT(J,I)
+//    IF (I.EQ.0) Z3(J) = <..BACKGROUND..>
+//    IF (I.EQ.1) Z3(J) = <..FOREGROUND..>
+C    AT OPENING 0,1 ARE DEVICE DEFAULT BACKGROUND/FOREGROUND ALWAYS
+//    IZ = <...CONVERT FROM NORMALISED REAL Z3(I) TO DEVICE VALUE...>
+10024 DEVLUT(J,I) = IZ
+      Z = DFX139(Z3(1),Z3(2),Z3(3))
+//    IZ = <...CONVERT FROM NORMALISED REAL Z3(I) TO DEVICE VALUE...>
+10023 DEVLUT(4,I) = IZ
+C    SET DC UNIT FOR HORIZONTAL/VERTICAL RASTER ELEMENT (PIXEL) SPACING
+//    HESCDC = <...>
+//    VESCDC = <...>
+      XDCOR0 = XDCORG
+      YDCOR0 = YDCORG
+      WSMDCS(1,NWS) = XDCMAX
+      WSMDCS(2,NWS) = YDCMAX
+C    SET WS CATEGORY (0 - WISS, 1 - MO, 2 - OUTPUT, 3 - OUTIN,
+C                     4 - INPUT, 5 - MI)
+//    WSCAT(NWS) = <...>
+C    SET WS DEFERRAL MODE (0 - ASAP, 1 - BNIL, 2 - BNIG, 3 - ASTI)
+C    (IF SET TO 0 WILL ENSURE ANY DIMFILM OUTPUT WILL BE FLUSHED
+C     TO DEVICE AT EXIT OF ROUTINE - E.G. ALL PLOT DATA CREATED BY
+C     A USER REFERENCE TO A DIMFILM ROUTINE WILL BE DISPLAYED AT
+C     RETURN TO USER CODE)
+C    (AN OFFLINE BATCH DEVICE REQUIRES ONLY VALUE 3 TO BE SET)
+//    WSDM(NWS) = <...>
+C    SET WS ID - SPECIFIC TO DEVICE
+C    (USE TWO DIGIT VALUE ASSIGNED INTERNALLY TO DEVICE - AS IN DFXD..)
+//    WSID(NWS) = <...>
+//    WSNAME(NWS) = '<..DEVICE NAME..>'
+C    SET UP DEFAULT WS TRANSFORMATION
+      CWSWIN(1,NWS) = 0.0
+      CWSWIN(2,NWS) = 1.0
+      CWSWIN(3,NWS) = 0.0
+      CWSWIN(4,NWS) = 1.0
+      CWSVP(1,NWS) = 0.0
+      CWSVP(2,NWS) = XDCMAX
+      CWSVP(3,NWS) = 0.0
+      CWSVP(4,NWS) = YDCMAX
+//    <..SET UP ANY OTHER DEVICE SPECIFIC PARAMETERS..>
+      ASSIGN 1004 TO JUMP
+      GO TO 10005
+C    CLOSE DEVICE
+ 1002 IF (WSDSE(NWS).AND.LOPFA) GO TO 10002
+//    <..SAVE IMAGE/CLEAR DISPLAY..>
+      WSDSE(NWS) = .TRUE.
+      LOPFA = .TRUE.
+10002 CONTINUE
+//    <..CLOSE DEVICE/ISSUE ANY SYSTEM REPORTS..>
+//    IF (<..SUCCESSFUL CLOSE..>) THEN
+C    ISSUE SUCCESSFUL DEVICE TERMINATION IF REQUIRED
+           GKSERR = 0
+      ELSE
+C    ISSUE ANY FAIL TO CLOSE DIAGNOSTIC
+//         GKSERR = <..NON-ZERO ERROR VALUE..>
+      ENDIF
+C
+      GO TO 9999
+C    FRAME ADVANCE
+ 1003 CONTINUE
+//    <..SAVE IMAGE/CLEAR DISPLAY..>
+      ASSIGN 9999 TO JUMP
+10005 WSDSE(NWS) = .TRUE.
+      LOPFA = .TRUE.
+10025 CONTINUE
+//   <ANY BEGINNING OF FRAME RESET ACTION SHOULD BE PERFORMED HERE>
+C    SET HERE TO FORCE LINE MULTI-WIDTH AND SPOT SIZE SELECTION
+C    AT BEGINNING OF FRAME (IF REQUIRED)
+//    MWLAST = <..UNSET..>
+//    SSLAST = <..UNSET..>
+      RGB0 = .TRUE.
+10006 CONTINUE
+      DEVCOL(NWS) = .TRUE.
+C    SHOULD ALSO SET BEAM POSITION, SPOT SIZE, LINE THICKNESS
+C    BEAM POSITION IS SET BY DIMFILM AT FRAME ADVANCE
+C    COLOUR IS FORCED AT F/A IN DFX000 VIA DEVCOL, MWLAST AND SSLAST
+      GO TO JUMP,(1004,9999,10030)
+C    RESET DEVICE TRANSFORMATION
+ 1004 DSCALE = AMAX1((CWSVP(2,NWS)-CWSVP(1,NWS))
+     1                       /(CWSWIN(2,NWS)-CWSWIN(1,NWS)),
+     2    (CWSVP(4,NWS)-CWSVP(3,NWS))/(CWSWIN(4,NWS)-CWSWIN(3,NWS)))
+      XDCO = CWSVP(1,NWS) - CWSWIN(1,NWS)*DSCALE + XDCOR0
+      YDCO = CWSVP(3,NWS) - CWSWIN(3,NWS)*DSCALE + YDCOR0
+C    THESE TRANSFORM VALUES YIELD DEVICE VALUES
+      GO TO 9999
+C    DEVICE SPECIFIC CODES COMMENCE AT -2001
+C
+C    CODES -2001,.. ARE RESERVED FOR DEVICE SPECIFIC FUNCTIONS THAT
+C    MAY BE REQUIRED IN ANY SPECIFIC DIMFILM IMPLEMENTATION THROUGH
+C    THE DEVICE SPECIFIC ROUTINES
+C    NO SUCH ENTRIES ARE REQUIRED FOR THE FULL FUNCTIONALITY OF
+C    DIMFILM IN ANY ENVIRONMENT
+ 2000 II = II - 2000
+//    GO TO (2001,<...ETC...>),II
+C
+C    OPCODE -2001      .....
+C
+C
+ 2001 CONTINUE
+//    <.....>
+      GO TO 9999
+C
+      END
+//    SUBROUTINE DFX..F(RR,GG,BB,ICOL,DIMX,DIMY,DEVLUT,MAXLUT,LCOL,
+     1      BLANK,WSBL)
+C    GENERAL DEVICE RASTER SCAN ROUTINE
+C    LOOK UP TABLE PARAMETERS:
+      INTEGER DIMX,DIMY,ICOL(DIMX,DIMY),DEVLUT(4,*)
+C    COLOUR TRIPLET PARAMETERS:
+      REAL RR(DIMX,DIMY),GG(DIMX,DIMY),BB(DIMX,DIMY),WSBL(4)
+C   WSBL IS PRE-BLANKING RECTANGLE IN DC (E.G. FOR PIXEL ARRAYS)
+      LOGICAL LCOL,BLANK,BLKLIN
+C
+C    FOR CELL ARRAY-TYPE:
+C
+C    LOOK UP TABLE ENTRY IS -
+C    ICOL IS ARRAY MAPPING IX BY IY ONTO XRAST1,XRAST2 BY YRAST1,YRAST2
+C    (N.B. ARRAY DIMENSIONS DIMX,DIMY  START POSITION IX0,IY0)
+C    TRIPLET ENTRY IS -
+C    (RR,GG,BB) WITH DIMENSIONS AS PER ICOL
+C
+C    FOR CELL LINE-TYPE:
+C
+C    LOOK UP TABLE ENTRY IS -
+C    ICOL(DIMX,1)
+C         FOR RUN-LENGTH ENCODING DIMX = TOTAL DATA LENGTH, AND
+C         ICOL COMPRISES PAIRED ENTRIES  (RUN LENGTH,LUT) = (2*N-1,2*N)
+C
+C    TRIPLET ENTRY IS -
+C    RR(DIMX,1),GG(DIMX,1),BB(DIMX,1),ICOL(DIMX,1)  - ICOL IS RUN LENGTH
+C
+C
+C    START OF SCAN LINE IS XRAST0,YRAST0
+C    PIXEL ELEMENT SPACING IS HRAST BY VRAST
+C    YRAST0 IS POSITION AT ENTRY AND IS DECREMENTED FOR EACH SCAN
+C
+C-----------------------------------------------------------------------
+      INTEGER SCAN,RSCAN,DSCAN
+      COMMON /DFXK../XRAST0,YRAST0,XRAST1,YRAST1,XRAST2,YRAST2,
+     1               XRAST3,YRAST3,HRAST,VRAST,IHSC,ISCAN,
+//   2               RSCAN(****),SCAN(****),DSCAN(4,****)
+C    DIMENSIONS OF RSCAN,SCAN,DSCAN SHOULD BE MAXIMUM OF PIXELS/SCAN
+C    FOR SPECIFIC DEVICE
+//    SAVE /DFXK../
+C-----------------------------------------------------------------------
+*CALL,DFXCP0
+C
+C    ----DFXCP0 CONTENTS FOR RASTER OPERATION----
+C
+C    IPAR(1)    X-LENGTH OF CELL ARRAY OR CURRENT LINE SCAN DATA ARRAY
+C        (2)    Y-LENGTH OF CELL ARRAY
+C        (3)    X-OFFSET FOR START OF X-SCAN
+C        (4)    Y-OFFSET FOR START OF Y-SCAN
+C        (5)    OVERALL X-DIMENSION OF CELL ARRAY OR
+C                   CELL MAP X-DIMENSION IF LINE SCAN
+C        (6)    OVERALL Y-DIMENSION OF CELL ARRAY
+C               (THESE ARE PASSED AS DIMX,DIMY TO THIS ROUTINE)
+C
+C    NPAR       = 0 IF CELL ARRAY
+C                   ELSE IS NUMBER OF CURRENT LINE SCAN
+C
+C    LPAR(1)    TRUE IF CELL MAPPED AREA TO BE PRE-CLIPPED,
+C                    FALSE IF NOT CLIPPED
+C        (2)    TRUE IF CELL MAPPED AREA BLANKED,
+C                    FALSE IF NOT BLANKED
+C        (3)    TRUE IF LOOK-UP-TABLE REFERENCES,
+C                    FALSE IF COLOUR TRIPLET VALUE
+C        (4)    TRUE IF INPUT RASTER IS COLOUR,
+C                    FALSE IF MONOCHROME INPUT
+C        (5)    FOR CELL SCAN ONLY:
+C                    TRUE IF RUN-LENGTH ENCODED INPUT DATA,
+C                    FALSE IF NOT COMPRESSED
+C
+C    RPAR(1)-(4)   IF CLIPPED, NDC COORDINATES OF CLIPPING RECTANGLE
+C        (5)-(6)   IF BLANKED, NDC COORDINATES OF BLANKING RECTANGLE
+C
+C
+*CALL,DFXC00
+*CALL,DFXC04
+*CALL,DFXC17
+      LOGICAL RUN
+      REAL Z3(4)
+      SAVE
+      IX = IPAR(5)
+      IY = IPAR(6)
+      IX0 = IPAR(3)
+      IY0 = IPAR(4)
+C    GET RASTER SCAN INCREMENT (INCLUDING SIGN)
+      DXRAST = (XRAST2-XRAST1)/FLOAT(IX)
+C    NOTE SIGN OF DYRAST DUE TO DIRECTION OF SCAN
+      DYRAST = (YRAST1-YRAST2)/FLOAT(IY)
+      IF ((DXRAST.EQ.0.0).OR.(DYRAST.EQ.0.0)) GO TO 999
+      XRATIO = ABS(DXRAST/HRAST)
+      IRATIO = NINT(XRATIO)
+      REMORG = ABS(FLOAT(IX)*(XRATIO-FLOAT(IRATIO)))
+      IF (REMORG.GE.0.5) THEN
+             IRATIO = XRATIO
+             REMORG = ABS(FLOAT(IX)*(XRATIO-FLOAT(IRATIO)))
+      ENDIF
+C
+C    MAPPING BETWEEN CELL AND DISPLAY PIXELS IS SUCH THAT THE LEFT
+C    BOUNDARY OF A CELL IS CONSIDERED INTERIOR
+C    (THE LAST CELL OF A SCAN ALSO HAS RIGHT BOUNDARY INTERIOR)
+C
+C     ISE IS START ELEMENT IN CELL ARRAY FOR SCAN
+C     XSR IS (PARTIAL) LENGTH OF THIS FIRST CELL
+C     IEE IS END ELEMENT IN CELL ARRAY FOR SCAN
+C     XER IS (PARTIAL) LENGTH OF THIS LAST CELL
+      ISE = INT((XRAST0-XRAST1)/DXRAST) + 1
+      XSR = DXRAST - ((XRAST0 - XRAST1) - DXRAST*(ISE-1))
+      IEE = MIN(INT((XRAST3-XRAST1)/DXRAST) + 1,IX)
+C    NOTE LIMIT TO IEE
+C         THIS IS DUE TO SPECIAL CASE FOR LAST CELL WHERE RIGHT HAND
+C         BOUNDARY IS INCLUSIVE
+C
+C
+      IF ((NPAR.NE.0).AND.(.NOT.LPAR(5))) THEN
+C
+C    FOR NON-RUN LENGTH LINE SCANS MUST CHECK VALIDITY OF SCAN RANGE
+C    IN THESE CASES IT IS POSSIBLE FOR THE SCAN TO HAVE AN ARRAY
+C    DIMENSION LESS THAN CELMAP DIMENSION IN DIRECTION OF SCAN
+C    ACTUAL DIMENSION IS PASSED IN IPAR(1) (EQUAL TO DIMX IN ARGUMENTS)
+C
+C
+           IF (DIMX.LT.IEE) THEN
+                  IEE = DIMX
+                  XX = XRAST1 + DXRAST*IEE
+C    MUST TAKE ACCOUNT OF DIRECTION OF SCAN
+                  IF (XRAST3.GE.XRAST1) THEN
+                         XX = MIN(XX,XRAST3)
+                  ELSE
+                         XX = MAX(XX,XRAST3)
+                  ENDIF
+                  XRAST3 = XX
+           ENDIF
+C
+C
+C    THE FOREGOING WILL ENSURE CORRECT BLANKING LIMITS AND XSCLEN IN
+C    PROCESSING LINE SCANS
+C
+C
+      ENDIF
+C
+C
+      XER = (XRAST3 - XRAST1) - DXRAST*(IEE-1)
+C    NOW ADD IN ARRAY OFFSETS
+      ISE = ISE + IX0
+      IEE = IEE + IX0
+      IF (BLANK) THEN
+          IF (XRAST0.LE.XRAST3) THEN
+                 X1 = WSBL(1)
+                 X2 = WSBL(2)
+                 X1H = X1 - HRAST
+                 X2H = X2 + HRAST
+          ELSE
+                 X1 = WSBL(2)
+                 X2 = WSBL(1)
+                 X1H = X1 + HRAST
+                 X2H = X2 - HRAST
+          ENDIF
+C    IB1/IB2 ARE INCLUSIVE DEVICE SCAN LINE ADDRESSES OF BLANKING
+C    IBL IS SCAN LINE MAXIMUM
+          IBL = 1 + INT(ABS(XRAST3-XRAST0)/HRAST)
+          IB1 = MAX(1,1+NINT(ABS(X1-XRAST0)/HRAST))
+          IB2 = MIN(IBL,1+NINT(ABS(X2-XRAST0)/HRAST))
+C    IEB1/XEB1 IS END OF SCAN AT IB1
+C    ISB2/XSB2 IS RESTART OF SCAN AT IB2
+C    NOTE - X1H/X2H ARE LAST VISIBLE RASTER ADDRESSES BEFORE/AFTER
+C           BLANKING ENCOUNTERED
+      ISB2 = INT((X2H-XRAST1)/DXRAST) + 1
+      XSB2 = (X2H - XRAST1) - DXRAST*(ISB2)
+      IEB1 = INT((X1H-XRAST1)/DXRAST) + 1
+      XEB1 = (X1H - XRAST1) - DXRAST*(IEB1-1)
+      ENDIF
+C
+C    FOR RIGHT TO LEFT SCANS MUST SIGN CORRECT LENGTHS
+C        THIS AVOIDS CHECKING INEQUALITY TESTING FOR
+C        COMPLETION OF SCAN, AND LEAVES HRAST ALWAYS POSITIVE
+C
+      XSR = ABS(XSR)
+      XER = ABS(XER)
+      XEB1 = ABS(XEB1)
+      XSB2 = ABS(XSB2)
+      XSCLEN = ABS(XRAST3-XRAST0)
+      ADXRST = ABS(DXRAST)
+C
+C    CONTINUATION RESTART
+  100 CONTINUE
+C    SET IHSC/SCAN IN CASE NO DATA IN RANGE
+      IHSC = 1
+      SCAN(1) = 0
+C    GET ARRAY POINTER
+      IYVAL1 = INT((YRAST0-YRAST2)/DYRAST) + 1 + IY0
+      IYVAL = IYVAL1
+      IF (NPAR.GT.0) THEN
+C    IF DISPLAY PIXEL SCAN IN ADVANCE OF CURRENT SCAN LINE
+C    RETURN AND AWAIT NEXT SCAN
+                 IF (IYVAL1.GT.NPAR) GO TO 999
+C    LINE ARRAY HAS SINGLE DIMENSION
+                 IYVAL = 1
+      ENDIF
+C    MUST NOW ENSURE DATA RANGE IS SENSIBLE I.E. ISE NOT EXCEEDING IEE
+C    (N.B. IHSC/SCAN PRESET SO ZERO LINE IF JUMP TAKEN)
+      IF (ISE.GT.IEE) GO TO 24
+      REM = REMORG
+C    BLKLIN MUSTY BE SET FOR EACH LINE SCAN
+      BLKLIN = .FALSE.
+      IF (BLANK) THEN
+         IF ((YRAST0.LE.WSBL(4)).AND.(YRAST0.GE.WSBL(3)))BLKLIN = .TRUE.
+      ENDIF
+      IF (REM.LT.0.5) THEN
+C    CAN TREAT SCAN AS INTEGRAL MULTIPLE OF DISPLAY PIXELS
+               IF (IRATIO.EQ.1) THEN
+C             FULL ARRAY - NOT RUN-LENGTH ENCODED (AT THIS STAGE)
+                    RUN = .FALSE.
+                    J = 0
+                    DO 1 I=ISE,IEE
+                    J = J + 1
+                    SCAN(J) = I
+                    IF (BLKLIN) THEN
+                         IF ((J.GE.IB1).AND.(J.LE.IB2)) SCAN(J) = 0
+                    ENDIF
+    1               CONTINUE
+                    IHSC = J
+               ELSE
+C             RUN-LENGTH ENCODED (CONSTANT EXCEPT FIRST/LAST ELEMENTS)
+                    RUN = .TRUE.
+                    J = 0
+                    IRUN = IRATIO
+                    IF (.NOT.BLKLIN) THEN
+                         DO 2 I=ISE,IEE
+                         J = J + 1
+                         RSCAN(J) = IRUN
+    2                    SCAN(J) = I
+                         IHSC = J
+C                       CORRECT FIRST/LAST ELEMENT RUNS
+                         RSCAN(1) = 1+INT(XSR/HRAST)
+                         SCAN(1) = ISE
+                         RSCAN(J) = 1+INT(XER/HRAST)
+                         SCAN(J) = IEE
+                    ELSE
+C                 OPTIONS ARE LINE STARTS BLANKED, ENDS BLANKED OR
+C                                  INCLUDES BLANKING
+                         IF (IB1.GT.1) THEN
+C                     STARTS VISIBLY
+                               DO 3 I=ISE,IEB1
+                               J = J + 1
+                               RSCAN(J) = IRUN
+    3                          SCAN(J) = I
+C                       CORRECT FIRST/LAST ELEMENT RUNS
+                               RSCAN(1) = 1+INT(XSR/HRAST)
+                               SCAN(1) = ISE
+                               RSCAN(J) = 1+INT(XEB1/HRAST)
+                               SCAN(J) = IEB1
+                         ENDIF
+C                 DO BLANKED PORTION
+                         J = J + 1
+                         RSCAN(J) = IB2-IB1+1
+                         SCAN(J) = 0
+                         IF (IB2.LT.IBL) THEN
+C                     ENDS VISIBLY
+                               K = J + 1
+                               DO 4 I=ISB2,IEE
+                               J = J + 1
+                               RSCAN(J) = IRUN
+    4                          SCAN(J) = I
+C                         CORRECT FIRST/LAST ELEMENT RUNS
+                               SCAN(J) = IEE
+                               RSCAN(J) = 1+INT(XER/HRAST)
+                               SCAN(K) = ISB2
+                               RSCAN(K) = 1+INT(XSB2/HRAST)
+                         ENDIF
+                    ENDIF
+                    IHSC = J
+               ENDIF
+      ELSE
+               IF (IRATIO.LT.2) THEN
+                      RUN = .FALSE.
+                      X = 0.0
+                      J = 0
+                      I = ISE
+                      REM = XSR
+    5                 J = J + 1
+                      SCAN(J) = I
+                      IF (BLKLIN) THEN
+                          IF ((J.GE.IB1).AND.(J.LE.IB2)) SCAN(J) = 0
+                      ENDIF
+                      X = X + HRAST
+                      IF (X.GT.XSCLEN) GO TO 6
+                      REM = REM - HRAST
+                      IF (REM.GT.0.0) GO TO 5
+   30                 REM = ADXRST + REM
+                      I = I + 1
+                      IF (REM.LE.0.0) GO TO 30
+                      GO TO 5
+    6                 IHSC = J
+               ELSE
+C              NO ATTEMPT TO OPTIMISE RUN LENGTH ENCODING BY ADVANCE OF
+C              IRATIO (POSSIBLY +1) EACH TIME
+                      RUN = .TRUE.
+                      X = 0.0
+                      J = 0
+                      K = 0
+                      I = ISE
+                      REM = XSR
+                      IR = 0
+                      IPLAST = ISE
+                      IF (BLKLIN) THEN
+                          IF ((1.GE.IB1).AND.(1.LE.IB2)) IPLAST = 0
+                      ENDIF
+    7                 K = K + 1
+                      IPIX = I
+                      IF (BLKLIN) THEN
+                          IF ((K.GE.IB1).AND.(K.LE.IB2)) IPIX = 0
+                      ENDIF
+                      IF (IPIX.EQ.IPLAST) THEN
+                                IR = IR + 1
+                      ELSE
+                                J = J + 1
+                                RSCAN(J) = IR
+                                SCAN(J) = IPLAST
+                                IPLAST = IPIX
+                                IR = 1
+                      ENDIF
+                      X = X + HRAST
+                      IF (X.GT.XSCLEN) GO TO 8
+                      REM = REM - HRAST
+                      IF (REM.GT.0.0) GO TO 7
+                      REM = ADXRST + REM
+                      I = I + 1
+                      GO TO 7
+    8                 J = J + 1
+                      RSCAN(J) = IR
+                      SCAN(J) = IPIX
+                      IPLAST = IPIX
+                      IHSC = J
+               ENDIF
+      ENDIF
+C    MAY NOW EXPAND DATA INTO SCAN LINE
+C
+C    STRUCTURE IS CURRENTLY:
+C         INTEGER   RSCAN       RUN-LENGTH (0=SKIP) IF RUN SET TRUE
+C         INTEGER    SCAN       POINTER TO CELL ARRAY ELEMENT
+C
+C    STRUCTURE TO PLOT:
+C
+C    (NOTE - DSCAN MAY BETTER BE PACKED OR OTHERWISE COMPUTED
+C            FOR ANY SPECIFIC DEVICE.  IF A 32 BIT MACHINE WITH
+C            8 BITS PER R,G,B THEN DSCAN MAY BE  IDENTICAL WITH
+C            SCAN AND PACKED IN 8-BIT PACKETS)
+C
+C         INTEGER    RSCAN  RUN-LENGTH (0=SKIP) IF RUN SET TRUE
+C         INTEGER    DSCAN(4, )
+C               (1, )      RED
+C               (2, )      GREEN
+C               (3, )      BLUE
+C               (4, )      BLACK/WHITE
+      ICS = ICHECK
+      ICHECK = -1
+C    SET LIMITS DEPENDENT ON OUTPUT RASTER BEING COLOUR/BLACK AND WHITE
+      IF (LCOL) THEN
+               J1 = 1
+               J2 = 3
+      ELSE
+               J1 = 4
+               J2 = 4
+      ENDIF
+C
+C    IF RUN-LENGTH ENCODED LINE ARRAY MUST MODIFY SCAN WHICH IS
+C    PRESENTLY POINTING TO NOTIONAL FULL CELL LINE
+C
+      IF ((NPAR.GT.0).AND.LPAR(5)) THEN
+          N1 = 1
+          II = 0
+          IOUT = 0
+          IROUT = 0
+C     SET INCREMENT FOR LUT/TRIPLET MODE
+          JINC = 1
+          IF (LPAR(3)) JINC = 2
+          J = 1 - JINC
+   20     J = J + JINC
+          IF (J.GT.DIMX) GO TO 23
+          N2 = N1 + ICOL(J,1) - 1
+          IF (N2.LT.N1) GO TO 20
+          DO 21 I=1,IHSC
+                IF (RUN) THEN
+                        IR = RSCAN(I)
+                ELSE
+                        IR = 1
+                ENDIF
+          IVAL = SCAN(I)
+          IF (IVAL.LE.N2) THEN
+                IROUT = IROUT + IR
+          ELSE
+                IF (IROUT.NE.0) THEN
+                          IOUT = IOUT + 1
+                          RSCAN(IOUT) = IROUT
+                          SCAN(IOUT) = J + JINC - 1
+                          IROUT = 0
+                ENDIF
+   22           J = J + JINC
+                IF (J.GT.DIMX) GO TO 23
+                N1 = N2 + 1
+                JCOL = MAX(ICOL(J,1),0)
+                N2 = N1 + JCOL - 1
+                IF (IVAL.GT.N2) GO TO 22
+                IROUT = IR
+          ENDIF
+   21     CONTINUE
+   23     IF (IROUT.NE.0) THEN
+              IOUT = IOUT + 1
+              RSCAN(IOUT) = IROUT
+              SCAN(IOUT) = J + JINC - 1
+          ENDIF
+          IHSC = IOUT
+          RUN = .TRUE.
+          IF (IHSC.EQ.0) THEN
+              IHSC = 1
+              RSCAN(1) = 0
+              SCAN(1) = 0
+              GO TO 13
+          ENDIF
+      ENDIF
+   24 DO 9 I=1,IHSC
+      IVAL = SCAN(I)
+      SCAN(I) = 0
+C    IF ZERO POINTER I.E. BLANKED NEED ZERO, ELSE
+      IF (IVAL.GT.0) THEN
+            IF (LPAR(3)) THEN
+C    THIS IS LOOK-UP-TABLE OPTION
+                 IVAL = ICOL(IVAL,IYVAL)
+                 DO 10 J=J1,J2
+                 IF (IVAL.GT.MAXLUT) IVAL = 1
+C    INVALID LUT POINTER ACCESSES FOREGROUND
+                 IZ = DEVLUT(J,IVAL)
+   10            DSCAN(J,I) = IZ
+             ELSE
+C    CHECK IF INPUT DATA IS TRIPLET OR GREY-SCALE
+                 IF (LPAR(4)) THEN
+C    THIS IS TRIPLET REFERENCE SO CONVERT AS NECESSARY
+                      CALL DFX160(NCMODE,RR(IVAL,IYVAL),GG(IVAL,IYVAL),
+     1                           BB(IVAL,IYVAL),Z3(1),Z3(2),Z3(3),IERR)
+C    IGNORE ERROR RETURN
+                      IF (.NOT.LCOL) THEN
+C    IF OUTPUT IS BLACK AND WHITE MUST CONVERT TRIPLET
+                             Z3(4) = DFX139(Z3(1),Z3(2),Z3(3))
+                      ENDIF
+                 ELSE
+C    GREY-SCALE INPUT
+                      Z3(4) = MIN(MAX(0.0,RR(IVAL,IYVAL)),
+     1                            MIN(1.0,RR(IVAL,IYVAL)))
+                 ENDIF
+                 DO 11 J=J1,J2
+                 Z = Z3(J)*ZRGB(1)
+//               IZ = <..CONVERT FROM NORM. REAL Z TO DEVICE VALUE..>
+   11            DSCAN(I) = IZ
+             ENDIF
+      ENDIF
+    9 CONTINUE
+   13 ICHECK = ICS
+C    NOW COMPUTE REPEAT SCAN LINES (IDENTICAL)
+      IVSC = 1
+      NMAX = ABS(DYRAST)/VRAST
+C   SOME COMPILERS PERFORM I=X/Y AS I=X*(1./Y)
+C   THIS MAY YIELD AN INTEGER RESULT THAT IS 1 TOO SMALL
+C   THE FOLLOWING LINE IS TO REMEDY THAT SITUATION
+C   (SPECIFICALLY CFT77)
+C         IF ((X-(I*Y)).GE.Y) I = I + 1
+C   THIS IS CORRECT ONLY FOR POSITIVE X AND Y (AS HERE)
+      IF ((ABS(DYRAST)-NMAX*VRAST).GE.VRAST) NMAX = NMAX + 1
+      V = SIGN(VRAST,DYRAST)
+   12 YRAST0 = YRAST0 + V
+      IF (V.GT.0.0) THEN
+C    CHECK AGAINST TOTAL LIMITS
+            IF (YRAST0.GT.YRAST3) GO TO 99
+      ELSE
+            IF (YRAST0.LT.YRAST3) GO TO 99
+      ENDIF
+      IYL = INT((YRAST0-YRAST2)/DYRAST) + 1 + IY0
+      IF (IYL.NE.IYVAL1) GO TO 99
+      IF (BLANK) THEN
+         IF (((YRAST0.LE.WSBL(4)).AND.(YRAST0.GE.WSBL(3))).NEQV.BLKLIN)
+     1                     GO TO 99
+C    SAME BLANKING AS PREVIOUS SCAN SO IDENTICAL
+      ENDIF
+      IVSC = IVSC + 1
+      GO TO 12
+   99 CONTINUE
+C
+C    NOW OUTPUT SCAN(S)
+C
+C    MUST OUTPUT IVSC SCAN LINES DERIVED FROM DSCAN,RSCAN (DEPENDING
+C    ON RUN)
+C    ACCOUNT MUST BE TAKEN OF DIRECTION (FROM ISCAN)
+//    <...........>
+C
+C
+C    NOW CHECK IF CELL ARRAY COMPLETE
+C            IF INCOMPLETE CAN CONTINUE WITH NEXT CELL SCAN
+C
+      IF (NPAR.EQ.0) THEN
+            IF (ISCAN.LE.1) THEN
+C          TOP TO BOTTOM
+                  IF (YRAST0.GE.YRAST3) GO TO 100
+            ELSE
+C          BOTTOM TO TOP
+                  IF (YRAST0.LE.YRAST3) GO TO 100
+            ENDIF
+      ENDIF
+  999 RETURN
+C    ON RETURN YRAST0 POINTS TO NEXT SCAN POSITION
+      END

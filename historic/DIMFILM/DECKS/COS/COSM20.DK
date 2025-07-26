@@ -1,0 +1,199 @@
+*DECK COSM20 F
+         IDENT      DFXM20
+*
+*    ROUTINE UNPACKS DATA FROM COMMON BLOCK DFXC21 AND PUTS
+*    IT IN ARRAY ICDATA IN DFXC22. ORIGINAL DATA PACKED 8
+*    ELEMENTS PER WORD AS 1 BYTE SIGNED BINARY INTEGERS.
+*
+*    CALLING SEQUENCE
+*
+*    COMMON /DFXC21/ ADATA(6000)
+*    COMMON /DFXC22/ ICDATA(100)
+*    CALL DFXM20(NBET,NBYTE1,NBYTE2)
+*
+*       UNPACKS NBYTE1 TO NBYTE2 INCLUSIVE OF ALPHABET NBET
+*       INTO ICDATA.
+*
+*--------------------------------------------------------------------
+*
+*   REGISTER USAGE:
+*
+*   A0
+*   A1  ADDRESS OF CURRENT WORD OF PACKED DATA
+*   A2  ADDRESS OF CURRENT WORD OF UNPACKED DATA
+*   A3  NUMBER OF BYTES TO UNPACK/ NO OF WORDS OF ICDATA LEFT TO FILL
+*   A4
+*   A5  SET TO 8
+*   A6  LOOP COUNTER
+*   A7  SET TO 56
+*
+*   S0
+*   S1  # OF FIRST WORD OF PACKED ARRAY
+*   S2  BYTE OFFSET IN FIRST WORD
+*   S3  # OF LAST WORD OF PACKED ARRAY
+*   S4  # OF BYTES TO UNPACK
+*   S5
+*   S6
+*   S7  56 BIT MASK FOR ARITHMETIC RIGHT SHIFT OPERATIONS
+*
+*-------------------------------------------------------------------
+*
+*   BYTE LIMITS ARE ASSIGNED FOR FONTS - THESE ARE CONVERTED
+*   TO WORD LIMITS AND USED IN CALCULATING POINTERS TO START OF
+*   DATA FOR EACH ALPHABET.
+*
+*
+*       DIMFILM MACHINE DEPENDENT INTERFACE - CRAY VERSION
+*       VERSION 1.0        01/02/84        STEVE WISE,ULCC
+*
+NBA      =          12000             LENGTH OF ALPHABET FONTS
+NWA      =          NBA/8
+NBS      =          10000             LENGTH OF SPECIAL FONTS
+NWS      =          NBS/8
+NBM      =           2000             LENGTH OF MARKER FONTS
+NWM      =          NBM/8
+*
+         COMMON     DFXC21
+ADATA    BSS        NWA*3+NWS+NWM     STORAGE ASSIGNED IN DFXM11
+         COMMON     DFXC22
+ICDATA   BSS        100
+         BLOCK
+TEMPDATA BSSZ       112               TEMP STORAGE FOR UNPACKED DATA
+PBET     CON        W.ADATA           POINTERS TO FIRST WORD OF EACH
+         CON        W.ADATA+NWA       ALPHABET.
+         CON        W.ADATA+NWA+NWA
+         CON        W.ADATA+NWA+NWA+NWA
+         CON        W.ADATA+NWA+NWA+NWA+NWS
+*
+DFXM20   ENTER      NP=3
+*
+*    FETCH PARAMETERS
+*
+         ARGADD     A1,1
+         A1         ,A1             NUMBER OF ALPHABET
+         ARGADD     A2,2
+         S1         ,A2             NBYTE1
+         ARGADD     A2,3
+         S3         ,A2             NBYTE2
+*
+*    CALCULATE NUMBER OF BYTES TO UNPACK, NUMBER OF WORDS TO
+*    READ AND STARTING OFFSET IN FIRST WORD
+*
+         S7         1
+         S6         <3
+         S4         S3-S1
+         S4         S4+S7           NUMBER OF BYTES TO UNPACK (<=100)
+         S1         S1-S7
+         S2         S1&S6           BYTE OFFSET
+         S1         S1>3            FIRST WORD OF PACKED DATA
+         S3         S3-S7
+         S3         S3>3            LAST WORD OF PACKED DATA
+         S5         S3-S1
+         S5         S5+S7           NUMBER OF WORDS
+         A3         S5
+*
+*      SET ADDRESSES FOR PACKED AND UNPACKED DATA
+*
+         A1         PBET-1,A1       START OF ALPHABET
+         A2         S1              WORD OFFSET
+         A1         A1+A2           START ADDRESS FOR PACKED DATA
+         A2         TEMPDATA        START ADDRESS FOR UNPACKED DATA
+*
+*      UNPACK DATA INTO TEMPDATA
+*
+         VL         A3              SET VL TO NUMBER OF WORDS
+         A0         A1
+         V0         ,A0,1           FETCH PACKED DATA
+         R          UNPACK
+*
+*     ZERO OUT ICDATA
+*
+         A0         ICDATA
+         V7         0
+         A1         64
+         VL         A1
+         ,A0,1      V7
+         A1         36
+         VL         A1
+         A0         ICDATA+64
+         ,A0,1      V7
+*
+*    NOW NEED TO READ THE DATA ACTUALLY WANTED FROM TEMPDATA INTO
+*    ICDATA - SINCE WHOLE WORDS HAVE BEEN UNPACKED THERE MAY BE
+*    UNWANTED DATA AT THE START AND END OF TEMPDATA.
+*
+*    S2  CONTAINS THE OFFSET TO THE FIRST WORD WANTED
+*    S4  CONTAINS THE TOTAL NUMBER OF WORDS WANTED
+*
+*    VECTOR REGISTERS ARE USED FOR TRANSFER - HENCE TWO TRANSFERS
+*    MAY BE NEEDED, FIRST FOR WORDS 1-64 SECOND FOR REMAINDER. IF
+*    LESS THAN 64 WORDS WANTED THEN ONLY SECOND MOVE NECESSARY
+*
+         A1         ICDATA        STARTING ADDRESS FOR ICDATA
+         A2         TEMPDATA      ADDRESS OF TEMPDATA PLUS
+         A3         S2             ANY OFFSET AS CALCULATED
+         A2         A2+A3          ABOVE
+*
+         S5         S4
+         S5         S5>6           DIVIDE NUMBER OF BYTES BY 64
+         S0         S5             TEST IF GREATER THAN 64 OR NOT
+         JSZ        LT64             IF NOT JUMP
+         S6         <6
+         S4         S4&S6          RESET S4 TO REMAINDER FROM 64
+         A4         64              AND MOVE FIRST 64 WORDS
+         VL         A4
+         A0         A2             LOAD DATA FROM TEMPDATA
+         V0         ,A0,1           INTO V0
+         A0         A1             AND RELOAD TO
+         ,A0,1      V0              ICDATA
+         A1         A1+A4
+         A2         A2+A4
+*
+*    MOVE REMAINING WORDS INTO ICDATA
+*
+LT64     =          *
+         S0         S4             SEE IF ANY WORDS LEFT TO MOVE
+         JSZ        FINISH
+         A4         S4             SET VL TO NUMBER OF WORDS
+         VL         A4
+         A0         A2             LOAD DATA FROM TEMPDATA
+         V0         ,A0,1           INTO V0
+         A0         A1             AND RELOAD TO
+         ,A0,1      V0              ICDATA
+FINISH   =          *
+         EXIT
+*--------------------------------------------------------------------------
+*
+*        ROUTINE TO UNPACK DATA - NUMBER OF WORDS UNPACKED
+*        DETERMINED BY VL REGISTER
+*
+*        ENTRY:
+*
+*        V0     CONTAINS PACKED WORDS
+*        A2     ADDRESS OF FIRST WORD TO HOLD UNPACKED DATA
+*
+*        EXIT:
+*
+*        A2     ENTRY VALUE+8
+*
+UNPACK   =          *
+         A7         56              SHIFT COUNTER
+         A6         0               LOOP COUNTER
+         A5         8               STEP FOR MEMORY STORE INST
+         S7         >56             BIT MASK
+         V7         0
+LOOP     =          *
+         V1         V0<A6           PUT NEXT BYTE AT LEFT OF V1
+         VM         V1,M            SET VM ACCORDING TO SIGN OF V1
+         V2         S7!V7&VM        FILL V2 WITH ZEROES OR BIT MASK
+         V3         V1>A7           SHIFT DATA RIGHT 56 BITS
+         V4         V3!V2           ADD IN V2
+         A0         A2              FETCH ADDRESS AND STORE DATA
+         ,A0,A5     V4
+         A0         A6-A7           TEST WHETHER A6=56 IN WHICH CASE
+         JAZ        END1
+         A6         A6+A5           ADD 8 TO A6
+         A2         A2+1            INC ADDRESS FOR UNPACKED DATA
+         J          LOOP
+END1     J          B00             RETURN
+         END

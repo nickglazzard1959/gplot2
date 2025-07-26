@@ -1,0 +1,104 @@
+*DECK CONTR F
+      SUBROUTINE CONTR(GRID,MX,MY,NCC,CVALS)
+      REAL GRID(MX,MY),CVALS(NCC)
+*CALL,DFXC11
+*CALL,DFXC15
+*CALL,DFXC00
+*CALL,DFXC05A
+*CALL,DFXC06
+*CALL,DFXC03
+C***********************************************************************
+C
+C***********************************************************************
+C
+C    DESCRIPTION OF VARIABLES IN COMMON BLOCK DFXC11
+C
+C***********************************************************************
+C
+C
+C    -----SIMPLE INTEGER VARIABLES-----
+C-----------------------------------------------------------------------
+C    IQUAD         INDICATES PART OF AREA SUPPLIED AS CONTOUR
+C           = 1    WHOLE AREA (DEFAULT)
+C           = 2    UPPER RIGHT QUADRANT
+C           = 3    RIGHT HALF
+C           = 4    UPPER HALF
+C    I             POINTER TO INTERPOLATION POSITION
+C    N             USED IN SEGMENT COUNTING FOR VALUE PLOTTING
+C    N2            SEGMENT COUNTER FOR VALUE PLOTTING
+C    NSTEP         NUMBER OF INTERPOLATING STEPS
+C
+C
+C    -----LOGICAL VARIABLES-----
+C-----------------------------------------------------------------------
+C    INTERP        GOVERNS CONNECTION BETWEEN INTERPOLATED POINTS
+C           = .FALSE.  STRAIGHT LINE JOIN - DEFAULT
+C           = .TRUE.  SMOOTH CURVE JOIN (CUBIC INTERPOLATION), NUMBER
+C                  OF INTERMEDIATE STEPS MUST BE SPECIFIED IN NSTEP
+C                  IN CALL TO CINTER
+C    CLAB          GOVERNS PLOTTING OF CONTOUR VALUES
+C           = .TRUE.  VALUES PLOTTED (DEFAULT)
+C           = .FALSE.  NO VALUES PLOTTED
+C    FIRST         INDICATES WHETHER FIRST POINT ON CONTOUR
+C    LAST          INDICATES WHETHER LAST POINT ON CONTOUR
+C    OPEN          INDICATES WHETHER CONTOUR IS OPEN OR CLOSED
+C
+C
+C    -----SIMPLE REAL VARIABLES-----
+C-----------------------------------------------------------------------
+C    CCHT          USER SPECIFIED HEIGHT FOR VALUE NUMERALS -
+C                  IF @ 0. A DEFAULT HEIGHT OF .02*MINIMUM WINDOW
+C                  DIMENSION USED (DEFAULT -1.0)
+C    CS            SCALE FACTOR FOR CONTOUR VALUES (DEFAULT 1.0)
+C    PHI           ANGULAR ORIENTATION (GROUP 1) FOR CONTOUR VALUES
+C                  DEFAULT 0.0
+C    Z1,Z2         X AND Y OFFSETS FOR CENTRING VALUES AT POINT
+C    CSTEP         STEP WHEN CONSTANT STEP IS DECLARED - ELSE USED
+C                  BY CONTR1 TO INDICATE DISTANCE TO NEAREST CONTOUR
+C                  FOR VALUE SPACING
+C    CH            PRESENT CONTOUR HEIGHT
+C    HTG           PRESENT GRID VALUE
+C    DHT           GRID DIFFERENCE ALONG CURRENT MESH UNIT SIDE
+C                  (ABSOLUTE VALUE).
+C    X,Y           INTERPOLATED POSITION IN GRID UNITS.
+C    A1            INITIALLY USED TO PASS SPACING FACTOR (FOR VALUES),
+C                  SUBSEQUENTLY HOLDS ABSOLUTE CLEARANCE ALONG MESH
+C                  UNIT SIDE FOR VALUING TO BE POSSIBLE.
+C    XP,YP         PLOTTING COORDINATE OF POSITION ON CURRENT CONTOUR
+C                  LINE (FOR INTERPOLATION ROUTINE).
+C    CHS           SCALED CONTOUR VALUE (= CH*CS).
+C    FX,FY         USED TO SCALE AND DIRECT PLOTTING ACCORDING TO IQUAD.
+C
+C
+C    -----REAL ARRAYS-----
+C-----------------------------------------------------------------------
+C    XC(3),YC(3)   POINTS BEING USED IN INTERPOLATION ROUTINE.
+C
+C
+C
+C***********************************************************************
+C
+C           CHARACTER VARIABLE IN DFXC15
+C-----------------------------------------------------------------------
+C    IFMT     HOLDS FORMAT FOR CONTOUR VALUE PLOTTING
+C             BY DEFAULT (G9.3)
+C
+C***********************************************************************
+C
+      ROUTIN = 'CONTR'
+*CALL,RIN
+      IF (MX.LE.1.OR.MY.LE.1) GO TO 10
+      CSTEP = 0.0
+      CALL DFX300
+      CALL DFX404(GRID,MX,MY,NCC,CVALS)
+      CALL DFX301
+*CALL,IMM
+   99 CONTINUE
+*CALL,ROUT
+      RETURN
+   10 IF (ICHECK.GT.0) WRITE(ERRREC,11) ROUTIN
+   11 FORMAT(1H0,'**DIMFILM WARNING**  CONTOURING ATTEMPTED WITH A GRID
+     1DIMENSION LESS THAN 2'/1H ,21X,'CALL OF ',A,'IGNORED')
+*CALL,LINOUT0
+      GO TO 99
+      END

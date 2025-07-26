@@ -1,0 +1,61 @@
+*DECK CMSM01 F
+DFXM01    TITLE  'FUNCTION TO RETURN DIMFILM CHARACTER VALUE'
+*             ***************  DFXM01  ***************
+*    CALLING SEQUENCE IS :
+*        INTEGER DFXM01,I
+*        CHARACTER*1 CHAR
+*         I = DFXM01(CHAR)
+*
+*  RETURNS DIMFILM INTEGER INTERNAL VALUE (1-96) FOR CHARACTER CHAR
+*   (VALUE IS EFFECTIVELY ASCII EQUIVALENT-31DEC)
+*  IF CHAR IS NOT ONE OF THE VALID 96 ,VALUE RETURNED IS THE NEGATIVE
+*  OF THE INTERNAL CODE OF THE CHARACTER REQUESTED
+*
+*                                               M WHEELER  MAR 1984
+*                                               TIDIED UP  JUN 1984
+*         PRINT ON,NOGEN
+*
+DFXM01    CSECT
+DFXM01    AMODE ANY
+DFXM01    RMODE ANY
+          SAVE     (14,12)            SAVE REGS
+          LR       12,15              SET ADDRESSABILITY FOR CSECT
+          USING    DFXM01,12
+*
+          L        1,0(1)             LOAD ADD OF CHAR
+          L        2,0(1)             R2 = VALUE OF CHAR
+          SRL      2,24               R2 = VALUE RIGHT SHIFTED
+          L        0,TABLE(2)         GET MAPPED BYTE INTO TOP OF R0
+          SRA      0,24               SHIFT RIGHT WITH SIGN EXTN
+          BNM      RET                IF POSITIVE THEN RETURN
+          LNR      0,2                ELSE NEGATE ORIG CHAR VALUE
+*
+RET       L        14,12(13)          AND RETURN
+          RETURN   (2,12),T           RESTORE REGISTERS
+*
+          DS       0F                 FULLWORD ALLIGNEMENT
+*                           MAPPING TABLE
+*     SECOND DIGIT :  0 1 2 3 4 5 6 7 8 9 A B C D E F   FIRST DIGIT
+TABLE     DC       X'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'     0
+          DC       X'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'     1
+          DC       X'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'     2
+          DC       X'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'     3
+          DC       X'01FFFFFFFFFFFFFFFFFFFF0F1D090C5D'     4
+          DC       X'07FFFFFFFFFFFFFFFFFF02050B0A1C5F'     5
+          DC       X'0E10FFFFFFFFFFFFFFFFFF0D06401F20'     6
+          DC       X'FF3FFFFFFFFFFFFFFF411B0421081E03'     7
+          DC       X'FF42434445464748494AFFFFFFFFFFFF'     8
+          DC       X'FF4B4C4D4E4F50515253FFFFFFFFFFFF'     9
+          DC       X'FF5F5455565758595A5BFFFFFF3CFFFF'     A
+          DC       X'FFFFFFFFFFFFFFFFFFFFFFFFFF3EFFFF'     B
+          DC       X'5C22232425262728292AFFFFFFFFFFFF'     C
+          DC       X'5E2B2C2D2E2F30313233FFFFFFFFFFFF'     D
+          DC       X'3DFF3435363738393A3BFFFFFFFFFFFF'     E
+          DC       X'1112131415161718191AFFFFFFFFFFFF'     F
+          DC       X'FFFFFF'                            OVERLAP
+*
+*NB. VALUE X'5F' (95) IS PRODUCED FOR BOTH CHARACTERS X'5F' (=NOT ~)
+*                                                 AND X'A1' (=TILDE)
+*NB2 VALUE X'60' (96) CANT BE PRODUCED ON AMDAHL AT PRESENT (=DEL)
+*
+          END

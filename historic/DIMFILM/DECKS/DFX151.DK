@@ -1,0 +1,13 @@
+*DECK DFX151 F
+      SUBROUTINE DFX151(NDEG,X,Y,COEFF)
+      REAL COEFF(6)
+C    FOR POLYNOMIAL EVALUATION WHERE DEGREE LESS THAN 6
+      Y = 0.0
+      XX = X
+      I = NDEG + 1
+    1 Y = Y + COEFF(I)
+      IF (I.EQ.1) RETURN
+      I = I - 1
+      Y = Y*XX
+      GO TO 1
+      END

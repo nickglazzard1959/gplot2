@@ -1,0 +1,125 @@
+ .BLANK 10
+  DIMFILM was first released at ULCC in May 1973 and the original
+ User Guide published one year later.  In its initial form DIMFILM
+ was described as a library of Descriptive Instructions for
+ MicroFILM and was designed for use with Fortran on the CDC computers
+ then operated at ULCC.  In that format it enjoyed considerable
+ popularity for ten years.  Additionally, it was also implemented on
+ a number of other computers driving different (non-microfilm)
+ graphics devices.
+  The advent of the Cray and Amdahl computers at ULCC required a
+ major conversion exercise if DIMFILM was to continue.  At the same
+ time it seemed sensible to redesign the internal logic of DIMFILM
+ to enable support of any graphic device through the provision of
+ appropriate driver software and to ensure a high degree of machine
+ independence so implementation on different machine ranges would be
+ considerably simplified and - of overriding importance - the user
+ interface would be constant.  Thus the decision was taken that the
+ new release of DIMFILM would provide a user interface in accord with
+ the Fortran 77 standard.  The major difference that the user of the
+ first release of the new DIMFILM will encounter is in the change of
+ many routine names.  The opportunity was taken to not only reduce
+ lengths of names to six characters but to rationalise certain of the
+ names.  Further, to ensure sensible device independence certain
+ parameter ranges were changed - primarily to remove limitations
+ imposed by the then operating CalComp 1670 Microfilm Recorder.
+ These changes have been kept to a minimum and most users will have
+ to do little more than edit references to DIMFILM library routines.
+ A later chapter in this guide is devoted to changes of this nature
+ that will be required during conversion of programs.  This chapter will
+ also serve as an addendum to the original User Guide until a full
+ descriptive document is available.
+  The new DIMFILM has been designed for the future incorporation of
+ many new facilities and enhancements.  These will be described in this
+ preliminary guide as they become available.
+  DIMFILM development has always benefited from the suggestions and
+ requests made by users.  We look forward to this continuing and would
+ restate here our commitment to consider all written comments etc.
+ forwarded to us.  At the same time, this release is made on the
+ same basis as those previously - DIMFILM is a developing system
+ and as such any corrections/improvements will be incorporated
+ at the earliest possible time.  There can be no guarantee that
+ all routines will function according to specification and your
+ cooperation in reporting any failings (however seemingly trivial) will
+ be appreciated.  The user interface specification as detailed in this
+ guide is intended to be definitive and we shall endeavour to support
+ it.  Although DIMFILM is a developing product it is
+ supported in the same manner as other software at ULCC
+ .CHAPTER General Notes
+ .BLANK 10
+  In this User Guide a number of conventions have been adopted either
+ in the interest of clarity or to circumvent limitations of the
+ typeface.  These should be borne in mind when reading
+ the text.
+  In the following, actual Fortran references are not given (CALL being
+ omitted) and, unless explicitly stated otherwise, parameters are
+ typed implicitly in accordance with standard Fortran default
+ (i.e. real, unless symbolic name commences I,J,K,L,M,N when integer).
+ Thus, for example SUB(X,Y,I) would be referenced with the Fortran
+ statement CALL SUB(X,Y,I) with parameters X and Y being real and
+ I integer.  Unless stated otherwise all references are as subroutines.
+  There is frequent reference to ranges of values; in particular, in
+ reference to acceptable parameter values.  A standard notation
+ has been adopted, whereby square brackets [ and ] denote _in_clusive
+ lower and upper limits respectively, while round parentheses ( and )
+ denote _ex_clusive lower and upper limits.  Thus, for example,
+ (0.0,1.0] indicates the range greater than zero and less than or equal
+ to unity.  Occasionally it has been necessary to use the notation
+ _<_ for less than or equal and _>_ for greater than or equal; where
+ underlining would result in ambiguity equivalent notations <= and >=
+ have been used.
+ .CHAPTER DIMFILM - an overall view
+  DIMFILM is a wide-ranging and comprehensive library of subprograms
+ for the generation of graphical output by computer.  Through its use
+ of descriptive names and short argument lists, combined with the
+ sensible use of defaults, DIMFILM offers a straightforward method
+ of plotting suited both to the simplest application and the
+ experienced user, for whom many advanced facilities are provided.
+  The user is able to define, and plot within, his own coordinate
+ space, while facility to clip and blank at the boundaries of
+ specified sub-areas is possible.  Available are several levels
+ of error checking, with which programs may be speedily
+ debugged.
+  Elaborate plotting is possible with minimal experience.  Features
+ such as alternate line styles (e.g. dashed or dotted lines),
+ rotation and translation of axes, specification of colour/intensity
+ etc. are included.  For textual output, a variety of fonts is
+ included offering a range of type styles and complexity.  The user
+ may readily modify his output script to contain underlined,
+ italicised or emphasised passages, while super- and sub-scripts
+ can be simply incorporated for the output of complex mathematical
+ expressions.  A variety of geometric functions is included.
+  Complementary to the range of vector plotting facilities,
+ DIMFILM provides comprehensive device independent raster
+ functions.  These may be used in conjunction with all other
+ features including the wide range of supported colour models.
+  In addition to these facilities for straightforward plotting, DIMFILM
+ is capable of generating other varied types of graphical output.
+ Many of these are primarily aimed toward the scientific plot
+ suitable for publication, thus various axis scaling (e.g. linear or
+ logarithmic) are supported together with polar plotting.  The user
+ has full control over frame and axis annotation.  Blanking is
+ operable for the inclusion of legends or other such captions.
+ Where discrete data coordinates are given interpolation may optionally
+ be performed.  Histograms, month-labelled axes and pie-charts are
+ among the other features.  The advanced user is able to uniquely
+ tailor his output style by redefinition of the various defaults.
+ These defaults enable the novice user to immediately produce
+ acceptable output.  A number of plots may be contained in a single
+ graph, while the user has full control over the number and
+ positioning of graphs in a single "frame".  Graphical, diagrammatic
+ and textual items may be freely intermixed in any plot.
+  The production of contour plots is possible through DIMFILM.
+  Other facilities are under review and will be introduced as they
+ are developed.  User suggestions/wishes are valued, and all such
+ offerings will be given serious consideration.
+  This document constitutes a concise guide to using the new
+ DIMFILM.  Descriptions of routines are not intended to be definitive
+ but are accurate for basic access to most features.  Definitive
+ documentation will be prepared at a later date.  It will be found
+ that when new, advanced facilities are available access by certain basic
+ routines involves predefinition of a range of sophisticated options.
+ However, the actions/functions described here will ensure compatibility
+ with the previous release of DIMFILM when used in conjunction with the
+ other basic routines.
+

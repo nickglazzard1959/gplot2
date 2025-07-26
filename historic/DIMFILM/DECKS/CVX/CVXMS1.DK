@@ -1,0 +1,25 @@
+*DECK CVXMS1 F
+      SUBROUTINE DFXMS1(UKDATE)
+***********************************************************************
+*                                                                     *
+*    DFXMS1:                                                          *
+*                                                                     *
+*        RETURNS CURRENT DATE TO CALLER AS 8-BYTE FIELD OF FORM:      *
+*                                                                     *
+*                      DD/MM/YY      (U.K. FORMAT)                    *
+*                                                                     *
+*                                                                     *
+***********************************************************************
+C    CONVEX HAS DIFFERENT INTERPRETATIONS OF DATE DEPENDING
+C    ON NATIVE/VAX/CRAY COMPATIBILITY
+C    TO AVOID THESE THE FUNCTION IDATE IS USED
+      IMPLICIT INTEGER(A-Z)
+      CHARACTER UKDATE*(*)
+      INTEGER MONTH,DAY,YEAR
+      CALL IDATE(MONTH,DAY,YEAR)
+      YEAR = MOD(YEAR,100)
+      WRITE(UKDATE,10) DAY,MONTH,YEAR
+10    FORMAT(I2.2,'/',I2.2,'/',I2.2)
+      RETURN
+      END
+

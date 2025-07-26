@@ -1,0 +1,201 @@
+*DECK MVS90D F
+DFX90D    TITLE  'DYNAMIC ALLOCATION FOR DIMFILM PRINTRONIX 300 FILE'
+          PRINT ON,NOGEN
+DFX90D      CSECT
+*           DYNAMIC ALLOCATION ROUTINES FOR DIMFILM PRINTRONIX 300 FILE
+*           THIS VERSION SENDS AN FB 140 FILE TO SYSOUT CLASS 'G'
+*                                JOHN GILBERT/M WHEELER.  MAY 1984
+*
+          ENTRY    DFX90A
+          ENTRY    DFX90B
+          ENTRY    DFX90C
+*
+*             ***************  DFX90A  ***************
+*             DYNAMICALLY ALLOCATES AND OPENS THE FILE
+*
+*  CALLING SEQUENCE IS:
+*          CALL DFX90A(IFORM,OUTLM,IFAIL)
+*
+*               IFORM - FOUR BYTE FORM NUMBER
+*               IOUTLM- MAX NUMBER OF RECORDS WHICH CAN BE WRITTEN
+*               IFAIL - RETURNS 4 BYTE FAILURE CODE ( =0 IF OK)
+*
+*      FILE STRUCTURE IS :  RECFM=FB,LRECL=140,BLKSIZE=4620
+*      ( FILE IS INITIALLY CREATED WITH A SYSOUT CLASS OF 0
+*        SO THAT IT WILL VANISH IF DFX90C IS NOT CALLED CORRECTLY )
+*
+*        ANY ALLOCATION ERROR IS REPORTED IN THE JOB LOG
+*
+*
+DFX90A    STM      14,12,12(13)       SAVE REGS IN FORTRAN SA
+          LR       10,15
+          USING    DFX90A,10
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          LM       3,5,0(1)           LOAD ADD OF PARAMETERS
+*
+          MVC      FORM(4),0(3)       MOVE PARM 1 TO FORM
+          MVC      OUTLM(3),1(4)      MOVE PARM 2 TO OUTLM
+          CLC      0(4,3),BLNK4       IS FORMS CODE BLANK
+          BNE      ALOC               IF NOT CARRY ON
+          MVI      TA+8,X'80'         ELSE SHORTEN TABLE
+*
+ALOC      LA       9,0                R9 = 0 (NO ERROR CODE)
+          LA       1,PBLOCK           ESTABLISH ADD OF RBP
+          DYNALLOC                     ALLOCATE
+*
+          LTR      15,15              CHECK FOR ERROR CODE
+          BZ       OPN                JUMP TO OPEN FILE IF OK
+*                    PROCESS ANY ERROR CODE
+          ST       15,RETCODE         ELSE GET SYSTEM TO REPORT ERROR
+          LA       1,RB1
+          ST       1,DFPB
+          LA       1,DFPB
+          LINK     EP=IKJEFF18
+*
+          LA       1,RB1+4            POINT TO ERROR CODE
+          ST       1,PLIST            STORE ADDRESS IN PARAM LIST
+          LA       1,PLIST            POINT TO IT
+          CALL     DFXMSA             AND CALL ERROR ROUTINE (FORTRAN)
+          L        9,RB1+4            ALSO PUT ERROR CODE INTO R9
+          B        RET1               RETURN
+*                    ALLOCATION OK
+OPN       OPEN     (PFILE,(OUTPUT))   OPEN FILE
+*
+          MVC      OFLG(1),PFILE+DCBOFLGS-IHADCB   GET OPEN FLAG
+          TM       OFLG,X'10'         TEST IF OPEN SUCCEEDED
+          BNZ      RET1               BRANCH IF OK
+          LA       9,3                ELSE SET ERROR CODE(3)
+*
+RET1      ST       9,0(5)             PUT ANY ERROR CODE IN IFAIL
+*
+          L        13,4(13)
+          LM       14,12,12(13)       RESTORE REGISTERS
+          SLR      15,15
+          BR       14
+*
+*              *************  DFX90B  *************
+*                WRITES A RECORD TO THE PLOT-FILE
+*
+*  CALLING SEQUENCE IS:
+*       CALL DFX90B(IBUFF)
+*
+*                   IBUFF - ARRAY OF LENGTH 140 BYTES
+*
+*         EQUIVALENT TO :     WRITE(<N>,100) (IBUFF(I),I=1,140)
+*                         100 FORMAT(140A1)
+*
+DFX90B    STM      14,12,12(13)       SAVE REGISTERS
+          LR       10,15
+          USING    DFX90B,10
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          L        2,0(1)             R2 -> IBUFF
+*
+          PUT      PFILE,(2)          COPY RECORD
+*
+*                          TIDY UP
+          L        13,4(13)           RESTORE REGISTERS
+          LM       14,12,12(13)
+          SLR      15,15
+          SPACE    2
+          BR       14                 RETURN
+*
+*               **************  DFX90C  ****************
+*            CLOSES PLOT-FILE AND CHANGES SYSOUT CLASS TO 'G'
+*            (FILE WILL VANISH IF THIS ROUTINE IS NOT CALLED -
+*             EG. IF JOB ABORTS BEFORE REACHING THIS ROUTINE)
+*   CALLING SEQUENCE IS:
+*          CALL DFX90C(IFAIL)
+*                      IFAIL - RETURNS FAILURE CODE ( = 0 IF OK)
+*
+DFX90C    STM      14,12,12(13)       SAVE REGISTERS
+          LR       10,15
+          USING    DFX90C,10
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          L        3,0(1)             ADDRESS OF IFAIL
+*
+          CLOSE    (PFILE)            CLOSE FILE
+*
+          LA       1,DBLOCK
+          DYNALLOC                    UNALLOCATE AND SEND
+*
+          L        9,RB2+4            RETURN ANY FAILURE CODE
+          ST       9,0(3)
+*
+          LTR      9,9                PASS ANY FAILURE CODE TO
+          BZ       RETDQ3                      DFXMSA
+          LA       1,RB2+4
+          ST       1,PLIST
+          LA       1,PLIST
+          CALL     DFXMSA
+*
+RETDQ3    L        13,4(13)           RESTORE REGISTERS
+          LM       14,12,12(13)
+          SLR      15,15
+          BR       14                 RETURN
+*
+*           *************  SVC 99 PARAMETER LISTS *****************
+*                          * DYNAMIC ALLOCATION *
+          DS       0D
+PBLOCK    DC       AL1(S99RBPND),AL3(RB1)
+RB1       DC       AL1(20,S99VRBAL),2X'00'
+          DC       F'0',A(TA),2F'0'
+*
+TA        DC       A(TA1,TA2,TA3)
+          DC       AL1(S99TUPLN),AL3(TA4)
+TA1       DC       AL2(DALDDNAM,1,8)               DD NAME
+DDN       DC       CL8'DFXDD090'
+TA2       DC       AL2(DALOUTLM,1,3)               OUTPUT LIMIT-
+OUTLM     DC       AL3(3000)                          3000 RECORDS
+TA3       DC       AL2(DALSYSOU,1,1),AL1(C'0')     SYSOUT(0,
+*                                                     (NO PROG NAME)
+TA4       DC       AL2(DALSFMNO,1,4)                          ,FORM)
+FORM      DC       CL4' '                          MUST BE LAST
+* (THIS IS SO THAT FILE WILL VANISH IF DFX90C IS NOT CALLED CORRECTLY)
+*          LEAVE DESTINATION SO FILE WILL RETURN TO REMOTE SITE
+*
+*                 *******************************************
+*                          * DYNAMIC UNALLOCATION *
+          DS       0D
+DBLOCK    DC       AL1(S99RBPND),AL3(RB2)
+RB2       DC       AL1(20,S99VRBUN),2X'00'         UNALLOCATE
+          DC       F'0',A(TU),2F'0'
+TU        DC       A(TU1)
+          DC       AL1(S99TUPLN),AL3(TU2)
+TU1       DC       AL2(DUNDDNAM,1,8)               DDNAME
+          DC       CL8'DFXDD090'
+TU2       DC       AL2(DUNOVCLS,1,1),AL1(C'G')     OVERIDE CLASS -'G'
+*
+*
+PFILE     DCB      DDNAME=DFXDD090,DSORG=PS,LRECL=140,RECFM=FB,        +
+               BLKSIZE=4620,MACRF=(PM)
+*
+*                 *******************************************
+*                        * ERROR CODE INTERPRETATION *
+DFPB      DS       A
+          DC       A(RETCODE)
+          DC       A(ZERO)
+          DC       A(DFFLAGS)
+RETCODE   DS       F
+ZERO      DC       F'0'
+DFFLAGS   DC       B'10000000',X'32'
+OFLG      DC       X'00'
+PLIST     DS       F
+BLNK4     DC       CL4'    '
+*
+SAVA      DS       20F
+          IEFZB4D0
+          IEFZB4D2
+          DCBD     DSORG=PS,DEVD=DA
+          END

@@ -1,0 +1,90 @@
+*DECK CMSMSB F
+      SUBROUTINE DFXMSB(VMBOPT,REPLY,LENRET,IERR)
+C        Get information from a VMBATCH job
+C
+C  Returns the values of various VMBATCH job options
+C  to a running batch Fortran program.
+C  The fields which can be returned are those which are documented
+C  in the VMBATCH SERVICE help entry. See list below for main OPTs.
+C  NB. Only works in a VMBATCH job.
+C
+C  Original single assembler routine VMBINF proved unreliable ??
+C  (Possibly a timing problem)
+C  This version written in Fortran as 2 separate calls.
+C                                       M.Wheeler  11 Dec  1990
+C Callable from Fortran as :
+C
+C   CALL DFXMSB(VMBOPT,REPLY,LENRET,IERR)
+C
+C        VMBOPT - Which VMBATCH OPTion to return. (CHARACTER)
+C                 eg. '$USER'    See below for some valid Options
+C        REPLY  - Location where value of option is to be returned
+C                 CHARACTER string - big enough to hold reply.
+C                 (Largest reply seen so far 'CPCLASS ' length 32  )
+C        LENRET - Length of field returned (rest blank padded)
+C                 INTEGER
+C        IERR   - ERROR Return code (INTEGER) :
+C                  =  0 - Completed OK
+C                              From CMSCALL VMBATCH  (R15) :
+C                  =  8   Option string > 255 .      Nothing stacked
+C                  =  24  Invalid or missing option name.   ..
+C                              From LINERD (R15) :
+C                  =  4   Attention interrupt ended read op
+C                  = 12   Function invalid for virtual screen specified
+C                  = 24   Incorrect parameter list specified
+C                  = 28   Virtual screen does not exist
+C                  = 89   Console is a 2741 typewriter terminal (!)
+C                  =104   Insufficient storage to execute function
+C
+C---------------------------------------------------------------------
+C
+C  Examples of some Valid options:
+C  -------------------------------
+C
+C  Option Name  Typical reply           Length
+C  -----------  -------------           ------
+C     $USER     CZIUG03                   8
+C     $ID       0798                      4
+C     $SFID     1302                      4
+C     ACCOUNT   CZIUG03                   8
+C     CLASS     A                         1
+C     COMMENT   MATTS VMBATCH TEST JOB   24
+C     CPCLASS   G                        32
+C     DEST      UKACULCC                  8
+C     EXEC      BATTEST                   8
+C     FILERETN  ALWAYS                    6
+C     HOLD      NOHOLD                    6
+C     NAME      JOB0798                   8
+C     PRINT     20000                     6
+C     PRIORITY  50                        2
+C     SPOOL     SPOOL                     7
+C     STORAGE   4096K                     6
+C     TAP1600   0                         2
+C     TIME      00:01:00                  8
+C     USERMODE  B                         2
+C     WORKDISK  4-3380                   12
+C  etc.
+C     or any valid job option.
+C     or any options supported by the submit command.
+C
+C---------------------------------------------------------------------
+C
+C
+      CHARACTER*(*) VMBOPT, REPLY
+      CHARACTER*31 VMBREQ
+      DATA VMBREQ/'VMBATCH SERVICE STACK oooooooo '/
+C
+      IERR  = 0
+      VMBREQ(23:30) = VMBOPT
+C
+C       Issue command
+      CALL DFXMSC(VMBREQ,31,IERR)
+      IF(IERR.NE.0) RETURN
+C
+C       Read reply line from stack
+      LENREP = LEN(REPLY)
+      CALL DFXMSE(REPLY,LENREP,LENRET,IERR)
+C
+      IF(LENRET.LT.LENREP) REPLY(LENRET+1:LENREP) = ' '
+      RETURN
+      END

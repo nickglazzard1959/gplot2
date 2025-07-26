@@ -1,0 +1,34 @@
+*DECK SETLUT F
+      SUBROUTINE SETLUT(N,V1,V2,V3)
+C
+C    +++++ALL CODE MUST BE REPLICATED IN DFX166+++++
+C
+      INTEGER NPT(2)
+*CALL,DFXC00
+*CALL,DFXC04
+*CALL,DFXC05A
+*CALL,DFXC17
+*CALL,DFXCBD
+      ROUTIN = 'SETLUT'
+*CALL,RIN
+      IF (N.LT.0.OR.N.GE.LUTSIZ) THEN
+                   IF (ICHECK.GT.0) WRITE(ERRREC,10)ROUTIN,N,LUTSIZ
+*CALL,LINOUT0
+   10 FORMAT(1H0,'**DIMFILM WARNING**  ROUTINE ',A,' REFERENCED WI
+     1TH INVALID LUT POINTER ',I3,'RANGE SHOULD BE 0-',I3/
+     2 1H0,21X,'CALL IGNORED')
+      ELSE
+                   CALL DFX160(NCMODE,V1,V2,V3,RRR,GGG,BBB,IERR)
+                   IF (IERR.LE.0) THEN
+                              RGBLUT(1,N) = RRR
+                              RGBLUT(2,N) = GGG
+                              RGBLUT(3,N) = BBB
+                              NWS = 0
+                              NPT(1) = N
+                              NPT(2) = N
+                              CALL DFX000(101,ZDUMMY,ZDUMMY,ZDUMMY,NPT)
+                   ENDIF
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

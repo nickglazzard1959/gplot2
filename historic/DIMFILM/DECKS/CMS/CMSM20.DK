@@ -1,0 +1,65 @@
+*DECK CMSM20 F
+DFXM20    TITLE  'UNPACK COMPRESSED CHARACTERS'
+*             ***************  DFXM20  ***************
+*    CALLING SEQUENCE IS :
+*        CALL DFXM20(NBET,NBYTE1,NBYTE2)
+*
+*             NBET   - ALPHABET NUMBER (1 - 5)
+*             NBYTE1 - START BYTE WITHIN THIS ALPHABET
+*             NBYTE2 - END   BYTE WITHIN THIS ALPHABET
+*    UNPACKS BYTES  NBYTE1 TO NBYTE2 INCLUSIVE OF ALPHABET NBET
+*    STORED IN   COMMON/DFXC21/ IABDAT(...)  (PACKED 8 BIT INTEGERS)
+*    INTO        COMMON/DFXC22/ ICDATA(...)        (32 BIT INTEGERS)
+*
+*                                               M WHEELER  SEP 1983
+*
+          PRINT ON,NOGEN
+*
+DFXM20    CSECT
+DFXM20    AMODE ANY
+DFXM20    RMODE ANY
+          STM      14,12,12(13)       SAVE REGS IN FORTRAN SA
+          LR       12,15
+          USING    DFXM20,12
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          LM       2,4,0(1)           LOAD ADD OF PARAMETERS
+          L        2,0(2)             R2 = NBET
+          L        3,0(3)             R3 = NBYTE1
+          L        4,0(4)             R4 = NBYTE2
+*
+          SLL      2,2                MULT R2 BY 4 FOR OFFSET
+          BCTR     3,0                R3 = NBYTE1-1 = OFFSET OF BYTE
+*
+          L        5,=V(DFXC21)       R5 -> 1ST BYTE IN /DFXC21/
+          A        5,ABOFF-4(2)       R5 -> 1ST BYTE IN ALPHABET NBET
+          AR       4,5                R4 -> LAST BYTE+1 TO COPY
+          AR       5,3                R5 -> 1ST BYTE TO COPY
+          L        6,=V(DFXC22)       R6 -> 1ST WORD IN /DFXC22/
+*
+LOOP      L        7,0(5)             GET THE BYTE INTO TOP OF R7
+          SRA      7,24               SHIFT TO RIGHT WITH SIGN EXTN
+          ST       7,0(6)             STORE THIS INTEGER INTO ICDATA
+          LA       5,1(5)             R5 -> NEXT BYTE FOR INPUT
+          LA       6,4(6)             R6 -> NEXT WORD FOR OUTPUT
+          CLR      5,4                HAS LAST BYTE BEEN REACHED
+          BL       LOOP               IF NOT LOOP
+*
+          L        13,4(13)           RETURN
+          LM       14,12,12(13)       RESTORE REGISTERS
+          SLR      15,15
+          BR       14
+*
+SAVA      DS       20F
+*
+* NB.     *** OFFSETS FOR EACH ALPHABET (BYTES) - MUST BE CORRECT ***
+*                  ( MUST ALSO AGREE WITH ROUTINE DFXM11 )
+ABOFF     DC       F'0'               ALPHABET 1 (LENGTH 12000 BYTES)
+          DC       F'12000'           ALPHABET 2 (LENGTH 12000 BYTES)
+          DC       F'24000'           ALPHABET 3 (LENGTH 12000 BYTES)
+          DC       F'36000'           ALPHABET 4 (LENGTH 10000 BYTES)
+          DC       F'46000'           ALPHABET 5 (LENGTH  2000 BYTES)
+          END

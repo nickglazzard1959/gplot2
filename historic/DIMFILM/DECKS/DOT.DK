@@ -1,0 +1,14 @@
+*DECK DOT F
+      SUBROUTINE DOT
+*CALL,DFXC00
+*CALL,DFXC05A
+      ROUTIN = 'DOT'
+*CALL,RIN
+      IDASH = 2
+      NO1 = 13
+      NO2 = 14
+      TL = XQ
+      CALL DFX105
+*CALL,ROUT
+      RETURN
+      END

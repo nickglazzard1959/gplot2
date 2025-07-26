@@ -1,0 +1,65 @@
+*DECK UCSMS5 F
+      SUBROUTINE DFXMS5(SYSLEV)
+      IMPLICIT INTEGER (A-Z)
+C
+C       RETURN CURRENT UNICOS SYSTEM LEVEL AND VERSION
+C
+C       DIMFILM MACHINE DEPENDENT INTERFACE - UNICOS VERSION
+C       VERSION 1.0        22/05/90        JOHN G.,ULCC
+C
+C
+C   DFXMCS IS USED TO PROCESS UNICOS COMMANDS AND
+C   ACCESS THE RETURNED STRING
+C   SYSCOD USED TO PASS ROUTINE TO DFXMCS FOR DIAGNOSTICS
+C
+*CALL,DFXC05
+      CHARACTER SYSLEV*(*),LEVEL*20
+      NMAX = LEN(SYSLEV)
+      SYSLEV = 'UNICOS '
+      SYSCOD = 'DFXMS5'
+C   GET SYSTEM LEVEL
+      CALL DFXMCS('uname -r',LEVEL,LRET)
+      IF (LRET.EQ.0) GO TO 999
+C   NOW FORMAT - AS UNICOS x.x (local)
+      I1 = INDEX(LEVEL,' ')
+      I = 7
+      IF (I1.GT.0) THEN
+          N = MIN(I1,NMAX-I)
+          SYSLEV(I+1:I+N) = LEVEL(1:N)
+          I = I + N
+      ENDIF
+      N = NMAX - I
+C   GET LOCAL LEVEL
+      CALL DFXMCS('uname -v',LEVEL,LRET)
+      IF (LRET.EQ.0) GO TO 999
+      I1 = INDEX(LEVEL,' ')
+      K = 0
+    1 IF (I1.LE.N) THEN
+C    CAN ACCOMMODATE FULL LOCAL LEVEL
+           I2 = N - I1
+           IF (I2.NE.2)  THEN
+               I = I + 1
+               SYSLEV(I:I) = ' '
+           ENDIF
+           IF (I2.GE.2) THEN
+               I = I + 1
+               SYSLEV(I:I) = '('
+           ENDIF
+           SYSLEV(I+1:I+I1) = LEVEL(K+1:K+I1)
+           I = I + I1
+           IF (I2.GE.2) THEN
+               I = I + 1
+               SYSLEV(I:I) = ')'
+           ENDIF
+      ELSE
+C    MUST TRUNCATE LOCAL LEVEL
+C    IF PREFIX OF ulcc. THEN DELETE THAT PART
+C    OTHERWISE IGNORE?
+           IF (LEVEL(1:5).EQ.'ulcc.') THEN
+                I1 = I1 - 5
+                K = 5
+                IF (I1.LE.N) GO TO 1
+           ENDIF
+      ENDIF
+  999 RETURN
+      END

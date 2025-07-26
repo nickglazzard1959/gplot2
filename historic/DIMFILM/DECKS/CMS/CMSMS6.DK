@@ -1,0 +1,27 @@
+*DECK CMSMS6 F
+      SUBROUTINE DFXMS6(USER)
+      CHARACTER*(*) USER
+      CHARACTER*8 JN
+C   RETURNS 20 CHARACTER USER NAME
+C
+C   UNDER CSM:
+C              INTERACTIVE -NO SENSIBLE SOURCE IDENTIFIED
+C                           SO RETURN JOB ACCOUNT NUMBER
+C              BATCH - GET COMMENTS
+C
+C   TYPICAL REFERENCE:
+C      CHARACTER*20 NM                                                  00000180
+C      CALL DFXMS6 ( NM )                                               00000190
+C
+*CALL DFXC12
+      CHARACTER*40 REPLY
+      USER = ' '
+      IF (SYSIA) THEN
+           CALL DFXMS3(JN)
+           USER = JN
+      ELSE
+           CALL DFXMSB('COMMENT ',REPLY,LENRET,IERR)
+           IF (LENRET.GT.0) USER = REPLY(1:LENRET)
+      ENDIF
+      RETURN
+      END

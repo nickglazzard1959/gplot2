@@ -1,0 +1,143 @@
+*DECK CMSUT1 F
+      SUBROUTINE DFXUT1(NWS,VSN,LABEL)
+C
+C    *   TAPE SUPPORT NOT YET INCLUDED IN CMS VERSION    *
+C    *   FILE MODES VIA .FT ARE AVAILABLE  - UNTESTED    *
+C    *   FOR THESE MODES OTHER THAN !FT FURTHER FORTRAN  *
+C    *   UNITS WILL BE USED - BEING THE 3 SEQUENTIALLY   *
+C    *   FOLLOWING THAT DECLARED FOR FT - ANY FILEDEF    *
+C    *   REQUIRED IS THE USER'S RESPONSIBILITY.          *
+C
+C
+C    THIS ROUTINE ASSOCIATES DEVICE NWS WITH MAGNETIC TAPE OR DATASET
+C    IDENTIFIED BY VSN:
+C         VSN = XFTYYYYY     WILL OUTPUT TO FORTRAN UNIT
+C                            IDENTIFIED AS YYYYY
+C                            IF X = ! DATASET WILL BE AS PER QUEUED
+C                                     PLOT DATA (I.E. UNSORTED, CONTROL
+C                                     BLOCKS AND FLAGS INCLUDED)
+C                               X = @ DATASET WILL BE AS PER FINAL
+C                                     STACKED PLOT DATA (SORTED,
+C                                     NO CONTROL BLOCKS BUT WITH
+C                                     ULCC-DICOMED SHORT BLOCKS)
+C                               X = ? AS FOR @  BUT WITHOUT ULCC
+C                                     SHORT BLOCKS.  SUCH A FILE
+C                                     COULD BE TRANSPORTED TO ANY
+C                                     DICOMED PROVIDED ULCC DDC
+C                                     EXTENSIONS ARE NOT INCLUDED
+C                                     IN THE CODE (SEE COMMENTS IN
+C                                     DFXDNN).
+C             = <ANY OTHER>    WILL BE DUMPED TO MAGNETIC TAPE USING
+C                              IDENTIFICATION AS TAPE VSN(S)
+C                              (NOMINALLY EQUIVALENT TO @FT)
+C                              HOWEVER, ?<ANY OTHER> WILL BE AS FOR
+C                              ?FT AND THE MAGNETIC TAPE WILL HAVE
+C                              NO ULCC SHORT BLOCKS AND ATTEMPT WILL
+C                              BE MADE TO INHIBIT DDC EXTENSIONS
+C
+C
+C      FOR SINGLE VSN     CALL DFXUT1(NWS,'VSN1')
+C
+C      FOR MULTI-VOLUME   CALL DFXUT1(NWS,'(VSN1,VSN2,VSN3)')
+C            EACH VSN MAY BE UP TO 6 CHARACTERS - THERE MAY BE
+C            NO INCLUDED BLANKS OR QUOTES IN THIS IMPLEMENTATION
+C            (CRAY DISPOSE WILL INCLUDE ...VOL=SER=<VSN AS SUPPLIED>..)
+C
+C
+C********** !FT<XX> IS HANDLED WITHIN NORMAL OUTPUT PATH AND
+C********** CONSEQUENTLY WILL HAVE OUTPUT LIMITS APPLIED TO IT)
+C
+C
+      CHARACTER*(*) VSN,LABEL
+*CALL,DFXPAB
+*CALL,CMSCUT
+*CALL,DFXCBA
+*CALL,DFXCAD
+*CALL,DFXC00
+*CALL,DFXC05A
+C
+C
+C     UTFLAG = 0 : INITIAL VALUE - NOT REFERENCED
+C            > 0 : USE/WS TPE REFERENCE:
+C                  1 - STANDARD MAGNETIC TAPE USE (NO LABEL)
+C                  2 - STANDARD MAGNETIC TAPE USE (STANDARD LABELS)
+C                  3 - DDC/NON-ULCC MAGNETIC TAPE USE (NO LABEL)
+C                  4 - DDC/NON-ULCC MAGNETIC TAPE USE (STANDARD LABELS)
+C                 11 - !FT - QUEUED DATA TO FILE
+C                 12 - @FT - STACKED DATA TO FILE (ULCC-DDC)
+C                 13 - ?FT - STACKED DATA TO FILE (STANDARD DDC)
+C
+      IF (NWS.LT.1.OR.NWS.GT.MSOPWS) THEN
+           IF (ICHECK.GT.0) WRITE(ERRREC,10) ROUTIN,NWS
+*CALL,LINOUT0
+   10 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' REFERENCED WITH INAVLID WOR
+     1KSTATION NUMBER ',I6,' - CALL IGNORED')
+           GO TO 999
+      ENDIF
+      IF (WSOP(NWS)) THEN
+         IF (ICHECK.GT.0) THEN
+              IF (ROUTIN.EQ.'USETPE') THEN
+                       WRITE(ERRREC,13) ROUTIN
+              ELSE
+                       WRITE(ERRREC,14) ROUTIN,NWS
+              ENDIF
+         ENDIF
+*CALL,LINOUT0
+   13 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' REFERENCED AFTER DEVICE OPE
+     1NED - CALL IGNORED')
+   14 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' REFERENCED FOR WORKSTATION
+     1NUMBER ',I6,' AFTER DEVICE OPENED - CALL IGNORED')
+         GO TO 999
+      ENDIF
+      IF (UTFLAG(NWS).GT.0) THEN
+         IF (ICHECK.GT.0) THEN
+              IF (ROUTIN.EQ.'USETPE') THEN
+                       WRITE(ERRREC,11) ROUTIN
+              ELSE
+                       WRITE(ERRREC,12) ROUTIN,NWS
+              ENDIF
+         ENDIF
+*CALL,LINOUT0
+   11 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' ALREADY REFERENCED - FURTHE
+     1R CALL IGNORED')
+   12 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' ALREADY REFERENCED FOR WORK
+     1STATION NUMBER ',I6,' - FURTHER CALL IGNORED')
+      ELSE
+         UTVSN(NWS) = VSN
+         IF (VSN(1:1).EQ.'!') THEN
+               UTFLAG(NWS) = 11
+         ELSE IF (VSN(1:1).EQ.'@') THEN
+               UTFLAG(NWS) = 12
+         ELSE IF (VSN(1:3).EQ.'?FT') THEN
+               UTFLAG(NWS) = 13
+C*DELETED*     UTFLAG(NWS)=1
+         ELSE
+C-             IF (VSN(1:1).EQ.'?') THEN
+C       IF ?<VSN> THEN MUST LOSE ? AND FLAG FOR
+C       PURE DDC/NO ULCC SHORT BLOCKS
+C-                  INC = 2
+C-                  UTVSN(NWS) = VSN(2:)
+C-             ELSE
+C-                  INC = 0
+C-             ENDIF
+C-             UTFLAG(NWS) = 2 + INC
+C-             IF (LABEL(1:2).EQ.'NL') THEN
+C-                 UTFLAG(NWS) = 1 + INC
+C-             ELSE IF (LABEL(1:2).NE.'SL') THEN
+C-                  IF (ICHECK.GT.0) WRITE(ERRREC,15) ROUTIN,LABEL(1:2)
+C-*CALL,LINOUT0
+C- 15 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' REFERENCED WITH INAVLID LAB
+C-   1EL DESIGNATOR - ',A2,' - SL ASSUMED')
+C-             ENDIF
+C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+C
+      IF (ICHECK.GT.0) WRITE(ERRREC,16) ROUTIN
+*CALL,LINOUT0
+   16 FORMAT(1H0,'**DIMFILM WARNING**  ',A,' REFERENCE FOR MAGNETIC TAPE
+     1 NOT SUPPORTED UNDER CMS - CALL IGNORED')
+C
+C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+         ENDIF
+      ENDIF
+  999 RETURN
+      END

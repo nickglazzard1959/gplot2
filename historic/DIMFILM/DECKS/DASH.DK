@@ -1,0 +1,14 @@
+*DECK DASH F
+      SUBROUTINE DASH
+*CALL,DFXC00
+*CALL,DFXC05A
+      ROUTIN = 'DASH'
+*CALL,RIN
+      IDASH = 1
+      NO1 = 11
+      NO2 = 12
+      TL = 2.0*XQ
+      CALL DFX105
+*CALL,ROUT
+      RETURN
+      END

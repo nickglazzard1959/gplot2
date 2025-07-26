@@ -1,0 +1,691 @@
+ .APPENDIX Device Specifications
+  This Appendix describes the characteristics
+ and capabilities of those devices supported by DIMFILM.  As
+ additional devices are made available in DIMFILM their
+ descriptions will be added here.  The previous Appendix
+ should be consulted for
+ comparison of various device categories in so far as their
+ mode of operation affects the appearance of graphical output.
+ .SECTION DICOMED Colour Film Recorder D(1)48C
+  The Dicomed D48C graphic COM system is a high precision colour
+ film recorder.  In D148C configuration it includes a Digital
+ Equipment Corporation controlling mini-computer.  The name D48C
+ refers to the graphic recorder, comprising firmware controller,
+ precision CRT, film transports and optical assemblies.
+  The D48C is capable of image recording in vector, raster and
+ alphanumeric modes, and may be used for either colour or
+ monochrome recording dependent on film/optics used.  It is
+ ideally suited to many applications, including scientific
+ plotting, business graphics (vector or raster), animation,
+ engineering and design, and alphanumeric COM ($BC$Bomputer
+ $BO$Butput $BM$Bicroform, e.g. microfiche
+ output - which may incorporate other graphics).
+  As a film recorder the Dicomed D48C captures the image of a
+ variable intensity spot as it traverses a precision _c_athode
+ _r_ay _t_ube.  This CRT uses the P48 phosphor (wide spectral
+ response), and colour is achieved by insertion of coloured
+ filters in the optical path.  For each colour filter the
+ corresponding components of the image are traced - that is,
+ recording is in an additive manner (filters being used singly,
+ _not_ in combination).  The filter assembly comprises seven
+ colours (red, green, blue, yellow, magenta, cyan, and
+ neutral) and is used in conjunction with specially designed
+ colour corrected optics.  (Note: colour output at ULCC is currently
+ produced by accessing the red, green, and blue filters alone
+ and streaming the plot data accordingly.)  For use with
+ black and white film the neutral filter may be utilised;
+ however, for the highest resolution in black and white on the
+ aperture format a separate narrow spectral response lens
+ is used (without filter assembly).
+ Three optical assemblies are in use at ULCC for graphic COM:
+ F300 for 16mm cine (colour and black and white), F304 for
+ 35mm slide (i.e. comic - colour), and F309 for 35mm aperture
+ card format (black and white).
+  The film transport (F333A - manufactured by Marron Carrell),
+ which sits atop the optical assemblies,
+ is able to handle 16mm (perforated) and 35mm (both perforated
+ and unperforated) with 400 feet film magazines.  This is
+ accomplished through changes to the transport mechanics and
+ use of appropriate aperture plates.
+  In $Bvector mode $B, the D48C has an addressability of
+ 32,768 x 32,768 upon the CRT (the optics/film format
+ will result in a [maximised] subset of this being available
+ for each film format).  The D48C is capable of very fast
+ vector plotting: a minimum length vector (single point) will
+ take 15 microseconds, while a full-screen, maximum intensity
+ vector can be drawn in 45 milliseconds (single pass).  The
+ time required is roughly proportional to the vector length.
+ Exposure may be at any of 256 levels (for any one filter).
+ In drawing a vector, the D48C deflection system is used to
+ accurately position the beam at selected points on the
+ 32K x 32K matrix when the exposure logic turns the beam on
+ for the requisite time.  The points are selected so that the
+ vector is drawn as a continuous
+ and uniform intensity line (through ensuring adjacent
+ points touch).
+  In $Braster mode $B, the D48C is able to plot on a matrix
+ of 4096 x 4096 addressable points (pixels - i.e. picture
+ elements) on the CRT (again, a subset is available to each film
+ format) at any of 256 exposure values.
+ The difference between vector and raster addressability
+ is due to the spot size generated; the raster spacing ensures
+ a continuous image through the touching of adjacent points.
+ The Dicomed provides the user with the means to construct
+ display pixels as composite points with control over point and
+ element spacing.  This enables other raster "resolutions" to be
+ imaged.  Point plotting in raster mode may be accomplished at
+ speeds of 100K-250K points per second, enabling maximum resolution
+ raster images in full colour (three passes) to be plotted in
+ around 3 minutes.  The maximum flyback time for repositioning
+ the beam to the next scan line is 100 microseconds; for
+ certain applications a short end of line delay of (about)
+ 15 microseconds may be introduced.
+  In $Bpoint mode $B, the D48C may be positioned to any of
+ the CRT's 32,768 x 32,768 addressable points, which may then
+ be exposed at any of 256 levels.  The maximum time to position
+ to any point is 100 microseconds, while exposure may be from
+ (about) 4 to 9 microseconds.
+  In $Bcharacter mode $B, the D48C has a high speed hardware
+ character generator.  This is particularly relevant to
+ alphanumeric COM applications.  The character fonts are stored
+ in local memory, and depending on complexity a number of fonts
+ may be accommodated simultaneously, with less than 50 milliseconds
+ required for font changes.  Characters may be generated at
+ different sizes and in four orientations, as standard.  Speed
+ depends on font complexity, but for typical alphanumeric COM
+ applications speeds in excess of 30,000 characters per second
+ may be achieved.  (In practice, throughput is dependant on
+ input rates to the D48C.)  The hardware character generator
+ functions at only one exposure level and differs from other
+ drawing modes through operating as a stroke generator.
+ Each character is drawn at high-speed as a series of short
+ vectors and the CRT beam is unblanked throughout the duration of
+ each stroke.
+  $BIntensity/exposure $B control is over an 8-bit (i.e. 256 level)
+ range.  However, this range is selected according to the plot mode
+ in use: vector, raster, point, and character modes all access
+ different CRT intensity scales in order to achieve compatible
+ film exposure when modes are intermixed on a frame.  [It should
+ be noted that hardware characters may only be generated at a single
+ exposure level.] The D48C
+ incorporates further internal exposure tables that are
+ selectable according to the optics and emulsion characteristics
+ to ensure consistent film exposure under the different
+ operating conditions.  Separate table references are made
+ according to the selected filter.
+ These tables are programmable so that
+ alternative emulsions may be used and the system calibrated
+ accordingly.  Indeed, calibration is required for each film
+ type and for each optical assembly with which it may be used:
+ this calibration is for each plotting mode and (for
+ colour assemblies) each filter.
+ In vector mode the internal intensity value
+ is dynamically compensated according to the angle at which a
+ vector is drawn.  The exposure technique is $Btime modulation $B
+ which controls the density of individual points directly through the
+ duration for which the CRT is excited.  This ensures precise control
+ and a high degree of repeatability with consistent line width.
+  The $bgeometrics $B of the D48C offer a very high precision with
+ minimal distortion and a high degree of repeatability.  With
+ regard to the major axis, $Btrapezoiding $B, $Brectangularity $B,
+ $Blinearity $B, and $Bline curvature $B (or $Bpin cushion
+ distortion $B) are all maintained
+ to less than (plus or minus) 0.1%, while orthogonality of
+ the horizontal and vertical axes is within (plus or minus) 0.15%.
+ The $Bspatial repeatability $B is within (plus or minus) 0.02%
+ over a ten-minute interval, and (plus or minus) 0.05% over a
+ thirty-minute interval (after a one-hour warm up).
+  The $Bphotometrics $B of the D48C offers a dynamic exposure range
+ of 256 levels.  In terms of diffuse density units (D), the range
+ on a typical panchromatic film (e.g. Kodak Plus-X) will be
+ 1.5D when processed to gamma 1.0 (or 2.0D for gamma 1.5).  The
+ $Bexposure uniformity $B over the entire plotting area has
+ a maximum deviation of (plus or minus) 0.15D (measured through
+ a circular aperture of  3 millimetres diameter).
+  The $Bfilm resolution $B is a function of optics and film type.
+ Measurements are in line pairs per millimetre
+ and are referenced to black and white film.  For the optics
+ in use at ULCC the target resolutions are:
+ .DISPLAY
+
+     _Optics_          _resolution_
+                          (lpm)
+     F300 (16mm)           90
+     F304 (35mm slide)     40
+     F309 (35mm aperture)  55
+
+ .ENDD
+  [It is important to appreciate that these are the resolutions
+ that may be achieved at the film plane on high resolution
+ film, such as DACO E.  It is possible to resolve 3000 lines
+ across the image area on the CRT of the D48C.  The 4K raster
+ of the D48C is designed so adjacent lines merge and a continuous
+ image is perceived.]
+  $BRegistration accuracy $B on the F333A film transport is
+ maintained within (plus or minus) 0.005 millimetres.  This
+ is of significance in generation of cinematographic film
+ and is adequate for producing steady images.
+  In practice,
+ measurements on the D48C at ULCC (for geometrics, photometrics
+ resolution and registration) have consistently indicated
+ performance well within these limits.
+  There are a number of aspects concerning use of the D48C that
+ are generally applicable to all devices.  These are dealt with in
+ the following sections, after which each film mode is considered
+ separately (i.e. these being the different $Bdevices $B supported
+ on the Dicomed).
+ .SUBSECTION Prime
+  An image is recorded from the excitation of phosphor on the
+ CRT (through a controlled exposure of an electron beam).  After
+ the excitation - and associated luminescence - of the phosphor
+ it must stabilise at a neutral level.  If this stabilisation is not
+ allowed to occur the next phosphor excitation may result in
+ greater luminescence.  That is, the exposure on the film may
+ be greater than that desired.  This effect _may_ be
+ observed as the "ghosting" of earlier images superimposed upon
+ the current picture, and is known as $Bimage retention $B.
+ It occurs most commonly on raster images (particularly in those
+ areas of relatively low intensity) and is more usually noticed
+ on grey scale images (on black and white film).  The retained image
+ is often a previously drawn vector picture or components from several.
+ Usually lines drawn at high intensity will be subject to retention,
+ although repeated tracing across the same area of the CRT [i.e.
+ identically positioned vectors, which might be user data or the
+ ULCC identification frame(s)] may also be retained.
+  Consider the case of a high intensity vector (redrawn several times)
+ followed by a low intensity uniform raster.  Each point in the
+ raster image will be subject to the same length of electron beam
+ excitation on the CRT, and it would be expected that even exposure
+ of the film across the raster would result.  However, those areas
+ of the CRT on which the vector was drawn may not have relaxed to
+ the appropriate neutral level.  At those points although excited
+ for the same length of time phosphor luminescence will be at a
+ different level than elsewhere: the result is a uniform raster
+ with a vector superimposed.  The effects on vector images are
+ virtually unnoticeable.  This is due partly to the very small
+ overlap of vectors which might exhibit retention (intersections
+ of line width slightly enhanced would not be perceived), but
+ mainly to the fact that vectors are produced via higher
+ exposures than rasters (dictated by relative visual perception)
+ and so retention effects are proportionately lower.  Similarly,
+ with colour rasters exposures are at a higher level than for
+ black and white due to film characteristics and spectral
+ filtering (i.e. the filter cuts the transmission of phosphor
+ luminescence considerably; conversely a longer exposure is required
+ for a similar effect on film).  Again, the effect may be observed
+ on low intensity colour rasters.  Similarly, high intensity
+ raster images occasionly result in noticeable image retention
+ on subsequent lower intensity rasters.  The effect is _not_
+ confined to adjacent images and may become apparent some
+ considerable time later.  Image retention is dependent on
+ phosphor characteristics (in the case of the D48C this
+ is P48).  At ULCC the Dicomed is periodically
+ $Bprimed $B; that is, the CRT is saturated with a uniform
+ high intensity raster.  This reduces image retention to a very
+ high degree.  However, image retention may become a problem
+ during graphic generation from stacked data (the method by which
+ ULCC combine the plot data of many individual users into a single,
+ continuous input to the Dicomed).  To help obviate
+ this DIMFILM users are provided with a means to prime the CRT
+ during their plot run.
+
+ .TT
+
+ $TDPRIME(<device>)
+
+ $I- this will cause the CRT to be primed for the designated device,
+ provided it is currently active.  If the display surface is
+ non-empty it will be cleared before the prime is initiated.  The
+ frame will always be advanced after the prime.  The single parameter
+ is of type CHARACTER and should be a string comprising the device
+ designation:
+
+ $T##'D35'$I- will prime device D35 (35mm black and white aperture
+ card format)
+
+ $T##'D35P'$I- will prime device D35P (35mm black and white portrait
+ mode format)
+
+ $T##'D16'$I- will prime device D16 (16mm black and white movie)
+
+ $T##'D35C'$I- will prime device D35C (35mm colour slide)
+
+ $T##'D16C'$I- will prime device D16C (16mm colour movie)
+
+ $T##'ALL'$I- will prime all active Dicomed devices
+
+ .EE
+
+  Specific references exist for each individual device if such
+ mode is preferred (these being detailed under the section for
+ relating to each device).
+  It should be noted that priming will expose a frame of film (the
+ film transport having no shutter).  Thus, priming is inappropriate
+ to cinematographic output except preceding sequences.
+  Most users will not find image retention a problem.  The facility
+ is included for users who encounter such effects.  Priming is a
+ relatively slow process and excessive use could degrade throughput
+ of the Dicomed system.  The length of this section is not intended
+ to emphasise the problem, but to explain and reassure users when
+ it is first encountered.
+
+ .SUBSECTION Frame repetition
+  In certain applications it is useful to repeat (either singly or
+ multiply) the generation of each successive frame.  In particular,
+ for animations which require twnety-four images for every second of
+ screen time (twenty-five if destined for PAL video) great economies
+ of computation may be made by "double framing", i.e. repeating each
+ image.  Thus for every second only twelve images will have been
+ computed.  Much animation can be successfully created in this way
+ with little, or no, jitter or judder apparent to the viewer.
+  Most animations will require action to be held for periods of time;
+ it is then sensible to instruct the system to replicate a particular
+ frame the relevant number of times (avoiding repeatedly re-computing
+ the same image).
+  Two device specific routines are provided in DIMFILM for these
+ purposes.
+
+ .TT
+
+ $TDMULTI(<device>,MFRAM)
+
+ $I- this will set the multi-frame count for the specified device (or,
+ optionally, for all active Dicvomed devices).
+
+ $T##<device>$I- is of type CHARACTER, and should be a string
+ containing the device designation (i.e. any of 'D35', 'D35P', 'D16',
+ 'D35C',or 'D16C' for a specific device or 'ALL' for all active
+ Dicomed devices).
+
+ $T##MFRAM$I- is the required multi-frame count (in range [0,5])
+ for all subnsequent frames.
+
+
+ .EE
+
+  It must be noted that DMULTI is a _deferred_ action: it does
+ not take effect until after the _next_ frame advance is executed.
+ Subsequent to that advance, following frames will be replicated to
+ generate the specified number of copies of each.
+  In particular, double framing will be achieved by setting MFRAM = 2.
+ While for MFRAM = N a total of N frames will be generated for each
+ following image.  MFRAM = 1 is single framing, and is equivalent
+ to MFRAM = 0.  In each case the action will commence _following_
+ the next reference to FRAME (it is, therefore, sensible - as an
+ aid to clarity - to position the refernce to DMULTI to immediately
+ precede a frame advanmce (i.e. reference to FRAME): the image
+ following that advance will then be the one for which the DMULTI
+ action first takes effect.  It will remain active until reset.
+  (Single and double framing may also be achieved through reference
+ to the DSET routine, described below.)
+
+ .TT
+
+ $TDHOLD(<device>,NFRAMS)
+
+ $I- this will repeat the next frame the specified number of times,
+ for the designated 16mm device, provided it is currently active.
+
+ $T##<device>$I- is of type CHARACTER, and should be a string
+ containing the device designation (i.e. any either 'D16',
+ or 'D16C').  This option is only available for 16mm animations
+ on the Dicomed film rcorder.
+
+ $T##NFRAMS$I- is the numbers of times the following complete
+ frame is to be generated.
+
+
+ .EE
+
+  It must be noted that DHOLD is available only for 16mm film
+ devices.  The action is _deferred_ until the next frame advance
+ is executed.  The following frame will then be generated the
+ requisite number of times, after which framing will revert
+ to single or multi framing (as presently set).  In particular,
+ NFRAMS is the number of frames in total that will be generated
+ for the hold.  That is, if NFRAMS = 1 a single frame only
+ will be produced (even if currently multi-framing).  In general,
+ for NFRAMS = N the original frame will be generated followed by
+ (N-1) repeats, yielding a total of N frames.  As DHOLD is a deferred
+ action it is sensible to position the reference to it to immediately
+ precede a frame advance (i.e. reference to FRAME): the image following
+ that advance will then be the one to which the DHOLD action refers.
+
+ .SUBSECTION Dicomed device control
+  There are other ways in which Dicomed devices can be controlled
+ or reset.  A routine, DSET, has been provided for some such
+ requirements.  In particular, this can be used to globally change
+ the orientation of a device or to control single or double framing
+ (in this it is a simple alternative to the facility provided in the
+ DMULTI routine).
+
+ .TT
+
+ $TDSET(<device>,KEY)
+
+ $I- this will select particular operational modes for the specified
+ device (or, optionally, for all active Dicvomed devices).
+
+ $T##<device>$I- is of type CHARACTER, and should be a string
+ containing the device designation (i.e. any of 'D35', 'D35P', 'D16',
+ 'D35C',or 'D16C' for a specific device or 'ALL' for all active
+ Dicomed devices).
+
+ $T##KEY$I- is a character string specifying the required action.  It
+ may be one of the following:
+
+ $T##SINGLE$I- turn on single framing, deferred until after the next
+ frame advance.
+
+ $T##DOUBLE$I- turn on double framing, deferred until after the next
+ frame advance.
+
+ $T##COMIC$I- turn on comic mode orientation.
+
+ $T##CINE$I- turn on cine mode orientation.
+
+ $T##LANDSCAPE$I- turn on landscape mode orientation.
+
+ $T##PORTRAIT$I- turn on portrait mode orientation.
+
+
+ .EE
+
+  For a fuller discussion of single and multi framing refer to the
+ description of DMULTI.
+  Orientation of an image may be considered in two ways.  Typically one
+ refers to a picture as being in either landscape or portrait
+ orientation.  A picture is said to be landscape if its longer
+ dimnension is horizontal, while it is portrait if its
+ longer dimension runs vertically.
+  For film the equivalent term is comic or cine; for comic mode the
+ picture base is longitudinal with respect to the (edge of the) film,
+ while in cine mode the base of the image is transverse (i.e. across
+ the film).  For each film format there is a different default and
+ imaging is done relative to this.  Through reference to DSET it is
+ possible to change that orientation.  The effect is of rotating
+ the image through ninety degrees before recording it on the film.
+ The default mode for 16mm film is CINE and for 35mm is COMIC, but
+ due to the aspect ratios of each both correspond to LANDSCAPE images.
+ (For 16mm the longer dimension is transverse, while for 35mm it is
+ longitudinal.)  Thus the default image layout is LANDSCAPE for all
+ the Dicomed film modes.  The routine DSET
+ enables the production of, for example, portrait mode slides
+ or portrait mode images on 16mm (the latter would be unsuited for
+ projection, but would be quite suitable for archive purposes).
+
+ .DISPLAY
+
+  For each device the equivalent combinations may be shown as:
+
+
+  DEVICE:#######D35######D16#####D35P#####D35C####D16C
+
+  ASPECT
+  RATIO
+
+  LANDSCAPE####COMIC####CINE####COMIC####COMIC####CINE#<--DEFAULT
+
+  PORTRAIT#####CINE#####COMIC###CINE#####CINE#####COMIC
+
+ .ENDD
+
+
+  It is strongly advised that changes of
+ orientation are made _only_ at the beginning of
+ a frame; they take immediate effect and various device
+ transformations will be reset to reflect the selected mode.
+
+ .SUBSECTION Raster elements
+  As intimated above, the raster element as used on the D48C may
+ be composed of a grouping of points with both point and element
+ spacing being variable.  DIMFILM raster facilities do not require
+ the user to address this topic.  All mappings from the cell mapped
+ area to device raster elements are performed within the device drivers.
+ However, it is recognised that for certain serious applications the
+ user will require more detailed understanding of the raster
+ construction.  Additionally the user is provided with the means
+ to respecify the raster characteristics (and DIMFILM will take
+ account of the actual raster structure when transmitting cell
+ data to the Dicomed).
+  The $BRaster element $B is the unit by which the D48C plots
+ a raster picture (i.e. it is the basic picture element, or
+ $Bpixel $B).  When a raster is transmitted to the D48C a series
+ of required pixel intensity values are transferred.  Successive
+ raster elements are plotted with those successive intensities,
+ the same intensity being applied to each point in the element.
+ When one element has been plotted the beam is spaced to the next;
+ when a scan line is complete the beam is repositioned ready for the
+ next scan.  The $Belement spacing $B (both horizontally and
+ vertically) may be set.  Each raster element is a square or
+ rectangular array of one to sixteen $Bpoints $B in each of the
+ horizontal and vertical directions.  The $Bpoint spacing $B
+ (both horizontally and vertically) within the element may also
+ be set.  The points correspond to the 32K grid addressability
+ which may be used to expose a single spot on the CRT - these
+ points should not be confused with pixels, of which they are
+ a component.  Only in the limiting case of elements consisting
+ of single points will points be equivalent to pixels.
+ The raster elements are the pixels of which the image is
+ composed, and it will be seen that the D48C offers the user
+ the ability to specify both the size and spacing of pixels.
+  The raster structure is determined by a number of parameters.
+ The $Braster element $B consists of an array of points, arranged
+ with a specified $Bnumber of points horizontally $B and a
+ $Bnumber of points vertically $B, these being in the range
+ [1,16].  Spacings are expressed in raster units.  That is, in
+ terms of the 4K x 4K maximum raster grid of the D48C.  However,
+ the spacings may be stepped by eighths of the raster unit which
+ is equivalent to units on the 32K x 32K addressable grid of
+ the CRT.  (It is these latter units which are used in DIMFILM.)
+ The spacing of points within
+ this array may be set independently in each direction via the
+ $Bhorizontal point spacing $B and the $Bvertical point spacing $B,
+ each of these being in the range 1 to 7-7/8 raster units (i.e.
+ in the range [8,63] CRT addressable units).  Similarly, elements
+ may be spaced in each direction by specifying the $Bhorizontal
+ element spacing $B and the $Bvertical element spacing $B, again in
+ the range 1 to 7-7/8 raster units (i.e. [8,63] CRT addressable units).
+ The element spacing is measured between the lower left corners
+ of adjacent elements (in the appropriate direction), and should
+ be such that adjacent elements do not overlap (i.e. in either
+ direction the element spacing should exceed the product of
+ the number of points and the point spacing).
+
+ .DISPLAY
+  The element structure may be shown:
+
+
+       ----------------------------------
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       ----------------------------------
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       O----O---------X----X-------------
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       ----------------------------------
+       |    |    |    |    |    |    |
+       O    O    |    X    X    |    |
+       |    |    |    |    |    |    |
+       ----------------------------------
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       O----O---------X----X-------------
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       ----------------------------------
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       ----------------------------------
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       ----------------------------------
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+       X----X---------X----X-------------
+       |    |    |    |    |    |    |
+       |    |    |    |    |    |    |
+
+
+ .ENDD
+  In the foregoing illustration, the lines represent a part of
+ a 4K x 4K grid on the CRT (i.e. raster units).
+ The 'O's are
+ the points comprising one raster element, while the 'X's
+ are points in adjacent elements.  The grid divisions (i.e.
+ 1/4096 of image dimension) are termed $Braster units $B.
+ In the example a $Braster element $B consists of six
+ $Bpoints $B arranged as 2 horizontally by 3 vertically.
+ The $Bhorizontal point spacing $B is 1 raster unit, and the
+ $Bvertical point spacing $B is 1.5 raster units.  The spacing
+ between elements is determined by the $Bhorizontal element
+ spacing $B of 3 raster units, and a $Bvertical element spacing $B
+ of 7 raster units.
+  DIMFILM provides the means whereby the user may change the
+ specification of the raster structure.
+
+ .TT
+
+ $TDRAST(<device>,HES,HPS,HPE,VES,VPS,VPE)
+
+ $I- this will set the raster structure for the designated device,
+ provided it is currently active.
+
+ $T##<device>$I- is of type CHARACTER, and should be a string
+ containing the device designation (i.e. any of 'D35', 'D35P', 'D16',
+ 'D35C', 'D16C' for a specific device or 'ALL' for all
+ active Dicomed devices),
+
+ $T##HES$I- is the $Bhorizontal element spacing $B in CRT
+ addressable units (= 8 x $Braster unit $B), as an INTEGER
+ in the range [8,63], but subject to exceeding HPExHPS.
+
+ $T##HPS$I- is the $Bhorizontal point spacing $B in CRT
+ addressable units (= 8 x $Braster unit $B), as an INTEGER
+ in the range [8,63].
+
+ $T##HPE$I- is the number of $Bhorizontal points per
+ element $B, as an INTEGER
+ in the range [1,16].
+
+ $T##VES$I- is the $Bvertical element spacing $B in CRT
+ addressable units (= 8 x $Braster unit $B), as an INTEGER
+ in the range [8,63], but subject to exceeding VPExVPS.
+
+ $T##VPS$I- is the $Bvertical point spacing $B in CRT
+ addressable units (= 8 x $Braster unit $B), as an INTEGER
+ in the range [8,63].
+
+ $T##VPE$I- is the number of $Bvertical points per
+ element $B, as an INTEGER
+ in the range [1,16].
+
+ .EE
+
+  Specific references exist for each individual device if such
+ mode is preferred.
+  On initialisation, each Dicomed device is initialised with a 2048 x
+ 2048 raster with elements consisting of 2 x 2 unit spaced points.
+ Element spacing is 2 raster units.  The equivalent parameters
+ to DRAST would be HES = 16, HPS = 8, HPE = 2, VES = 16,
+ VPS = 8, and VPE = 2.  For most purposes this will yield
+ eminently acceptable results.
+ .SUBSECTION Line Width/Spot Size
+  The Dicomed devices are able to produce thickened lines and
+ (hardware) spots of various sizes.  These are controlled through the
+ DIMFILM routines for line width and spot size scale factors.
+ The supported range is from 1 to 16 in each case - the default
+ being for a single width line and minimal point.  Scale factors below
+ 1.0 will equate to the (default) of 1.0, while values above 1.0 will
+ select the nearest integral value up to a maximum of 16.
+  $BNOTE $B: At present multi-width lines on the Dicomed are produced
+ on a vector by vector basis and no account is made of any preceding
+ or following vector.  Unacceptable results will be produced for
+ thick lines forming parts of curves (in particular characters).
+ This will be investigated in due course; until it has been resolved
+ users are advised to restrict their use of thickened lines to
+ lower values of the scale factor (a maximum of 3.0 is suggested).
+ .SUBSECTION Plot Dataset Length
+  DIMFILM attempts to utilise the Amdahl queues in an economic
+ and efficient manner.  To this end a limit is applied to the
+ permitted size of a user's plot dataset.  At present, the Dicomed
+ drivers will terminate when a dataset length of 100 MBytes is
+ exceeded.  We shall review this limit in the light of experience,
+ and would be pleased to hear from users who encounter
+ difficulties as a result of this limit.  It is possible that
+ the limit may be reduced if operational difficulties result -
+ every effort will be made to give notice of such change, but this
+ cannot be guaranteed.
+ .SUBSECTION Device Sizes
+  The physical image size on film for each of the Dicomed modes
+ is maintained, to a close tolerance,
+ according to various international standards.
+ The default coordinate system for each film device is
+ intended to produce images of the defined size (within the
+ physical device limitations).  While these have been carefully
+ determined, the right is reserved to amend them should the
+ need arise.  There will be no effect upon users specifying their
+ own coordinate system through reference to BOUNDS.
+ .SUBSECTION D35 - monochrome aperture card format (35mm)
+
+  Medium: 35mm unperforated film (reversal)
+  Imaging: monochrome, vector and raster
+  Physical image size: 36.41x27.94 millimetres
+  Default horizontal coordinates:  0.0,32236.0
+  Default vertical coordinates:    0.0,24708.0
+  Default image/film mode:  landscape/comic
+  Default (initial) intensity: 0.8
+
+ .SUBSECTION D35P - monochrome 35mm portrait mode
+
+  Medium: 35mm unperforated film (reversal)
+  Imaging: monochrome, vector and raster
+  Physical image size: 27.94x36.41 millimetres
+  Default horizontal coordinates:  0.0,24708.0
+  Default vertical coordinates:    0.0,32236.0
+  Default image/film mode:  portrait/cine
+  Default (initial) intensity: 0.8
+
+ .SUBSECTION D16 - monochrome 16mm (movie)
+
+  Medium: 16mm double perforated monochrome film (reversal)
+  Imaging: monochrome, vector and raster
+  Physical image size: 10.26x7.49 millimetres
+  Default horizontal coordinates:  0.0,32767.0
+  Default vertical coordinates:    0.0,23920.0
+  Default image/film mode:  landscape/cine
+  Default (initial) intensity: 0.8
+
+ .SUBSECTION D35C - colour slide 35mm
+
+  Medium: 35mm double perforated, reversal colour film
+  Imaging: colour, vector and raster
+  Physical image size: 36.3x24.5 millimetres
+  Default horizontal coordinates:  0.0,32148.0
+  Default vertical coordinates:    0.0,21698.0
+  Default image/film mode:  landscape/comic
+  Default (initial) intensity: 0.8
+  Default (initial) colour: (0.8,0.8,0.8)
+
+ .SUBSECTION D16C - colour 16mm (movie)
+
+  Medium: 16mm double perforated, reversal colour film
+  Imaging: colour, vector and raster
+  Physical image size: 10.26x7.49 millimetres
+  Default horizontal coordinates:  0.0,32767.0
+  Default vertical coordinates:    0.0,23920.0
+  Default image/film mode:  landscape/cine
+  Default (initial) intensity: 0.8
+  Default (initial) colour: (0.8,0.8,0.8)
+
+

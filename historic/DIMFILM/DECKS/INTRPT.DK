@@ -1,0 +1,21 @@
+*DECK INTRPT F
+      SUBROUTINE INTRPT(N,NCHAR)
+*CALL,DFXC00
+*CALL,DFXC05A
+      ROUTIN = 'INTRPT'
+*CALL,RIN
+      IF (N.LT.1.OR.NCHAR.LT.1.OR.NCHAR.GT.48) THEN
+                  IF (ICHECK.GT.0) THEN
+                              WRITE(ERRREC,2) N, NCHAR
+*CALL,LINOUT0
+    2 FORMAT(1H0, 58H**DIMFILM WARNING**  INTRPT CALLED WITH ILLEGAL ARG
+     1UMENTS ,2I10/1H ,21X, 17HTHIS CALL IGNORED)
+                  ENDIF
+      ELSE
+                  INTEND = N
+                  IICHAR = NCHAR
+                  INTCH = 0
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

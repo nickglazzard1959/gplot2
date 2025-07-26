@@ -1,0 +1,18 @@
+*DECK CVXMS2 F
+      SUBROUTINE DFXMS2(UKTIME)
+***********************************************************************
+*                                                                     *
+*      TIME:                                                          *
+*                                                                     *
+*        RETURNS CURRENT TIME TO CALLER AS 8-BYTE FIELD OF FORM:      *
+*                                                                     *
+*                      HH.MM.SS                                       *
+*                                                                     *
+*                                                                     *
+***********************************************************************
+      CHARACTER UKTIME*(*),CVXTIM*8
+      CALL TIME(CVXTIM)
+      UKTIME=CVXTIM
+      RETURN
+      END
+

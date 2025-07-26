@@ -1,0 +1,41 @@
+*DECK DFX01E F
+      SUBROUTINE DFX01E(N,MAXBYT)
+C    ERROR HANDLING ROUTINE FOR DICOMED DEVICES (DFXD01/2/3/4/5) FOR
+C    MAXBYT > 0  DEVICE CAPACITY EXCEEDED
+C OR MAXBYT < 0  I/O ERROR IN DEVICE
+C    COMMON ROUTINE FOR ALL HOSTS
+*CALL,DFXC05
+*CALL,DFXCBD
+      CHARACTER*4 DEV(5)
+      CHARACTER*7 CBYTE
+      DATA DEV/'D35','D16','D35P','D35C','D16C'/
+          DEVICE = DEV(N)
+      IF (MAXBYT.GT.0) THEN
+C   POSITIVE ERRORS ARE DEVICE CAPACITY EXCEEDED
+          MB = MAXBYT
+          CBYTE = ' BYTES'
+          IF (MB.GE.1000000) THEN
+                            MB = (MB-1)/1024 + 1
+                            CBYTE = 'K BYTES'
+          ENDIF
+          IF (MB.GE.1000000) THEN
+                            MB = (MB-1)/1024 + 1
+                            CBYTE = 'M BYTES'
+          ENDIF
+          IF (MB.EQ.1) CBYTE(7:7) = ' '
+          WRITE(ERRREC,1000) DEV(N),MB,CBYTE
+ 1000 FORMAT('**DIMFILM**  DEVICE - ',A,' - QUEUE CAPACITY (',I6,A,
+     1  ') EXCEEDED')
+          FATPT = 1
+      ELSE
+C   NEGATIVE ERRORS ARE DEVICE I/O ERRORS
+           J = -MAXBYT
+          WRITE(ERRREC,1001) DEV(N),J,SYSCOD
+ 1001 FORMAT('**DIMFILM**  DEVICE - ',A,' - I/O ERROR (',I3,
+     1  ') SYSTEM CODE = ',  )
+C   (ONLY ONE SUCH ERROR AT MOMENT)
+          FATPT = 2
+      ENDIF
+      CALL DFX003(ERRREC(1))
+      CALL DFX001(ROUTIN,22)
+      END

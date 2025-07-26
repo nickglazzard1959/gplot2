@@ -1,0 +1,42 @@
+ .
+ .macro tt
+ .table 20,10
+ .parspace 1
+ .endm
+ .
+ .macro ee
+ .endtable
+ .endm
+ .
+ . ------------------------------------------------------------
+ .JUSTIFY
+ .set contents true
+ .headlength 1
+ .footlength 3
+ .foot
+
+ DIMFILM         $eDRAFT DOCUMENT
+ Preliminary User Guide $e~%date
+ .endf
+ .head
+
+ .endh
+ $c University of London Computer Centre
+ .BLANK 5
+ $C_$BDIMFILM$B_
+ .BLANK 10
+ $C_Preliminary User Guide_
+ .BLANK 15
+ $CJohn C. Gilbert
+ .newpage
+ .SPACE 2
+ .CONTENTS
+ .SET CHAPTER -1
+ .PAGE 0
+ .CHAPTER Preamble
+ .foot
+
+ DIMFILM$c~%page $eDRAFT DOCUMENT
+ Preliminary User Guide $e~%date
+ .endf
+

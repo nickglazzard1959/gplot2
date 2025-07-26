@@ -1,0 +1,11 @@
+ .PART DIMFILM Guidelines
+  The new DIMFILM has undergone a major rewrite.  While rationalising
+ certain routine names and converting to Fortran 77 the opportunity
+ was taken to improve the internal operation of the product.  Thus,
+ all internal (i.e. inaccessible to user) routines now have the prefix
+ DFX.  A similar convention was applied to common blocks and internally
+ accessed files.  The user is therefore cautioned not to use the
+ prefix DFX for any purpose associated with DIMFILM.  Failure to
+ respect this condition may well result in unpredictable results
+ and the probable failure of DIMFILM.
+

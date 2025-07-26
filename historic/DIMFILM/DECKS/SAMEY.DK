@@ -1,0 +1,14 @@
+*DECK SAMEY F
+      SUBROUTINE SAMEY
+*CALL,DFXC02
+*CALL,DFXC05A
+      ROUTIN = 'SAMEY'
+*CALL,RIN
+      IF (YGL.EQ.YGU) THEN
+            CALL DFX304
+      ELSE
+            FIXY = .TRUE.
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

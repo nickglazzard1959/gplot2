@@ -1,0 +1,15 @@
+*DECK YIQ F
+      SUBROUTINE YIQ(Y,I,Q)
+      REAL Y,I,Q
+*CALL,DFXC04
+*CALL,DFXC05A
+      ROUTIN = 'YIQ'
+*CALL,RIN
+      CALL DFX160(2,Y,I,Q,RRR,GGG,BBB,IERR)
+      IF (IERR.LE.0) THEN
+                        DO 1 J=1,NRGB
+    1                   CALL DFX143(J,RRR,GGG,BBB)
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

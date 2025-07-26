@@ -1,0 +1,15 @@
+*DECK SAMERT F
+      SUBROUTINE SAMERT
+*CALL,DFXC02
+*CALL,DFXC05A
+      ROUTIN = 'SAMERT'
+*CALL,RIN
+      IF ((RGL.EQ.RGR).OR.(THGL.EQ.THGR)) THEN
+            CALL DFX304
+      ELSE
+            FIXR = .TRUE.
+            FIXTH = .TRUE.
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

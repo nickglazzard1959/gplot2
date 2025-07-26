@@ -1,0 +1,15 @@
+*DECK YUV F
+      SUBROUTINE YUV(Y,U,V)
+      REAL Y,U,V
+*CALL,DFXC04
+*CALL,DFXC05A
+      ROUTIN = 'YUV'
+*CALL,RIN
+      CALL DFX160(3,Y,U,V,RRR,GGG,BBB,IERR)
+      IF (IERR.LE.0) THEN
+                        DO 1 J=1,NRGB
+    1                   CALL DFX143(J,RRR,GGG,BBB)
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

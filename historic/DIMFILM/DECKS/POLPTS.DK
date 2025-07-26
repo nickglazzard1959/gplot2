@@ -1,0 +1,33 @@
+*DECK POLPTS F
+      SUBROUTINE POLPTS(R,THETA,N,NCHAR)
+      REAL R(N),THETA(N)
+*CALL,DFXC00
+*CALL,DFXC02
+*CALL,DFXC05A
+      ROUTIN = 'POLPTS'
+*CALL,RIN
+      IF (NCHAR.LT.1.OR.NCHAR.GT.48) THEN
+              IF (ICHECK.GT.0) WRITE(ERRREC,21) NCHAR
+   21 FORMAT(1H0,'**DIMFILM WARNING** POLPTS CALLED WITH INVALID FOURTH
+     1PARAMETER ',I4,' SHOULD BE IN RANGE 1 - 48'/1H ,21X,'CALL IGNORED'
+     2/)
+*CALL,LINOUT0
+      ELSE
+C   FLAG POINTS
+              NDEG = -1
+              INTSAV = INTCH
+              INTCH = 0
+              INSAVE = INTEND
+              INTEND = 1
+              ICHSAV = IICHAR
+              IICHAR = NCHAR
+              CALL DFX339(R,THETA,N)
+              NDEG = 0
+              INTEND = INSAVE
+              IICHAR = ICHSAV
+              INTCH = INTSAV
+*CALL,IMM
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

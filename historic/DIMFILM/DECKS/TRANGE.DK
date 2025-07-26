@@ -1,0 +1,30 @@
+*DECK TRANGE F
+      SUBROUTINE TRANGE(R1,R2)
+*CALL,DFXC02
+*CALL,DFXC00
+*CALL,DFXC03
+*CALL,DFXC05A
+      ROUTIN = 'TRANGE'
+*CALL,RIN
+      THG1 = R1*ANGCON(1,ANGRP(2))
+      THG2 = R2*ANGCON(1,ANGRP(2))
+      IF (R2.LE.R1) THEN
+                 FIXTH = .FALSE.
+                 IF (ICHECK.GT.0) WRITE(ERRREC,4)R1,R2
+    4 FORMAT(1H0,'**DIMFILM WARNING**  INVALID ARGUMENTS IN CALL TO TRAN
+     1GE - ',1P2E16.8/1H ,21X,'THE SECOND SHOULD BE GREATER THAN THE FIR
+     2ST'/1H ,21X,'AUTOT WILL BE PERFORMED')
+*CALL,LINOUT0
+      ELSE
+                 IF ((THG2-THG1).LT.TWOPI) THEN
+                            THGL = DFX004(THG1)
+                            THGR = DFX004(THG2)
+                 ELSE
+                            THGL = 0.0
+                            THGR = TWOPI
+                 ENDIF
+                 FIXTH = .TRUE.
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

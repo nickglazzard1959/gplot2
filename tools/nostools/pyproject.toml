@@ -24,6 +24,8 @@ classifiers = ["Development Status :: 4 - Beta",
                "License :: OSI Approved :: MIT License",
                "Operating System :: POSIX :: Linux",
                "Operating System :: MacOS :: MacOS X",
+               "Operating System :: Other OS :: CDC NOS",
+               "Operating System :: Other OS :: Cray Research COS",
                "Programming Language :: Python :: 3"
               ]
 
@@ -36,6 +38,7 @@ modsplit = "nostools.modsplit:main"
 modjoin = "nostools.modjoin:main"
 asciify = "nostools.asciify:main"
 trimcends = "nostools.trimcends:main"
+sgformat = "nostools.sgformat:main"
 
 [tool.setuptools]
 packages = ["nostools"]

@@ -1,0 +1,62 @@
+*DECK CMSMSE F
+DFXMSE  TITLE 'Input a line'                                            LIN00010
+DFXMSE   CSECT ,                                                        LIN00020
+DFXMSE   AMODE ANY                                                      LIN00030
+DFXMSE   RMODE ANY                                                      LIN00040
+*                                                                       LIN00050
+*                                       M.Wheeler   9 Oct  1990         LIN00060
+* Callable from Fortran as :                                            LIN00070
+*                                                                       LIN00080
+*   CALL DFXMSE(REPLY,LENBUF,LENRET,IERR)                               LIN00090
+*                                                                       LIN00100
+*        REPLY  - Location where value of option is to be returned      LIN00110
+*                 CHARACTER string - big enough to hold reply.          LIN00120
+*                 (Largest reply seen so far 'CPCLASS ' length 32  )    LIN00130
+*        LENBUF - Length of REPLY buffer   ( = LEN(REPLY) )             LIN00140
+*                 INTEGER                                               LIN00150
+*        LENRET - Length of field returned (rest blank padded)          LIN00160
+*                 INTEGER                                               LIN00170
+*        IERR   - ERROR Return code (INTEGER) :                         LIN00180
+*                  =  0 - Completed OK                                  LIN00190
+*                              From CMSCALL VMBATCH  (R15) :            LIN00200
+*                  = -8   Option string > 255 .      Nothing stacked    LIN00210
+*                  = -24  Invalid or missing option name.   ..          LIN00220
+*                              From LINERD (R15) :                      LIN00230
+*                  =  4   Attention interrupt ended read op             LIN00240
+*                  = 12   Function invalid for virtual screen specified LIN00250
+*                  = 24   Incorrect parameter list specified            LIN00260
+*                  = 28   Virtual screen does not exist                 LIN00270
+*                  = 89   Console is a 2741 typewriter terminal (!)     LIN00280
+*                  =104   Insufficient storage to execute function      LIN00290
+*                                                                       LIN00300
+*---------------------------------------------------------------------  LIN00310
+*                                                                       LIN00320
+*                                                                       LIN00330
+*---------------------------------------------------------------------  LIN00340
+*                                                                       LIN00350
+         PRINT ON,NOGEN                                                 LIN00360
+         STM   14,12,12(13)                                             LIN00370
+         LR    12,15                                                    LIN00380
+         USING DFXMSE,12                                                LIN00390
+*                                                                       LIN00400
+         LM    3,6,0(1)                                                 LIN00410
+*                                    R3 -> REPLY                        LIN00420
+         L     4,0(4)                R4 =  LENGTH OF BUFFER             LIN00430
+*                                    R5 -> LENGTH RETURNED              LIN00440
+*                                    R6 -> IERR                         LIN00450
+*                                                                       LIN00460
+*                                                                       LIN00470
+* Now read the VARIABLE from the program STACK and get its LENGTH.      LIN00480
+*                                                                       LIN00490
+         LINERD   DATA=((3),(4)),TYPE=STACK,TRANS=NO,CASE=MIXED         LIN00500
+*                                                                       LIN00510
+         ST    15,0(6)               Return any ERROR code from R15     LIN00520
+         ST    0,0(5)                Return LENGTH from R0              LIN00530
+*                                                                       LIN00540
+RET      LM    2,12,28(13)           Restore                            LIN00550
+         L     14,12(13)             :                                  LIN00560
+         MVI   12(13),X'FF'          and                                LIN00570
+         SR    15,15                 :                                  LIN00580
+         BR    14                    Return                             LIN00590
+*                                                                       LIN00600
+         END                                                            LIN00610

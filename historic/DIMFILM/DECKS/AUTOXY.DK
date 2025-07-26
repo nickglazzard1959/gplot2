@@ -1,0 +1,13 @@
+*DECK AUTOXY F
+      SUBROUTINE AUTOXY
+*CALL,DFXC02
+*CALL,DFXC05A
+      ROUTIN = 'AUTOXY'
+*CALL,XIN
+      FIXX = .FALSE.
+      MONX = 0
+      FIXY = .FALSE.
+      MONY = 0
+*CALL,XOUT
+      RETURN
+      END

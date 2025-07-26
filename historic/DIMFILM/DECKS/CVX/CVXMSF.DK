@@ -1,0 +1,33 @@
+*DECK CVXMSF C
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <stdio.h>
+#include <stdlib.h>
+void dfxmsf_(user,name,lenuser,lenname,luse,lnam)
+/*  get effective user + name,
+    or, if root, actual user + name
+    from password database */
+char user[64],
+     name[64];
+long int *lenuser,
+         *lenname,
+         luse,
+         lnam;
+{
+struct passwd *pwdptr;
+pwdptr = getpwuid( geteuid() );
+strcpy(user,pwdptr->pw_name);
+if (strncmp( user, "root", 4) == 0)
+   {
+     /* if effective user is root get actual user */
+   pwdptr = getpwuid( getuid() );
+   strcpy(user,pwdptr->pw_name);
+   }
+strcpy(name,pwdptr->pw_gecos);
+*lenuser = strlen(user);
+*lenname = strlen(name);
+return;
+}
+

@@ -1,0 +1,15 @@
+*DECK COLOR F
+      SUBROUTINE COLOR(N)
+*CALL,DFXC04
+*CALL,DFXC05A
+      ROUTIN = 'COLOR'
+*CALL,RIN
+      CALL DFX140(IRGBN)
+      CALL DFX161(N,IERR)
+      IF (IERR.EQ.0) THEN
+                        DO 1 I=1,NRGB
+    1                   NLUT(I) = N
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

@@ -1,0 +1,36 @@
+*DECK CVXMS6 F
+      SUBROUTINE DFXMS6(USER)
+      CHARACTER*(*) USER
+      CHARACTER*8 JN
+C   RETURNS 20 CHARACTER USER NAME
+C
+C   UNDER CONVEX:
+C              INTERACTIVE - GET USER NAME
+C
+C              BATCH - GET NQS REQUEST NAME, APPEND TO NAME
+C
+C   TYPICAL REFERENCE:
+C      CHARACTER*20 NM
+C      CALL DFXMS6 ( NM )
+C
+*CALL DFXC12
+      CHARACTER*20 EVALUE
+      CHARACTER*64 USEID,NAME
+      INTEGER*4 LUSEID,LNAME
+      USER = ' '
+C    Get effective user, or - if root - actual user + name
+      CALL DFXMSF(USEID,NAME,LUSEID,LNAME)
+      I = INDEX(NAME(1:LNAME),',') - 1
+      IF (I.GT.0) LNAME = I
+      USER = NAME(1:LNAME)
+      IF (.NOT.SYSIA) THEN
+C    Append batch request name if non-blank
+           CALL GETENV('QSUB_REQNAME',EVALUE)
+           IF (EVALUE.NE.' ') THEN
+               I = LNBLNK(USER)
+               IF (I.LT.19) USER(I+1:) = '/'//EVALUE
+           ENDIF
+      ENDIF
+      RETURN
+      END
+

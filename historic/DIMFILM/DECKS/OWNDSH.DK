@@ -1,0 +1,14 @@
+*DECK OWNDSH F
+      SUBROUTINE OWNDSH
+*CALL,DFXC00
+*CALL,DFXC05A
+      ROUTIN = 'OWNDSH'
+*CALL,RIN
+      IDASH = 4
+      NO1 = 1
+      NO2 = N4
+      TL = TL4*XQ
+      CALL DFX105
+*CALL,ROUT
+      RETURN
+      END

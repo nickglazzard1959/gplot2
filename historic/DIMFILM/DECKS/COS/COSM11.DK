@@ -1,0 +1,344 @@
+*DECK COSM11 F
+      SUBROUTINE DFXM11(NBET,NFONT,IERR,INO)                            COSM11.2
+C                                                                       COSM11.3
+C   EXTENDED FOR UNICOS   -  JOHN GILBERT  MAY 1990
+C                                                                       COSM11.3
+C        ROUTINE LOADS FONT NUMBER NFONT INTO ALPHABET NBET             COSM11.4
+C                                                                       COSM11.5
+C        ALSO CONTAINS TWO OTHER ENTRY POINTS:                          COSM11.6
+C                                                                       COSM11.7
+C        DFXM10   -  ACCESS DEFAULT FONT DATASET                        COSM11.8
+C                                                                       COSM11.9
+C           CALLS CAL ROUTINE DFXMAC TO PERFORM THE ACCESS SO THAT      COSM1110
+C           MESSAGES CAN BE SUPRESSED.                                  COSM1111
+C                                                                       COSM1112
+C        DFXM12   -  RELEASE FONT DATASET                               COSM1113
+C                                                                       COSM1114
+C        THESE ARE INCLUDED AS ENTRY POINTS SO THAT THE FONT DN         COSM1115
+C        NEED ONLY BE DEFINED ONCE - THE DEFAULT PDN AND ID ARE         COSM1116
+C        SET UP IN THE CAL ROUTINE DFXMAC.                              COSM1117
+C                                                                       COSM1118
+C------------------------------------------------------------------     COSM1119
+C                                                                       COSM1120
+C        COMMON BLOCK DFXC21 IS USED TO STORE THE PACKED DATA           COSM1121
+C        BYTE LIMITS ARE ASSIGNED FOR EACH FONT TYPE AND                COSM1122
+C        PARAMETER STATEMENTS USED TO CALCULATE WORD ADDRESSES          COSM1123
+C        FOR THE FIRST WORD OF EACH FONT AND THE TOTAL LENGTH           COSM1124
+C        NEEDED FOR ADATA. THE THREE PARAMETERS WHICH MUST BE           COSM1125
+C        SET ARE                                                        COSM1126
+C                                                                       COSM1127
+C        NBA  BYTE LIMIT FOR ALPHABETIC FONTS - CURRENTLY 12000         COSM1128
+C        NBS  BYTE LIMIT FOR MARKER FONTS     - CURRENTLY 10000         COSM1129
+C        NBM  BYTE LIMIT FOR MARKER FONTS     - CURRENTLY  2000         COSM1130
+C                                                                       COSM1131
+C        N.B. IF CHANGED THESE VALUES WILL ALSO NEED TO BE              COSM1132
+C             ALTERED IN CAL ROUTINE DFXM20.                            COSM1133
+C                                                                       COSM1134
+C        FROM THESE THE FOLLOWING ARE CALCULATED:                       COSM1135
+C                                                                       COSM1136
+C        NWA  # OF WORDS PER ALPHABETIC FONT                            COSM1137
+C        NWS  # OF WORDS PER SPECIAL FONTS                              COSM1138
+C        NWM  # OF WORDS PER MARKER FONT                                COSM1139
+C        PBET1 .. PBET5  POINTERS TO FIRST WORD OF EACH ALPHABET        COSM1140
+C        NWADATA  # OF WORDS FOR ALL FIVE ALPHABETS                     COSM1141
+C                                                                       COSM1142
+C----------------------------------------------------------------       COSM1143
+C                                                                       COSM1144
+C        OTHER PARAMETERS USED:                                         COSM1145
+C                                                                       COSM1146
+C        NWPR  :  NUMBER OF WORDS PER RECORD FOR FONT DATASET           COSM1147
+C        NBPR  :  NUMBER OF BYTES PER RECORD FOR FONT DATASET           COSM1148
+C        NIEPR :  NUMBER OF INDEX ENTRIES PER RECORD FOR FONT DATASET
+C                                                                       COSM1149
+C----------------------------------------------------------------       COSM1150
+C                                                                       COSM1151
+C        ERROR CODES : RETURNED IN IERR                                 COSM1152
+C                      FOR DFXM11 INO RETURNS NUMBER OF CHARACTERS      COSM1153
+C                      SUCCESSFULLY READ                                COSM1154
+C                                                                       COSM1155
+C        DFXM10  -   IERR SET TO SYSTEM CODE (0=SUCCESS)                COSM1156
+C        DFXM12  -   IERR SET TO SYSTEM CODE (0=SUCCESS)                COSM1157
+C                                                                       COSM1158
+C        DFXM11  -   NON-FATAL CODES                                    COSM1159
+C                                                                       COSM1160
+C         1   FONT NOT FOUND                                            COSM1161
+C         2   FONT TRUNCATED (I.E. COORDINATES EXCEED MAX ALLOWED)      COSM1162
+C         3   FONT HAS TOO MANY ENTRIES                                 COSM1163
+C         4   FONT HAS TOO FEW ENTRIES                                  COSM1164
+C         5   ERROR IN FONT LOAD. UNEXPECTED END OF FILE WHILE          COSM1165
+C             READING IN FONT                                           COSM1166
+C                                                                       COSM1167
+C                    FATAL CODES                                        COSM1168
+C                                                                       COSM1169
+C        -1   SYSTEM ERROR - NO DATA TRANSFERRED                        COSM1170
+C        -2   SYSTEM ERROR - PARTIAL TRANSFER OF DATA                   COSM1171
+C                                                                       COSM1172
+C----------------------------------------------------------------       COSM1173
+*                                                                       COSM1174
+*       DIMFILM MACHINE DEPENDENT INTERFACE - CRAY VERSION              COSM1175
+*       VERSION 1.0        01/02/84        STEVE WISE,ULCC              COSM1176
+*       VERSION 1.1        26/04/84        STEVE WISE,ULCC
+*       VERSION 1.2        08/05/90        JOHN GILBERT,ULCC
+*                                                                       COSM1177
+CDIR$ EJECT                                                             COSM1178
+      IMPLICIT INTEGER (A-Z)                                            COSM1179
+      PARAMETER (NWPR=30 , NBPR=NWPR*8 , NIEPR=6)                       COSM1180
+      PARAMETER (NBA=12000 , NBS=10000 , NBM=2000)                      COSM1181
+      PARAMETER (NWA=NBA/8 , NWS=NBS/8 , NWM=NBM/8)                     COSM1182
+      PARAMETER (PBET2=1+NWA , PBET3=PBET2+NWA , PBET4=PBET3+NWA ,      COSM1183
+     +           PBET5=PBET4+NWS)                                       COSM1184
+      PARAMETER (NWADATA=PBET5+NWM-1)                                   COSM1185
+      DIMENSION  LINE(NWPR),PBET(5)                                     COSM1186
+*CALL,DFXC20
+      COMMON /DFXC21/ ADATA(NWADATA)                                    COSM1188
+*CALL,DFXC22
+      EQUIVALENCE     (ICDATA(1),LINE(1))                               COSM1190
+      LOGICAL         IFDNT                                             COSM1191
+      POINTER         (PLBYTE,LBYTE(0:120))                             COSM1192
+      DATA            ENDFLAG/'END'L/                                   COSM1193
+      DATA            PBET /1,PBET2,PBET3,PBET4,PBET5/                  COSM1194
+      DATA            FDN/'dfxfdn'L/                                    COSM1195
+      DATA            IFDNT/.FALSE./                                    COSM1195
+C
+C------------------------------------------------------
+C
+C      FONT FILE STRUCTURE
+C
+C      FILE HEADER:
+C           WORD 1:   FONT NUMBER (+VE VALUE, -VE END OF DATA FILE)
+C                     (FOR THE CRAY IMPLEMENTATION THE FOLLOWING
+C                      TWO POINTERS ARE RELATIVE; I.E. THEY ARE
+C                      THE NUMBER OF INDEX+DATA RECORDS IN
+C                      THE PRECEDING/CURRENT FONT EXCLUDING THE
+C                      INTER-FONT END FLAG RECORD WHICH IS USED
+C                      BY THE CRAY)
+C                2:   BACKWARD POINTER  (INDEX+DATA RECORDS USED FOR
+C                                        PRECEDING FONT, -1 IF NONE)
+C                3:   FORWARD POINTER    (INDEX+DATA RECORDS FOR THIS
+C                                         FONT, REDUNDANT FOR
+C                                         FONT=-1)
+C                4:   NUMBER OF CHARACTERS IN FONT (INCLUDING ACCENTS)
+C                                                   = <NUM>
+C                5:   MONO HALF-WIDTH LEFT
+C                6:   MONO HALF-WIDTH RIGHT
+C                7:   BASE LINE OFFSET
+C                8:   HEIGHT
+C                9:   LINE SPACING
+C                               (NOTE: 5-9 IN CHARACTER RASTER UNITS)
+C      INDEX:
+C            <NUM> 5 WORD ENTRIES, BEING FOR EACH CHARACTER:
+C           WORD 1:   LAST BYTE POINTER (I.E. FIRST BYTE-1 OF NEXT
+C                                        CHARACTER)
+C                2:   LEFT EXTENT (PROPORTIONAL)
+C                3:   RIGHT EXTENT (PROPORTIONAL)
+C                4:   LOWEST EXTENT (HEIGHT MIN)
+C                5:   HIGHEST EXTENT (HEIGHT MAX)
+C                     (FOR ACCENTS 4/5 ARE MIN/MAX HEIGHTS:
+C                      WHEN ABSOLUTE VALUE LESS THAN 100 ARE
+C                      ABSOLUTE MIN/MAX,
+C                      WHEN ABSOLUTE VALUE IS 100 OR GREATER ARE
+C                      MIN/MAX HEIGHTS RELATIVE TO PRECEDING
+C                      CHARACTER,
+C                      BOTH ZERO IF ACCENT DOES NOT AFFECT HEIGHT
+C                      OF PRECEDING CHARACTER)
+C
+C      DATA:
+C            CHARACTER DATA - DESCRIBED IN DFX202
+C
+C------------------------------------------------------                 COSM1128
+C
+C                                                                       COSM1196
+C        SEARCH FOR FONT                                                COSM1197
+C                                                                       COSM1198
+      IERR=0                                                            COSM1199
+      IF (.NOT.IFDNT) THEN                                              COSM1100
+        IERR=-1                                                         COSM1101
+        INO=0                                                           COSM1102
+        RETURN                                                          COSM1103
+      ENDIF                                                             COSM1104
+      REWIND FDN                                                        COSM1105
+    1 READ(FDN,END=900,ERR=901) LINE                                    COSM1106
+      IF (LINE(1).EQ.NFONT) GOTO 3                                      COSM1107
+    2   READ(FDN,END=900,ERR=901) LINE                                  COSM1108
+        IF (LINE(1).EQ.ENDFLAG) GOTO 1                                  COSM1109
+        GOTO 2                                                          COSM1110
+  900 IERR=1                                                            COSM1111
+      INO=0                                                             COSM1112
+      RETURN                                                            COSM1113
+C------------------------------------------------------                 COSM1128
+C                                                                       COSM1114
+C      LOAD DATA FROM HEADER RECORD                                     COSM1115
+C                                                                       COSM1116
+    3 MHWLRU(NBET)=LINE(5)                                              COSM1117
+      MHWRRU(NBET)=LINE(6)                                              COSM1118
+      BLORU (NBET)=LINE(7)                                              COSM1119
+      HRU   (NBET)=LINE(8)                                              COSM1120
+      LSRU  (NBET)=LINE(9)                                              COSM1121
+C------------------------------------------------------                 COSM1128
+C                                                                       COSM1123
+C      FILL ARRAYS FROM INDEX RECORDS                                   COSM1124
+C      THE ACTIONS TAKEN VARY FOR EACH OF THE THREE FONT                COSM1125
+C      TYPES DETERMINED BY NBET:                                        COSM1126
+C                                                                       COSM1129
+C       ALPHABET FONTS         NBET=1-3                                 COSM1130
+C       SPECIAL FONTS          NBET=4                                   COSM1160
+C       MARKER FONTS           NBET=5                                   COSM1188
+C                                                                       COSM1131
+C------------------------------------------------------
+C
+C      FIRST SET UP CERTAIN VARIABLES DEPENDING ON FONT TYPE
+C
+C   MAXCH   :  MAX NO OF CHARACTERS IN CURRENT FONT TYPE
+C
+C   LBYTE   :  CURRENT ARRAY OF LAST BYTE POINTERS                      COSM1222
+C       NOTE:  POINTER IS USED TO EQUIVALENCE THE DUMMY ARRAY           COSM1219
+C              LBYTE WITH THE CURRENT ARRAY OF LAST BYTE POINTERS       COSM1220
+C                                                                       COSM1221
+C   FLEN    :  MAX LENGTH OF CURRENT FONT IN BYTES                      COSM1223
+C
+      IF (NBET.EQ.4) THEN
+        MAXCH=96
+        FLEN=NBS
+        PLBYTE=LOC(LBYTES(0))
+      ELSE IF (NBET.EQ.5) THEN
+        MAXCH=48
+        FLEN=NBM
+        PLBYTE=LOC(LBYTEM(0))
+      ELSE
+        MAXCH=120
+        FLEN=NBA
+        PLBYTE=LOC(LBYTEA(0,NBET))
+      ENDIF
+C
+C   THEN FILL RELEVANT ARRAYS FROM INDEX
+C
+      NMAXI=MIN(MAXCH,LINE(4))                                          COSM1132
+      IF (NMAXI.LT.MAXCH) IERR=4                                        COSM1133
+      IF (LINE(4).GT.MAXCH) IERR=3                                      COSM1134
+      DO 500 I=0,MAXCH                                                  COSM1135
+  500 LBYTE(I)=0                                                        COSM1136
+      NIND=(NMAXI-1)/NIEPR+1                                            COSM1137
+      XIND=(LINE(4)-1)/NIEPR+1-NIND                                     COSM1138
+      DO 501 I=1,NIND                                                   COSM1139
+      READ (FDN,END=902,ERR=901) LINE                                   COSM1140
+      IF (LINE(1).EQ.ENDFLAG) GOTO 902                                  COSM1141
+      DO 501 J=1,NIEPR                                                  COSM1142
+        I1=NIEPR*(I-1)+J                                                COSM1143
+        LBYTE(I1)=LINE(J*5-4)                                           COSM1144
+        IF (NBET.NE.5) THEN
+          LXTENT(I1,NBET)=LINE(J*5-3)                                   COSM1146
+          RXTENT(I1,NBET)=LINE(J*5-2)                                   COSM1147
+          LYTENT(I1,NBET)=LINE(J*5-1)
+          UYTENT(I1,NBET)=LINE(J*5)
+        ENDIF
+  501 CONTINUE                                                          COSM1149
+      IF (XIND.NE.0) THEN                                               COSM1150
+        DO 502 I=1,XIND                                                 COSM1151
+        READ (FDN,END=902,ERR=901)                                      COSM1152
+  502   IF (LINE(1).EQ.ENDFLAG) GOTO 902                                COSM1153
+      ENDIF                                                             COSM1154
+C---------------------------------------------------------------        COSM1211
+C                                                                       COSM1212
+C   FILL DATA ARRAY                                                     COSM1213
+C                                                                       COSM1214
+C     BEFORE READING DATA THE LAST BYTE POINTERS ARE SEARCHED           COSM1215
+C     FOR THE LAST CHARACTER WHICH WILL FIT INTO THE CURRENT            COSM1216
+C     ALPHABET - CHARACTERS WHICH DONT FIT HAVE THEIR LAST              COSM1217
+C     BYTE POINTERS SET TO ZERO.                                        COSM1218
+C                                                                       COSM1224
+C   LCHAR   :  LAST CHAR IN FONT WHICH WILL FIT INTO                    COSM1225
+C              CURRENT ALPHABET                                         COSM1226
+C   NFREC   :  NUMBER OF FULL RECORDS OF COORDS TO BE                   COSM1227
+C              READ FROM FONT DATASET                                   COSM1228
+C   XWORD   :  EXTRA WORDS FROM LAST PARTIAL FONT RECORD                COSM1229
+C                                                                       COSM1230
+      DO 800 I=NMAXI,1,-1                                               COSM1231
+  800 IF(LBYTE(I).LT.FLEN) GOTO 801                                     COSM1232
+      IERR=2                                                            COSM1233
+      INO=0                                                             COSM1234
+      RETURN                                                            COSM1235
+  801 LCHAR=I                                                           COSM1236
+      IF (LCHAR.NE.NMAXI) IERR=2                                        COSM1237
+      DO 802 I=LCHAR+1,NMAXI                                            COSM1238
+  802 LBYTE(I)=0                                                        COSM1239
+      NFREC=LBYTE(LCHAR)/NBPR                                           COSM1240
+      N=PBET(NBET)                                                      COSM1241
+      DO 803 NREC=1,NFREC                                               COSM1242
+      READ (FDN,END=903,ERR=904) (ADATA(J),J=N,N+NWPR-1)                COSM1243
+      IF (ADATA(N).EQ.ENDFLAG) GOTO 903                                 COSM1244
+  803 N=N+NWPR                                                          COSM1245
+      XBYTE=LBYTE(LCHAR)-NFREC*NBPR                                     COSM1246
+      IF (XBYTE.NE.0) THEN                                              COSM1247
+        XWORD=((XBYTE-1)/8)+1                                           COSM1248
+        READ (FDN,END=903,ERR=904) (ADATA(J),J=N,N+XWORD-1)             COSM1249
+        IF (ADATA(N).EQ.ENDFLAG) GOTO 903                               COSM1250
+      ENDIF                                                             COSM1251
+      INO=LCHAR                                                         COSM1252
+      RETURN                                                            COSM1253
+C----------------------------------------------------------------       COSM1254
+C       ERROR TRAPPING                                                  COSM1255
+C                                                                       COSM1256
+  901 IERR=-1                                                           COSM1257
+      INO=0                                                             COSM1258
+      RETURN                                                            COSM1259
+  902 IERR=5                                                            COSM1260
+      INO=0                                                             COSM1261
+      RETURN                                                            COSM1262
+  903 IERR=5                                                            COSM1263
+      GOTO 910                                                          COSM1264
+  904 IERR=-2                                                           COSM1265
+      GOTO 910                                                          COSM1266
+C                                                                       COSM1267
+C      CALCULATE NUMBER OF CHARS FOR WHICH DATA SUCCESSFULLY READ       COSM1268
+C                                                                       COSM1269
+  910 LBR=(NREC-1)*NBPR                                                 COSM1270
+      DO 911 I=LCHAR,0,-1                                               COSM1271
+  911 IF(LBYTE(I).LT.LBR) GOTO 912                                      COSM1272
+  912 INO=I                                                             COSM1273
+      RETURN                                                            COSM1274
+C================================================================       COSM1275
+C                                                                       COSM1276
+      ENTRY DFXM10(IERR)                                                COSM1277
+C                                                                       COSM1276
+C       CALL DFXMAC(IERR,FDN)                                           COSM1278
+C     NOW USE FORTRAN CALL TO AVOID CHANGES IN PDD
+C
+*IF DEF,UNICOS
+C    NOTE: FILE IDENTIFIER USED MUST AGREE WITH DN DEFINITION
+      IERR = ISHELL('assign -a $PUBLIC/.dfxfnts dfxfdn')
+*ELSE
+*/  MUST BE COS
+        CALL ACCESS(IERR,
+     1              'DN'L,   FDN,
+     2              'PDN'L,  'HERSHEYFONTS'L,
+     3              'OWN'L,  'PUBLIC'L,
+     4              'ERR'L,
+     5              'MSG'L)
+C
+C    THE FOREGOING ACCESSES THE FILE SUPPRESSING MESSAGES ON EITHER
+C    ERROR OR TERMINATION.  HOWEVER, MESSAGE IS ENTERED IN SYSTEM LOG.
+C
+C    TO AVOID ALL MESSAGES IT IS NECESSARY TO TURN ECHOING OFF/ON
+C
+C       CALL ECHO('OFF'L,'ALL'L)
+C       CALL ACCESS(....
+C       CALL ECHO('ON'L,'ALL'L)
+C
+*ENDIF
+        IF (IERR.NE.0) CALL DFXMSA(IERR)                                COSM1279
+        IF (IERR.EQ.0) IFDNT = .TRUE.                                   COSM1279
+C    ASSUME FILE ACCESSED
+        RETURN                                                          COSM1280
+C================================================================       COSM1281
+C                                                                       COSM1282
+      ENTRY DFXM12(IERR)                                                COSM1283
+*IF DEF,UNICOS
+      IERR = ISHELL('assign dfxfdn')
+*ELSE
+*/  MUST BE COS
+      CALL RELEASE (IERR,                                               COSM1284
+     +              'DN'L     ,   FDN      )                            COSM1285
+*ENDIF
+      IF (IERR.NE.0) CALL DFXMSA(IERR)                                  COSM1286
+      RETURN                                                            COSM1287
+      END                                                               COSM1288

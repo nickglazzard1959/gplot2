@@ -1,0 +1,84 @@
+*DECK COS90D F
+      SUBROUTINE DFX90D
+C
+C   ROUTINES TO HANDLE HEXADECIMAL DATASET FOR PRINTRONIX 300 DRIVER
+C
+C   EXTENDED FOR UNICOS   -  JOHN GILBERT  MAY 1990
+C
+C   ENTRY POINTS:
+C
+C     DFX90A(IFORM,IOUTLIM,IERR)
+C
+C       ALLOCATES FILE FOR METAFILE - SET UP AS SCRATCH DATASET
+C       WITH DN=$DFXPRX. IFORM AND IOUTLIM ARE SAVED IN THE JCL
+C       TO BE USED BY DFX90C
+C
+C     DFX90B(BUFF)
+C
+C       WRITES A RECORD FROM BUFF TO THE DATASET
+C
+C     DFX90C(IERR)
+C
+C       DISPOSES THE DATASET TO SYSOUT=G ON THE AMDAHL - THIS
+C       SHOULD THEN RETURN TO ORIGINATING SITE
+C
+*
+*       DIMFILM MACHINE DEPENDENT INTERFACE - CRAY VERSION
+*       VERSION 1.0        01/06/84       JOHN GILBERT/STEVE WISE,ULCC
+*
+      IMPLICIT INTEGER (A-Z)
+      CHARACTER IBUFF*(*),IFORM*4,JCL*64
+*IF DEF,UNICOS
+      DATA  DN/'dfxprx'L/
+*ELSE
+*/  MUST BE COS
+      DATA  DN/'$DFXPRX'L/
+*ENDIF
+      DATA  JCL/
+     +'SYSOUT=(G,,    ),DCB=(RECFM=F,LRECL=140),OUTLIM=00000000'/
+C=======================================================================
+C
+      ENTRY DFX90A(IFORM,IOUTLIM,IERR)
+      WRITE(JCL(12:15),'(A4)')   IFORM
+      WRITE(JCL(49:56),'(I8.8)') IOUTLIM
+*IF DEF,UNICOS
+C    NOTE: FILE IDENTIFIER USED MUST AGREE WITH DN DEFINITION
+      IERR = ISHELL('assign -a $TMPDIR/.dfxprx dfxprx')
+*ELSE
+*/  MUST BE COS
+      CALL ASSIGN (IERR,
+     +             'DN'L    , DN      ,
+     +             'DC'L    , 'SC'L   ,
+     +             'BFI'L   , 'OFF'L   )
+*ENDIF
+      IF (IERR.NE.0) CALL DFXMSA(IERR)
+      RETURN
+C=======================================================================
+C
+      ENTRY DFX90B(IBUFF)
+      WRITE(DN,'(A)') IBUFF
+      RETURN
+C=======================================================================
+C
+      ENTRY DFX90C(IERR)
+*IF DEF,UNICOS
+      CLOSE(DN)
+      JCL(64:64) = ''''
+      IERR = ISHELL
+     1       ('dispose $TMPDIR/.dfxprx -dPT -mM1 -fBB -S -t'''//JCL)
+      IERR0 = ISHELL('assign dfxprx')
+      IERR0 = ISHELL('rm $TMPDIR/.dfxprx 2>/dev/null')
+*ELSE
+*/  MUST BE COS
+      JCL(64:64)=CHAR(0)
+           CALL DISPOSE (IERR,
+     +              'DN'L    , DN      ,
+     +              'DC'L    , 'PT'L   ,
+     +              'MF'L    , 'VS'L   ,
+     +              'DF'L    , 'CB'L   ,
+     +              'TEXT'L  , JCL     ,
+     +              WAIT                 )
+*ENDIF
+      IF (IERR.NE.0) CALL DFXMSA(IERR)
+      RETURN
+      END

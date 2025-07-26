@@ -1,0 +1,214 @@
+*DECK CMSMSD F
+DFXMSD   TITLE 'Perform synchronous I/O using diagnose A8'
+DFXMSD   CSECT ,
+DFXMSD   AMODE ANY
+DFXMSD   RMODE ANY
+*
+*  This routine uses the CP diagnose code A8 to perform
+*  synchronous I/O.  It is designed for virtual readers, printers
+*  and punches, but may be useful for other devices such as tapes.
+*
+*  Will work in 370 or XA mode machine, above or below the line.
+*
+*  See "CP Programming services" for a full discussion of
+*  this diagnose.
+*
+*  Use assembler H (HASM command)
+*
+*  Calling sequence
+*    CALL DFXMSD ( DEV, FUN, BUF, LEN, RC, STAT)
+*  DEV - device number (vaddr)- binary fullword
+*  FUN - 'READ' or 'WRITE' or a hex channel command code
+*          READ/WRITE use the simplest Read/write instruction.
+*          See the 'yellow card' or its successor for valid
+*          command codes for each device, e.g.
+*            '1F' - write tape mark (for a tape)
+*            '09' - write, spacing 1 line (for a printer)
+*  BUF - buffer
+*  LEN - length, max 204 for unit record device
+*  RC - return code (0=ok,1=eof,2=I/O failed,3=I/O not done,4=param
+*                    error) - fullword
+*  STAT - supplementary return info (fullword)
+*       - when RC=0, length actually transferred (may not be length
+*                    written to a unit record device: these are padded
+*                    out with blanks to the maximum for the device.
+*       - when RC=1, undefined
+*       - when RC=2, device and subchannel status
+*       - when RC=3, DIAGNOSE return code
+*       - when RC=4, undefined
+*
+*  The device should have been defined by, for example
+*    CP DEFINE RDR AS vaddr     (to read)
+*    CP DEFINE 3800 AS vaddr    (to write)
+*
+*  Bad buffer address or length may cause an ABEND.
+*
+*  Diagnose return codes (in STAT, when RC=3)
+*    1 - device not attached
+*    2 - device not supported
+*    3 - device busy or has pending interrupt
+*    16 - unsolicited status pending on device
+*
+         STM   14,12,12(13)
+         LR    12,15
+         USING DFXMSD,12
+         LM    2,7,0(1)            R2-R7 are parameter addresses
+*
+*  Set device number in I/O parameters
+*
+         L     1,0(2)
+         LTR   1,1
+         BNP   BADPARM
+         C     1,=X'0000FFFF'
+         BH    BADPARM
+         STH   1,DEVNUM
+*
+*  Interpret request.
+*  Valid forms are C'WRITE', C'READ' C'xx'
+*
+         CLI   0(3),C'R'
+         BE    READ1
+         CLI   0(3),C'W'
+         BE    WRITE1
+*
+*  I/O code must be hex digits if valid.  Convert.
+*
+         MVC   WORK(2),0(3)
+         TR    WORK(2),HEXIN
+         CLI   WORK,X'FF'
+         BE    BADPARM
+         CLI   WORK+1,X'FF'
+         BE    BADPARM
+         PACK  WORK+4(2),WORK(3)
+         MVC   IOCODE(1),WORK+4
+         B     IOCODEOK
+*
+*  Check for READ or WRITE - set the simplest read and write codes.
+*  (N.B. for a real printer the 'simplest' I/O code results in
+*  constant overprinting)
+*
+READ1     CLC   =C'READ',0(3)
+          BNE   BADPARM
+          MVI   IOCODE,READCODE
+          B     IOCODEOK
+*
+WRITE1    CLC   =C'WRITE',0(3)
+          BNE   BADPARM
+          MVI   IOCODE,WRICODE
+*
+IOCODEOK  DS    0H
+*
+*  Set buffer address and length in channel program
+*
+         ST    4,BUFPTR
+         L     1,0(5)
+         STH   1,BUFLEN
+*
+*  Do I/O
+*
+         LA    1,SGIOP
+         DC    X'83',X'10',X'00A8' diagnose A8 - complete I/O
+*
+*  If condition code is not zero the I/O failed, and a return
+*  code in R15 tells us why.  Set RC=3 and save R15.
+*
+*   First check for R15=13, which is an I/O error.
+*
+          BZ     IOCOMPLT
+          CH     15,=H'13'
+          BE     IOERROR
+          ST     15,0(7)
+          LA     1,3
+          ST     1,0(6)
+          B      RETURN
+*
+*  I/O has completed.
+*  Check the device and subchannel status.
+*    X'0C00' - device and channel end - ok
+*    X'0100' - device exception (normally end of file)
+*
+IOCOMPLT DS    0H
+         CLC   DEVSTAT(2),=X'0C00'
+         BE    IOOK
+IOERROR  DS    0H
+         CLC   DEVSTAT(2),=X'0100'
+         BE    DEVEX
+*
+*  I/O error - set RC=2 and save device and subchannel status
+*
+         XR    1,1
+         ICM   1,3,DEVSTAT
+         ST    1,0(7)
+         LA    1,2
+         ST    1,0(6)
+         B     RETURN
+*
+*  Device exception (normally eof) - set RC=1
+*
+DEVEX    DS    0H
+         LA    1,1
+         ST    1,0(6)
+         B     RETURN
+*
+*  I/O complete.  Get count of bytes transferred using the
+*  original length and the residual byte count.  RC=0
+*
+IOOK     DS     0H
+         L      1,0(5)
+         SH     1,RESID
+         ST     1,0(7)
+         XR     1,1
+         ST     1,0(6)
+         B     RETURN
+*
+*  Exits
+*
+BADPARM  DS    0H
+         LA    1,4
+         ST    1,0(6)              set RC=4
+         B     RETURN
+RETURN   DS    0H
+         LM    14,12,12(13)
+         BR    14
+*
+*  Constants
+*
+HEXIN    DC    256X'FF'
+         ORG   HEXIN+C'A'
+         DC    X'0A0B0C0D0E0F'
+         ORG   HEXIN+C'0'
+         DC    X'00010203040506070809'
+         ORG   HEXIN+256
+*
+*  Work area
+*
+WORK     DS    D
+*
+*  Parameter list required by diagnose A8 to describe I/O
+*
+SGIOP    DS    0D
+DEVNUM   DC    AL2(*-*)            Device #
+         DC    X'00'               Storage key for CCWs etc.
+         DC    X'80'               Flags: format-1 CCWs used
+         DC    F'0'                reserved
+         DC    A(CHP)              channel program address
+         DC    F'0'                reserved
+         DC    A(0)                returned as last executed CCW
+DEVSTAT  DC    X'00'               returned as device status
+SSSTAT   DC    X'00'               returned as subchannel status
+RESID    DC    H'0'                returned as residual byte count
+         DC    F'0'                reserved
+         DC    H'0'                reserved
+         DC    H'0'                returned as count of sense bytes
+         DC    6F'0'               reserved
+         DC    8F'0'               returned as sense bytes
+*
+CHP      DS    0D                  channel program: CCW
+IOCODE   DC    AL1(*-*)            I/O function code
+         DC    B'00100000'         flags: SLI, not continued
+BUFLEN   DC    AL2(*-*)            count to transfer
+BUFPTR   DC    AL4(*-*)            buffer address
+*
+READCODE EQU   X'02'               simple read op-code
+WRICODE  EQU   X'01'               simple write op-code
+         END

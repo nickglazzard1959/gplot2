@@ -1,0 +1,27 @@
+*DECK DFX166 F
+      SUBROUTINE DFX166(N,V1,V2,V3)
+C
+C++++++++++++++CODE MUST REPLICATE THAT IN USER ACCESSIBLE SETLUT+++++++
+C
+      INTEGER NPT(2)
+*CALL,DFXC00
+*CALL,DFXC04
+*CALL,DFXC05A
+*CALL,DFXC17
+*CALL,DFXCBD
+C   SUPPRESS DIAGNOSTICS
+      ICHSAV = ICHECK
+      ICHECK = 0
+      CALL DFX160(NCMODE,V1,V2,V3,RRR,GGG,BBB,IERR)
+      ICHECK = ICHSAV
+      IF (IERR.LE.0) THEN
+                  RGBLUT(1,N) = RRR
+                  RGBLUT(2,N) = GGG
+                  RGBLUT(3,N) = BBB
+                  NWS = 0
+                  NPT(1) = N
+                  NPT(2) = N
+                  CALL DFX000(101,ZDUMMY,ZDUMMY,ZDUMMY,NPT)
+      ENDIF
+      RETURN
+      END

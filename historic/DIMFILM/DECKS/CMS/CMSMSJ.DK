@@ -1,0 +1,40 @@
+*DECK CMSMSJ F
+DFXMSJ   TITLE 'Get the USERID from the SYSTEM'
+DFXMSJ   CSECT ,
+DFXMSJ   AMODE ANY
+DFXMSJ   RMODE ANY
+*
+*              DFXMSJ
+*
+*  A FORTRAN callable routine to return the 8 character User-ID.
+*
+*                Matthew Wheeler      30 Jan 90
+*
+*  Returns an eight byte value to the first argument.
+*
+*  FORTRAN Example:
+*      CHARACTER*8 UID
+*      CALL DFXMSJ(UID)
+*
+*  Save calling program's registers
+         STM   14,4,12(13)
+         LR    4,15
+         USING DFXMSJ,4
+*
+         L     3,0(1)        R3 -> Param. 1
+         LA    1,DIAGINFO    R1 -> Results area
+         LA    2,24          R2 ' = Get 24 bytes of info'
+         DC    X'83120000'   Issue Diagnose X'00'  R1,R2
+*
+         MVC   0(8,3),16(1)  Return 8 char Userid
+*
+* Restore saved registers
+         LM    2,4,28(13)
+         L     14,12(13)
+         MVI   12(13),X'FF'
+         SR    15,15
+* Return to calling program
+         BR    14
+*
+DIAGINFO DS    3D            Diagnose results area
+         END

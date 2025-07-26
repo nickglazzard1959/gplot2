@@ -1,0 +1,32 @@
+*DECK POLDEF F
+      SUBROUTINE POLDEF(ITITLE,IRLAB)
+      CHARACTER*(*) ITITLE,IRLAB
+*CALL,DFXC00
+*CALL,DFXC06
+*CALL,DFXC05A
+      ROUTIN = 'POLDEF'
+*CALL,RIN
+C----------------------------------
+C    EQUIVALENT TO LTITLE(ITITLE)
+      Y = YTB1 + DC3*(YTB2 - YTB1)
+      CALL DFX328(Y,ITITLE)
+C----------------------------------
+C    EQUIVALENT TO LXLAB(IRLAB)
+      CALL DFX310(IRLAB,1,.TRUE.)
+C----------------------------------
+C    EQUIVALENT TO POLFR
+      CALL DFX324(0)
+C----------------------------------
+C    EQUIVALENT TO RVAL
+      CALL DFX324(2)
+C----------------------------------
+C    EQUIVALENT TO RTIK
+      CALL DFX324(4)
+C----------------------------------
+C    EQUIVALENT TO TVAL
+      CALL DFX322(.FALSE.)
+C----------------------------------
+*CALL,IMM
+*CALL,ROUT
+      RETURN
+      END

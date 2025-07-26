@@ -1,0 +1,15 @@
+*DECK SAMEXY F
+      SUBROUTINE SAMEXY
+*CALL,DFXC02
+*CALL,DFXC05A
+      ROUTIN = 'SAMEXY'
+*CALL,RIN
+      IF ((XGL.EQ.XGR).OR.(YGL.EQ.YGU)) THEN
+            CALL DFX304
+      ELSE
+            FIXX = .TRUE.
+            FIXY = .TRUE.
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

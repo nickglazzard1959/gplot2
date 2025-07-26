@@ -1,0 +1,243 @@
+ .APPENDIX Using DIMFILM at ULCC
+  DIMFILM is currently available on both the Amdahl 5890
+ and the Cray X-MP at ULCC.
+ It is intended that the user interface
+ as described in this document will not be subject to change.  Please
+ advise Graphics Development Group
+ at ULCC of any problems with this product.
+ We shall endeavour to fix reported bugs at the earliest possible
+ moment.  Similarly new features will be incorporated as they become
+ available and will be documented by revisions to this guide.
+  It should be noted that some microfilm services (notably, colour
+ film) may be subject to a charge.  In these cases users _must_
+ ensure that their intended usage is covered by an official college
+ order.  This should be directed to the Microform Section of
+ the Operations Division (not Allocation and Control or
+ Administration).  The order may cover a single account number,
+ a department or whole institution, and may indicate either a
+ monetary limit or expiry date.  Any enquiries regarding this
+ should be directed to Claire Steward (extension 365).
+ .SECTION Amdahl 5890 - VM/CMS Service
+  The DIMFILM library is produced under VS FORTRAN Version 2, a
+ Fortran 77 compiler available under VM/CMS.
+ DIMFILM is built with the latest version of this compiler.
+  Under CMS the implementation of DIMFILM and its internal
+ interface to the Dicomed film recorder makes use of virtual device
+ addresses - these may be in the range 180-183 (inclusive), and so
+ should be avoided by the user.
+ .SUBSECTION VS Fortran Version 2
+  The DIMFILM library for use with VS Fortran is available on the
+ GRAPHICS mini-disk.  Access to this must be achieved by inclusion
+ of an appropriate command:
+         GIME  GRAPHICS
+  To access the DIMFILM library it is further necessary to incorporate
+ a couple of GLOBAL commands.  These, for regular users of DIMFILM,
+ might best be included in their PROFILE EXEC file:
+ .display
+
+       GLOBAL TXTLIB DIMFILM VSF2FORT CMSLIB
+
+       GLOBAL LOADLIB VSF2LOAD
+
+ .endd
+  A typical Fortran program would appear as:
+ .display
+             PROGRAM TEST
+             ...
+             CALL D35
+             .. <Program including calls to DIMFILM routines>
+             CALL DIMEND
+             STOP
+             END
+ .endd
+  This should be compiled, loaded and executed in the normal manner.
+ The GLOBAL commands will ensure the correct satisfaction of
+ references to DIMFILM routines at the appropriate point.
+ .contig INLINE
+  The DIMFILM library is large, the memory required will depend
+ on the modules referenced by the user.
+  When multiple libraries are used with DIMFILM it is possible
+ that the default Loader table sizes may be exceeded - to avoid
+ this, the default table size may be increased by including a
+ command similar to the following:
+       SET LDRTBLS 14
+ .space 2
+   Note: Users who are new to the Amdahl will find general
+ documentation on running jobs in the Amdahl Handbook,
+ published by ULCC. In particular
+ see Chapter 2.2 for details of running jobs and Chapters 3.0 and
+ 3.2.1 for details of using the FORTRAN compiler.
+ .endc
+ .SECTION Amdahl 5890 - MVS Service
+  The DIMFILM library is produced under Fortran 77 and made available
+ for use with both VS Fortran and Siemens Fortran 77.  Separate
+ libraries are maintained for use with these compilers.
+ DIMFILM is built with the latest version of each compiler, and
+ so all jobs should follow the JOB statement with
+         /*JOBPARM P=PROC02
+ .SUBSECTION VS Fortran
+  The DIMFILM library for use with VS Fortran is available on
+ SYS2.DFILMVS.LIB, and should be used in conjunction with release
+ 5.0 of VS Fortran, which is obtained by immediately following the
+ JOB statement with
+         /*JOBPARM  P=PROC02
+  To access the DIMFILM library LLIB1='SYS2.DFILMVS.LIB' may be
+ used in the FVS procedure. A simple job to produce output on
+ 35mm black and white film might be :
+ .display
+   JCL
+
+       //<jobname>   JOB  '<name and delivery>',REGION=2000K
+       //*PASSWORD <MVS password>
+       /*JOBPARM P=PROC02
+       //         EXEC    FVSCLG,LLIB1='SYS2.DFILMVS.LIB'
+       //C.SYSIN  DD  *
+             PROGRAM TEST
+             ...
+             CALL D35
+             .. <Program including calls to DIMFILM routines>
+             CALL DIMEND
+             STOP
+             END
+       //
+ .endd
+ .display
+   Phoenix 3
+
+
+       //<jobname>   JOB  '<name and delivery>',REGION=2000K
+       //*PASSWORD <MVS password>
+       //           EXEC   PHOENIX3
+       FVSCLG PROGRAM=%H+ LIBRARY=SYS2.DFILMVS.LIB
+             PROGRAM TEST
+             ...
+             CALL D35
+             .. <Program including calls to DIMFILM routines>
+             CALL DIMEND
+             STOP
+             END
+       +
+       //
+ .endd
+ .contig INLINE
+  The DIMFILM library is large and it will almost certainly be
+ necessary to request more than the default memory allocation
+ using the REGION parameter on the JOB statement. The default is
+ 600K and the maximum is over 7000K, although no more than 6500K
+ should normally be requested. (Numbers are decimal and
+ specify units of 1K (1000) bytes).
+  When multiple libraries are used with DIMFILM it is possible
+ that the default Linkage Editor/Loader table sizes may be
+ exceeded giving an MVS IEW0484 TABLE OVERFLOW error.  To avoid
+ this, the default table sizes may be increased by including the
+ following parameters in the appropriate JCL EXEC statement:
+ .display
+     Using the Linkage Editor:
+           LPARM='SIZE=(2000K,64K)',LREGN=2000K
+     or using the Loader:
+           LPARM='SIZE=2000K',LREGN=2000K
+ .endd
+ .endc
+ .SUBSECTION Siemens Fortran
+  The DIMFILM library for use with Siemens Fortran is available on
+ SYS2.DFILM77.LIB.  This may be accessed by utilising the LLIB1
+ parameter in the F77 procedure. It is recommended that Version 4
+ of Siemens Fortran be used - considerable savings in CP time and
+ memory can be achieved. A simple job to produce output on
+ 35mm black and white film might be:
+ .display
+       //<jobname>   JOB  '<name and delivery>',REGION=2000K
+       //*PASSWORD <MVS password>
+       /*JOBPARM P=PROC02
+       //     EXEC    F77CLG,LLIB1='SYS2.DFILM77.LIB'
+       //C.SYSIN  DD  *
+             PROGRAM TEST
+             ...
+             CALL D35
+             .. <Program including calls to DIMFILM routines>
+             CALL DIMEND
+             STOP
+             END
+       //
+ .endd
+ .display
+   Phoenix 3
+
+       //<jobname>   JOB  '<name and delivery>',REGION=2000K
+       //*PASSWORD <MVS password>
+       //           EXEC   PHOENIX3
+       F77CLG PROGRAM=%H+ LIBRARY=SYS2.DFILM77.LIB
+             PROGRAM TEST
+             ...
+             CALL D35
+             .. <Program including calls to DIMFILM routines>
+             CALL DIMEND
+             STOP
+             END
+       +
+       //
+ .endd
+ .contig INLINE
+  The DIMFILM library is large and it will almost certainly be
+ necessary to request more than the default memory allocation
+ using the REGION parameter on the JOB statement. The default is
+ 600K and the maximum is over 7000K, although no more than 6500K
+ should normally be requested. (Numbers are decimal and
+ specify units of 1K (1000) bytes).
+  When multiple libraries are used with DIMFILM it is possible
+ that the default Linkage Editor/Loader table sizes may be
+ exceeded giving an MVS IEW0484 TABLE OVERFLOW error.  To avoid
+ this, the default table sizes may be increased by including the
+ following parameters in the appropriate JCL EXEC statement:
+ .display
+     Using the Linkage Editor:
+           LPARM='SIZE=(2000K,64K)',LREGN=2000K
+     or using the Loader:
+           LPARM='SIZE=2000K',LREGN=2000K
+ .endd
+ .space 2
+   Note: Users who are new to the Amdahl will find general
+ documentation on running jobs in the Amdahl Handbook,
+ published by ULCC. In particular
+ see Chapter 2.2 for details of running jobs and Chapters 3.0 and
+ 3.2.1 for details of using the FORTRAN compilers.
+ .endc
+ .SECTION Cray X-MP - UNICOS Service
+   The DIMFILM routines are available as a library, compiled with the
+ CFT77 compiler and accessible
+ on /lib as libdimfilm.a.  The normal usage will involve only the
+ declaration of dimfilm as a library; either to segldr or cf77, via
+ the -l option.  There is no need to use any other graphics library
+ in order to produce output on film. A simple job to
+ produce output on 35mm black and white film might be:
+ .display
+       cat test.f <</EOF
+             PROGRAM TEST
+             ...
+             CALL D35
+             .. <Program including calls to DIMFILM routines>
+             CALL DIMEND
+             STOP
+             END
+       /EOF
+       cf77 -l dimfilm test.f
+
+
+ alternatively, the last command may be replaced by:
+
+       cft77 test.f
+       segldr -l dimfilm test.o
+ .endd
+ .contig INLINE
+    The DIMFILM library is large; the required memory will depend
+ on the modules acccessed by the user program.
+    Where plot data is staged via the front end, an indication of
+ file size and frames generated will be given, but confirmation of
+ successful staging is a function  of the front end.
+ .space 2
+   Note: Users who are new to the Cray will find general documentation
+ on running jobs in the Cray Handbook published by ULCC.
+ In particular see Chapter 2.2 on running jobs
+ and Chapter 3.1 on the use of the CFT77 FORTRAN compiler.
+ .endc
+

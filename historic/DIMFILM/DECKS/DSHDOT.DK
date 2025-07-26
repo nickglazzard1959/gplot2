@@ -1,0 +1,14 @@
+*DECK DSHDOT F
+      SUBROUTINE DSHDOT
+*CALL,DFXC00
+*CALL,DFXC05A
+      ROUTIN = 'DSHDOT'
+*CALL,RIN
+      IDASH = 3
+      NO1 = 15
+      NO2 = 18
+      TL = 3.0*XQ
+      CALL DFX105
+*CALL,ROUT
+      RETURN
+      END

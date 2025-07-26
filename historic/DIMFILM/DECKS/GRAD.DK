@@ -1,0 +1,12 @@
+*DECK GRAD F
+      SUBROUTINE GRAD
+*CALL,DFXC00
+*CALL,DFXC05A
+      ROUTIN = 'GRAD'
+*CALL,XIN
+      J = 3
+      DO 2 I=1,4
+    2 ANGRP(I) = J
+*CALL,XOUT
+      RETURN
+      END

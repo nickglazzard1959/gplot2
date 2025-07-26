@@ -1,0 +1,1965 @@
+ WS2000ÿ1.00ÿÿÿÿ PSTIMES2.PDFÿÿÿ      0 !Releaseÿ3.00ÿÿÿ !,   18162       13,+1993  1 28+*1989  2  3*-ÿ -.ÿ ./ÿ /0ÿ ÿ ÿ ÿ ÿ 01ÿ ÿ ÿ ÿ ÿ 12ÿ 2u 0  1i 0  0i^  6^_  1_[Aÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ<$).38=BGLQV[`ejoty~ƒˆ’—ÿÿ[a 67a\ 10\] 10]b11be1ef1fg1gh00h`1  3  2`:133:s011111sE0     0   0     0     0E&%PAGE&
+E0     0   2    12   999E
+v
+.jcgPART GENERAL PLOTTING
+
+.jcgCHAPTER Basic Plotting
+This section introduces the basic concepts of diagrammatic plotting (or drawing), although restricting discussion to calligraphic (that is, line or vector) graphical output.  The topic of shaded (that is, area filled or raster) output is deferred to a following dedicated section.  This demarcation enables the whole subject of raster plotting (at both basic and refined levels) to be presented in a unified way, while users with interest only in line drawing may skip that section.  However, some aspects of basic plotting will be of essential relevance to users with a principal interest in shaded images (in particular, device control, plotting areas and colour models).
+.jcgSECTION Plotter Control
+
+.jcgSUBSECTION Device initiation
+At the simplest level, DIMFILM may be initialised by directly referencing one of the device nomination routines.  One of these must be the first DIMFILM reference.  Each device has its own characteristics and capabilities.  An Appendix is included to describe each device in detail.  This contains details of specific device parameters the user may need to know and also, where relevant, will detail any device specific routines that may access functions/features that are not sufficiently widespread as to form a part of the general DIMFILM package.  There is also an Appendix with general notes on differences between different classes of device (for example, in how overlapping vectors are generated and their appearance).
+
+.jcgTT
+
+	D35	selects the Dicomed in 35mm black and white aperture card mode (on unperforated film), with landscape aspect ratio.  The default coordinate ranges will be horizontal: 0.,32236.  and vertical: 0.,24708., corresponding to a nominal image size of 36.41x27.94 millimetres on film.
+  
+	D35P	selects the Dicomed in 35mm black and white (on unperforated film) in portrait aspect ratio.  The default coordinate ranges will be horizontal: 0.,24708.  and vertical: 0.,32236., corresponding to a nominal image size of 27.94x36.41 millimetres on film.  This mode is particularly suited to documentation applications for traditional page layouts.
+  
+	D16	selects the Dicomed in 16mm black and white cine mode (on double perforated film), with landscape aspect ratio.  The default coordinate ranges will be horizontal: 0.,32767.  and vertical: 0.,23920., corresponding to a nominal image size of 10.26x7.49 millimetres on film.
+  
+	D35C	selects the Dicomed in 35mm colour slide mode, with landscape aspect ratio.  The default coordinate ranges will be horizontal: 0.,32148.  and vertical: 0.,21698., corresponding to a nominal image size of 36.3x24.5 millimetres on film.
+  
+	D16C	selects the Dicomed in 16mm colour cine mode (on double perforated film), with landscape aspect ratio.  The default coordinate ranges will be horizontal: 0.,32767.  and vertical: 0.,23920., corresponding to a nominal image size of 10.26x7.49 millimetres on film.
+
+.jcgEE
+
+Other device types will be considered where there is sufficient user demand (to this end, please advise us of your requirements).
+.jcgSUBSECTION Control
+Generally, a single job will consist of a number of discrete pictures and it is required that each of these be separate and the display surface cleared and readied for the next image.
+
+.jcgTT
+
+	FRAME	is used to achieve this, the effect being appropriate to the type of device.  Thus, film will be advanced on a film recorder, paper advanced or a new page readied on a pen plotter, or the screen cleared on a display terminal.
+.jcgEE
+
+.jcgSUBSECTION Termination
+To ensure the plot data is flushed/disposed (as relevant to the device/system) each DIMFILM execution must be terminated by
+
+.jcgTT
+
+	DIMEND	which will correctly conclude the current DIMFILM execution.
+.jcgEE
+It is possible to combine more than one DIMFILM execution in a job-step provided each is correctly initiated and terminated.
+
+.jcgSECTION Plotting Areas
+DIMFILM is designed to operate in the user's chosen coordinate range, with checks to avoid plotting beyond this area.  Each device when used for DIMFILM initiation will cause its default coordinate ranges to be used for plot bounds.  Generally, it is more convenient for the user to specify his own ranges.  Such user coordinates may be referred to as world coordinate space .  Additionally, the user may specify sub-areas to which plotting will be confined (by clipping at the boundaries) or in which plotting will be prohibited (by blanking).  All these areas are defined by their ranges in each of the x- and y- directions.  Thus, parameters (XLEFT,XRIGHT,YLOW,YUP) define a rectangle (aligned with the frame edges) running from XLEFT to XRIGHT in the x-direction and from YLOW to YUP in the y-direction.
+.jcgSUBSECTION Overall Bounds
+
+.jcgTT
+
+	BOUNDS(XLEFT,XRIGHT,YLOW,YUP)
+ 
+	is used to set the user's overall plotting bounds as the rectangle with x-range [XLEFT,XRIGHT] and y-range [YLOW,YUP], thereby defining world coordinates.  This area is mapped to the largest rectangle of the same aspect ratio that can be fitted on the device display surface.  Clipping will be performed at the boundaries of this area, which may be redefined at any time.  (Redefinition may rescale symbol/marker heights and broken line patterns.) The current plot position will be set to the lower left corner of the area, viz.  (XLEFT,YLOW).  Any currently active preclipping/blanking areas will be cancelled.
+.jcgEE
+While the user's plotting is performed within the defined overall bounds it is possible to select sub-areas to which plotting is restricted or in which plotting is suppressed.
+.jcgSUBSECTION Clipping
+
+.jcgTT
+
+	PANE(XLEFT,XRIGHT,YLOW,YUP)
+ 
+	will define an area to which plotting is restricted, i.e.  all plot data will be pre-clipped at the boundaries of this rectangle (defined in user's overall coordinates as the rectangle with x-range [XLEFT,XRIGHT] and y-range [YLOW,YUP]).
+  
+	ENPANE
+ 
+	cancels the current pre-clip area, which effectively reverts to the overall bounds.
+
+.jcgSUBSECTION Blanking
+
+	BLANK(XLEFT,XRIGHT,YLOW,YUP)
+ 
+	will define an area in which plotting is suppressed, i.e.  pre- blanking will be performed at the boundaries of this rectangle (defined in users's overall coordinates as the rectangle with x-range {XLEFT,XRIGHT} and y-range {YLOW,YUP}).
+  
+	ENBLNK
+ 
+	terminates pre-blanking of the user's plot data.
+.jcgEE
+
+.jcgSECTION Categories of Drawing
+The components of any plot may be categorised by function.  First, there are the line drawing operations through which the user constructs the picture: this may be the specific drawing of each graphic element or the application of functional routines (including graphing and contouring operations).  Second, each plot may include a textual content: this may be specific text defined by the user or text produced automatically by, for example, axis valuing in graph plotting.  Third, plots may incorporate non-textual annotation: this might be the outlining of boundaries (for example, the current clipping pane may be drawn) or axes and their ticking during graph generation.
+The user may wish to visually discriminate between these categories through using lines of different appearance for each class.  The visual appearance of any line is governed by both the colour in which it is drawn and the style (being such properties as solid/broken and thickness).  For this reason, DIMFILM categorises the drawing functions into three classes or types - referred to as Colour/Style Types (CSTypes).  Each CSType function will be drawn with the same line, both in colour and style - these may be set independently by the user.  These groupings of line properties
+Similarly, DIMFILM supports three latent groups of Colour/Style which are accessed according to the particular plot function.  These CSGroups each define a set of line-drawing properties, including colour/intensity and style, values for which may be assigned to each group independently.  The three CSGroups are associated with the three CSTypes.
+When a drawing operation is performed DIMFILM first determines the CSType of the function and then ensures plotting is performed with the corresponding CSGroup colour and style.
+This may be summarised:
+.jcgDISPLAY
+      CSType 1   -  general line drawing
+                    most functional plots
+
+      CSType 2   -  all text
+
+      CSType 3   -  non-textual annotation (graphs,etc.)
+                    most boundary plotting
+
+
+.jcgENDD
+When plotting, the corresponding CSGroup is utilised (e.g.  for text, a CSType 2 operation, CSGroup 2 is used).  The user may set different colours and styles for each of the three groups and the relevant one will be used according to the actual type of the plot operation.  (It is possible to set all three groups to the same colour/style.) It is possible to reassign the mapping between plot operation and colour/intensity group - a more rigorous description is given in a later section.
+.jcgSECTION Basic Line Drawing
+All basic plotting is performed in the user's coordinate space, subject to any transformations in effect (see later), having regard to any active pre-clipping/blanking.  Lines are drawn at the current colour/intensity and in the current style - that is, CSType 1 as described at 1.3.2.
+
+.jcgSUBSECTION Drawing
+
+.jcgTT
+
+	OFF2(X,Y)
+ 
+	is used to reposition the current plot position to (X,Y) without drawing any line.
+  
+	ON2(X,Y)
+ 
+	causes a line to be drawn from the current plot position to (X,Y) at the current colour/intensity and in the current style (i.e.  CSType 1).
+  
+	POINT(X,Y)
+ 
+	will cause a point to be plotted at coordinates (X,Y), subject to any clipping/blanking (CSType 1).
+.jcgEE
+
+.jcgSUBSECTION Line Style
+The user may select the style in which he wishes lines to be drawn.  Style comprises all properties controlling the appearance of the line other than its colour/intensity - i.e.  it is the combination attributes such as the continuity and thickness of the line.
+It is possible to specify solid (i.e.  unbroken or continuous) lines (being the default) or dashed, dotted or dash-dotted lines.  A user defined pattern may also be defined (described in a later section).
+The following all set the style for all CSGroups:
+
+.jcgTT
+
+	DASH	specifies the style to be dashed lines.
+  
+	DOT	specifies the style to be dotted lines.
+  
+	DSHDOT	specifies the style to be dash-dotted lines.
+  
+	DSHOFF	cancels any broken line pattern; the style reverts to solid (i.e.  continuous) lines (the default).
+
+.jcgEE
+It should be noted that any broken line style is continuous, in the sense that the pattern remains in phase over adjacent drawn line segments (thereby enabling curve approximations to be drawn in broken patterns) and across clipped/blanked regions.  A pattern will be restarted following any non-drawing relocation of the current position (e.g.  by references to OFF2, BOUNDS, FRAME etc.).
+The thickness of lines may be specified for all or any of the CSGroups.  The user specifies a scale factor by which the default line on any device is to be scaled in thickness.  It should be noted that thickness is device related: not all devices can support the same range of line widths.  In particular, the default on many devices will be for the finest line width so a factor less than unity will be ignored in such cases.  Equally, most devices can only support a discrete range of line thicknesses between a set minimum and maximum.  Each device will select an appropriate line thickness depending on its default and the specified scale factor (which by default is unity) - the Appendix on supported devices should be consulted for details of each device's capability.
+
+.jcgTT
+
+	LINSF(FACTOR)
+ 
+	sets the line thickness scale factor for all CSGroupings (1-3) to FACTOR ( > 0.0).
+  
+	LINSFn(FACTOR) - n = 1,2,3
+ 
+	sets the line thickness scale factor for CSGroup n (1,2 or 3) to be FACTOR ( > 0.0).
+  
+	In both the foregoing references, the case of FACTOR = 0.0 is treated as a special case whereby the finest line of which any device is capable is selected.
+
+.jcgEE
+
+
+.jcgSUBSECTION Point/Spot Style
+By default, DIMFILM generates points, or spots, as a software drawn mark.  However, most devices have a facility to plot a point directly; such a point is known as a hardware generated point, and the user may specify whether hardware or software points are required.
+
+.jcgTT
+
+	HWSPOT	will cause all subsequent points to be produced, where supported, on the device.
+  
+	SWSPOT	will cause all subsequent points to be generated by DIMFILM software.  [This is the default.]
+
+.jcgEE
+
+When software points are produced, the basic spot size will be (approximately) one ten-thousandth of the maximum device dimension.
+As with lines, the size of the basic spot may be scaled using scale factors, and this may be specified for all or any of the CSGroups.  The user specifies a scale factor by which the default spot on any device is to be scaled.  Where hardware spots are selected, it should be noted that the size is device related: not all devices can support the same range of spots.  In particular, the default on many devices will be for the smallest spot so a factor less than unity will be ignored in such cases.  Equally, most devices can only support a discrete range of spot sizes between a set minimumn and maximum.  Each device will select an appropriate spot depending on its default and the specified scale factor (which by default is unity) - the Appendix on supported devices should be consulted for details of each device's capability.
+
+.jcgTT
+
+	SPOTSF(FACTOR)
+ 
+	sets the spot size scale factor for all CSGroupings (1-3) to FACTOR ( > 0.0).
+  
+	SPOTSn(FACTOR) - n = 1,2,3
+ 
+	sets the spot size scale factor for CSGroup n (1,2 or 3) to be FACTOR ( > 0.0).
+  
+	In both the foregoing references, the case of FACTOR = 0.0 is treated as a special case for hardware points whereby the smallest spot of which any device is capable is selected.  For software spots, the basic spot is scaled to create a spot of the required size.  For factors above unity the spot will be (partially) infilled.  Factors below one will result in an appropriately scaled spot; a zero factor, for software spots will result in no discernible spot being plotted.
+
+.jcgEE
+
+
+.jcgSECTION Basic Text
+The DIMFILM user has available to him a very sophisticated text plotting "subsystem".  Much of the power and flexibility of this will be described in later sections.  At the elementary level the user may control the size, positioning and orientation of his text string.  However, within the actual text string the user may incorporate certain escape sequences to change the output characteristics (e.g.  underlining, italicisation,super- or sub- scripting, type density etc.) or even to switch to or load an alternate font.  DIMFILM offers a range of fonts (initially being a modification and extension of the Hershey occidental data); this range will be expanded as time and manpower permits - again your requirements are sought.  The mathematical capabilities of the original DIMFILM are now embodied in the single text output routine.  Details of these and the other escape sequences will be described later as they become available.  For the purposes of basic text output the user should refrain from the inclusion of characters * (star) and$ (dollar) in text strings.
+.jcgSUBSECTION Text Production
+
+
+.jcgTT
+
+	SYMTXT(STRING)
+ 
+	will output the character string passed in the parameter STRING, which must be of type CHARACTER.  The string will be plotted from the current symbol string position - which by default is the current position (normally located via reference to ON2 or OFF2.  The string will be produced at the current symbol height and orientation, and (by default) will be plotted in the normal left to right mode.  The current symbol colour/style (the CSGroup currently associated with CSType 2) will be used.
+.jcgEE
+
+The passing of character strings to SYMTXT (and, indeed, to other DIMFILM routines) may be accomplished in a number of ways.  The user may pass the string in a simple CHARACTER variable, or as a reference to one element of a CHARACTER array, or by directly defining the string argument in the reference to DIMFILM.  When using variable references it is possible to pass substrings, rather than the whole string stored in the simple variable or array element.
+Consider the following FORTRAN statements:
+.jcgDISPLAY
+          CHARACTER*26 STRING
+          DATA STRING/'abcdefghijklmnopqrstuvwxyz'/
+
+          CALL SYMTXT(STRING)      (i)
+
+          CALL SYMTXT(STRING(4:6)) (ii)
+
+.jcgENDD
+The declaration of STRING is of a simple CHARACTER variable of length 26.  The first reference to SYMTXT (i) will cause the whole of STRING to be output, i.e.  all twenty-six letters of the alphabet will be plotted.  The second reference (ii), however, will pass only the substring of STRING consisting of characters 4 to 6 (inclusive) to SYMTXT, and the plot will be def only.  {FORTRAN 77 will assume an omitted first substring pointer to indicate the beginning of the string, and an omitted second pointer to indicate the end of the declared string.}
+When a CHARACTER array is used the concept is similar; only a single array element will be processed by SYMTXT.  In this case:
+.jcgDISPLAY
+          CHARACTER*10 STRING(3)
+          DATA STRING(1)/'abcdefghij'/
+          DATA STRING(2)/'qrstuvwxyz'/
+          DATA STRING(3)/'1234567890'/
+
+          CALL SYMTXT(STRING(3))   (iii)
+
+          CALL SYMTXT(STRING(1))   (iv)
+
+          CALL SYMTXT(STRING(2)(:6)) (v)
+
+          CALL SYMTXT(STRING)      (vi)
+
+.jcgENDD
+Here a CHARACTER array of three elements has been declared, with each element having a length of ten characters.  Reference (iii) to SYMTXT specifically passes the third element of the array STRING and the plot will comprise the digits 1234567890.  Reference (iv) is to the first element and the plot will be abcdefghij.  The next reference (v) is to the substring consisting of the first (defaulted) to sixth character in the second array element and the plot will be qrstuv.  The last of these references (vi) is an unsubscripted reference to the array and by default the first element will be passed to SYMTXT, and the effect will be identical to that achieved by the specific element reference at (iv).
+Finally, the user is free to specify a constant string as the argument:
+.jcgDISPLAY
+          CALL SYMTXT('xyz')
+
+.jcgENDD
+In this instance the whole of the CHARACTER constant will be passed and the plot will be of xyz.
+In general the string will be plotted in the current default font - this topic is dealt with later.
+.jcgSUBSECTION Numerics
+Whilst it is usual for numeric values to be passed to SYMTXT in the character string, there are cases when the user may wish to output the current value of a variable in his computer program.  DIMFILM supports this requirement for both REAL and INTEGER simple variables (or single array elements) and permits the user to supply the Fortran FORMAT whereby the output will be controlled.
+
+.jcgTT
+
+	RNUM(RNUMB,FMT)
+ 
+	will output a REAL value, according to the supplied format, at the current symbol string position (see descriptions pertaining to SYMTXT) at the current symbol height and orientation.  This is a CSType 2 function.
+  
+	  RNUMB	holds the REAL value (it may be a reference to an array element) to be plotted
+ 
+	 FMT	is a string containing the Fortran FORMAT by which the value is to be output, and must be of type CHARACTER.  The FORMAT must commence with an opening parenthesis and contain a matching closing parenthesis to terminate output.  Text within the FORMAT will be plotted as if it were directly passed to SYMTXT.  The FORMAT must be a valid Fortran specification, comprising only one output record of not more than 150 characters; the only format specifier should be compatible with type REAL (i.e.  E, F, G, etc.) - scale factors etcetera are supported.  However, only one variable may be output (that is, output lists of several entities cannot be handled - the user should use continuation strings {see SYMCON/TXTCON later}).
+  
+	INUM(INUMB,FMT)
+ 
+	will output an INTEGER value, according to the supplied format, at the current symbol string position (see descriptions pertaining to SYMTXT) at the current symbol height and orientation.  This is a CSType 2 function.
+  
+	  INUMB	holds the INTEGER value (it may be a reference to an array element) to be plotted
+ 
+	 FMT	is a string containing the Fortran FORMAT by which the value is to be output, and must be of type CHARACTER.  The FORMAT must commence with an opening parenthesis and contain a matching closing parenthesis to terminate output.  Text within the FORMAT will be plotted as if it were directly passed to SYMTXT.  The FORMAT must be a valid Fortran specification, comprising only one output record of not more than 150 characters; the only format specifier should be compatible with type INTEGER (e.g.  I).  However, only one variable may be output (that is, output lists of several entities cannot be handled - the user should use continuation strings {see SYMCON/TXTCON later}).
+
+.jcgEE
+
+The following examples of FORTRAN usage should help to clarify the use of the format parameter.
+.jcgDISPLAY
+        CALL RNUM(A,'(F10.3)')
+
+          will output the current value of A (REAL) as
+          it would be output by the Fortran format
+          specification F10.3
+
+        IJK = 2*35 + 3
+            .
+            .
+        CALL INUM(IJK,'(''THE VALUE OF IJK IS '',I3)')
+
+          will output the current value of IJK (INTEGER)
+          according to the Fortran format, giving -
+
+            THE VALUE OF IJK IS  73
+
+.jcgENDD
+In each case the format could have been supplied in a variable of type CHARACTER.  Note also, when single quotes are to be used in a character string it is necessary to insert two such quotes - the whole string being commenced and terminated by single quotes.
+
+
+.jcgSUBSECTION Text Size/Orientation
+
+Text output via SYMTXT will be plotted at the previously specified height and orientation.  This latter may be either relative to the frame or to the current axes.  Once set values hold until redefined.
+
+.jcgTT
+
+	SYMHT(HEIGHT)
+ 
+	sets the character height for subsequent strings to HEIGHT, in the dimensions of the users overall coordinates.  At first entry to DIMFILM the symbol height is set to one-fiftieth of the maximum bounds range.
+  
+	SYMANG(ANGLE)
+ 
+	specifies that text strings are to be produced at ANGLE (AGroup1, default degrees - see 1.9 for discussion of angular measure) to the reference X-direction (which may correspond to either axis or frame) in the counter-clockwise direction.
+  
+	RELAX	indicates that subsequent text strings will be oriented with respect to the current positive X-axis.
+  
+	RELFR	indicates that subsequent text strings will be oriented with respect to the X-boundary of the frame.  (This is the default action.)
+
+.jcgEE
+
+
+.jcgSECTION Markers
+
+It is possible to plot various marker symbols centred at the current position.
+
+.jcgTT
+
+	MARKER(NMARK)
+ 
+	cause the marker number NMARK from the current marker set to be plotted, centred on the current position and utilising the current colour/intensity (i.e.  CSType 1 - basic line plotting rather than text).  This will be plotted at the current marker height.  Within any marker font there is a maximum of 48 symbols, consequently NMARK should be in the range [1,48].
+  
+	MARKHT(HEIGHT)
+ 
+	sets the current marker height to be HEIGHT in units of the user's current overall bounds.  At DIMFILM initialisation this will be set to one-fiftieth of the Y-range.
+
+.jcgEE
+
+
+.jcgSECTION Colour/Intensity
+To support a diverse range of graphic output devices DIMFILM provides considerable flexibility in the specification of colour and intensity.  By adopting a consistent approach to the interrelationship between these parameters output can be directed to monochrome or achromatic devices and to true or pseudo colour devices.
+As described elsewhere, DIMFILM supports three latent groups of colour/style which are accessed according to the particular plot function.  These CSGroups each define a set of line-drawing properties, including colour/intensity and style.  The user may set up different colours/intensities for each of the three groups and the relevant one will be used dependent on the nature of the actual plot operation.  Alternatively, the user may set all three groups to the same colour/intensity value.
+.jcgSUBSECTION Intensity
+For any CSGroup, the relation between colour and intensity is maintained.  Where a colour is specifically set the corresponding intensity will be computed according to the predefined relationship (covered later).  However, where a specification is made for intensity alone, the colour will be recomputed to maintain the same hue whilst yielding the desired intensity.  Thus for monochromatic or achromatic use the intensity only need be specified.  (It should be noted that due to the methods of colour mapping not all hues utilise the whole range of intensity.  Appropriate diagnostics are issued and hue maintained where possible.)
+
+.jcgTT
+
+	INTSY(ZINT)
+ 
+	sets the intensity for all CSGroupings (1-3) to value ZINT, which should be in the range [0.,1.].  (For each device this unit range is mapped onto the available intensities.)
+ 
+	INTSYn(ZINT) - n = 1,2,3
+ 
+	sets the intensity for CSGroup n (1,2 or 3) to value ZINT in range [0.,1.].
+
+.jcgEE
+
+At DIMFILM initialisation the intensity is set to a default value of 0.8.
+.jcgSECTION Colour Models
+DIMFILM provides the user with the means to specify colour either through reference to a look up table or specifically by definition of a triplet of colour defining values in any of the range of supported colour models.  The methods may be freely intermixed and the user provided with the maximum flexibility in attaining the desired result.  Each method is described in the following section on colour selection.  The remainder of this section is concerned with a description of the individual colour models.  An appendix will later be provided defining the various look up table definitions in terms of selected models; this should serve as a useful guide to the user wishing to specify his own colour palette.
+.jcgSUBSECTION General Terms
+Light may be seen as achromatic or chromatic: achromatic light has no discernable colour - it is a composite of frequencies in the spectrum yielding "white" light, perceived as a shade in the "grey" scale running from black-grey-white; chromatic light has a dominant colour and is (generally) a mixture of frequencies.  Monochromatic light is a specific case of chromatic light: it is a single frequency and may be seen as varying brightness of the one colour.
+Achromatic and monochromatic light have a single attribute - intensity - by which the observer can differentiate output from different sources.  This is the single parameter that is important when outputting to a black and white device or, indeed, a monochromatic device (such as a green screen storage tube).  Chromatic light - or colour - has, however a range of sensations experienced by an observer.  In order to uniquely define a colour these attributes must be identified and specified.  Colour is to a large extent subjective.  Indeed, the physiological response to "colour" is still under investigation.  However, it is generally accepted that there are three psycho-physiological characteristics of colour that may be quantified, and which together can define the observed colour; these are typically hue (essentially the "colour"), saturation (the "purity"), and brightness ("luminance" or intensity).  These will be considered in turn.
+hue - hue is used to distinguish the perceived "colour".  This could be a single waveband in the visible spectrum, but would more normally be a group of different wavelengths that are emitted and result in the (subjectively) perceived colour.  In practice, a dominant (i.e.  single) wavelength may be derived which (possibly mixed with pure white) results in the same physical interpretation by an observer.  Thus, hue may be defined as light of a single frequency corresponding to the dominant wavelength.  For convenience, the spectrum of visible light may be arranged as a circle onto which the hue may be mapped.  This angular measure defaults to degrees.  A convention has been adopted whereby zero corresponds to red, with hue increasing counterclockwise through yellow.  Note that complementary colours (see CMY discussion below) are diametrically opposed; i.e.  they lie 180 degrees apart.
+
+.jcgDISPLAY
+
+   This may be portrayed diagrammatically:
+
+
+                           *
+                        -     -
+       green  120.0  -           -  60.0  yellow
+                   *               *
+
+                 -                   -
+
+               -                       -
+
+              -                         -
+ cyan  180.0 *        hue spectrum       * 0.0  red
+              -                         -
+
+               -                       -
+
+                 -                   -
+
+                   *               *
+        blue  240.0  -           -  300.0  magenta
+                        -     -
+                           *
+
+
+
+.jcgENDD
+
+
+It should be noted that white, gray (any shade), and black are not hues but may be considered as colours.
+
+
+saturation - saturation is the degree to which a colour is undiluted by white (i.e.  the absence of an amount of its complementary colour, which would effectively add "white").  More strictly this is the purity of a colour.  It is expressed on a normalised scale [0.0,1.0]; for example, pure red is more saturated than pink.  It must be noted that it is independent of brightness; at any brightness a hue may attain any saturation in the range [0.0,1.0] (excepting the cases of black and white - nominally corresponding to minimum, or zero, and maximum brightness).  In essence, saturation controls the appearance of a colour running from the pastel shades to strong (and pure) colours.  [In some colour models saturation is not truly equivalent to purity, as its ratio relates only to the particular colour subspace modelled.  ]
+
+brightness - brightness (also variously referred to as lightness, intensity etc.) is equivalent to the intensity attribute of achromatic light.  It is notionally independent of hue and saturation.  Strictly it would be an expression of the luminance of a colour surface.  However, the term brightness (alternatively lightness, intensity) has become accepted in the very subjective area of colour definition.  This is normally quantified as a normalised value in the range [0.0,1.0].
+While discussing the general definition of colour it is worth considering the terms used by artists.  They are more concerned with describing colours by reference to the attributes tints , shades , and tones of pure colours (i.e.  the available pigments).  From a pure pigment (e.g.  one that is fully saturated), the artist may choose to add white pigment (thereby creating a tint - and decreasing the saturation), or adding black pigment (creating a shade - decreasing the brightness).  Addition of both white and black pigments results in a tone.  All these changes are variations of a single hue.
+
+
+.jcgDISPLAY
+   This may be shown diagrammatically:
+
+
+                        Tints
+         White   *---------------------* pure colour
+                 |                    /   (i.e. fully
+                 |                   /     saturated
+                 |                  /            hue)
+                 |                 /
+                 |                /
+                 |               /
+                 |              /
+                 |             /
+                 |   Tones    /
+                 |           /
+         Grays   |          /  Shades
+                 |         /
+                 |        /
+                 |       /
+                 |      /
+                 |     /
+                 |    /
+                 |   /
+                 |  /
+                 | /
+                 |/
+         Black   *
+
+
+
+
+.jcgENDD
+
+
+
+.jcgSUBSECTION Look Up Tables
+DIMFILM contains a 256 entry colour Look Up Table (LUT) that the user may reference.  A simple integer value in the range 0-255 will access a colour (internally defined by an appropriate value triplet) from the LUT.  The user may redefine individual entries in the table, or the complete table, either through his own specification of triplet(s) or by reference to one of the standard LUTs supported by DIMFILM (reference may be to the complete table or to an individual member).  In defining triplets for insertion into the LUT the user may work in any of the colour models supported in DIMFILM.  Although the default model is the RGB system, the user may well prefer to work in one of the other models (possibly due to familiarity or the particular colour properties required).  Switching between models is possible at any time, but will not affect any colours already set.  The use of look-up-tables is dependent on the output device capabilities; the DIMFILM table of 256 may be excessive for many devices and the user should ensure familiarity with his device.  For many purposes the user will find need of relatively few colours, but will want this to be discrete and well defined.  With this in mind, all the look up tables offered by DIMFILM will (unless specifically stated otherwise) have a common set of colours for the first 16 entries.  The remaining entries will be dependent on the nature of the selected model.
+.jcgDISPLAY
+ For all look up tables these common entries are:
+
+        entry (R ,G ,B )          colour
+          0                       background (device specific)
+          1                       foreground (device specific)
+          2     (1.,0.,0.)        red
+          3     (0.,1.,0.)        green
+          4     (0.,0.,1.)        blue
+          5     (1.,1.,0.)        yellow
+          6     (0.,1.,1.)        cyan        (blue-green)
+          7     (1.,0.,1.)        magenta     (red-blue)
+          8     (1.,.5,0.)        red-yellow  (orange)
+          9     (.5,1.,0.)        yellow-green
+         10     (0.,1.,.5)        green-cyan
+         11     (0.,.5,1.)        cyan-blue
+         12     (.5,0.,1.)        blue-magenta
+         13     (1.,0.,.5)        magenta-red
+         14     (1.,1.,1.)        white
+         15     (0.,0.,0.)        black
+
+
+.jcgENDD
+Note the foreground/background colours are device defaults (refer to Appendix on devices).  They are usually black and white, although which is used as foreground and which background will depend on device characteristics.  For example, a pen plotter is likely to have white background (paper) and black foreground (pen's ink).  Conversely, a raster display or film recorder may have a black background (blank screen/unexposed film) on which the default drawing action, the foreground colour, will be white.  The inclusion of white and black at 14 and 15 does not imply that all devices are capable of accessing such colours.  The result of drawing in the background colour is also device specific.  Unless a device is capable of doing so, picture elements cannot be erased dynamically.  (E.g.  an active film recorder will already have exposed the vector to be erased and no action, barring total redrawing of frame, can eliminate that vector.  However, on most raster devices the background colour may be used to erase data and restore the background.) The Appendix on device types should clarify this situation.
+.jcgSUBSECTION RGB Colour Model
+The RGB colour model is used in colour television monitors and in most colour raster displays.  The Red, Green and Blue primary colours may be used additively to create any other colour (that is, as primaries they cannot be decomposed into any combination of the other two chosen primaries).  Note that red, green and blue are commonly referred to as the additive primaries.  For the purpose of RGB colour definition, a unit cube defined by three orthogonal axes is used; with the cartesian axes for the red, green and blue components each normalised to be in the range [0.0,1.0].  [This is a subspace of three-dimensional colour space.] Any colour in this space is uniquely defined by the relative amounts of the three primaries - i.e.  by the triplet value (red, green, blue).  Of particular interest is the principal diagonal - this is the achromatic, or grey, scale - being the set of values with equal components of each of the three primaries; this runs from black (at the origin) to pure white (when red=green=blue=unity).
+
+
+.jcgDISPLAY
+   The RGB colour cube may be shown diagrammatically:
+
+
+             Green                           Yellow
+                 *---------------------------*
+                /                           /|
+               / |                         / |
+              /                           /  |
+             /   |                       /   |
+            /                           /    |
+           /     |                     /     |
+      Cyan*---------------------------*White |
+          |      |                    |      |
+          |                         . |      |
+          |      |                    |      |
+          |                           |      |
+          |      |              .     |      |
+          |                           |      |
+          |      |                    |      |
+          |                           |      |
+          |      |           .        |      |
+          |                           |      |
+          |      |        .           |      |
+          |                           |      |
+          |      |   .                |      |
+          |                           |      |
+          | Black* -  -  -  -  -  -  -| -  - *Red
+          |                           |     /
+          |    /                      |    /
+          |                           |   /
+          |  /                        |  /
+          |                           | /
+          |/                          |/
+          *---------------------------*
+       Blue                           Magenta
+
+
+.jcgENDD
+
+{The orientation of the tri-orthogonal axes R, G and B - as depicted here - is chosen for two reasons: (i) the R-G-B axes correspond to the normal three-dimensional cartesian axis convention for X-Y-Z, and (ii) when viewed as a projection along the achromatic diagonal (from white toward black) there is a good visual relationship with the hue disc for which red lies at zero degrees (see Section 1.7.1).}
+
+.jcgSUBSECTION CMY Colour Model
+Whereas red, green and blue are known as the additive primaries, their complements - cyan, magenta and yellow, respectively - are referred to as the subtractive primaries.  This is because - on transmitted or reflected light - they remove or subtract their complementary colour.  Thus:
+
+.jcgDISPLAY
+      -red   = blue  + green = cyan
+      -blue  = green + red   = yellow
+      -green = red   + blue  = magenta
+
+.jcgENDD
+Indeed, the colour subspace of the CMY system is the identical subspace in cartesian space as defined by the RGB colour cube.  However, an essential difference is that white light is located at the origin, with black at the opposite vertex.  The additive primaries add to black, while the subtractives subtract from white light.
+The subtractive primaries are of especial importance in photographic emulsions and in print applications, where the pigments in print dyes operate in a subtractive mode.  Thus, for example, green is achieved through the combined effects of yellow and cyan inks.  Yellow absorbs blue - leaving green and red - while cyan absorbs red, leaving only green to be reflected from the surface.  Similarly, cyan, magenta and yellow inks together will reflect no light with a resultant black.  The coloured pigment employed in most hard copy devices (e.g.  ink jet, thermal ink transfer and electrographic techniques) functions in this manner - CMY colour space is therefore useful in defining these processes.
+
+.jcgDISPLAY
+   The conversion between RGB and CMY triplet values
+   is given by:
+
+          |C|   |1|   |R|              |R|   |1|   |C|
+          |M| = |1| - |G|              |G| = |1| - |M|
+          |Y|   |1|   |B|              |B|   |1|   |Y|
+
+.jcgENDD
+
+
+
+.jcgDISPLAY
+   The CMY colour cube may be shown diagrammatically:
+
+
+           Magenta                           Blue
+                 *---------------------------*
+                /                           /|
+               / |                         / |
+              /                           /  |
+             /   |                       /   |
+            /                           /    |
+           /     |                     /     |
+       Red*---------------------------*Black |
+          |      |                    |      |
+          |                         . |      |
+          |      |                    |      |
+          |                           |      |
+          |      |              .     |      |
+          |                           |      |
+          |      |                    |      |
+          |                           |      |
+          |      |           .        |      |
+          |                           |      |
+          |      |        .           |      |
+          |                           |      |
+          |      |   .                |      |
+          |                           |      |
+          | White* -  -  -  -  -  -  -| -  - *Cyan
+          |                           |     /
+          |    /                      |    /
+          |                           |   /
+          |  /                        |  /
+          |                           | /
+          |/                          |/
+          *---------------------------*
+     Yellow                           Green
+
+
+.jcgENDD
+
+
+.jcgSUBSECTION Broadcast TV Colour Models
+Broadcast television has developed colour models to serve its own particular requirements.  Indeed, the need for a colour methodology arose after a number of years of monochrome television transmissions.  This dictated the overriding concern for compatibility of a colour signal when received by a monochrome receiver.  The outcome was a value triplet one member of which was a measure of brightness .  For computer graphics this has the fortunate result that by assigning different levels of brightness to different colours one can be sure that they may be discriminated when displayed on a monochrome device.  The brightness axis runs along the achromatic scale (suited to the particular display device characteristics); the two remaining axes retain orthogonality by their definition in the plane perpendicular to brightness.  The direction of one of these axes must be chosen, thereby leaving the plane containing the remaining axis defined.  Essentially, these two axes are together a measure of the chroma component when all brightness (i.e.  the "white" component) is removed.  As indicated above in the discussion of general terms hue and saturation describe this colour - and, indeed, the two remaining axes may be related to hue and saturation trigonometrically.  However, by maintaining all three axes in three dimensional cartesian space simple transformation exists between this space and RGB (as also to CMY).  The importance of this should not be forgotten.  Further, a straight line in all these spaces transforms into a straight line in each of the others - thus, interpolations between colours may be accomplished simply.  [This is not true in general for transforming interpolations between HSV and HLS spaces and RGB, CMY or "television" colour spaces.]
+The definition of "television" colour space depends on the chosen brightness axis and the orientation of the remaining axes.  The first is selected physically on the basis of what RGB value yields white (not the ideal model of the diagonal in the colour cube).  Here there arise differences between adopted national standards.
+PAL (Phase Alternation Line) as used in Great Britain, Germany and most non-American Western nations has defined brightness (Y) as:
+.jcgDISPLAY
+       Y = 0.299R + 0.587G + 0.114B
+
+.jcgENDD
+The other two components are known as U and V , and are chosen so U is "near-blue" (to the magenta side of blue.  V is then at right angles to U (on the magenta side of red).
+.jcgDISPLAY
+   The conversions between YUV  and RGB  are then defined as:
+
+
+          |R|   | 1.000   0.000   0.140| |Y|
+          |G| = | 1.000  -0.394  -0.581| |U|
+          |B|   | 1.000   2.020   0.000| |V|
+
+    and
+
+          |Y|   | 0.299   0.587   0.114| |R|
+          |U| = |-0.148  -0.291   0.439| |G|
+          |V|   | 5.007  -4.193  -0.814| |B|
+
+
+
+.jcgENDD
+
+
+.jcgDISPLAY
+   It is instructive to look at the YUV axes against the RGB
+axes.  [Note: for this representation the RGB axes have been
+rotated from the  previously  shown  orientation in order to
+better illustrate the YUV axis selection.]
+
+
+                        | B
+                        |
+                        |
+                        |
+                        |
+                        |
+                        |
+                        |
+                        |
+                       -|                  / Y
+                 U  -   |  -             /
+                \-      |      -       /
+               - \      |        -   /
+    sat.          \     |          /
+       -     -    .\    |        /  -
+          -     .   \   |      /
+          -  - . hue \  |    /        -
+                -     \ |  /
+         -         -   \|/              -
+         -            - *-------------------------
+          -           -/                 -       G
+                    - /
+            -     -  /                 -
+                -   /
+              -    /                 -
+            -     /
+        V -      /-               -
+                /   -
+               /       -      -
+              /           -
+             /
+            /
+           /
+          / R
+
+   [Note: hue angularly from U, saturation radially outwards.]
+
+
+
+
+.jcgENDD
+NTSC (National Television System Committee) is the system used in the United States, South America and Japan.  The NTSC definition of brightness (Y) is:
+.jcgDISPLAY
+       Y = 0.30R + 0.59G + 0.11B
+
+.jcgENDD
+The other two components are known as I and Q, and were chosen with the I axis being aligned with orange-cyan and the Q axis as green-magenta.
+.jcgDISPLAY
+   The conversions between YIQ  and RGB  are then defined as:
+
+
+          |R|   | 1.00   0.95   0.62| |Y|
+          |G| = | 1.00  -0.28  -0.64| |I|
+          |B|   | 1.00  -1.11   1.73| |Q|
+
+    and
+
+          |Y|   | 0.30   0.59   0.11| |R|
+          |I| = | 0.60  -0.28  -0.32| |G|
+          |Q|   | 0.21  -0.52   0.31| |B|
+
+
+
+.jcgENDD
+The differences between the NTSC and PAL models were occasioned by the criteria used in the location of the I-Q and U-V axes.  The NTSC system was based on the degree of differentiability between colours of the same brightness for different hues: the eye being particularly perceptive for orange-cyan.  PAL, on the other hand, was designed to minimise errors in hue reproduction (a disadvantage of NTSC - "Never Twice the Same Colour" - is its liability to hue distortion, particularly flesh tones) and to simplify the design of decoders.
+.jcgSUBSECTION HSV Colour Model
+The above described colour models are primarily hardware related.  Although, for instance, RGB may be used to define colours rationally it does not lend itself to the artists' concept of colour.  Indeed, a perceptual model requires reference to tints, tones and shades rather than the more physically precise RGB rectangular coordinates.  Compromise models exist: HSV is one of these.  In actual fact, such models are defined in terms related to the display hardware, but in a way that - at least in practice - is sympathetic to the subjective visual system.  The HSV model defines the appearance of a colour by a value triplet measuring its Hue, Saturation and (notional) Value.
+If one considers the RGB colour cube it is possible to visualise the solid from a viewpoint along the extended achromatic diagonal.  From this vantage point a hexagonal projection is seen.  (Three planes are visible, while three others are obscured.)
+
+.jcgDISPLAY
+
+   Viewed along the principal diagonal the RGB colour cube
+   will appear thus:
+
+
+
+
+              green  *------------* yellow
+                    /.            /\
+                   /             /  \
+                  /    .        /    \
+                 /             /      \
+                /        .    /        \
+               /             /          \
+              /            ./white       \
+       cyan  *------------- .  .  .  .  . * red
+              \            .\            /
+               \             \          /
+                \        .    \        /
+                 \             \      /
+                  \    .        \    /
+                   \             \  /
+                    \.            \/
+               blue  *------------* magenta
+
+
+   [Note: Visible edges are shown solid, invisible
+          edges dotted.  The black vertex is obscured.]
+
+
+
+.jcgENDD
+
+If the RGB colour cube is considered as a projection onto the plane orthogonal to the achromatic axis (i.e.  perpendicular to the grey diagonal) a hexagonal disc results.  For each value of grey there is defined a subcube with its own projection.  As the value is increased from zero (black) the hexagonal disc will increase in size, until it is at a maximum for the cube defined by the full (white) diagonal.  [Notes: 1 - at black the disc will be a point, 2 - the projection is scaled so the length of a side in the projected disc equals the length of a side in the solid.] Each disc is the projection of the three "brightest" faces of the associated subcube; where the defining diagonal value (= v) runs from 0.0 to 1.0 the subcube will be comprised of sides of that same length; I.e.  each disc comprises colours on the surfaces of the cube defined by r=v, g=v, b=v.  So by specifying v at least one of r,g,b will equal v; conversely, v = max(r,g,b).  Thus the value is defined by the grey value, in the range [0.0,1.0].  The hue is an angular measure of the hue, or colour component, in degrees - nominally in the range [0.0,360.0].  The convention adopted here is for red to equate to 0.0, with counter clockwise rotation (increasing angle) through yellow, green, etc.  The remaining member of the defining triplet is the saturation, which is measured radially outward from the value axis of the hexcone.  The saturation is essentially a ratio in that for any hexagonal disc section it may take any value in the range [0.0,1.0]; being zero on the axis and unity on the boundary of the disc (i.e.  at the triangular surfaces of the hexcone).  Saturation = 0.0 refers to the central axis and so covers the range of greys; in particular, with value = 0.0 yields black and = 1.0 gives white - intermediate values are shades of grey.  For the case of zero saturation hue is undefined.  At all other values of saturation the hue must be specified.
+The relationship to the artists perception of colour may be illustrated by considering a fully saturated hue at maximum value.  For example, (0.0,1.0,1.0) [hue = 0.0, saturation = 1.0, value = 1.0] is pure red.  The addition of white, thereby creating tints, is accomplished by reducing the saturation (holding the value constant).  Equivalently, shades may be created by adding black, and is effected by decreasing the value (the saturation being unchanged).  Decreasing both saturation and value together results in tones.
+
+.jcgDISPLAY
+   The HSV single hexcone colour model may be shown
+   diagrammatically:
+
+
+                             ^ V = value
+                             |
+                 green       |       yellow
+                      -------|-------
+                    - .      |      . -
+                 -           |           -
+              -              |              -
+           -           .     |     .           -
+        -                    |                    -
+  cyan *                 1.0 * white               * red
+        \-              .    |    .              -/
+         \  -                                 -  /
+          \    -             |             -    /
+           \      -      .       .      -      /
+            \        -----------------        /
+             \   blue \      |      /magenta /
+              \           .     .           /
+               \       \     |     /       /
+                \                         /
+                 \      \  . | .  /      /
+                  \                     /
+                   \     \   |   /     /
+                    \       . .       /
+                     \    \  |  /    /
+                      \             /
+                       \   \ | /   /
+                        \         / -
+                         \  \|/  /         -
+                          \     /      -.
+                           \ | /   -      .H = hue
+                            \ /-           .
+                             *-------------------->
+                         0.0   black   S = saturation
+
+     [Note: obscured edges shown dotted.]
+
+
+
+.jcgENDD
+
+
+.jcgSUBSECTION HLS Colour Model
+An alternative to the previously described HSV colour model is the HLS model.  The basic difference is the substitution of lightness for value; hue remains as for the HSV model, while saturation is essentially equivalent (though not numerically identical).  However, single hexcone HSV space is transformed into a double hexcone for the HLS model.  This may be considered to be accomplished by deforming the HSV space with the central white point being drawn upwards.  The central axis remains the achromatic range, and this is the axis of lightness - again running from 0.0 (black) to 1.0 (white).  It is important to appreciate that in this model maximally saturated hues are located at mid-lightness (saturation = 1.0, lightness = 0.5).  Considering the surface of the double hexcone, above the mid-section the surface corresponds to the upper (V = 1.0) hexagonal disc of the HSV model so one of R,G,B will be maximum at 1.0 and lightness above 0.5 will be achieved by desaturating this dominant component.  Indeed, at L = 1.0 saturation and hue are irrelevant as pure white results {rgb = (1.0,1.0,1.0)}.  While the HLS model has saturation measured radially (in range (0.0,1.0), as before) the numeric value for saturation of an identical colour in the HSV and HLS models will differ.
+The achromatic scale occurs when saturation = 0.0, when hue may be undefined, and the degree of grey is determined by the value of lightness.
+In neither the HSV nor HLS model does lightness/value equate to luminance (as, for example, used in the broadcast TV models), and so different colours may share the same luminance and therefore be represented by the same grey scale on monochromatic displays.
+
+.jcgDISPLAY
+   The HLS double hexcone colour model may be illustrated:
+                             ^
+                             |  L = lightness
+                             |
+                         1.0 * white
+                            /|\
+                           // \\
+                          /.|||.\
+                         / |   | \
+                        / ./ | \. \
+                       /  /     \  \
+                      /   |  |  |   \
+                     /  . /     \ .  \
+                    /    /   |   \    \
+                   /     |       |     \
+                  /    . |   |   | .    \
+                 /       /       \       \
+                /       /    |    \       \
+               /        |         |        \
+              /  green. |    |    | .yellow \
+             /        . / . . . . \ .        \
+            /       . ./     |     \. .       \
+           /     .     |           |     .     \
+          /   .        |     |     |        .   \
+         / .           /           \           . \
+        /             |      |      |             \
+  cyan *              |  0.5 *      |              * red
+        \-            / .    |    . \            -/
+         \  -        /               \        -  /
+          \    -     |       |       |     -    /
+           \      -  /   .       .   \  -      /
+            \        -----------------        /
+             \   blue \      |      /magenta /
+              \           .     .           /
+               \       \     |     /       /
+                \                         /
+                 \      \  . | .  /      /
+                  \                     /
+                   \     \   |   /     /
+                    \       . .       /
+                     \    \  |  /    /
+                      \             /
+                       \   \ | /   /
+                        \         / -
+                         \  \|/  /         -
+                          \     /      -.
+                           \ | /   -      .H = hue
+                            \ /-           .
+                             *-------------------->
+                         0.0   black   S = saturation
+
+     [Note: Obscured edges shown dotted.]
+
+.jcgENDD
+
+{The HLS convention adopted by Tektronix uses a double cone rather than a double hexcone.  Illustrations of the double hexcone often portray it as a double cone by topologically deforming it.  Additionally, Tektronix use the convention of blue being located at zero hue.  The algorithms incorporated in DIMFILM for the HSV and HLS models relate to the geometry of the hexagonal disc and require no trigonometric evaluations.}
+
+.jcgSECTION Colour Selection
+Whereas the preceding section described the various colour models supported by DIMFILM, the present section is concerned with the specification and selection of colours for the purpose of drawing.
+As described previously (1.3.2), DIMFILM supports three latent groups of colour/style which are accessed according to the particular plot function in use.  Colours may be specifically assigned to any or all of these CSGroups.  This colour specification may be either by direct assignment of the value triplet in any of the supported colour models or by reference to a look-up table (members of which may be set by the user).  Direct specification of a colour results in the computation of the corresponding intensity (for monochromatic output); however, subsequent change of the intensity (see 1.6, above) will maintain the hue (in terms of the proportion of the R,G,B components).
+Specification of colour etc.  is considered for each supported colour model separately.  For each model, the triplet value will be checked against range limits for each parameter; out-of-range parameters will result in a diagnostic and the colour assignment will be ignored.  Internally, DIMFILM will ensure also that the value triplet transforms to within the RGB colour cube space; the R,G,B values will - if necessary - be forced into range, noting that this may well result in a change of hue.
+Some DIMFILM subroutines require specification of the triplet of values defining the colour without specific identification of the colour model to be used.  (This is the case with certain raster operations and modification of look-up-table entries.) In these cases the current colour model will be used in interpreting the triplet.
+
+.jcgSUBSECTION Colour model
+DIMFILM is initialised with the RGB colour model as default.  Any value triplets without specific colour model reference will be assumed to be in terms of RGB colour space and interpreted accordingly.  The user may wish to redefine the current colour model; indeed, it is likely that one of the other models will be preferable for many applications.  All subsequent triplet definitions (other than those specifically related to other models) will be interpreted under the new current model.  This model may be changed at will, but is not retrospective.  Changing the colour model will not affect the appearance of any previously assigned colour.
+
+.jcgTT
+
+	CMODEL(<model>)
+ 
+	sets the default colour model to be that defined by the parameter,which must be of type character.  The parameter may be a character variable or a character string.  The permitted values are:
+ 
+	 RGB
+ 
+	 CMY
+ 
+	 HLS
+ 
+	 HSV
+ 
+	 YUV
+ 
+	 YIQ
+
+.jcgEE
+
+Thus, for example, a reference to CMODEL('HLS') will cause subsequent undesignated colour triplets to be interpreted according to the HLS model.  However, this does not preclude references to routines such as CMY2 (see below) being used.
+
+.jcgSUBSECTION Look Up Tables
+There are very many situations when the user will prefer to make reference to look up tables rather than making colour selections on the basis of triplets of real values.  Where only a finite range of colours is required (and elaborate facilities, such as fades etc.  are not used) the look up table provides a simple and reliable method of selection.  As described earlier, the default DIMFILM look up tables offer as the first 16 entries a range of basic colours.  The size of the LUTs (256) makes them suitable for most purposes, and a range of different LUTs is provided for different applications.
+
+
+.jcgTT
+
+	COLOR(ILUT)
+ 
+	sets the colour for all CSGroupings (1-3) to equate to the colour defined by entry ILUT in the Look Up Table.
+  
+	COLORn(ILUT)
+ 
+	sets the colour for CSGroup n (1,2 or 3) to equate to the colour defined by entry ILUT in the Look Up Table.
+
+.jcgEE
+
+ILUT must be in the range [0,255].
+It should be noted that the colour plotted will be that defined by the look up table entry at the time of issuing the plot instruction.  Thus it is permissible to change the look up table value after the LUT assignment for any CSGroup has been made.
+The user may wish to modify any (or all) entries in the current look up table.
+
+.jcgTT
+
+	SETLUT(ILUT,V1,V2,V3)
+
+	will set entry ILUT (which must be in the range [0,255]) of the LUT to the colour defined by triplet (V1,V2,V3) in the current colour model.
+
+.jcgEE
+
+The user may make such changes at any time; they will affect all subsequent plotting that refers to the LUT.  The colour will be evaluated under the colour model current at the time of definition; however, there is no restriction that all entries in a LUT shall be defined in the same model.  The user may change the colour model and enter different elements of the LUT in those models.
+The user may, at any time, reinitialise the current LUT, either by reloading the default LUT or any of the others available in DIMFILM.  Any changes made to the LUT will be lost.
+
+.jcgTT
+
+	LDLUT0	will reinitialise the active LUT with the DIMFILM default look up table.
+
+.jcgEE
+
+
+.jcgSUBSECTION RGB colour model
+
+
+
+.jcgTT
+
+	RGB(R,G,B)
+ 
+	sets the colour for all CSGroupings (1-3) to equate to the colour defined by the value triplet (R,G,B) in the RGB colour model.
+  
+	RGBn(R,G,B) - n = 1,2,3
+ 
+	sets the colour for CSGroup n (1,2 or 3) to be (R,G,B) in terms of the RGB colour model.
+
+.jcgEE
+
+R,G,B are each in the range [0.0,1.0].  {Note: Greys may be achieved by setting R=G=B=v, for v in [0.0,1.0]; with black the special case v=0.0, and white v= 1.0.}
+
+.jcgSUBSECTION CMY colour model
+
+
+
+.jcgTT
+
+	CMY(C,M,Y)
+ 
+	sets the colour for all CSGroupings (1-3) to equate to the colour defined by the value triplet (C,M,Y) in the CMY colour model.
+  
+	CMYn(C,M,Y) - n = 1,2,3
+ 
+	sets the colour for CSGroup n (1,2 or 3) to be (C,M,Y) in terms of the CMY colour model.
+
+.jcgEE
+
+C,M,Y are each in the range [0.0,1.0].  {Note: Greys may be achieved by setting C=M=Y=v, for v in [0.0,1.0]; with black the special case v=1.0, and white v= 0.0.}
+
+.jcgSUBSECTION PAL colour model (YUV)
+
+
+
+.jcgTT
+
+	YUV(Y,U,V)
+ 
+	sets the colour for all CSGroupings (1-3) to equate to the colour defined by the value triplet (Y,U,V) in the YUV colour model (i.e.  that used in PAL broadcast TV).
+  
+	YUVn(Y,U,V) - n = 1,2,3
+ 
+	sets the colour for CSGroup n (1,2 or 3) to be (Y,U,V) in terms of the YUV (PAL) colour model.
+
+.jcgEE
+
+Y is in the range [0.0,1.0].  U is checked against the  range [-0.439,0.439], and V against [-5.007,5.007]; noting that this space is a superset of RGB space and so certain combinations of YUV may not map into the RGB unit cube.  Care should therefore be exercised to ensure mapping onto RGB is possible.  Where the mapping onto RGB space results in a colour beyond the unit cube truncation will be applied to the out-of-range R,G,B component - and hue is not retained.
+.jcgSUBSECTION NTSC colour model (YIQ)
+
+
+
+.jcgTT
+
+	YIQ(Y,I,Q) - I is real
+ 
+	sets the colour for all CSGroupings (1-3) to equate to the colour defined by the value triplet (Y,I,Q) in the YIQ colour model (i.e.  that used in NTSC broadcsat TV).
+  
+	YIQn(Y,I,Q) - n = 1,2,3 I is real
+ 
+	sets the colour for CSGroup n (1,2 or 3) to be (Y,I,Q) in terms of the YIQ (NTSC) colour model.
+
+.jcgEE
+
+Y is in the range [0.0,1.0].  I (which is a REAL variable) is checked against the range [-0.60,0.60], and Q against [-0.52,0.52]; noting that this space is a superset of RGB space and so certain combinations of YIQ may not map into the RGB unit cube.  Care should therefore be exercised to ensure mapping onto RGB is possible.  Where the mapping onto RGB space results in a colour beyond the unit cube truncation will be applied to the out-of-range R,G,B component - and hue is not retained.
+.jcgSUBSECTION HSV colour model
+
+
+
+.jcgTT
+
+	HSV(H,S,V)
+ 
+	sets the colour for all CSGroupings (1-3) to equate to the colour defined by the value triplet (H,S,V) in the HSV colour model.
+  
+	HSVn(H,S,V) - n = 1,2,3
+ 
+	sets the colour for CSGroup n (1,2 or 3) to be (H,S,V) in terms of the HSV colour model.
+
+.jcgEE
+
+H - the hue - is in the range [0.0,360.0) [although it will be forced modulus 360.0], while S and V are in the range [0.0,1.0].  {Note: Greys may be achieved with S = 0.0, and V in [0.0,1.0]; with black the special case V=0.0, and white V= 1.0.  For zero saturation hue is undefined.}
+
+.jcgSUBSECTION HLS colour model
+
+
+
+.jcgTT
+
+	HLS(H,L,S) - L is real
+ 
+	sets the colour for all CSGroupings (1-3) to equate to the colour defined by the value triplet (H,L,S) in the HLS colour model.
+  
+	HLSn(H,L,S) - n = 1,2,3 L is real
+ 
+	sets the colour for CSGroup n (1,2 or 3) to be (H,L,S) in terms of the HLS colour model.
+
+.jcgEE
+
+H - the hue - is in the range [0.0,360.0) [although it will be forced modulus 360.0], while L (which is a REAL variable) and L are in the range [0.0,1.0].  {Note: Greys may be achieved with S = 0.0, and L in [0.0,1.0]; with black the special case L=0.0, and white L= 1.0.  For zero saturation hue is undefined.  Fully saturated hues are attained at L = 0.5.}
+
+.jcgSECTION Colour/Style Groups and Types
+All plotted/drawn lines may have a number of properties associated with them; these may govern the appearance by specifying colour (and/or intensity), thickness or style (e.g.  solid or type of broken pattern).
+For the purpose of assigning colour/style attributes, DIMFILM recognises a number of classifications of plot operations.  These classes are referred to as colour/style types (CSType).  The primary type-class comprises line drawing operations (CSType 1).  The secondary type-class (CSType 2) is text output, while the tertiary type-class (CSType 3) includes non-textual annotation of graphical plots.  Functional plot routines, with the exception of those for boundary plotting, are performed as primary type operations (i.e.  CSType 1).  The exceptions (primarily including OUTLIN, OWS, OWSVP, OWSWIN, OWCWIN, MARGIN, OPANE and OBLANK) are plotted under CSType 3.  Any other exception will be noted in the routine description.
+DIMFILM supports three latent groups of colour/style attributes which are accessed according to the class of the particular plot function.  These colour/style groups will be subsequently referenced in the form CSGroup n (n = 1,2,3).  In number these CSGroups correspond to the CSType classes.  Essentially, each CSType has an associated CSGroup (although the mapping need not be 1:1); i.e.  at any time there will be a particular colour/style set of attributes associated with each plot-type classification.
+For example: assuming the default mapping, the line produced by a call to GRAPH (see later) is of CSType 1 and so would be drawn in the colour and style currently defined for CSGroup 1; text (such as captions and labels produced, for example, by GRDEF) is of CSType 2 and would be in the colour and style set by CSGroup 2; the axes and framing of the graph (which may also be performed by GRDEF) are of CSType 3 and would be in the colour and style of CSGroup 3.
+The assignment of plotting operations into CSTypes is fixed.  However, the user is free to define the attributes for each CSGroup (via the colour, intensity and line style routines described elsewhere) and also to assign the mapping of CSGroup to CSType.  Initially the mapping is linear - with CSType 1 functions being plotted with CSGroup 1 colour/style attributes, CSType 2 with CSGroup 2, and CSType 3 with CSGroup 3.
+The user may set up different colours/styles for each of the three CSGroups and the relevant one will be used dependent on the nature of the actual plot operation (i.e.  determined by CSType of operation and mapping onto CSGroup).  Alternatively, the user may set all three groups to the same colour/style.  By reassigning the mapping between plot operation and colour/style group the user may cause different types of operation to be assigned the same colour/style group
+It is important to remember that conceptually there are three latent drawing tools - the relevant one being automatically used for any task (and hence becoming active).  Each, independently or collectively, may have different properties specified.  DIMFILM will also offer the facility of a resident pool of inactive "pens" from which the latent ones may be assigned.
+[After each plotting task is performed the currently active task type reverts to 1, and the currently active colour/style will be the CSGroup associated with CSType 1.]
+
+
+.jcgTT
+
+	COLPT1(N)	associates CSGroup N with CSType 1
+ 
+	COLPT2(N)	associates CSGroup N with CSType 2
+ 
+	COLPT3(N)	associates CSGroup N with CSType 3
+ 
+	{In the foregoing, N must be in the range [1,3]}
+ 
+	COLSET	reset the default association; i.e.  CSType n is associated with CSGroup n.
+
+.jcgEE
+
+Referring to the earlier example with GRAPH, if it is desired that the axes and boundary annotation have the same appearance as the text, it could be accomplished by a reference to COLPT3(2), which would associate CSType 3 functions (non-textual annotation) with the same group as used by text (CSType 2) - CSGroup 2.  The user would then only need to set colour and style for these two groups.
+
+.jcgSECTION Angular Measure
+There are various units of angular measure that may be used.  There are often different requirements as to which set of units is most appropriate for a particular task, and it may be that the user will wish to use different units for different tasks rather than an overall election of one unit of angular measure.
+DIMFILM offers the user three alternate types of angular measure, namely degrees, radians, or grads.  Additionally, plot parameters with an angular specification are grouped into four Angular Groups (AGroups), each of which may have an independent specification of unit of angular measure.
+The groupings and default units are given in tha accompanying table.
+.jcgDISPLAY
+
+$C      Assignment of angular arguments to groups
+
+
+.jcgTABSET 3,12,24,36,48
+
+	AGroup	     1     	     2     	     3     	     4     
+
+	Default	  Degrees	  Radians	  Degrees	  Degrees
+
+
+.jcgTABSET 3,14,26,38,50
+
+		SYMANG	TRANGE	CIRARC	PARAL2
+		ROTATE	POLAR	DTHETA	BOX
+		HATCH	POLFN	ELARC1	POLYGN
+		CLABHT	RADSEP		
+		SHDEGR	POLTOA		
+			POLPY3		
+			POLPY5		
+			POLFN		
+			POLON		
+			POLOFF		
+			TLEVS		
+			ELARC2 -	ELARC2 -	
+			  PHI1/2	  PSI	
+
+
+.jcgTABSET
+
+.jcgENDD
+
+The relevant angular group is noted alongside each primary parameter description.
+The group assignment may be changed, or all groups set to one angular unit.  A number of routines exist for these purposes.
+
+.jcgTT
+
+	RADIAN	sets radians as the unit if angular measure for all AGroups.
+  
+	DEGREE	sets degrees as the unit if angular measure for all AGroups.
+  
+	GRAD	sets grads as the unit if angular measure for all AGroups.
+  
+	RADGRP(N)	set radians as the unit of angular measure for AGroupN, for N=1 to 4.
+  
+	DEGGRP(N)	set degrees as the unit of angular measure for AGroupN, for N=1 to 4.
+  
+	GRAGRP(N)	set grads as the unit of angular measure for AGroupN, for N=1 to 4.
+
+.jcgEE
+
+
+.jcgCHAPTER Refined Plotting
+
+.jcgSECTION Textual Plotting
+DIMFILM includes very versatile and comprehensive facilities for the output of text strings.  The user has full control over the characteristics of a string and may change these from within the string being plotted.  This section gives a detailed description of text control and plotting.  The user should note that all switches (i.e.  escape sequences) may be incorporated in strings passed to the graphical annotation routines; the only limitation there being the inability to continue text strings and the restriction to string length being imposed by the Fortran implementation used.
+.jcgSUBSECTION Text Founts
+(In accord with common computer parlance, the word font will hereafter be used for fount - referring to a set of "printable" characters.)
+DIMFILM, as standard, has several fonts permanently resident in memory for immediate access by the user.  These fonts comprise three for alphabets and one each for special symbols and markers.  Each alphabet font - numbered 1 to 3 - has a maximum capacity of 96 characters and 24 accents (noting that these latter may be combined), while the symbol font has a maximum capacity of 96 and the marker font a maximum of 48 "characters".  The DIMFILM system has access to a considerable number of alternate fonts which may be loaded as the resident fonts, either by a subroutine reference or from within a text string.  Switching between resident fonts is a more economical process and is to be preferred where possible.
+The fonts are arranged to reflect the printable set of 7-bit ASCII, and are mapped onto this set from the host machine.  The user need not concern himself with the mapping mechanism while using character strings.  [However, the characters available to a user in a character string within a Fortran 77 program are dependent on two factors: i) the particular Fortran implementation, ii) the input character set supported by the host &/or telecommunications system.] To simplify transport of DIMFILM programs it is possible to access the whole character set through use of the standard Fortran 77 character set.
+For reasons that will become apparent, the 96 character font is considered to be arranged in 6 columns (each of 16 rows).  The layout is as shown:
+.jcgDISPLAY
+$CDIMFILM Font Layout
+
+
+.jcgTABSET 22,44
+	Upper Case	Lower Case
+
+.jcgTABSET 19,23,28,33,45,50
+
+	0	16	32	48	64	80
+
+
+.jcgTABSET 11,19,24,29,34,46,51
+	1	 	0	@	P	`	p
+	2	!	1	A	Q	a	q
+	3	"	2	B	R	b	r
+	4	#	3	C	S	c	s
+	5	$	4	D	T	d	t
+	6	%	5	E	U	e	u
+	7	&	6	F	v	f	v
+	8	'	7	G	W	g	w
+	9	(	8	H	X	h	x
+
+.jcgTABSET 10,19,24,29,34,46,51
+	10	)	9	I	Y	i	y
+	11	*	:	J	Z	j	z
+	12	+	;	K	[	k	{
+	13	,	<	L	\	l	|
+	14	-	=	M	]	m	}
+	15	.	>	N	^	n	^
+	16	/	?	O	_	o	
+
+
+
+.jcgTABSET
+$CDescription of non-alphanumerics
+
+
+.jcgTABSET 6,9,12,33,36,39
+	1	 	space	28	;	semicolon
+	2	!	exclamation point	29	<	less than
+	3	"	quotation marks	30	=	equals
+	4	#	number sign	31	>	greater than
+	5	$	dollar	32	?	question mark
+	6	%	percent	33	@	commercial at
+	7	&	ampersand	60	[	opening bracket
+	8	'	apostrophe	61	\	reverse slant
+	9	(	opening parenthesis	62	]	closing bracket
+
+.jcgTABSET 5,9,12,33,36,39
+	10	)	closing parenthesis	63	^	circumflex
+	11	*	asterisk	64	_	underline
+	12	+	plus	65	`	grave accent
+	13	,	comma	92	{	opening brace
+	14	-	hyphen (minus)	93	|	vertical line
+	15	.	period	94	}	closing brace
+	16	/	slant	95	^	overline (tilde)
+	27	:	colon
+
+.jcgTABSET
+
+.jcgENDD
+
+.jcgDISPLAY
+ NOTE:-  The Fortran 77 characters set comprises
+
+.jcgTABSET 10,25
+
+	Alphabetic	A to Z
+	Numeric	0 to 9
+	Special	= equal
+	Characters	+ plus
+
+.jcgTABSET 25
+	- minus
+	* asterisk
+	/ slash
+	( opening parenthesis
+	) closing parenthesis
+	, comma
+	. period (decimal point)
+	$ currency symbol (dollar)
+	' apostrophe
+	: colon
+	" quotation mark
+
+.jcgTABSET 27
+	blank (space)
+
+.jcgTABSET
+
+.jcgENDD
+
+
+.jcgCONTIG INLINE
+There is a range of fonts available to the DIMFILM user - and more will be added in the future.  Traditionally, fonts are designed for reproduction at a specific size and with a standard appearance.  To enable output with the wide range of variation permitted by such a system as DIMFILM compromise has to be made.  In expanding a character beyond its designated point size smoothness and solidity may become degraded.  According to demand, it is intended to enhance the range of fonts (by way of style and alphabet) - consequently user requirements should be made known.  One particular difficulty in font design is the output attributes of mono or proportional spacing; each font may be ideally suited to only one of these modes.  The present fonts are best output proportionally spaced (this is the default).  It is intended to incorporate a selection of fonts that will be more suited to mono spacing.
+Each font is identified to DIMFILM by an integer value.  The present set of fonts (with residency denoted in braces) comprises:
+
+.jcgCOPY
+$CRoman (English) Alphabetic Fonts
+
+
+.jcgTABSET 15,35
+	sans-serif	seriffed
+
+
+.jcgTABSET 12,18,32,38
+	11	Simplex {1}	14	Small Complex
+	12	Duplex	15	Complex {2}
+	111	Mono/Simplex	16	Triplex
+			24	Small Complex Italic
+			25	Complex Italic
+			26	Triplex Italic
+			31	Simplex Script
+			35	Complex Script
+			46	Gothic English Triplex
+			56	Gothic German Triplex
+			66	Gothic Italian Triplex
+
+
+
+.jcgENDC
+
+.jcgCONTIG INLINE
+
+.jcgCOPY
+$CGreek Alphabetic Fonts
+
+
+.jcgTABSET 15,35
+	sans-serif	seriffed
+
+
+.jcgTABSET 12,18,32,38
+	1011	Simplex	1014	Small Complex
+			1015	Complex {3}
+
+
+
+.jcgENDC
+
+.jcgCONTIG INLINE
+
+.jcgCOPY
+$CCyrillic Alphabetic Fonts
+
+
+.jcgTABSET 15,35
+	sans-serif	seriffed
+
+
+.jcgTABSET 12,18,32,38
+			2015	Complex
+
+
+.jcgENDC
+
+.jcgCONTIG INLINE
+
+.jcgCOPY
+$CSymbol Fonts
+
+
+
+.jcgTABSET 27,37
+	8001	Mathematical (1) {S}
+	8002	Cartographic
+	8003	Astronomical
+	8004	Astrological
+	8005	Musical
+
+
+.jcgENDC
+
+.jcgCONTIG INLINE
+
+.jcgCOPY
+$CMarker Fonts
+
+
+
+.jcgTABSET 27,37
+	9001	Principal Marker Set {M}
+
+
+.jcgENDC
+
+
+.jcgBLANK 2
+
+.jcgTABSET 2
+
+.jcgCONTIG INLINE
+	Notes
+
+.jcgTT
+
+
+.jcgFILL
+
+	1:	"small" in font description indicates a font that is suitable for output at a smaller size; this size is directly controlled by the user.  Character sizes for all fonts are set by SYMHT.  (Such fonts are generally characterized by the individual character definition employing fewer coordinates; spacing between multiple "strokes" for small, complex characters is also more suited to output at lesser sizes.)
+ 
+	2:	Default assignment of fonts to alphabets is indicated, being:
+
+.jcgEE
+
+
+.jcgCOPY
+
+.jcgTABSET 22
+	alphabet 1 - font 11,
+	alphabet 2 - font 15,
+	alphabet 3 - font 1015,
+	symbols - font 8001,
+	markers - font 9001.
+
+.jcgENDC
+
+.jcgFILL
+
+The user may load any available font into any of the memory resident set (appropriate action is taken where selected font is incompatible with load destination; i.e.  it is possible to load symbols or markers into alphabet fonts, which will not thereby be completely filled, etc.).
+Through restricting the number of memory resident fonts that are available to it, DIMFILM seeks to limit its usage of central processor memory.  All other fonts are held on a mass-storage device from which they may be acquired (in place of one of the memory resident set) as needed - this being at the users control.  This enables DIMFILM to access a very wide range of fonts, a range that may be periodically updated.  Pictorially, the process may be shown:
+.jcgDISPLAY
+
+                              Memory
+                       -----------------------------------
+                       |
+                       |   Alphabets
+                       |   -----------
+                      .|  1|         |.
+                     . |   ----------- .
+   Mass Storage     .  |                .  A
+   ------------   L.   |   -----------    .        -----
+   |          |   O  . |  2|         |.....B- - - >|   |
+   |    F     | . A    |   -----------    .        | T |
+   |          |. .D    |                 . E       | E |
+   |    O     |.       |   ----------- .           | X |
+   |          |. .R. . |  3|         |.    T       | T |
+   |    N     |.  O    |   -----------             |   |
+   |          | . U    |                           | R |===>
+   |    T     |.  T    |    Symbols                | O |
+   |          | . I  . |   ----------              | U |
+   |    S     |  .N    |   |        | - - - - - - >| T |
+   |          |   E    |   ----------              | I |
+   ------------   S.   |                           | N |
+                    .  |    Markers                | E |
+                     . |   ---------               | S |
+                      .|   |       |- - - - - - - >|   |
+                       |   ---------               -----
+                       |
+                       ----------------------------------
+
+
+.jcgENDD
+
+
+.jcgCONTIG INLINE
+
+
+.jcgTT
+
+	LDABET(IBET,NFONT)
+ 
+	will load font number NFONT into memory resident alphabet IBET; where IBET = 1,2, or 3.
+  
+	LDSYM(NFONT)
+ 
+	will load font number NFONT into memory resident symbols.
+  
+	LDMARK(NFONT)
+ 
+	will load font number NFONT into memory resident markers.
+.jcgEE
+
+
+.jcgENDC
+
+
+.jcgSUBSECTION Initial Text Characteristics
+There are a number of parameters that characterize text appearance other than size and orientation.  For example , mono or proportional spacing, colour, density, italicisation.  Such entities are, for the purposes of DIMFILM text output, known as the Text Characteristics.  In particular, those which are active at the commencement of text form a set known as the Initial Text Characteristics (subsequently referred to as ITC).  It is possible to change most characteristics from within a string, and the set active at any time is known as the Current Text Characteristics (CTC).  By default, each output string will commence with the initial characteristics active; i.e.  the CTC will be set to the ITC.  The user may set certain characteristics of the ITC independently.  The ITC comprises:
+
+.jcgTT
+
+	alphabet	- the active alphabet from the memory resident set of alphabetic fonts.  {Default = 1}
+ 
+	mapping	- the mapping from the input string may be set to one of three modes.  Mixed identically maps the input character onto the DIMFILM font; Lower maps upper case input characters onto the lower case set (viz.  entries in columns 3 and 4 map directly across to columns 5 and 6); Upper maps lower case input characters onto the upper case set (viz.  entries in columns 5 and 6 map directly across to columns 3 and 4).  (Columns 1 and 2 are unaffected by any mapping.  Note also that use of lower case input characters is outside the scope of Standard Fortran 77.) {Default = Mixed}
+ 
+	pen	- two "pens" are available for text production (each having an associated colour/intensity).  There is a standard colour/intensity for text and an alternate colour/intensity.  {Default = Standard}
+ 
+	spacing	- text may be produced with either monotonic or proportional spacing.  {Default = Proportional}
+ 
+	italics	- text may optionally be italicised (i.e.  a slant will superimposed on each output character).  Note that this characteristic is additional to any inherent in the font definition; if italics are set they will be superimposed on an italicised font.  {Default = italics off}
+ 
+	underline	- text may optionally be underlined.  {Default = underline off}
+ 
+	heavy	- text may be in normal density or heavy density.  This affects only the intensity of the text (where supported on a device) and should not be confused with bold type which also employs line thickening.  (It is possible for the intensity shift to be specified as a reduction when lightening of the density will result.) {Default = normal}
+ 
+	fonts	- font assignment to each resident alphabet, special symbol and marker set.  {default = see font descriptions}
+ 
+	all other	- all other text characteristics cannot be set other than from within a string and always revert to their default state at the end of the input string.  Such characteristics include superscripts/subscripts/fractions/accents/backspacing/access to symbols and markers etc.  Such states are always cleared at commencement/termination of each string passed via SYMTXT etc.  regardless of election for text continuation.  Each string will commence at the base level (see later discussion of fractions and super-/sub- scripts).  {Default = inactive}
+
+.jcgEE
+
+
+.jcgSUBSECTION User Specification of ITC
+The user may set the various Initial Text Characteristics and certain values associated with them.  Once changed they remain in force until reset, either explicitly or implicitly (e.g.  by total reset of all text characteristics).  The following relate to the setting of ITC values.
+
+.jcgTT
+
+	ABET(IBET)
+ 
+	selects the memory resident alphabet that is to be used.  IBET must be in range [1,3]; default is 1.
+  
+	UPPER	forces input characters to be mapped onto the upper case set.
+  
+	LOWER	forces input characters to be mapped onto the lower case set.
+  
+	NOMAP	accepts input characters without mapping.  This is the default.
+  
+	ALTTYP	specifies that the alternate text pen is to be used.
+  
+	DEFTYP	specifies that the default (standard) text pen is to be used.  This is the default (and will normally access colour/intensity group 2).
+  
+	ALTPEN(IPEN)
+ 
+	sets the alternate text pen to group IPEN, which should be in range [1,3].  The default is 3.
+  
+	MONO	selects mono spacing.
+  
+	PROP	selects proportional spacing.  This is the default.
+  
+	ITALIC	selects italicisation of text fonts.
+  
+	NOITAL	turns off any italicisation.  This is the default.
+  
+	SETITL(TANANG)
+ 
+	sets the italicisation to the angle with tangent TANANG; the angle being that at which a vertical stroke would appear measured clockwise from the upward normal to the string direction.  The default value being 0.2.
+  
+	UNLIN	selects underlining.
+  
+	NOUNLN	turns off underlining.  This is the default.
+  
+	HVYTYP	selects heavy type.
+  
+	NRMTYP	selects normal type density.  This is the default.
+  
+	HVYINT(ZINT)
+ 
+	sets the intensity increment to be applied to the normal type intensity as ZINT.  (Note: this may be negative, when HVYTYP would result in a lighter type.) The default value is 0.15.
+
+.jcgEE
+
+
+
+.jcgSUBSECTION Current Text Characteristics
+There are a number of parameters, in addition to the Initial Text Characteristics, that determine the appearance of text.  DIMFILM provides powerful facilities (by way of escape sequences) whereby the user may modify the ITCs within a string and to effect other appearance/layout changes.  At any time the set of active parameters governing text appearance is known as the Current Text Characteristics (CTC) - this includes the ITC parameters as a subset, but additionally incorporates a number of dynamic characteristics.
+It is reiterated that the subset of the CTC equivalent to the ITC is normally reset identically to the ITC at the commencement of each string, while the remaining parameters are turned off at such time (e.g.  fractions are assumed inactive at string commencement, generally being sensibly terminated at the conclusion of each string).
+The CTC comprises the ITC (each of which may be dynamically modified) and additionally:
+
+.jcgTT
+
+	fractions	- two levels of fraction beyond the base text level being supported
+ 
+	super/sub scripts
+ 
+	- up to six levels of super &/or sub scripts is supported (beyond the base level) at each fraction level (including the base text level).
+
+.jcgEE
+
+Conveniently considered with the CTC are the escape sequences used to access accents, special symbols, and markers, and those to perform other transient effects (e.g.  backspace, etc.).  Each of these while active may be deemed a CTC; however, their effects are terminated once executed - i.e.  they have a strictly limited scope.
+
+.jcgSUBSECTION User Specification of CTC
+The user may set the various Current Text Characteristics, and certain values associated with them, from within a text string.  Once changed they remain in force until reset, either explicitly or implicitly (e.g.  by total reset of CTC to ITC at end of string, or through cessation of their effective scope).  Within a text string (passed as type CHARACTER) two characters have special significance.  These are * (asterisk) and$ (dollar/currency symbol).  Generally, these are taken to indicate commencement of an "escape sequence" [following character(s) determining escape function].  To produce either of these characters in text it is necessary to replicate it.  Thus, for each single * required in text it is necessary to include the double **; likewise each occurrence of$$ will yield a single output$ .  All other occurrences of * or$ will either produce a CTC change or result in a diagnostic (possibly an unrecognised escape sequence or one that is invalid at that point).  The * and$ have notionally different functions.  As a rule, escape sequences flagged by * initiate an effect, while those flagged by$ terminate an effect (certain actions have no corresponding termination; e.g.  spacing is specified to be mono or proportional - the * sequence used logically in each case).
+The available escape sequences are given here; all are initiated by * and so the given character syntax for the escape should be preceded by *.  If termination is applicable this is specifically stated.  Only characters in the standard Fortran 77 character set are used for escape sequences (in particular, upper case letters are mandatory).  In the following specifications of escape sequences, certain escape fields are "variable" (and should be entered as appropriate by the user) - these are denoted by lower case strings delimited by < and >.  {Some examples follow the escape definitions.}
+
+.jcgTT
+
+	U	- upper case mapping.  Input lower case characters (i.e.  those from columns 5 or 6) are mapped onto the upper case set (i.e.  columns 3 or 4, respectively).  {Termination by$ U causes mixed (or no) mapping to become effective.}
+ 
+	L	- lower case mapping.  Input upper case characters (i.e.  those from columns 3 or 4) are mapped onto the lower case set (i.e.  columns 5 or 6, respectively).  {Termination by$ L causes mixed (or no) mapping to become effective.}
+ 
+	1	- sets the current alphabet to resident alphabet set 1.
+  
+	2	- sets the current alphabet to resident alphabet set 2.
+  
+	3	- sets the current alphabet to resident alphabet set 3.
+  
+	+	- initiates a superscript, incrementing the super/subscript level for the current fraction.  {Termination by$ + cancels the last superscript (and any intermediate subscripts) for the current fraction, decrementing the current fraction super/subscript level for each.  See also$ 0 below.}
+ 
+	-	- initiates a subscript, incrementing the super/subscript level for the current fraction.  {Termination by$ - cancels the last subscript (and any intermediate superscripts) for the current fraction, decrementing the current fraction super/subscript level for each.}
+ 
+	A	- selects the alternate type (i.e.  colour/intensity).  {Termination by$ A selects the default colour/intensity combination.}
+ 
+	H	- selects heavy type.  {Termination by$ H selects the default intensity type.}
+ 
+	M	- selects mono spaced text.
+  
+	P	- selects proportionally spaced text.
+  
+	=	- turns underlining on in the current super/subscript level of the current fraction.  {Termination by$ = turns underlining off in the current super/subscript level of the current fraction.}
+ 
+	I	- turns italicisation on in the current super/subscript level of the current fraction.  {Termination by$ I turns italicisation off in the current super/subscript level of the current fraction.}
+ 
+	,	- initiates a fraction numerator.  The fraction level is incremented and the numerator commenced at that level.  {Termination by$ , terminates the numerator and commences the denominator [this is equivalent to *.  ].}
+ 
+	.	- initiates a fraction denominator for the current fraction level; a numerator must be active at this level.  {Termination by$ .  terminates the denominator and the fraction; the fraction level being decremented.  See also$ Q below.}
+ 
+	/<res>/<font>/
+ 
+	- loads the font designated by the unsigned integer value <font> into the resident set <res>, which may be any of 1 2 3 S or M, denoting resident alphabets 1 to 3, special symbol set or marker set respectively.  The terminating slash is mandatory.  E.g.  the sequence /3/2015/ would load the complex Cyrillic font (font 2015) into memory resident alphabet 3.  Note: the active alphabet is unchanged, and in the example given complex Cyrillic would not become the current alphabet unless resident alphabet 3 was currently active.
+
+.jcgEE
+
+The following characteristics have a limited range of definition; that is, they specify an action that is to take place immediately and then revert to the CTC that was previously active (e.g.  the escape to output a special symbol will cause output of a single special symbol and then revert to the previously active alphabet).
+
+.jcgTT
+
+	:<num>	- the special symbol having value <num> will be output.  The value, denoted by <num>, should be a two digit unsigned integer in the range [1,96].  (A single digit is permissible if unambiguous in context - i.e.  it is not followed by a digit.  A single digit value may be unambiguously given as two digits, the first being a zero or space.)
+ 
+	::<num>	- the marker having value <num> will be output.  The value, denoted by <num>, should be a two digit unsigned integer in the range [1,48].  (A single digit is permissible if unambiguous in context - i.e.  it is not followed by a digit.  A single digit value may be unambiguously given as two digits, the first being a zero or space.)
+ 
+	V<num>	- the character in the currently active alphabet having the value <num> will be output.  The value, denoted by <num>, should be a two digit unsigned integer in the range [1,96].  (A single digit is permissible if unambiguous in context - i.e.  it is not followed by a digit.  A single digit value may be unambiguously given as two digits, the first being a zero or space.)
+ 
+	B	- the next output character will be backspaced over the previously output character in this string.  The backspacing will be performed so that the medians of the characters are coincident.
+  
+	N	- a "null" character is output.  This is essentially used to reset the reference point for subsequent super/sub-scripts, in that a super/sub-script is normally placed relative to the current text level so a string may have both super and sub script suffices aligned with continuation text clearing both script levels.  The null is necessary if, for example, a prefixed subscript is to follow a super (or sub) scripted entity.
+  
+	O	- subsequent super- and sub- scripts will be taken to clear the maximum and minimum height extents of the previous character.  This is particularly useful for limits of integrals, summations etc.  in mathematical expressions (when a backspace before the first limit - i.e.  "super" or "sub" script will force the limits to be directly above/below the function symbol).  For all other purposes the "limit" script will be taken as a level of super/sub scripting.  {Termination by$ O will cause reversion to normal super/sub script notation.}
+
+ 
+	D	- diacritics (i.e.  accents) will be produced.  Each DIMFILM font has an associated set of accents that may be applied to any character in that font (for convenience, a cross out character may be included as an accent).  There may be up to twenty-four diacritics associated with any font, and these are referred to by the upper case letters A to X.  Single, or multiple, diacritics may be associated with any output character.  The character to which the diacritic(s) is to be applied must immediately follow the D escape.  If a single diacritic is to be produced then its associated reference (A to X) should itself follow the base character.  Where more than one diacritic is to be applied the associated reference letters should be enclosed in parentheses following the base character.  For example, to output a with an acute accent (reference B) the sequence *DaB would be used.  If the user wished to output a crossed out (reference X) c cedilla (reference A) the sequence *Dc(AX) would be used.
+  
+	(	- this (and the next) escape is specifically to enable access of any character in the DIMFILM font layout from the restricted set of characters of standard Fortran 77.  The next output character will be derived from the next non-escape input character by first mapping it left one column in the font layout (i.e.  its ASCII value will be decreased by 16).  {Note: this mapping is applied before any active case mapping (either upper or lower) is applied.} For example, to output < (less than) the sequence *(L could be used.
+  
+	)	- this (and the previous) escape is specifically to enable access of any character in the DIMFILM font layout from the restricted set of characters of standard Fortran 77.  The next output character will be derived from the next non-escape input character by first mapping it right one column in the font layout (i.e.  its ASCII value will be increased by 16).  {Note: this mapping is applied before any active case mapping (either upper or lower) is applied.} For example, to output \ (reverse slant) the sequence *)L could be used; however, if lower mapping were active the output character which would result is | (vertical line).
+
+.jcgEE
+
+The remaining escapes are different in that they terminate effects only.  That is, they must be preceded by$ .
+
+.jcgTT
+
+	0	- (zero) is used as$ 0 to clear all super/sub-scripts to the base level in the current fraction.  (Termination of a fraction also has this effect.)
+ 
+	Q	- used as$ 0 to quit all super/sub-scripts and fractions to the base text level.  (Termination of a character string input also has this effect.)
+
+.jcgEE
+
+The concepts embodied in the above discussion will become clear if the following examples are considered.
+.jcgDISPLAY
+      CALL SYMTXT('This is DIMFILM')
+                 or
+      CALL SYMTXT('T*LHIS IS$L DIMFILM')
+                 or
+      CALL SYMTXT('*Ut$Uhis is *Udimfilm')
+
+      will all plot:  This is DIMFILM
+
+      CALL SYMTXT('This is *=underlined *Iitalic$I$= text')
+
+      will plot: This is underlined italic text
+          (with the word italic italicised)
+
+      CALL SYMTXT('z = *,x*+2$+ + 1*.*,1*.2y$.$.')
+
+      will plot the equation z equals x-squared plus one
+      all divided by one upon two y.
+
+.jcgENDD
+Certain parameters associated with text layouts may be specified by the user.  For example, size and positioning of super and sub scripts may be set to "personalise" the output appearance.
+
+.jcgTT
+
+	SETCEX(CEXP)
+ 
+	- will set the character expansion factor to CEXP (CEXP > 0.0).  Each character will be stretched/squeezed in its width relative to the nominal height.  {Default = 1.0}
+ 
+	SETCSP(CSPACE)
+ 
+	- each character will be followed by a space of CSPACE times the current text height.  A negative value may be used to close up text (caution should be exercised).  {Default = 0.0}
+ 
+	SETFR(FHT,FOFF,FGAP)
+ 
+	- controls the appearance of fractions.  Heights of each numerator and denominator will be set to FHT times current text height, while the fraction bar will be set at a position FOFF times current text height above the present text baseline.  A gap will be forced between the fraction bar and both numerator base and maximum height extent of denominator; this gap will be FGAP times the fraction numerator/ denominator height.  (FHT,FGAP > 0.0) {Default = (0.6,3./7.,0.13)}
+ 
+	SETSUP(SHT,SUPY)
+ 
+	- sets the height of superscripts as SHT (> 0.0) times the current text height at a position SUPY times the current text height above the height of the preceding character (either relative to the actual maximum height of that character or as an absolute position according to the current height - see SUPABS/SUPREL).  A negative SUPY will position the superscript below the preceding character relative/absolute height.  {Default = (0.4,0.1) relative}
+ 
+	SETSUB(SHT,SUBY)
+ 
+	- sets the height of subscripts as SHT (>0.0) times the current text height at a position SUBY times the current text height above the text baseline at the current level.  A negative SUBY will position the subscript below the text baseline.  {Default = (0.4,0.0)}
+ 
+	SETOVR(OVHT,OVY,UNY)
+ 
+	- when super/sub-scripts are set as over/under (via escape *O) their height will be OVHT times the current text height, while "over" items will have a gap of OVY times current text height between their base and the reference character, and "under" items will have a gap of UNY times the current text height between their nominal top and base of reference character.  (OVHT > 0.0; OVY,UNY not < 0.0) {Default = (0.4,0.1,0.1)}
+ 
+	SETUN(UNGAP)
+ 
+	- underlining will be performed at UNGAP times the current text height below the lowest extent of the underlined section of text (this will clear fractions, subscripts etc., but may not clear individual character descenders).  (UNGAP not < 0.0) {Default = 0.1}
+ 
+	SUPABS	- superscripts will be positioned relative to the absolute (i.e.  currently active) height of the preceding character.
+  
+	SUPREL	- superscripts will be positioned relative to the actual character height maximum of the preceding character (although it will be forced to clear any subscript of a single level applied to the same character).  Thus superscripts will, for example, be differently positioned for "x" and "X".  {Default = relative} TEMPORARY NOTE - superscripts are currently set as absolute at -0.4 (see SETSUP); the declared default state will be applied shortly.
+
+.jcgEE
+
+The default values may cause fractions and superscripts to exceed the basic text extent (i.e.  baseline to nominal height).  Judicious redefinition of certain values can avoid this (provided over/under items are avoided); it is suggested that FHT=0.4, FGAP=0.1, FOFF=0.5, may help in this regard.  However, DIMFILM is designed to accommodate variations in line spacing and the "length" text routines may be used in this respect.  Full allowance for such text layout will be made by graph annotation routines, etc.
+
+.jcgTT
+
+	RESTXT	- will reset all text string parameters to their default state (except height and string position).
+
+.jcgEE
+
+
+.jcgSUBSECTION String Continuation
+It is often the case that the user may require a text string to be output positioned immediately following the last output string.  This can be very useful when values (output via INUM/RNUM) are required within a complex string.
+
+.jcgTT
+
+	SYMCON	will result in all following direct text output to be positioned as a continuation of the previously plotted string.Note that all subsequent strings will be contiguous until this option is negated.
+  
+	ENSYMC	will cause all following direct text output to commence at the current plot position.
+
+.jcgEE
+
+Each string, including those produced as positionally continuous through the use of SYMCON, will (by default) commence with the set Initial Text Characteristics.  For blocks of text, whether or not these be positionally continuous, it is often appropriate for each string to continue with the Current Text Characteristics that applied at the conclusion of the previous string.
+
+.jcgTT
+
+	TXTCON	will result in all subsequent direct text output commencing with the CTC that was active at the end of the previous string.  I.e.  each string does not revert to the ITC at its commencement.  Thus TXTCON should be referenced before the first continuation string (and after the string which is required to commence with the ITC).  It should also be noted that any reference to any of the ITC routines will force the next string reference to commence with all ITCs active, after which subsequent strings will have continuous CTCs.  (Any reference to other DIMFILM modules, such as graphing or contouring, will force the next direct string reference to commence with the ITC - TEXTCON will, however, remain active for subsequent references.)
+ 
+	ENTXTC	will cancel the effect of TXTCON; all strings will be plotted commencing with the ITC.
+
+.jcgEE
+
+The foregoing is applicable to direct string references (i.e.  SYMTXT, RNUM, INUM etc.) - indirect string output via (for example) graph titling, axis labelling is not affected.
+It is reiterated that SYMCON and TXTCON are independent, but may be simultaneously active if required.
+
+.jcgSUBSECTION Text String Length
+It is often necessary, for layout purposes, for the actual output length of a text string to be known (before it is physically plotted).
+
+.jcgTT
+
+	STRING(TEXT)
+ 
+	is a REAL FUNCTION, returning as its value the length (in users world coordinate units) that would be occupied were the text string in TEXT (of type CHARACTER) to be passed to SYMTXT and plotted at unit height.
+  
+	SRNUM(RNUMB,FMT)
+ 
+	is a REAL FUNCTION, returning as its value the length (in users world coordinate units) that would be occupied were the parameters RNUMB (of type REAL) and FMT (of type CHARACTER) to be passed to RNUM and the resultant string plotted at unit height.
+  
+	SINUM(INUMB,FMT)
+ 
+	is a REAL FUNCTION, returning as its value the length (in users world coordinate units) that would be occupied were the parameters INUMB (of type INTEGER) and FMT (of type CHARACTER) to be passed to INUM and the resultant string plotted at unit height.
+
+.jcgEE
+
+As an example, suppose the user requires to exactly fit a string into 17.5 of his units.  He may pass the string to STRING and obtain the length it would occupy at unit height and select a height accordingly:
+.jcgDISPLAY
+
+      WIDTH = STRING('This occupies 17.5 units')
+      CALL SYMHT(17.5/WIDTH)
+      CALL SYMTXT('This occupies 17.5 units')
+
+
+.jcgENDD
+
+There is also the case where the user's string may conclude with one or more blanks (possibly when a variable of fixed length is used for several strings input during program execution).  In this case:
+
+.jcgTT
+
+	STRAIL(TEXT,NA,SLONG)
+ 
+	is a subroutine reference, returning in SLONG (REAL) the length (in users world coordinate units) that would be occupied were the text string in TEXT (of type CHARACTER) to have trailing blanks removed and the remainder passed to SYMTXT and plotted at unit height.  The number of characters in TEXT, after trailing blanks are stripped, is returned in NA (INTEGER).
+
+.jcgEE
+
+All the string length functions/subroutine take full account of embedded escape sequences within the input strings.
+
+.jcgCHAPTER Raster Plotting
+DIMFILM offers the user a wide range of raster plotting facilities.  These may be freely intermixed with all other plotting operations.  However, not all devices can support the (full) range of raster functions.  Where possible non-raster devices will perform some simulation of the raster commands, but - depending on the type of device - this may be minimal.  The Appendices on device types and specific devices supported should be consulted for details on how the raster operations will be performed.  This section details the raster operations as they would function on a full-feature device.
+In calligraphic (or vector) plotting, images are created through the drawing of line segments.  This is analogous to the draughtsman's pencil.  Raster plotting produces fully shaded (possibly multi-coloured) pictures, and is more akin to the artist's paintbrush.  Digital computers and electronic displays require an ordered approach to picture formation, and so the raster image is composed of a mesh of points.  These are generally arranged at regular intervals on a rectangular grid.  The smallest point that may be displayed, and to which a unique colour may be assigned, is termed a pixel.  These points are so arranged that under normal viewing conditions they cannot be discriminated (within an area of constant colour); that is, they appear to touch and the coloured area is visually continuous.  On sophisticated devices the number of pixels is large and they cannot be discriminated even across colour transitions - the image then appears continuous and, given sufficient colour range, will be capable of a high degree of realism.  Not all applications of raster graphics require realism.  The shading of areas can greatly enhance graphic presentations even when relatively few colours are used.
+Different devices may have different numbers of pixels in each orthogonal direction.  The usual expression of the raster capability is as 'resolution of H x V pixels' (in the Horizontal and Vertical directions, sometimes extended by 'x B' to define number of data, i.e.  colour, bits per pixel).  An alternative is to express the number of pixels per linear unit of measure (or even per unit of area).  The consequence is that to drive a raster device the user (or software) must know the device resolution.  DIMFILM is a general purpose graphics library and, as such, is independent (in user terms) of the graphics output device addressed.  In consequence, the user defines a raster image in terms of minimum elements (known as cells) and the low level interfaces (the device drivers) convert these into device pixels.  There is no need, then, for the general user to be concerned with the device raster specification; beyond the obvious necessity of ensuring the chosen device can adequately represent the generated pictures (in terms of raster resolution, colour representation, etc.).  The sophisticated, or more demanding, user will find that careful definition of his coordinate space and his cell mapping will enable precise addressing of a particular device's raster pixels (and still enabling an approximate depiction on secondary devices - possibly lower resolution preview displays).
+In practice, the user defines a cell map, comprising his chosen raster (i.e.  cell) resolutions in both horizontal and vertical directions and a mapping of this rectangular area onto his coordinate space.  He may then assign a different colour to each cell of this raster grid,thereby forming a cell array .  DIMFILM will map this cell array onto each device such that every device pixel contained within any user cell will be assigned the colour of that cell.  Clearly, the general case will be that many device pixels are located within a particular cell and so are coloured identically yielding a cell of the designated colour.
+.jcgDISPLAY
+ This may be illustrated thus:
+
+       .    .    .    .    .    .    .    .    .    .
+          -------------------------------------
+       .  | *   |*    *    *|   * |  *  | *   |.    .
+          |     |     |     |     |     |     |
+       .  | *   |*    *    *|   * |  *  | *   |.    .
+          |     |     |     |     |     |     |
+       .  --*----*----*----*----*----*----*----.    .
+          |     |     |     |     |     |     |
+       .  | *   |*    *    *|   * |  *  | *   |.    .
+          |     |     |     |     |     |     |
+       .  | *   |*    *    *|   * |  *  | *   |.    .
+          -------------------------------------
+       .  | *   |*    *    *|   * |  *  | *   |.    .
+          |     |     |     |     |     |     |
+       .  | *   |*    *    *|   * |  *  | *   |.    .
+          |     |     |     |     |     |     |
+       .  --*----*----*----*----*----*----*----.    .
+          |     |     |     |     |     |     |
+       .  | *   |*    *    *|   * |  *  | *   |.    .
+          |     |     |     |     |     |     |
+       .  | *   |*    *    *|   * |  *  | *   |.    .
+          -------------------------------------
+       .    .    .    .    .    .    .    .    .    .
+
+ Notes: i) the cells are shown boxed
+       ii) device pixels are shown as . or *
+      iii) pixels contained in cells = *
+       iv) pixels outside cell map = .
+
+
+.jcgENDD
+The foregoing illustration gives some pictorial idea of how device pixels may be mapped into cells (assignment of cell boundaries to interiors is subject to an implementation convention).
+It is (generally) redundant for the user cell resolution to exceed that of the chosen output device for then not every cell can be represented (in this case each pixel will correspond to the one cell containing it, and some cells will be omitted as they will not contain any pixel).  Direct device pixel addressing will be ensured when the cell resolution equates to the pixel resolution when the coordinate space is mapped onto the device.
+The user of raster plotting through DIMFILM must determine the resolution at which he wishes to work (the cell resolution) and may then communicate with DIMFILM routines in terms of these cells.  This may either be defined in terms of the whole cell array or by defining successive single rows of this array - cell scans.  Considerations of computer storage may well dictate the chosen mode, as may the algorithm used to generate colour values for each cell.
+Whichever mode is utilised, the user may assign colour (or intensity) either by reference to look up tables or specific value triplets.  Where scans are utilised there is the option of providing data either for each cell in the scan or for incorporating some compression in the input.
+.jcgSECTION Cell Mapping
+As depicted above, a cell map consists of a rectangular grid of cells which is mapped onto user coordinate space (i.e.  world coordinates).  The definition of this cell mapping is common to all subsequent discussion of cell-raster output.  The user is required to define the Number of Cells in the X-direction (i.e.  horizontally) and the Number of Cells in the Y-direction (i.e.  vertically).  This gives the cell resolution.  Also required is the mapping of this onto the user's coordinate space.  For this it is necessary to define the X-coordinate of the START of the first cell scan and the X-coordinate of the END of that scan, and also the Y-coordinate of the START of the first scan and the Y-coordinate of the END of the last scan.  Pictorially this may be shown:
+.jcgDISPLAY
+
+
+        XSTART                               XEND
+     YSTART -----------------..-----------------
+            |    |    |    |    |    |    |    |
+            |  1 |  2 |  3 |    |    |    |NCX |
+            |    |    |    |    |    |    |    |
+            -----------------..-----------------
+            |    |    |    |    |    |    |    |
+            |  2 |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            -----------------..-----------------
+            |    |    |    |    |    |    |    |
+            |  3 |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            -----------------..-----------------
+            .    .    .    .    .    .    .    .
+            .    .    .    .    .    .    .    .
+            .    .    .    .    .    .    .    .
+            -----------------..-----------------
+            |    |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            -----------------..-----------------
+            |    |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            -----------------..-----------------
+            |    |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            |NCY |    |    |    |    |    |    |
+       YEND -----------------..-----------------
+
+
+
+.jcgENDD
+This shows the layout of the cell mapped area.  Thus each scan comprises NCX cells, and NCY rows of raster cell scans map onto the area defined by XSTART to XEND in the X-direction (i.e.  the 'horizontal' scan direction) and YSTART to YEND orthogonally in the Y-direction (i.e.  the vertical, or direction in which successive scans are produced).  It is this area that is mapped from the users world coordinates onto each device display area.  This concept is important to all following discussion in this chapter.
+.jcgSECTION Cell Arrays
+In the simplest form, the user may pass data relating to the whole of the cell mapped area in a two-dimensional data array.  In this case the user will have determined the cell values (i.e.  colours) for each cell in the NCX x NCY cell grid.  In general terms this will be in an array of dimension (NCX,NCY).  That is, the value in element (i,j) of this array will be that of the i-th cell in the j-th scan.  With cell arrays, the user defines the cell mapped area and passes data for the complete grid of cells.
+.jcgDISPLAY
+ Pictorially, this may be shown:
+
+    (1,1)     (2,1)  . . . . . (NCX-1,1)     (NCX,1)
+
+    (1,2)     (2,2)  . . . . . (NCX-1,2)     (NCX,2)
+
+    (1,3)     (2,3)  . . . . . (NCX-1,3)     (NCX,3)
+
+      .         .                    .           .
+      .         .                    .           .
+      .         .                    .           .
+      .         .                    .           .
+
+    (1,NCY-1) (2,NCY-1)  . . . (NCX-1,NCY-1) (NCX,NCY)
+
+    (1,NCY)   (2,NCY)  . . . . (NCX-1,NCY)   (NCX,NCY)
+
+
+.jcgENDD
+The user may specify these values as either look-up-table references or actual value triplets (in the current colour model).
+
+.jcgSUBSECTION Cell Arrays via LUT
+One of the simplest ways to generate a raster is through the definition of a set of CEll Look up table references in an ARray.  In this case the cell mapped area must be defined and an array of the LUT values provided.
+
+.jcgTT
+
+	CELAR(XSTART,XEND,YSTART,YEND,NCX,NCY,LUTARR)
+ 
+	will result in the cell array defined in LUTARR being plotted on the cell mapped area using look up table entries.
+  
+	  XSTART	is the X-coordinate of the start of the first scan
+ 
+	 XEND	is the X-coordinate of the end of the first scan
+ 
+	 YSTART	is the Y-coordinate of the start of the first scan
+ 
+	 YEND	is the Y-coordinate of the last scan
+ 
+		(all coordinates being in the user's world coordinate space)
+ 
+	 NCX	is the number of cells in each scan
+ 
+	 NCY	is the number of scans
+ 
+	 LUTARR	is an integer array of dimension (NCX,NCY) with the value of the (i,j)th element being a pointer into the look up table for the i-th cell in the j-th scan.  The values in this array should be constrained to [0,255].
+
+.jcgEE
+
+There may be occasions when the storage array used for the LUT pointers may not be dimensioned as required (for instance, when only as subset of the storage array is to be plotted).  There is, for such purposes, an alternative subroutine CELAR1, which requires additional information concerning the array and subarray dimensions.  (The need and use of this will be apparent only to those familiar with Fortran array usage.)
+
+.jcgTT
+
+	CELAR1(XSTART,XEND,YSTART,YEND,NAX,NAY,NCS,NRS,NCX,NCY,LUTARR)
+ 
+	will result in the cell array defined in LUTARR being plotted on the cell mapped area using look up table entries.  The parameters XSTART, XEND, YSTART, YEND, NCX, and NCY are as for CELAR, above.  However, the dimensioning of LUTARR is different, and defined by other parameters:
+ 
+	 XSTART	is the X-coordinate of the start of the first scan
+ 
+	 XEND	is the X-coordinate of the end of the first scan
+ 
+	 YSTART	is the Y-coordinate of the start of the first scan
+ 
+	 YEND	is the Y-coordinate of the last scan
+ 
+		(all coordinates being in the user's world coordinate space)
+ 
+	 NAX	is the first dimension of storage array LUTARR
+ 
+	 NAY	is the second dimension of storage array LUTARR
+ 
+	 NCS	is the starting column within LUTARR at which the cell array commences
+ 
+	 NRS	is the starting row within LUTARR at which the cell array commences
+ 
+	 NCX	is the number of cells in each scan
+ 
+	 NCY	is the number of scans
+ 
+	 LUTARR	is an integer array of dimensions (NAX,NAY) which holds the pointers to the look up table for the NCX x NCY cell array as a subset.  Each scan commences at column NCS of LUTARR and the first scan is at row NRS of LUTARR.  {For this case, the value of the (i,j)th element of the cell mapped array to be plotted will be found at (NCS-1+i,NRS-1+j) of LUTARR.  CELAR is the specific case of CELAR1 with NAX = NCX, NAY = NCY, and NCS = NRS = 1.}
+
+.jcgEE
+
+This may be shown schematically as:
+.jcgDISPLAY
+
+
+               1   NCS                      NAX
+            ------------..-------------..-------
+            |    |    |    |    |    |    |    |
+          1 |    |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            ------------..-------------..-------
+            |    |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            |    |  1 |    | NCX|    |    |    |
+            -----=======..=======------..-------
+            |    I    |    |    I    |    |    |
+        NRS |   1I ** |    |    I    |    |    |
+            |    I    |    |    I    |    |    |
+            -----I------..------I------..-------
+            .    .    .    .    .    .    .    .
+            .    .    .    .    .    .    .    .
+            .    .    .    .    .    .    .    .
+            ------------..-------------..-------
+            |    I    |    |    I    |    |    |
+            | NCYI    |    |    I    |    |    |
+            |    I    |    |    I    |    |    |
+            -----=======..=======------..-------
+            |    |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            ------------..-------------..-------
+            .    .    .    .    .    .    .    .
+            .    .    .    .    .    .    .    .
+            .    .    .    .    .    .    .    .
+            ------------..-------------..-------
+            |    |    |    |    |    |    |    |
+        NAY |    |    |    |    |    |    |    |
+            |    |    |    |    |    |    |    |
+            ------------..-------------..-------
+
+
+
+.jcgENDD
+The cell mapped array is the subarray of dimension NCXxNCY, with its first element (**) located at (NCS,NRS) within the main storage array of size (NAX,NAY).
+.jcgSUBSECTION Cell Arrays via Triplet
+Not all usage will be satisfied by look up table references.  Where more control (and possibly greater colour range) is needed it is necessary to generate CEll Triplet values by ARray.  The cell mapped area must be defined, and three arrays must be provided which together define the three colour values for each cell.  The meaning of the three arrays depends on which colour model is currently active (e.g.  RGB, HLS, HSV, etc.).
+
+.jcgTT
+
+	CETAR(XSTART,XEND,YSTART,YEND,NCX,NCY,V1,V2,V3)
+ 
+	will result in the cell array defined by (V1,V2,V3) being plotted on the cell mapped area using direct triplet values interpreted according to the currently active colour model.
+  
+	  XSTART	is the X-coordinate of the start of the first scan
+ 
+	 XEND	is the X-coordinate of the end of the first scan
+ 
+	 YSTART	is the Y-coordinate of the start of the first scan
+ 
+	 YEND	is the Y-coordinate of the last scan
+ 
+		(all coordinates being in the user's world coordinate space)
+ 
+	 NCX	is the number of cells in each scan
+ 
+	 NCY	is the number of scans
+ 
+	 V1,V2,V3	are real arrays, each of dimension (NCX,NCY), defining the colour triplet value for each cell; the i-th cell in the j-th scan having triplet value {V1(i,j),V2(i,j),V3(i,j)}.  The values must be within the ranges required for the currently active colour model which will be used for their interpretation.
+
+.jcgEE
+
+
+.jcgSECTION Cell Scans
+The alternative to the cell array method of plotting a raster/cell image is for each scan line of cells to be passed separately to DIMFILM.  This may well be the preferred method when large numbers of cells and scans are involved (especially when computer memory is limited).
+In this case the user must first define his cell mapped area (there is no default).  Each scan line is then passed to DIMFILM, which will interpret successive scan lines as part of a cell mapped image and ensure correct location on the cell mapped area.  The first line will be positioned at (XSTART,YSTART) and subsequent lines advanced automatically toward YEND.
+A pointer onto the cell mapped area is maintained by DIMFILM to position the next scan.  This will be initialised to the cell mapped area X/Y-START at any DIMFILM frame advance, whenever the cell mapped area is redefined, and when a new coordinate transformation becomes active, or when specifically initialised (via RESCMP).  The pointer will not be initialised if the actual number of scan lines generated exceeds the predefined cell map limit (in this case, excess lines are ignored).  It is permissible for other DIMFILM functions to be performed between consecutive cell scans; the raster image should appear continuous in the cell mapped area (although some devices may show some minor positional discontinuity or colour shift).  Equally, it is perfectly acceptable for different scans to be generated by different cell scan techniques (e.g.  run length compressed scans may be interspersed with full lines).
+
+.jcgSUBSECTION Cell Mapped Area
+Prior to any cell scan reference a valid cell mapped area must be defined.  Once defined, within a DIMFILM execution, this cell mapped area will remain defined for all subsequent cell scans.  It is independent of the cell mapped area as specifically defined via any cell array reference, and so the various types of cell scan operation may be freely intermixed.
+
+.jcgTT
+
+	CELMAP(XSTART,XEND,YSTART,YEND,NCX,NCY)
+ 
+	will define a cell mapped area for use with all subsequent cell scan operations and initialise the cell scan pointer to (XSTART,YSTART).
+  
+	  XSTART	will be the X-coordinate of the start of the first scan
+ 
+	 XEND	will be the X-coordinate of the end of the first scan
+ 
+	 YSTART	will be the Y-coordinate of the start of the first scan
+ 
+	 YEND	will be the Y-coordinate of the last scan
+ 
+		(all coordinates being in the user's world coordinate space)
+ 
+	 NCX	will be the number of cells in each (full) scan
+ 
+	 NCY	will be the number of scans for the complete image
+
+
+.jcgEE
+
+It is of note that individual scan lines will be processed up to a maximum of NCX cells, while short scans are permitted.
+
+.jcgTT
+
+	RESCMP	may be used to re-initialise the cell scan line pointer into the mapped area (to X/Y-START).  When this is referenced the following cell scans will overlay any previously generated ones on the same mapped area on the current frame.  It is included for those cases where such overlays are required.  The user is cautioned that the effects on the specific device in use should be considered with care.  (An implicit RESCMP is performed on any DIMFILM frame advance.)
+
+.jcgEE
+
+
+.jcgSUBSECTION Cell Scans via LUT
+Two routines are provided for CEll Look up table reference SCans, with the option of Run length encoding (compression).  The routines should be referenced once for each scan line required on the cell mapped area.
+
+.jcgTT
+
+	CELSC(LSCAN,NC)
+ 
+	will cause the NC look up table values in integer array LSCAN (dimension NC) to be applied as the values for NC cells in the next cell scan.  These values should be in the range [0,255].
+  
+	CELSCR(LRSCAN,NC)
+ 
+	is for run length encoded scans.  The integer array LRSCAN with dimension (2,NC) holds the definition for the next cell scan.  For each pair of elements, LRSCAN(1,i) is the number of consecutive cells to have look up table value LRSCAN(2,i); i=1,NC.  Thus the length of the scan defined by this reference is the summation of LRSCAN(1,i) for i=1 to NC.  (Negative or zero runs are ignored.) Each LUT value should be in the range [0,255].
+
+.jcgEE
+
+
+.jcgSUBSECTION Cell Scans via Triplet
+As with cell arrays, it is also possible for the user to produce CElls of Triplet values in SCan lines; again these may optionally include Run length compression.  Each triplet will be evaluated according to the current colour model.  The routines should be referenced once for each scan line required on the cell mapped area.
+
+.jcgTT
+
+	CETSC(V1,V2,V3,NC)
+ 
+	will cause the NC triplet values defined by real arrays V1,V2,V3 (each of dimension NC) to be applied as the values for NC cells in the next cell scan line.  The value of the i-th cell will be evaluated as the triplet {V1(i),V2(i),V3(i)} according to the current colour model.  (The triplet values should be within the relevant range.)
+ 
+	CETSCR(V1,V2,V3,IRUN,NC)
+ 
+	is for run length encoded scans.  The integer array IRUN (of dimension NC) holds the run length corresponding to each of the NC triplets defined by the real arrays V1,V2,V3 (each of dimension NC).  The i-th triplet {V1(i),V2(i),V3(i)} will be evaluated according to the current colour model and applied to IRUN(i) consecutive cells in the scan.  Thus the length of the scan defined by this reference is the summation of IRUN(1,i) for i=1 to NC.  (Negative or zero runs ignored.) Each value triplet should be within the range appropriate to the current colour model.
+
+.jcgEE
+
+
+
+
+
+ Û  å    å  ð ANWZBÿ¯eÿÿÿAFGZÿ¯Û ÿÿÿ          E_         E_    #      E_  Q d   ‹H!U

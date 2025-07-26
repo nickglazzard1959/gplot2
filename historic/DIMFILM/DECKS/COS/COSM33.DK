@@ -1,0 +1,25 @@
+*DECK COSM33 F
+        IDENT  DFXM33
+*----------------------------------------------------------
+*
+*   DFXM33 - CALLING SEQUENCE FROM CFT:
+*
+*      LOGICAL DFXM33
+*      ...
+*      RESULT=DFXM33(N)
+*
+*      RETURNS  .TRUE. IF LOW ORDER BIT OF N IS SET
+*              .FALSE. IF LOW ORDER BIT OF N IS UNSET
+*      N MAY BE ANY DATA TYPE
+*
+*----------------------------------------------------------
+*
+*       DIMFILM MACHINE DEPENDENT INTERFACE - CRAY VERSION
+*       VERSION 1.0        01/02/84        STEVE WISE,ULCC
+*
+DFXM33  ENTER  NP=1
+        ARGADD A1,1         PICK UP
+        S1     ,A1           ARGUMENT
+        S1     S1,S1>1      MOVE LOW ORDER BIT TO SIGN BIT
+        EXIT
+        END

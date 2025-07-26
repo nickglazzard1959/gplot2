@@ -1,0 +1,21 @@
+*DECK DFX325 F
+      SUBROUTINE DFX325(S,J,DIFF,T,NIL)
+*CALL,DFXC00
+*CALL,DFXC06
+*CALL,DFXC10
+*CALL,DFXC04
+      LOGICAL NIL
+      CALL DFX147(3)
+      T = 1.
+      IF (J.GT.0) GO TO 1
+      S = S + DIFF
+      RETURN
+    1 S = S + DL(J)
+      J = J + 1
+      IF (J.EQ.10) J = 1
+      IF (J.EQ.1) RETURN
+      T = TC2
+      CALL DFX147(NRGB)
+      IF (NIL) T = 0.0
+      RETURN
+      END

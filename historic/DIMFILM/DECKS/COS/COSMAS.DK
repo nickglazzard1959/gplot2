@@ -1,0 +1,129 @@
+*DECK COSMAS F
+          IDENT    DFXMAS
+*------------------------------------------------------
+*
+*   THREE ENTRY POINTS -
+*
+*     DFXMNS - RETURN ACCOUNT NUMBER/JOBNAME
+*     DFXMUS - RETURN JOBNAME (WOULD PREFER JOB COMMENT FIELD)
+*     DFXMJS - RETURN JOB SEQUENCE NUMBER
+*     DFXMSS - RETURN STAGED DISK DATASET JOB PARAMETER (SD)
+*
+*   WRITTEN IN CAL TO PICK UP TABLE OFFSETS TO JOB ACCOUNTING
+*   TABLE FROM $SYSTEXT.
+*
+*
+*       DIMFILM MACHINE DEPENDENT INTERFACE - CRAY VERSION
+*       VERSION 1.0        01/02/84        STEVE WISE,ULCC
+*       VERSION 1.1        23/05/86        JOHN GILBERT,ULCC
+*                                          ADDED DFXMSS ENTRY
+*                                          COS 1.14+
+*       VERSION 1.2        12/05/89        JOHN GILBERT,ULCC
+*                                          ADDED DFXMUS ENTRY
+*
+          EXT      $EFI,$EFV,$EFF
+TABLE     BSSZ     LE@AC         JOB ACCOUNTING TABLE
+RECLEN    DATA     8             RECORD LENGTH FOR ENCODING JSQ
+FMT       DATA     '(3HJSQ,I5)'  FORMAT FOR ENCODING JSQ
+*------------------------------------------------------
+*
+*   ENTRY DFXMNS - RETURN ACCOUNT NUMBER/JOBNAME
+*
+*   CHARACTER*8 JOBNAME
+*
+*   CALLED AS :
+*                  CALL DFXMNS(JOBNAME)
+*
+*   ON AMDAHL JOBNAME=ACCOUNT NUMBER+OPTIONAL LETTER
+*   ON CRAY JOBNAME (JN) IS OPTIONAL PARAMETER - DEFAULTS TO
+*   THE ACCOUNT NUMBER. ACCOUNT NUMBER IS ACTUALLY GIVEN IN
+*   US PARAMETER.
+*   FOR CONSISTENCY WITH AMDAHL RETURN THE 'TSO' JOBNAME
+*   I.E.  <ACCOUNT NUMBER> PLUS FIRST LETTER OF CRAY JN
+*   PARAMETER.
+*
+DFXMNS    ENTER    NP=1
+          R        GETJAC      PICK UP JAC TABLE
+          A1       TABLE
+          ARGADD   A2,1
+          S2       W@ACUSR,A1
+          S3       W@ACJN,A1
+          S3       S3>56
+          S2       S2!S3
+          ,A2      S2
+          EXIT
+*------------------------------------------------------
+*
+*   ENTRY DFXMUS - RETURN JN PARAMETER (JOBNAME)
+*
+*   CHARACTER*8 JOBNAME
+*
+*   CALLED AS :
+*                  CALL DFXMUS(JOBNAME)
+*
+*   IDEALLY SHOULD R4TURN COMMENT FIELD FROM JOB STATEMENT.
+*   IN ABSENCE OF THIS INFORMATION USE JN (JOBNAME) PARAMETER
+*   (COULD USE CRAY ROUTINE JNAME, AND CONVERT HOLLERITH TO CHARACTER)
+*
+DFXMUS    ENTER    NP=1
+          R        GETJAC      PICK UP JAC TABLE
+          A1       TABLE
+          ARGADD   A2,1
+          S2       W@ACJN,A1
+          ,A2      S2
+          EXIT
+*------------------------------------------------------
+*
+*   ENTRY DFXMJS - RETURN JOB SEQUENCE NUMBER
+*
+*   CHARACTER*8 JSQ
+*
+*   CALLED AS :
+*                  CALL DFXMJS(JSQ)
+*
+*   RETURNS JSQ IN THE FORM  JSQNNNNN WHERE N=DIGIT
+*
+DFXMJS    ENTER    NP=1
+          R        GETJAC       GET JAC TABLE
+          A1       RECLEN
+          A2       FMT
+          ARGADD   A3,1
+          CALL     $EFI,(A1,A2,A3)
+          A1       TABLE
+          GETF,S1  S2,ACJSQ,A1
+          CALLV    $EFV,(S1)
+          R        $EFF
+          EXIT
+*------------------------------------------------------
+*
+*   ENTRY DFXMSS - RETURN JCL JOB STATEMENT PARAMETER SD
+*
+*   FINDS OUT IF SD HAS BEEN SET ON THE JOB CARD
+*   RETURNS SINGLE INTEGER PARAMETER I :
+*                 I  =  0 IF SD NOT SET
+*                 I  =  1 IF SD SET
+*
+*   FOR USE UNDER COS 1.14+ ONLY
+*
+*   CALLED AS :
+*                  CALL DFXMSS(I)
+*
+DFXMSS    ENTER    NP=1
+          R        GETJAC       GET JAC TABLE
+          A1       TABLE
+          GETF,S1  S2,ACSGSD,A1    GET SD FIELD
+          ARGADD   A2,1
+          ,A2      S1
+          EXIT
+*------------------------------------------------------
+*
+*   GET JOB ACCOUNTING TABLE IF NOT ALREADY DONE
+*
+GETJAC    =        *
+          S0       TABLE,0
+          JSN      RETURN
+          S0       F$ACT
+          S1       TABLE
+          EX
+RETURN    J        B00
+          END

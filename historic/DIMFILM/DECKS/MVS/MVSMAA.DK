@@ -1,0 +1,328 @@
+*DECK MVSMAA F
+DFXMAA    TITLE  'DYNAMICALLY ALLOCATE AND READ HERSHY DATASET'
+          PRINT ON,NOGEN
+DFXMAA    CSECT
+*           DYNAMIC ALLOCATION ROUTINES FOR DIMFILM
+*
+          ENTRY    DFXMAE
+          ENTRY    DFXMAB
+          ENTRY    DFXMAC
+          ENTRY    DFXMAD
+          ENTRY    DFXM12
+*
+*             ***************  DFXMAE  ***************
+*          DYNAMICALLY ALLOCATES AND OPENS A GIVEN DISC DATASET
+*                                               M WHEELER  SEP 1983
+*    CALLING SEQUENCE IS :
+*            CALL DFXMAE(DSN,IFAIL)
+*
+*             DSN  - DATA SET NAME
+*             IFAIL- RETURNS ANY FAILURE CODE (=0 IF OK)-4BYTE
+*                    REFER TO SPL JOB MANAGEMENT FOR ERROR CODES
+*                    (ERROR IS ALSO SPELT OUT IN JOBLOG)
+* NB. THE   SUBROUTINE DFXMSA(IFAIL)       MUST ALSO BE SUPPLIED
+*     WHICH IS CALLED TO OUTPUT THE MACHINE DEPENDENT ERROR CODE
+*
+*    FILE IS ALLOCATED WITH A DISPOSITION OF (SHR,KEEP,KEEP)
+*
+DFXMAE    STM      14,12,12(13)       SAVE REGS IN FORTRAN SA
+          LR       10,15
+          USING    DFXMAE,10
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          LM       3,4,0(1)           LOAD ADD OF PARAMETERS
+          LR       8,3                COPY R3 INTO R8
+*            FIND LENGTH OF DSN
+          LA       9,DSN              LOAD ADD OF DSN INTO R9
+          LA       12,DSN+44          LOAD ADD OF END OF DSN IN R12
+LOOP      CLI      0(8),X'40'         IS THIS CHAR A BLANK
+          BE       ENDNAME            IF SO JUMP OUT OF LOOP
+          CLR      9,12               IS THIS END OF NAME FIELD
+          BNL      ENDNAME            IF SO JUMP OUT OF LOOP
+          MVC      0(1,9),0(8)        MOVE CHAR FROM DSNAME TO DSN
+          LA       8,1(8)             GET NEXT CHAR
+          LA       9,1(9)             INCR R9
+          B        LOOP               BACK TO LOOP
+ENDNAME   SR       8,3                SUBTRACT ADDRESSES
+          STH      8,NAMELEN          AND STORE THIS LENGTH
+*
+          LA       9,0                R9 = 0 (OK)
+          LA       12,RB              R12 -> RB
+          LA       1,ABLOCK           ESTABLISH ADD OF RBP
+          DYNALLOC                    ALLOCATE
+*
+          LTR      15,15              CHECK IF ITS WORKED
+          BZ       RTURN              IF OK RETURN
+*                                     ELSE REPORT ERROR
+          ST       15,RETCODE         GET SYSTEM TO REPORT
+          ST       12,DFPB            (R12 -> RB)
+          LA       1,DFPB
+          LINK     EP=IKJEFF18
+          L        9,4(12)            R9 = FAIL CODE FROM RB
+*
+          LA       1,4(12)            PUT ADDRESS OF FAIL CODE
+          ST       1,PLIST            - INTO PARAM LIST
+          LA       1,PLIST            R1 -> PLIST
+          CALL     DFXMSA             CALL ERROR MESSAGE ROUTINE
+*
+RTURN     ST       9,0(4)             PUT ERROR CODE IN IFAIL
+*
+          L        13,4(13)
+          LM       14,12,12(13)       RESTORE REGISTERS
+          SLR      15,15
+          BR       14
+          DROP     10                 DROP REG
+*
+*              *************  DFXMAB  *************
+*      CALLING SEQUENCE IS :
+*                 CALL DFXMAB(NFONT,IBUFF,IERR)
+*                                                     M WHEELER OCT 83
+*  OPENS MEMBER CORRESPONDING TO FONT NFONT IN ALLOCATED PDS
+*  WHEN FOUND, HEADER RECORD IS COPIED INTO IBUFF (LENGTH - LRECL)
+* (NOTE THAT MEMBER MUST BE CLOSED EG BY DFXMAD BEFORE THIS ROUTINE
+*  CAN BE CALLED AGAIN)
+*   IERR RETURNS ANY ERROR CODE
+*     IERR = 0    OK
+*     IERR = 1    REQUESTED MEMBER NOT FOUND (THE ABEND IS REPRIEVED)
+*     IERR = 2    READ JFCB FAILED
+*     IERR = 3    OPEN FAILED
+*     IERR = 4    EOF ENCOUNTERED WHILE READING
+*
+DFXMAB    STM      14,12,12(13)       SAVE REGISTERS
+          LR       12,15
+          USING    DFXMAB,12
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          LM       2,4,0(1)           GET PARAMETERS; R3 -> IBUFF
+          L        2,0(2)             R2 = NFONT REQUIRED
+*
+          MVC      INDCB1,INDCB       GET FRESH COPY OF DCB
+          RDJFCB   (INDCB1)           READ JFCB
+          LTR      15,15              TEST FOR SUCCESS
+          BNZ      ERRJ
+*
+          OI       JFCBIND1,JFCPDS    SET PDS FLAG
+*              CONSTRUCT MEMBER NAME FROM FONT NUMBER
+*   NAME IS IN THE FORM '#000000<N>'  (8 BYTES,RIGHT ADJ,ZERO FILLED)
+*
+          CVD      2,WORK1            CNVT NFONT TO PACKED DECIMAL
+          MVC      WORK2,EDPTRN       COPY EDIT PATTERN
+          ED       WORK2,WORK1+4      EDIT
+          LA       1,WORK2            R1 -> RESULT
+          MVI      0(1),C'#'          INSERT # THERE
+*
+          MVC      JFCBELNM,0(1)      PLANT MEMBER NAME
+          MVI      ABENDF,X'00'       CLEAR ABEND FLAG
+*
+          OPEN     (INDCB1,(INPUT)),TYPE=J     OPEN MEMBER
+*
+          CLI      ABENDF,X'00'       TEST FOR ABEND
+          BNE      ERRM
+          LA       2,4                SET EOF=ERROR CODE 4
+*                                     GET OPEN FLAG
+          MVC      OFLG(1),INDCB1+DCBOFLGS-IHADCB
+          TM       OFLG,X'10'         TEST IF OPEN SUCCEEDED
+          BNZ      GETHED             BRANCH IF OK
+          LA       9,3                ELSE SET ERROR CODE (3)
+          B        RET12              AND TERMINATE
+*
+GETHED    GET      INDCB1             R1 -> FIRST RECORD
+*
+          LR       8,1                R8 -> HEADER REC
+          LR       6,3                R6 -> IBUFF LOCATION
+          LH       7,INDCB1+DCBLRECL-IHADCB       R7=REC LEN
+          LR       9,7                R9 = REC LEN
+          MVCL     6,8                COPY HEADER RECORD
+          LA       9,0                R9 = 0  - OK
+          B        RET12              RETURN
+*
+ABENDEX   DS       0H                 ABEND EXIT ROUTINE
+          CLC      0(3,1),NOMEM       IS ABEND 'COS MEMBER NOT FOUND
+          BNE      DOABEND            IF NOT ABEND AS USUAL
+          MVI      3(1),4             ELSE REPRIEVE ABEND
+          MVI      ABENDF,X'01'       BUT SET ABEND FLAG
+          BR       14                 AND CONTINUE FROM OPEN
+DOABEND   MVI      3(1),0             DO ABEND
+          BR       14                 RETURN FROM OPEN
+*
+ERRJ      LA       9,2                2 - READ JFCB ERROR
+          B        RET12
+ERRM      LA       9,1                1 - MEMBER NOT FOUND
+RET12     ST       9,0(4)             PUT ERROR CODE INTO 3RD PARAM
+*
+          L        13,4(13)           RESTORE REGISTERS
+          LM       14,12,12(13)
+          SLR      15,15
+          BR       14                 RETURN
+*
+*
+*              *************  DFXMAC  *************
+*      CALLING SEQUENCE IS :
+*                 CALL DFXMAC(NREC,IBUFF(I),IERR)
+*                                                     M WHEELER OCT 83
+*  GET THE NEXT NREC RECORDS FROM ALLOCATED FILE AND STORE
+*  CONTIGUOUSLY STARTING AT ADDRESS IBUFF(I)
+*  IERR RETURNS ANY ERROR CODE
+*     IERR =  0   OK
+* IF EOF ENCOUNTERED,    IERR = NUMBER OF RECORDS NOT TRANSFERED
+*
+DFXMAC    STM      14,12,12(13)       SAVE REGISTERS
+          LR       12,15
+          USING    DFXMAC,12
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          LM       2,4,0(1)           GET PARAMETERS
+          L        2,0(2)             R2 = NREC
+*
+*
+          LH       11,INDCB1+DCBLRECL-IHADCB       R11=REC LEN
+          LR       6,3                R3 -> IBUFF(I) LOCATION
+*
+NXT       GET      INDCB1             R1 -> NEXT RECORD
+          LR       8,1                COPY TO R8
+          LR       7,11               R7 = LENGTH
+          LR       9,11               R9 = LENGTH
+          MVCL     6,8                MOVE RECORD INTO IBUFF
+          BCT      2,NXT              LOOP R2 TIMES
+          B        RET13
+*
+*
+EOF       ST       2,0(4)             PUT N RECORDS LEFT IN 3RD PARAM
+          CLOSE    (INDCB1)            AND CLOSE FILE ?
+*
+RET13     L        13,4(13)           RESTORE REGISTERS
+          LM       14,12,12(13)
+          SLR      15,15
+          BR       14                 RETURN
+*
+*               **************  DFXMAD  ****************
+*                        CLOSES INPUT FILE
+*         (MUST BE CALLED BEFORE ANOTHER FILE CAN BE OPENED)
+*
+*        CALLING SEQUENCE IS :
+*                CALL DFXMAD
+*
+DFXMAD    STM      14,12,12(13)       SAVE REGISTERS
+          LR       12,15
+          USING    DFXMAD,12
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          CLOSE    (INDCB1)           CLOSE FILE
+          FREEPOOL INDCB1             DROP OLD DCB BUFFERS
+*
+          L        13,4(13)           RESTORE REGISTERS
+          LM       14,12,12(13)
+          SLR      15,15
+          BR       14                 RETURN
+*
+*               **************  DFXM12  ****************
+*                       UNALLOCATES INPUT FILE
+*
+*        CALLING SEQUENCE IS :
+*                CALL DFXM12(IFAIL)
+*
+DFXM12    STM      14,12,12(13)       SAVE REGISTERS
+          LR       12,15
+          USING    DFXM12,12
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          L        3,0(1)             ADDRESS OF IFAIL
+*
+          LA       1,DBLOCK
+          DYNALLOC                    UNALLOCATE AND CATALOG
+*
+          L        9,RB2+4            RETURN ANY FAILURE CODE
+          ST       9,0(3)
+          LTR      9,9                TEST IF ZERO
+          BZ       RETM12             IF SO RETURN
+          LA       1,RB2+4            ELSE PUT ADDR OF FAIL CODE
+          ST       1,PLIST            - INTO PARAM LIST
+          LA       1,PLIST            R1 -> PLIST
+          CALL     DFXMSA             CALL ERROR MESSAGE ROUTINE
+*
+RETM12    L        13,4(13)           RESTORE REGISTERS
+          LM       14,12,12(13)
+          SLR      15,15
+          BR       14                 RETURN
+*
+*           *************  SVC 99 PARAMETER LISTS *****************
+*                          * DYNAMIC ALLOCATION *
+          DS       0D
+ABLOCK    DC       AL1(S99RBPND),AL3(RB)
+RB        DC       AL1(20,S99VRBAL),2X'00'
+          DC       F'0',A(TP),2F'0'
+*
+TP        DC       A(TU1,TU2,TU3,TU4)
+          DC       AL1(S99TUPLN),AL3(TU5)
+TU1       DC       AL2(DALDSNAM,1)                 DSN
+NAMELEN   DS       H
+DSN       DC       CL44' '
+TU2       DC       AL2(DALSTATS,1,1),AL1(8)        SHR
+TU3       DC       AL2(DALNDISP,1,1),AL1(8)        KEEP
+TU4       DC       AL2(DALCDISP,1,1),AL1(8)        KEEP
+TU5       DC       AL2(DALDDNAM,1,8)               DD NAME
+          DC       CL8'HERSHYFL'
+*
+*                 *******************************************
+*                          * DYNAMIC UNALLOCATION *
+          DS       0D
+DBLOCK    DC       AL1(S99RBPND),AL3(RB2)
+RB2       DC       AL1(20,S99VRBUN),2X'00'         UNALLOCATE
+          DC       F'0',A(TX),2F'0'
+TX        DC       A(TX1)
+          DC       AL1(S99TUPLN),AL3(TX2)
+TX1       DC       AL2(DUNDDNAM,1,8)               DDNAME
+          DC       CL8'HERSHYFL'
+TX2       DC       AL2(DUNREMOV,0)              EVEN IF NOT PERM ALLOC
+*
+*                 *******************************************
+*
+INDCB     DCB      DDNAME=HERSHYFL,DSORG=PS,MACRF=(GL),EODAD=EOF,      +
+               EXLST=EXLST1,BUFNO=2
+INDCB1    DS       XL96               WORK WITH COPY OF DCB
+*
+SAVA      DS       20F
+DFPB      DS       A
+          DC       A(RETCODE)
+          DC       A(ZERO)
+          DC       A(DFFLAGS)
+RETCODE   DS       F
+ZERO      DC       F'0'
+DFFLAGS   DC       B'10000000',X'32'
+OFLG      DC       X'00'
+*
+          DS       0F
+EXLST1    DC       X'07',AL3(JFCB)
+          DC       X'91',AL3(ABENDEX)
+JFCB      DS       CL176
+JFCBELNM  EQU      JFCB+X'2C',8       MEMBER NAME
+JFCBIND1  EQU      JFCB+X'56',1       FLAG BYTE
+JFCPDS    EQU      X'01'              MEMBER OF PDS
+*
+ABENDF    DC       X'00'              ABEND FLAG
+NOMEM     DC       X'013018'          ERROR CODE FOR NO-MEMBER
+*
+EDPTRN    DC       X'F020202020202120'  EDIT PATTERN FOR FONT NO.
+WORK1     DS       D                  NFONT IN PACKED DECIMAL
+WORK2     DS       CL8                SPACE FOR RESULT
+PLIST     DS       F
+*
+          IEFZB4D0
+          IEFZB4D2
+          DCBD     DSORG=PS,DEVD=DA
+          END

@@ -1,0 +1,14 @@
+*DECK SAMET F
+      SUBROUTINE SAMET
+*CALL,DFXC02
+*CALL,DFXC05A
+      ROUTIN = 'SAMET'
+*CALL,RIN
+      IF (THGL.EQ.THGR) THEN
+            CALL DFX304
+      ELSE
+            FIXTH = .TRUE.
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

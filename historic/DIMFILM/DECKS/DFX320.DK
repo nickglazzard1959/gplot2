@@ -1,0 +1,191 @@
+*DECK DFX320 F
+      SUBROUTINE DFX320(I1,T,Z,ITYPE)
+*CALL,DFXC06
+*CALL,DFXC02
+*CALL,DFXC00
+*CALL,DFXC04
+*CALL,DFXC05
+      LOGICAL GRID
+      LOGICAL LAB,LEFT
+*CALL,DFXC10
+      CALL DFX300
+      GRID = .FALSE.
+      I = I1
+      LAB = .FALSE.
+      IF (I.LT.20) GO TO 61
+      LAB = .TRUE.
+      LEFT = .TRUE.
+      I = I - 20
+      IF (I.LT.10) GO TO 60
+      LEFT = .FALSE.
+      I = I - 10
+      GO TO 60
+   61 IF (I.LT.10) GO TO 60
+      GRID = .TRUE.
+      I = I - 10
+   60 GO TO (1,2),I
+    1 ZL = XGL
+      ZR = XGR
+      IZVAL = IXVAL
+      DIV = DIV1
+      ZD = XTB2 - XTB1
+      ZDOTHR = YTB2 - YTB1
+      ZAT = XAT
+      ZS = XTB1 + DC2*ZD
+      IF (ZL.GT.ZR) ZS = XTB2 - DC2*ZD
+      Y1 = Z
+      GO TO 3
+    2 ZL = YGL
+      ZR = YGU
+      IZVAL = IYVAL
+      DIV = DIV2
+      ZD = YTB2 - YTB1
+      ZDOTHR = XTB2 - XTB1
+      ZAT = YAT
+      ZS = YTB1 + DC2*ZD
+      IF (ZL.GT.ZR) ZS = YTB2 - DC2*ZD
+      X1 = Z
+    3 S = AMIN1((XTB2-XTB1),(YTB2-YTB1))
+      TIK = SIGN(TC1*S,T)
+      TIK2 = TC2*TIK
+      IF (GRID) TIK = ZDOTHR*DC1
+      IF (GRID) TIK2 = TIK
+      AZL = ZL
+      AZR = ZR
+      ISDASH = IDASH
+      IF (.NOT.LAB.AND..NOT.GRID) IDASH = 0
+      IF (ITYPE.EQ.1) GO TO 7
+      AZL = ALOG10(ZL)
+      AZR = ALOG10(ZR)
+    7 S2 = (DC1*ZD)/(AZR-AZL)
+      IF (ITYPE.EQ.2) GO TO 4
+      IF (DIV.LE.0.0) GO TO 5
+      DIFF = DIV
+      IF (IZVAL) DIFF = AINT(DIFF)
+      IF (DIFF.LE.0.) DIFF = 1.0
+      DIST = ABS(AZR-AZL)
+      IF (DIFF.LT..01*DIST.OR.DIFF.GE..5*DIST) GO TO 5
+C    DIFFERENCE LIMITED TO SENSIBLE VALUES - SEE ALSO DFX309
+      GO TO 8
+   20 ITYPE = -2
+    5 DIST = ABS(AZR-AZL)
+      A = ALOG10(DIST)
+      J = INT(DFX302(A))
+      BB = 10.**(ABS(A - FLOAT(J)))
+      D = .2
+      IF (BB.GE.3.) D = .5
+      IF (BB.GE.7.) D = 1.
+      DIFF = D*10.**J
+      IF (ITYPE.EQ.-2.OR..NOT.IZVAL) GO TO 8
+C    HERE FOR INTEGER LINEAR AXIS VALUES
+      DIFF = AINT(DIFF)
+      DIFF = AMAX1(1.0,DIFF)
+      IF (LAB.OR.(DIFF.GE..01*DIST.AND.DIFF.LT..5*DIST)) GO TO 8
+      IF (ICHECK.GT.0) WRITE(ERRREC,70)AZL,AZR
+   70 FORMAT(1H0, 91H**DIMFILM WARNING**  INTEGRAL TICKING OR GRIDDING C
+     1ANNOT SENSIBLY BE PERFORMED WITH RANGE (,1PE16.8,  1H,,1PE16.8,  1
+     2H)/   1H ,21X, 12HCALL IGNORED)
+*CALL,LINOUT0
+      GO TO 100
+    8 A = AMIN1(AZL,AZR)
+      BB = AMAX1(AZL,AZR)
+      J = INT(A/DIFF)
+      IF (A.LT.0.0) J = J - 1
+      S1 = FLOAT(J)*DIFF
+      DIFF01 = TD01*ABS(AZR-AZL)
+      IF (S1.LE.(A-DIFF01)) S1 = S1 + DIFF
+      IF (LAB) GO TO 62
+      IF (S1.LE.(A+DIFF01)) S1 = S1 + DIFF
+      IF (.NOT.GRID.AND..NOT.AXTK.AND.ABS(S1-ZAT).LE.DIFF01) S1=S1+DIFF
+      IF (S1.GE.BB-DIFF01) GO TO 100
+      GO TO (11,12),I
+   11 X1 = (S1 - A)*S2 + ZS
+      CALL DFX110(X1,Y1)
+      CALL DFX106(X1,Y1+TIK)
+      S1 = S1 + DIFF
+      IF (.NOT.GRID.AND..NOT.AXTK.AND.ABS(S1-ZAT).LE.DIFF01) S1=S1+DIFF
+      IF (S1.LT.BB-DIFF01) GO TO 11
+      GO TO 100
+   12 Y1 = (S1 - A)*S2 + ZS
+      CALL DFX110(X1,Y1)
+      CALL DFX106(X1+TIK,Y1)
+      S1 = S1 + DIFF
+      IF (.NOT.GRID.AND..NOT.AXTK.AND.ABS(S1-ZAT).LE.DIFF01) S1=S1+DIFF
+      IF (S1.LT.BB-DIFF01) GO TO 12
+      GO TO 100
+C    HERE FOR LOGARITHMIC AXIS
+    4 DIST = ABS(AZR-AZL)
+      IF (DIST.LT.LOGMIN) GO TO 20
+C    HERE FOR FULL LOGARITHMIC CYCLING
+      IF (DIST.GE.LOGMAX) TIK2 = 0.0
+      A = AMIN1(AZL,AZR)
+      BB = A
+      K = INT(BB)
+      IF (BB.LT.0.0) K = K - 1
+      C = BB - FLOAT(K)
+      J = INT(10.**C)
+      S1 = FLOAT(J)*(10.**FLOAT(K))
+      IF (J.GE.10) J = 1
+C    THIS CORRECTS CASE WITH ZERO MANTISSA AND NEGATIVE CHARACTERISTIC
+      S1 = ALOG10(S1)
+      BB = AMAX1(AZL,AZR)
+      CALL DFX148(3,ZLTI)
+      DIFF01 = TD01*ABS(AZR-AZL)
+      IF (ZAT.GT.0.0) ZAT = ALOG10(ZAT)
+      IF (ZAT.LE.0.0) ZAT = AZL - 10.*DIFF01
+      IF (S1.GE.(A-DIFF01)) GO TO 6
+    9 S1 = S1 + DL(J)
+      J = J + 1
+      IF (J.EQ.10) J = 1
+    6 IF (LAB) GO TO 62
+      IF (S1.LE.A+DIFF01) GO TO 9
+      IF (.NOT.GRID.AND..NOT.AXTK.AND.ABS(S1-ZAT).LE.DIFF01) GO TO 9
+      IF (S1.GE.BB-DIFF01) GO TO 100
+      IF (LAB) GO TO 62
+      GO TO (21,22),I
+   21 X1 = (S1 - A)*S2 + ZS
+      CALL DFX110(X1,Y1)
+      T1 = TIK2
+      IF (J.EQ.1) T1 = TIK
+      IF (J.NE.1) CALL DFX147(NRGB)
+      CALL DFX106(X1,Y1+T1)
+      CALL DFX147(3)
+   40 S1 = S1 + DL(J)
+      IF (S1.GE.BB-DIFF01) GO TO 100
+      J = J + 1
+      IF (J.EQ.10) J = 1
+      IF (.NOT.GRID.AND..NOT.AXTK.AND.ABS(S1-ZAT).LE.DIFF01) GO TO 40
+      GO TO 21
+   22 Y1 = (S1 - A)*S2 + ZS
+      CALL DFX110(X1,Y1)
+      T1 = TIK2
+      IF (J.EQ.1) T1 = TIK
+      IF (J.NE.1) CALL DFX147(NRGB)
+      CALL DFX106(X1+T1,Y1)
+      CALL DFX147(3)
+   41 S1 = S1 + DL(J)
+      IF (S1.GE.BB-DIFF01) GO TO 100
+      J = J + 1
+      IF (J.EQ.10) J = 1
+      IF (.NOT.GRID.AND..NOT.AXTK.AND.ABS(S1-ZAT).LE.DIFF01) GO TO 41
+      GO TO 22
+   62 IF (.NOT.AXLAB) GO TO 63
+      GO TO (64,65),I
+   64 Y0T = Z - YTB1 - DC2*(YTB2-YTB1)
+      IF (.NOT.LEFT) Y0T = Z - (YTB2 - DC2*(YTB2-YTB1))
+      GO TO 63
+   65 X0T = Z - XTB1 - DC2*(XTB2-XTB1)
+      IF (.NOT.LEFT) X0T = Z - (XTB2 - DC2*(XTB2-XTB1))
+   63 CALL DFX137
+C    FORCE TRANSFORM
+      I = I + 20
+      IF (.NOT.LEFT) I = I + 10
+      IX = 0
+      IF (ITYPE.EQ.2) IX = J
+      IF (ITYPE.EQ.-2) IX = -2
+      CALL DFX309(I,IX,S1,S2,ZS,DIFF,A,BB,ZL,ZR)
+      IF (ITYPE.EQ.-2) ITYPE = 2
+  100 CALL DFX301
+      IDASH = ISDASH
+      RETURN
+      END

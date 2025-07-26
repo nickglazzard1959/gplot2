@@ -1,0 +1,29 @@
+*DECK DFX405 F
+      LOGICAL FUNCTION DFX405(XVAL,YVAL)
+*CALL,DFXC00
+*CALL,DFXC11
+*CALL,DFXC01
+*CALL,DFXC15
+      LOGICAL TEMP
+      XV = XVAL
+      YV = YVAL
+      TEMP = .FALSE.
+      XZ = HT*DFX211(1,CHS,IDUMMY,IFMT)
+      X4 = XV + XZ*CANGL
+      X3 = HT*SANGL
+      X1 = XV - X3
+      X3 = X4 - X3
+      XL = AMIN1(X1,XV,X3,X4) + X0T
+      XU = AMAX1(X1,XV,X3,X4) + X0T
+      IF (XL.LT.XTB1.OR.XU.GT.XTB2) GO TO 1
+      Y3 = YV + XZ*SANGL
+      Y4 = HT*CANGL
+      Y2 = YV + Y4
+      Y4 = Y3 + Y4
+      YL = AMIN1(YV,Y2,Y3,Y4) + Y0T
+      YU = AMAX1(YV,Y2,Y3,Y4) + Y0T
+      IF (YL.LT.YTB1.OR.YU.GT.YTB2) GO TO 1
+      TEMP = .TRUE.
+    1 DFX405 = TEMP
+      RETURN
+      END

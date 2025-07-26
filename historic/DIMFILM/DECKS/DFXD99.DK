@@ -1,0 +1,173 @@
+*DECK DFXD99 F
+      SUBROUTINE DFXD99(I,X,Y,Z,N)
+C    DEVICE DRIVER FOR DQEC - DIMFILM META-FILE V0.0
+C    NO GUARANTEE OF SUPPORT - NEW FEATURES MAY NOT BE INCLUDED
+C    FORMAL META-FILE SHOULD BE USED WHEN AVAILABLE
+*CALL,DFXPAB
+*CALL,DFXCBA
+*CALL,DFXCBD
+*CALL,DFXCBF
+*CALL,DFXCAC
+*CALL,DFXCAD
+*CALL,DFXC04
+*CALL,DFXC05
+*CALL,DFXC17
+      INTEGER FRAMES
+      CHARACTER*1 CFRAM
+      CHARACTER*120 RECORD,REC1,REC2
+      REAL L
+      SAVE XDCO,YDCO,DSCALE,RD,GD,BD,ZI,H,L,S
+      DATA REC1(1:90)/'1         XX        DPLOT'/
+C    NOTE - FOLLOWING DATA HAS BEEN REPLACED BY ASSIGNMENT TO
+C           ACCOMMODATE DEFFICIENCY IN CFT 1.11
+C     DATA REC1(91:) /'DIMFILM META-FILE V0.0'/
+C
+      DATA REC2/'          XX'/
+      NN = N
+      IF (I.LE.0) GO TO 1000
+      IF (I.EQ.1) GO TO 1
+      IF (I.EQ.2) GO TO 2
+      IF (I.EQ.4) GO TO 4
+      IF (I.EQ.204) GO TO 204
+C    IGNORE ALL OTHER ENTRIES
+      GO TO 9999
+C    DO OFF MOVE (2 WITHOUT POINT, 1 WITH POINT)
+    2 NN = 0
+    1 XD = XDCO + X*DSCALE
+      YD = YDCO + Y*DSCALE
+      WRITE(RECORD,800) I,XD,YD,NN
+  800 FORMAT(' ',I6,2F10.8,10X,I6)
+      GO TO 9998
+C    DO ON MOVE
+    4 XD = XDCO + X*DSCALE
+      YD = YDCO + Y*DSCALE
+      IF (DEVCOL(NWS)) THEN
+C    SET COLOUR/INTENSITY - 199 NOT NOW USED
+           DEVCOL(NWS) = .FALSE.
+           II = ICOLPT(IRGBN)
+           NC = NLUT(II)
+           IF (NC.LT.0) THEN
+C    HERE IF R,G,B
+                           RD = R(II)*ZRGB(II)
+                           GD = G(II)*ZRGB(II)
+                           BD = B(II)*ZRGB(II)
+                           ZI = ZINT(II)*ZRGB(II)
+                        ELSE
+C    HERE IF LUT
+                           RD = RGBLUT(1,NC)
+                           GD = RGBLUT(2,NC)
+                           BD = RGBLUT(3,NC)
+                           ZI = DFX146(-NC)
+           ENDIF
+C    CONVERSION RGB TO HLS  -  AS STATUS REPORT, GSPC
+C                                 AUGUST 1979  III-37
+           A1 = MAX(R(II),G(II),B(II))
+           A2 = MIN(R(II),G(II),B(II))
+           L = (A1 + A2)*.5
+           H = 0.0
+           S = 0.0
+           IF (A1.EQ.A2) GO TO 1021
+           A3 = A1 - A2
+           RA = (A1 - R(II))/A3
+           GA = (A1 - G(II))/A3
+           BA = (A1 - B(II))/A3
+           IF (L.LE..5) THEN
+                           S = A3/(A1+A2)
+                        ELSE
+                           S = A3/(2.-A1-A2)
+           ENDIF
+           IF (R(II).EQ.A1) THEN
+                                H = 2. + BA - GA
+               ELSE IF (G(II).EQ.A1) THEN
+                                H = 4. + RA - BA
+               ELSE
+                                H = 6. + GA - RA
+           ENDIF
+           H = MOD(H*60.,360.)
+           L = 100.*L
+           S = 100.*S
+ 1021      CONTINUE
+           WRITE(RECORD,802) RD,GD,BD,ZI,H,L,S
+C    NOTE****102 NO LONGER USED AS SUCH BY DFX000****
+  802 FORMAT(' ',3X,'102',36X,4F6.4,3F8.4,29X)
+      ENDIF
+      CALL DFX99B(RECORD)
+      WRITE(RECORD,801) I,XD,YD,RD,GD,BD,ZI,H,L,S
+  801 FORMAT(' ',I6,2F10.8,16X,4F6.4,3F8.4,29X)
+      WSDSE(NWS) = .FALSE.
+      GO TO 9998
+  204 IF (N.NE.0) GO TO 1
+      GO TO 4
+C    OUTPUT RECORD
+ 9998 CALL DFX99B(RECORD)
+ 9999 RETURN
+ 1000 II = -I
+      GO TO (1001,1002,1003,1004),II
+C    OPEN META-FILE
+ 1001 CALL DFXMS3(REC1(31:38))
+      CALL DFXMS8(REC1(51:70))
+      CALL DFXMS5(REC1(71:86))
+C    SEE COMMENTS AT DATA STATEMENTS
+      REC1(91:) = 'DIMFILM META-FILE V0.0'
+C
+      CALL DFXMS4(REC2(31:38))
+      CALL DFXMS2(REC2(42:49))
+      CALL DFXMS1(REC2(52:59))
+      CALL DFXMS6(REC2(101:120))
+      FRAMES = 0
+      CALL DFX99A('DQEC',50000,IFAIL)
+C    SET 4-BYTE FORM ID, LINE LIMIT, GET ERROR CONDITION
+      IF (IFAIL.EQ.0) GO TO 897
+C    GKS ERROR 21 24 26 POSSIBLE
+      GKSERR = 26
+      GO TO 9999
+  897 WRITE(RECORD,899) REC1
+      CALL DFX99B(RECORD)
+      WRITE(RECORD,899) REC2
+      CALL DFX99B(RECORD)
+  899 FORMAT(A120)
+      WSMDCS(1,NWS) = 1.0
+      WSMDCS(2,NWS) = 1.0
+      WSCAT(NWS) = 2
+C    TEMPORARILY TREAT AS BASIC OUTPUT WS RATHER THAN META OUTPUT WS
+      WSDM(NWS) = 3
+C    SET WS ID - SPECIFIC TO DEVICE
+      WSID(NWS) = 99
+      WSNAME(NWS) = 'DQEC'
+C    SET UP DEFAULT WS TRANSFORMATION
+      CWSWIN(1,NWS) = 0.0
+      CWSWIN(2,NWS) = 1.0
+      CWSWIN(3,NWS) = 0.0
+      CWSWIN(4,NWS) = 1.0
+      CWSVP(1,NWS) = 0.0
+      CWSVP(2,NWS) = 1.0
+      CWSVP(3,NWS) = 0.0
+      CWSVP(4,NWS) = 1.0
+      WRITE(RECORD,898)I
+      CALL DFX99B(RECORD)
+  898 FORMAT(' ',I6,113X)
+      GO TO 1004
+C    CLOSE DEVICE
+ 1002 WRITE(RECORD,898) I
+      CALL DFX99B(RECORD)
+      CALL DFX99C(IFAIL)
+      GKSERR = IFAIL
+C    FRAME COUNT ONLY REFLECTS SPECIFICALLY REQUESTED ADVANCES
+      CFRAM = 'S'
+      IF (FRAMES.EQ.1) CFRAM = ' '
+      WRITE(ERRREC,10009) FRAMES,CFRAM
+10009 FORMAT('**DIMFILM  -  DEVICE DQEC TERMINATED - ',I6,' FRAME',A)
+      CALL DFX003(ERRREC(1))
+      GO TO 9999
+C    FRAME ADVANCE
+ 1003 WRITE(RECORD,898) I
+      FRAMES = FRAMES + 1
+      GO TO 9998
+C    RESET DEVICE TRANSFORMATION - N.B. TREATING AS OUTPUT WS
+ 1004 DSCALE = AMAX1((CWSVP(2,NWS)-CWSVP(1,NWS))
+     1                        /(CWSWIN(2,NWS)-CWSWIN(1,NWS)),
+     2    (CWSVP(4,NWS)-CWSVP(3,NWS))/(CWSWIN(4,NWS)-CWSWIN(3,NWS)))
+      XDCO = CWSVP(1,NWS) - CWSWIN(1,NWS)*DSCALE
+      YDCO = CWSVP(3,NWS) - CWSWIN(3,NWS)*DSCALE
+      GO TO 9999
+      END

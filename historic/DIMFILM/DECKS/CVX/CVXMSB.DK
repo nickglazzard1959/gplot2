@@ -1,0 +1,26 @@
+*DECK CVXMSB C
+#include <string.h>
+#include <sys/utsname.h>
+#include <stdio.h>
+#include <stdlib.h>
+void dfxmsb_(rel,ver,lenrel,lenver,serial,lrel,lver)
+char rel[64],
+     ver[64];
+long int *lenrel,
+         *lenver,
+         lrel,
+         lver;
+unsigned short int *serial;
+{
+struct utsname *conptr;
+struct utsname convex;
+conptr = &convex;
+uname(conptr);
+strcpy(rel,conptr->release);
+strcpy(ver,convex.version);
+*lenrel = strlen(rel);
+*lenver = strlen(ver);
+*serial = convex.si.system_sn;
+return;
+}
+

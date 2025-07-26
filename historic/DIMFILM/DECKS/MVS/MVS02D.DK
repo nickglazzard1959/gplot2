@@ -1,0 +1,337 @@
+*DECK MVS02D F
+DFX02D    TITLE 'DYNAMIC ALLOCATION ROUTINES FOR DIMFILM DICOMED FILE'
+          PRINT ON,NOGEN
+DFX02D      CSECT
+*           DYNAMIC ALLOCATION ROUTINES FOR DIMFILM PLOT-FILE
+*           THIS VERSION SENDS A 'U' FILE TO SYSOUT CLASS
+*             'G' FOR VECTOR OR 'I' FOR RASTER
+*           WITH FORM NUMBER DEFINING THE FILM MODE EG. 'D16 '
+*                                            M WHEELER.  JAN  1988
+*
+          ENTRY    DFX02A
+          ENTRY    DFX02B
+          ENTRY    DFX02C
+*
+*              *************  DFX02D  *************
+*    SETS THE BYTE LIMIT - MAXBYT  (SEE DFX02B)
+*
+*  CALLING SEQUENCE IS:
+*       CALL DFX02D(MAXBYT)
+*
+*                   MAXBYT - BYTE LIMIT
+*
+          STM      14,12,12(13)       SAVE REGISTERS
+          LR       10,15
+          USING    DFX02D,10
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          L        4,0(1)             R4 -> MAXBYTE
+          MVC      MAXBYTE(4),0(4)    OVERWRITE DEFAULT VALUE
+*
+          L        13,4(13)           RESTORE REGISTERS
+          LM       14,12,12(13)
+          MVI      12(13),X'FF'
+          SLR      15,15
+          BR       14                 RETURN
+*
+*
+*             ***************  DFX02A  ***************
+*      DYNAMICALLY ALLOCATES AND OPENS THE DIMFILM PLOT-FILE
+*
+*  CALLING SEQUENCE IS:
+*          CALL DFX02A(IFORM,OUTLM,HEDR1,HEDR2,IFAIL)
+*
+*               IFORM - FOUR BYTE FORM NUMBER
+*               IOUTLM- MAX NUMBER OF RECORDS WHICH CAN BE WRITTEN
+*               HEDR1,HEDR2 - FIRST 2 RECORDS TO BE WRITTEN
+*                  THESE CONTAIN ACCOUNTING INFORMATION ETC.
+*                  BOTH RECORDS ARE 240 DATA BYTES LONG
+*                  HEDR1 IS IN EBCDIC
+*                  HEDR2 IS SAME INFORMATION IN ASCII
+*                  4 CHECKSUM BYTES ARE ADDED TO EACH HEADER (=244)
+*               IFAIL - RETURNS 4 BYTE FAILURE CODE ( =0 IF OK)
+*
+*      FILE STRUCTURE IS :  RECFM=U,BLKSIZE=1024
+*      ( FILE IS INITIALLY CREATED WITH A SYSOUT CLASS OF 0
+*        SO THAT IT WILL VANISH IF DFX02C IS NOT CALLED CORRECTLY )
+*
+*        ANY ALLOCATION ERROR IS REPORTED IN THE JOB LOG
+*        AND AN EXTERNAL ROUTINE DFXMSA IS CALLED WITH
+*        THE ERROR CODE AS ITS ONLY PARAMETER
+*
+*        THE ACCOUNTING VARIABLES ARE ALSO INITIALISED
+*
+*
+DFX02A    STM      14,12,12(13)       SAVE REGS IN FORTRAN SA
+          LR       10,15
+          USING    DFX02A,10
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          LM       3,7,0(1)           LOAD ADD OF PARAMETERS
+*
+          MVC      FORM(4),0(3)       MOVE PARM 1 TO FORM
+          MVC      OUTLM(3),1(4)      MOVE PARM 2 TO OUTLM
+          CLC      0(4,3),BLNK4       IS FORMS CODE BLANK
+          BNE      ALOC               IF NOT CARRY ON
+          MVI      TA+12,X'80'        ELSE SHORTEN TABLE
+*
+ALOC      LA       9,0                R9 = 0 (NO ERROR CODE)
+          LA       1,PBLOCK           ESTABLISH ADD OF RBP
+          DYNALLOC
+*
+          LTR      15,15              CHECK FOR ERROR CODE
+          BZ       OPN                JUMP TO OPEN FILE IF OK
+          ST       15,RETCODE         ELSE GET SYSTEM TO REPORT ERROR
+          LA       1,RB1
+          ST       1,DFPB
+          LA       1,DFPB
+          LINK     EP=IKJEFF18
+*
+          LA       1,RB1+4            POINT TO ERROR CODE
+          ST       1,PLIST            STORE ADDRESS IN PARAM LIST
+          LA       1,PLIST            POINT TO IT
+          CALL     DFXMSA             AND CALL ERROR ROUTINE (FORTRAN)
+          L        9,RB1+4            ALSO PUT ERROR CODE INTO R9
+          B        RET1
+*
+OPN       OPEN     (DFILE,(OUTPUT))
+*
+          MVC      OFLG(1),DFILE+DCBOFLGS-IHADCB   GET OPEN FLAG
+          TM       OFLG,X'10'         TEST IF OPEN SUCCEEDED
+          BNZ      HEDR               BRANCH IF OK
+          LA       9,3                ELSE SET ERROR CODE(3)
+          B        RET1               - AND RETURN
+*                                     PROCESS HEADER RECORD
+HEDR      LR       4,5                R4 = ADDRESS OF HEADER
+*                                       CALCULATE CHECKSUM
+          MVI      HASHDW,X'00'       ZERO HASH DOUBLE WORD
+          MVC      HASHDW+1(7),HASHDW
+          LA       3,240(5)
+HLOOP     XC       HASHDW(8),0(5)     EXCLUSIVE OR WITH OLD HASH
+          LA       5,8(5)             MOVE ON TO NEXT 8 BYTES
+          CR       5,3                FINISHED ?
+          BL       HLOOP              IF NOT - LOOP
+*
+          MVC      TFLAG(3),HASHDW+4  SAVE 3 BYTES OF CHECKSUM
+*
+          LA       5,244              R5 = LENGTH OF RECORD 244
+          STH      5,DFILE+DCBLRECL-IHADCB     SET LRECL = R5
+          PUT      DFILE              RETURNS NEW BUFFER ADDR TO R1
+          LR       2,1                R2 -> 1ST WORD IN BUFFER
+          LA       5,240              R5 = LENGTH OF DATA = 240
+          LR       3,5                COPY LENGTH FROM R5 TO R3
+          MVCL     2,4                MOVE R5 BYTES INTO BUFFER
+          MVC      0(4,2),TFLAG       MOVE HASH BYTES IN
+*
+          PUT      DFILE              SAME FOR SECOND RECORD
+          LR       2,1
+          LA       5,240
+          LR       3,5
+          LR       4,6
+          MVCL     2,4
+          MVC      0(4,2),TFLAG
+*
+          MVC      NOBYTE(4),INITBYT  PUT HEADER LENGTH INTO NOBYTE
+          MVI      LENERR,X'00'       SET LENGTH ERROR FLAG FALSE
+*
+RET1      ST       9,0(7)             PUT ERROR CODE IN IFAIL
+*
+          L        13,4(13)
+          LM       14,12,12(13)       RESTORE REGISTERS
+          MVI      12(13),X'FF'
+          SLR      15,15
+          BR       14
+*
+*              *************  DFX02B  *************
+*                WRITES A RECORD TO THE PLOT-FILE
+*
+*  CALLING SEQUENCE IS:
+*       CALL DFX02B(IBUFF,NUM,TYPE)
+*
+*                   IBUFF - ARRAY CONTAINING DATA
+*                   NUM   - NUMBER OF 16 BIT INSTRUCTIONS
+*                           MUST BE .LE. 510
+*                    (IE. BUFFER LENGTH = 2*NUM BYTES)
+*                   TYPE  - DICOMED RECORD TYPE - INTEGER*4
+*                          (ONLY LAST BYTE USED)   0  1  2  4
+*                                                 CN  R  G  B
+*
+*    THE NUMBER OF BYTES WRITTEN IS ALSO ACCUMULATED IN THE
+*    VARIABLE NOBYTE. IF THE NUMBER OF BYTES WRITTEN EXCEEDS
+*    MAXBYTE,THE EXTERNAL ROUTINE DFX01E IS CALLED WITH 2
+*    PARAMETERS (EP1,MAXBYTE). THIS TERMINATING ROUTINE MAY CALL
+*    THIS ROUTINE AGAIN AND MUST THEREFORE STOP AFTERWARDS
+*
+*
+DFX02B    STM      14,12,12(13)       SAVE REGISTERS
+          LR       10,15
+          USING    DFX02B,10
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          LM       4,6,0(1)           GET THE PARAMETERS
+          L        3,0(5)             R3 = NUM
+          XR       2,2
+          ST       2,0(5)             RESET NUM TO ZERO
+          SLL      3,1                R3 = LENGTH OF DATA (BYTES)
+*                                     R4 = ADDRESS OF RECORD
+          LA       7,4(3)             R7 = LENGTH + 4
+*
+          STH      7,DFILE+DCBLRECL-IHADCB     SET LRECL = R7
+*
+          PUT      DFILE              FLUSHES PREVIOUS BUFFER AND
+*                                     RETURNS NEW BUFFER ADDR TO R1
+          LR       2,1                R2 -> 1ST WORD IN BUFFER
+          LR       5,3                COPY LENGTH FROM R3 TO R5
+*                                     (USE EVEN/ODD PAIRS R2 THRU R5)
+          MVCL     2,4                MOVE R5 BYTES INTO BUFFER
+*                                      (R2 NOW INCREMENTED)
+          MVC      0(3,2),TFLAG       ADD IN 3 BYTE HASH CODE
+          MVC      3(1,2),3(6)        ADD IN 1 BYTE CONTROL CODE
+*
+*                                  DO ACCOUNTING AND TRAPPING
+          L        8,NOBYTE           GET BYTE COUNT
+          AR       8,7                ADD ON RECORD LENGTH
+          ST       8,NOBYTE           REPLACE
+          L        9,MAXBYTE          BYTE LIMIT
+          CR       8,9                IS COUNT LESS THAN LIMIT
+          BL       RET2               IF SO RETURN
+          CLI      LENERR,X'00'       LIMIT EXCEEDED,IS ERROR FLAG SET
+          BNE      RET2               IF YES, RETURN
+          MVI      LENERR,X'FF'       ELSE SET ERROR FLAG
+*                                     AND CALL ERROR ROUTINE
+          LA       1,ELIST            POINT TO PARAM LIST
+          CALL     DFX01E             AND CALL FORTRAN ROUTINE
+*               NB. THIS ROUTINE MUST STOP SINCE IT IS RECURSIVE
+*
+*                          TIDY UP
+RET2      L        13,4(13)           RESTORE REGISTERS
+          LM       14,12,12(13)
+          MVI      12(13),X'FF'
+          SLR      15,15
+          BR       14                 RETURN
+*
+*               **************  DFX02C  ****************
+*            CLOSES PLOT-FILE AND CHANGES SYSOUT CLASS TO 'G' OR 'I'
+*            (FILE WILL VANISH IF THIS ROUTINE IS NOT CALLED -
+*             EG. IF JOB ABORTS BEFORE REACHING THIS ROUTINE)
+*   CALLING SEQUENCE IS:
+*          CALL DFX02C(LRASTR,IFAIL,NOBYTE)
+*
+*                      LRASTR - RASTER MODE FLAG ,LOGICAL*4
+*                               IF TRUE OVERIDE SYSOUT CLASS TO I
+*                      IFAIL  - RETURNS FAILURE CODE ( = 0 IF OK)
+*                      NOBYTE - NUMBER OF BYTES WRITTEN
+*
+DFX02C    STM      14,12,12(13)       SAVE REGISTERS
+          LR       10,15
+          USING    DFX02C,10
+          LR       11,13
+          LA       13,SAVA
+          ST       11,4(13)
+          ST       13,8(11)
+*
+          LM       3,5,0(1)           LOAD ADDRESSES
+*
+          L        3,0(3)             R3 = LRASTR
+          LTR      3,3                TEST
+          BZ       CLOSD              IF FALSE LEAVE CLASS AS G
+          MVC      OCLASS(1),RCLASS   OVERIDE CLASS TO RCLASS
+*
+CLOSD     CLOSE    (DFILE)            CLOSE FILE
+*
+          LA       1,DBLOCK
+          DYNALLOC                    UNALLOCATE AND SEND
+*
+          L        9,RB2+4            RETURN ANY FAILURE CODE
+          ST       9,0(4)
+*
+          MVC      0(4,5),NOBYTE      RETURN NOBYTE AS 3RD PARAM
+*
+          L        13,4(13)           RESTORE REGISTERS
+          LM       14,12,12(13)
+          MVI      12(13),X'FF'
+          SLR      15,15
+          BR       14                 RETURN
+*
+*           *************  SVC 99 PARAMETER LISTS *****************
+*                          * DYNAMIC ALLOCATION *
+          DS       0D
+PBLOCK    DC       AL1(S99RBPND),AL3(RB1)
+RB1       DC       AL1(20,S99VRBAL),2X'00'
+          DC       F'0',A(TA),2F'0'
+*
+TA        DC       A(TA1,TA2,TA3,TA4)
+          DC       AL1(S99TUPLN),AL3(TA5)
+TA1       DC       AL2(DALDDNAM,1,8)               DD NAME
+DDN       DC       CL8'DFXDD002'
+TA2       DC       AL2(DALSUSER,1,5)               DEST =
+          DC       CL5'LOCAL'                             LOCAL
+*   (THIS STOPS ROUTE TRYING TO HAUL FILE BACK TO REMOTE SITE)
+TA3       DC       AL2(DALOUTLM,1,3)               OUTPUT LIMIT-
+OUTLM     DC       AL3(3000)                          3000 RECORDS
+TA4       DC       AL2(DALSYSOU,1,1),AL1(X'F0')    SYSOUT(0,
+*                                                     (NO PROG NAME)
+TA5       DC       AL2(DALSFMNO,1,4)                          ,FORM)
+FORM      DC       CL4' '
+* (THIS IS SO THAT FILE WILL VANISH IF DFX02C IS NOT CALLED CORRECTLY)
+*
+*
+*                 *******************************************
+*                          * DYNAMIC UNALLOCATION *
+          DS       0D
+DBLOCK    DC       AL1(S99RBPND),AL3(RB2)
+RB2       DC       AL1(20,S99VRBUN),2X'00'         UNALLOCATE
+          DC       F'0',A(TU),2F'0'
+TU        DC       A(TU1,TU2)
+          DC       AL1(S99TUPLN),AL3(TU3)
+TU1       DC       AL2(DUNDDNAM,1,8)               DDNAME
+          DC       CL8'DFXDD002'
+TU2       DC       AL2(DUNOVCLS,1,1)               OVERIDE CLASS -
+OCLASS    DC       CL1'G'                                  G
+TU3       DC       AL2(DUNOVSUS,1,5)               OVERIDE DEST- LOCAL
+          DC       CL5'LOCAL'
+*
+*
+DFILE     DCB      DDNAME=DFXDD002,DSORG=PS,RECFM=U,                   +
+               BLKSIZE=1024,MACRF=(PL)
+*
+*                 *******************************************
+*                        * ERROR CODE INTERPRETATION *
+DFPB      DS       A
+          DC       A(RETCODE)
+          DC       A(ZERO)
+          DC       A(DFFLAGS)
+RETCODE   DS       F
+ZERO      DC       F'0'
+DFFLAGS   DC       B'10000000',X'32'
+OFLG      DC       X'00'
+RCLASS    DC       CL1'I'        NEW CLASS FOR RASTER WORK
+PLIST     DS       F
+BLNK4     DC       CL4'    '
+HASHDW    DC       D'0'          HASH DOUBLE WORD
+*
+TFLAG     DC       X'7B7B7B00'   TRAILER FLAG   HASH + COLOUR/CNTRL
+*
+EP1       DC       F'2'          FIRST PARAMETER TO DFX01E
+ELIST     DC       A(EP1)        PARAMETER LIST
+EP2       DC       XL1'80',AL3(MAXBYTE)  POINTER TO LAST PARAMETER
+*
+INITBYT   DC       F'488'        HEADER LENGTH     = 2*(240 + 4)
+NOBYTE    DS       F             NUMBER OF BYTES WRITTEN
+MAXBYTE   DC       F'102400000'  BYTE LIMIT = 100 MBYTE (5000FT)
+LENERR    DC       X'00'         EXCESS DATA ERROR FLAG
+*
+SAVA      DS       18F
+          IEFZB4D0
+          IEFZB4D2
+          DCBD     DSORG=PS,DEVD=DA
+          END

@@ -1,0 +1,84 @@
+*DECK COS99D F
+      SUBROUTINE DFX99D
+C
+C   ROUTINES TO HANDLE METAFILE DATASET FOR QEC DEVICE DRIVER
+C
+C   EXTENDED FOR UNICOS   -  JOHN GILBERT  MAY 1990
+C
+C   ENTRY POINTS:
+C
+C     DFX99A(IFORM,IOUTLIM,IERR)
+C
+C       ALLOCATES FILE FOR METAFILE - SET UP AS SCRATCH DATASET
+C       WITH DN=$DFXQEC. IFORM AND IOUTLIM ARE SAVED IN THE JCL
+C       TO BE USED BY DFX99C
+C
+C     DFX99B(BUFF)
+C
+C       WRITES A RECORD FROM BUFF TO THE METAFILE
+C
+C     DFX99C(IERR)
+C
+C       DISPOSES THE METAFILE TO SYSOUT=G ON THE AMDAHL - THIS
+C       SHOULD THEN RETURN TO QEC (ASSUMING JOB WAS PUT IN AT QEC)
+C
+*
+*       DIMFILM MACHINE DEPENDENT INTERFACE - CRAY VERSION
+*       VERSION 1.0        01/02/84        STEVE WISE,ULCC
+*
+      IMPLICIT INTEGER (A-Z)
+      CHARACTER IBUFF*(*),IFORM*4,JCL*80
+*IF DEF,UNICOS
+      DATA  DN/'dfxqec'L/
+*ELSE
+*/  MUST BE COS
+      DATA  DN/'$DFXQEC'L/
+*ENDIF
+      DATA  JCL/
+     +'SYSOUT=(G,,    ),DCB=(RECFM=FB,LRECL=120,BLKSIZE=3000),OUTLIM='/
+C=======================================================================
+C
+      ENTRY DFX99A(IFORM,IOUTLIM,IERR)
+      WRITE(JCL(12:15),'(A4)')   IFORM
+      WRITE(JCL(63:70),'(I8.8)') IOUTLIM
+*IF DEF,UNICOS
+C    NOTE: FILE IDENTIFIER USED MUST AGREE WITH DN DEFINITION
+      IERR = ISHELL('assign -a $TMPDIR/.dfxqec dfxqec')
+*ELSE
+*/  MUST BE COS
+      CALL ASSIGN (IERR,
+     +             'DN'L    , DN      ,
+     +             'DC'L    , 'SC'L   ,
+     +             'BFI'L   , 'OFF'L   )
+*ENDIF
+      IF (IERR.NE.0) CALL DFXMSA(IERR)
+      RETURN
+C=======================================================================
+C
+      ENTRY DFX99B(IBUFF)
+      WRITE(DN,'(A)') IBUFF
+      RETURN
+C=======================================================================
+C
+      ENTRY DFX99C(IERR)
+*IF DEF,UNICOS
+      CLOSE(DN)
+      JCL(80:80) = ''''
+      IERR = ISHELL
+     1       ('dispose $TMPDIR/.dfxqec -dPT -mM1 -fCB -S -t'''//JCL)
+      IERR0 = ISHELL('assign dfxqec')
+      IERR0 = ISHELL('rm $TMPDIR/.dfxqec 2>/dev/null')
+*ELSE
+*/  MUST BE COS
+      JCL(80:80)=CHAR(0)
+           CALL DISPOSE (IERR,
+     +              'DN'L    , DN      ,
+     +              'DC'L    , 'PT'L   ,
+     +              'MF'L    , 'VS'L   ,
+     +              'DF'L    , 'CB'L   ,
+     +              'TEXT'L  , JCL     ,
+     +              WAIT                 )
+*ENDIF
+      IF (IERR.NE.0) CALL DFXMSA(IERR)
+      RETURN
+      END

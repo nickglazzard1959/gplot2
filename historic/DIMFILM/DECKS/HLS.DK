@@ -1,0 +1,15 @@
+*DECK HLS F
+      SUBROUTINE HLS(H,L,S)
+      REAL H,L,S
+*CALL,DFXC04
+*CALL,DFXC05A
+      ROUTIN = 'HLS'
+*CALL,RIN
+      CALL DFX160(6,H,L,S,RRR,GGG,BBB,IERR)
+      IF (IERR.LE.0) THEN
+                        DO 1 I=1,NRGB
+    1                   CALL DFX143(I,RRR,GGG,BBB)
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

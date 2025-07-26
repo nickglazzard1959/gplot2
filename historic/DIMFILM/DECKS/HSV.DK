@@ -1,0 +1,15 @@
+*DECK HSV F
+      SUBROUTINE HSV(H,S,V)
+      REAL H,S,V
+*CALL,DFXC04
+*CALL,DFXC05A
+      ROUTIN = 'HSV'
+*CALL,RIN
+      CALL DFX160(5,H,S,V,RRR,GGG,BBB,IERR)
+      IF (IERR.LE.0) THEN
+                        DO 1 I=1,NRGB
+    1                   CALL DFX143(I,RRR,GGG,BBB)
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

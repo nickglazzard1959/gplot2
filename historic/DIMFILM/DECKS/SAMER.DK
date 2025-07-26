@@ -1,0 +1,14 @@
+*DECK SAMER F
+      SUBROUTINE SAMER
+*CALL,DFXC02
+*CALL,DFXC05A
+      ROUTIN = 'SAMER'
+*CALL,RIN
+      IF (RGL.EQ.RGR) THEN
+            CALL DFX304
+      ELSE
+            FIXR = .TRUE.
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

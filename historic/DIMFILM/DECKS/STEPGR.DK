@@ -1,0 +1,21 @@
+*DECK STEPGR F
+      SUBROUTINE STEPGR(X,Y,N)
+      REAL X(N),Y(N)
+*CALL,DFXC02
+*CALL,DFXC05A
+      ROUTIN = 'STEPGR'
+*CALL,RIN
+      BAR = -1.0
+      IHIST = ISIGN(2,IHIST)
+C-----------------------------------------------
+C    EQUIVALENT TO HISTGR(X,Y,N,BAR)
+      HIST = BAR
+      IF (BAR.LT.-.5) HIST = -1.0
+      CALL DFX336(X,Y,N)
+      HIST = -10.0
+C-----------------------------------------------
+      IHIST = ISIGN(1,IHIST)
+*CALL,IMM
+*CALL,ROUT
+      RETURN
+      END

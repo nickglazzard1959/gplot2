@@ -1,0 +1,41 @@
+*DECK CMSMS0 F
+DFXMS0   TITLE 'Write message to terminal'
+DFXMS0   CSECT ,
+DFXMS0   AMODE ANY
+DFXMS0   RMODE ANY
+*   FORTRAN callable function to display a message
+*   of up to 80 characters. Callable as :
+*          CALL DFXMS0(LEN,ITEXT)
+*              LEN   - length of message in bytes (.LE. 80)
+*              ITEXT - array containing message
+*
+*    M Wheeler  Jul 90
+         PRINT ON,NOGEN
+         STM   14,12,12(13)
+         LR    2,15
+         USING DFXMS0,2
+*
+         LM    3,4,0(1)      R3 -> LEN, R4 -> ITEXT
+         L     3,0(3)        R3=LEN
+         LTR   3,3           Is it zero or negative?
+         BNP   RETN          If so do nothing - return
+         LA    7,80          R7 =MAX LENGTH= 80
+         CLR   7,3           CHECK FOR MAX LENGTH
+         BNL   SETMSG
+         LR    3,7           ie. R3=MIN(80,LENGTH)
+SETMSG   STCM  3,B'0001',MSG Store in Length byte
+         BCTR  3,0           R3=LEN-1 for move
+         EX    3,MOVE        COPY MESSAGE
+*
+         APPLMSG APPLID=CMS,TEXTA=MSG
+*
+RETN     LM    14,12,12(13)
+         MVI   12(13),X'FF'
+         XR    15,15
+         BR    14
+*
+MOVE     MVC   TEXT(0),0(4)  EXECUTED ABOVE
+*
+MSG      DC    X'14'                         Length byte
+TEXT     DC    CL80' No Message supplied'    Text
+         END

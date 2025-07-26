@@ -1,0 +1,71 @@
+*DECK CMSMS5 F
+DFXMS5   TITLE 'Get the SYStem LEVel'
+DFXMS5   CSECT ,
+DFXMS5   AMODE ANY
+DFXMS5   RMODE ANY
+*
+*  A FORTRAN callable routine to return 16 character SYStem LEVel
+*  FORTRAN Example:
+*      CHARACTER*16 SLEV
+*      CALL DFXMS5(SLEV)
+*  Format returned is 'VM/XA SPrrvvllll'
+*  where rr = release, vv = version, llll = level
+*  eg.       'VM/XA SP 2 0 204'
+*                                    Matthew Wheeler   26 APR 90
+*
+*  Save calling program's registers
+         STM   14,4,12(13)
+         LR    4,15
+         USING DFXMS5,4
+*
+         L     3,0(1)        Address of param. 1
+         LA    1,SYSNAM      R1 -> Storage area
+         LA    2,40          R2  ' = Get 40 bytes of info'
+         DC    X'83120000'   Issue Diagnose X'00'  R1,R2
+*
+         MVC   CSYSNAM(8),0(1)   Copy 8 char SYS Name to Result area
+         XR    2,2
+*
+         IC    2,RELEASE         Convert Release byte to character
+         CVD   2,WORK1
+         MVC   WORK2,EDPATERN
+         ED    WORK2,WORK1+3
+         MVC   CREL(2),WORK2+8    and store 2 bytes
+*
+         IC    2,VERSION         Convert Version byte to character
+         CVD   2,WORK1
+         MVC   WORK2,EDPATERN
+         ED    WORK2,WORK1+3
+         MVC   CVERS(2),WORK2+8   and store 2 bytes
+*
+         LH    2,LEVEL           Convert Level (2 bytes) to character
+         CVD   2,WORK1
+         MVC   WORK2,EDPATERN
+         ED    WORK2,WORK1+3
+         MVC   CLEVL(4),WORK2+6   and store 4 bytes
+*
+         MVC   0(16,3),CSYSNAM   Return 16 char construct
+*
+* Restore saved registers
+         LM    2,4,28(13)
+         L     14,12(13)
+         MVI   12(13),X'FF'
+         SR    15,15
+* Return to calling program
+         BR    14
+*
+EDPATERN DC    X'40202020202020202120'
+WORK1    DS    D
+WORK2    DS    CL10
+*                        Area where required string is constructed:
+CSYSNAM  DS    CL8
+CREL     DS    CL2
+CVERS    DS    CL2
+CLEVL    DS    CL4
+*                        Area where Diagnose stores its results:
+SYSNAM   DS    1D            System name     8 bytes
+         DS    XL28           (other info)  28 bytes
+RELEASE  DS    XL1           Release number  1 byte
+VERSION  DS    XL1           Version number  1 byte
+LEVEL    DS    XL2           Level           2 bytes
+         END

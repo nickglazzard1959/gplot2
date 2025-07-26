@@ -1,0 +1,74 @@
+*DECK CVXM04 C
+/*    Convex version of DFXM04:
+      comprising entries DFXM05 & DFXM06
+
+      Backend nomination and calling interface
+
+      DFXM06   called as CALL DFXM06(<subname>,N)
+
+             defines backend <subname> as device number N
+             N in range 1-5
+             <subname> must be declared EXTERNAL in calling routine
+
+
+      DFXM05   called as CALL DFXM05(I,X,Y,Z,J)
+
+             transfers call to current backend as detemined
+             by value of NWS in common block DFXCBD -
+             the transfer address must have been planted
+             by a previous reference to DFXM06.
+             If DFXM06 has not been called for the
+             referenced workstation NWS transfer will
+             be made to error routine DFX007
+             NOTE:  NWS must be of length to agree with
+                    definition in /DFXCBD/, and is first
+                    value stored in that block.
+                    A compiler switch P8 (or p8) is used to match
+                    -cfc or -p8 declaration in fc compilation.
+
+
+
+      Version 1.0               15 August 1991
+                                  John Gilbert              */
+
+
+void dfx007_();
+struct jump
+    {
+    void (*jmpaddr)();    /* pointer to function*/
+    };
+struct jump jumplist[5] =
+
+        {dfx007_,dfx007_,dfx007_,dfx007_,dfx007_}
+    ;
+void dfxm06_(routin,n)
+void (*routin)();
+#if P8 | p8
+long long int *n;
+#else
+int *n;
+#endif
+{
+
+jumplist[*n].jmpaddr = routin;
+
+        return;
+}
+void dfxm05_(i,x,y,z,j)
+float *x,
+      *y,
+      *z;
+int   *i,
+      *j;
+{
+#if P8 | p8
+extern long long int _dfxcbd_;
+#else
+extern int _dfxcbd_;
+#endif
+
+(*jumplist[_dfxcbd_].jmpaddr)(i,x,y,z,j);
+
+return;
+}
+

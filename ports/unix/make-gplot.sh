@@ -24,7 +24,4 @@ echo "... linking gplot"
 gfortran -g -o ../gplot ftgplot.o ../lib/dimfm.a ../lib/grdev.a ../lib/support.a ../lib/utils.a
 cd ..
 #
-echo "... Copying font file to DADIMFO"
-cp ../../gplot-library/dadimfo.src ./DADIMFO
-#
 echo "... done."

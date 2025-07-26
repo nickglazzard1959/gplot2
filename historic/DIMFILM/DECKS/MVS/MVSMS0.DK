@@ -1,0 +1,52 @@
+*DECK MVSMS0 F
+DFXMS0   TITLE 'WRITE MESSAGE TO JOB LOG.'
+*   VS/SIEMENS CALLABLE FUNCTION TO WRITE TO JOB LOG A STRING OF
+*   UP TO 72 CHARACTERS. CALLABLE AS :
+*          CALL DFXMS0(LEN,ITEXT)
+*              LEN   - LENGTH OF MESSAGE IN BYTES (.LE. 72)
+*              ITEXT - MESSAGE IN CHARACTER VARAIBLE
+*
+*    M WHEELER  AUG 82
+*      (BASED ON AN ORIGINAL IDEA BY AANDI INSTON)
+         SPACE 2
+         PRINT ON,NOGEN
+         SPACE 2
+DFXMS0   CSECT
+         STM   14,12,12(13)
+         LR    2,15
+         USING DFXMS0,2
+         SPACE 1
+         LM    4,5,0(1)      LOAD PARAMETER ADDRESSES
+         L     4,0(4)        R4=LENGTH
+         LA    10,1           R10=1
+         SR    4,10          R4=LENGTH-1
+         LA    7,71          R7=(MAX LENGTH - 1)=71
+         CLR   7,4           CHECK FOR MAX LENGTH
+         BNL   CPYMS
+         LR    4,7             R4=MIN(71,LENGTH-1)
+CPYMS    MVC   TEXT(8),=CL8' ' BLANK OUT 8 BYTES IN CASE SHORT
+         EX    4,MOVE        COPY MESSAGE
+         LA    4,5(4)        R4 = LENGTH + 4
+         STH   4,LEN         STORE LENGTH+4 IN LEN
+         LA    0,12          MINIMUM FOR LENGTH+4 =12
+         CLR   0,4           CHECK FOR MIN LENGTH
+         BNH   CFLGS
+         LR    4,0             R4=MAX(12,LENGTH+4)
+CFLGS    LA    6,LEN(4)      ADDRESS FOR FLAGS TO GO
+         MVC   0(4,6),FLAGS  MOVE FLAGS
+         LA    1,LEN         SVC 35 PARAM LIST
+         SVC   35            ISSUE WTO,ROUTCDE=11
+         LM    14,12,12(13)
+         MVI   12(13),X'FF'
+         XR    15,15
+         BR    14
+         SPACE 1
+MOVE     MVC   TEXT(0),0(5)  EXECUTED ABOVE
+         SPACE 2
+FLAGS    DC    X'02000020'   ROUTCDE=11 FLAGS
+         SPACE 1
+         DS    0F            FULLWORD ALIGNMENT
+LEN      DS    H
+         DC    X'8000'       FLAGS
+TEXT     DS    CL76          SPACE FOR MESSAGE AND FLAGS
+         END

@@ -1,0 +1,83 @@
+*DECK COSM04 F
+             IDENT  DFXM04
+*
+*
+*    BACKEND NOMINATION AND CALLING ROUTINES
+*
+*    ENTRY POINTS
+*
+*      DFXM06      CALL DFXM06(SUBNAME,N)
+*
+*         DEFINES BACKEND 'SUBNAME' AS DEVICE NUMBER N
+*           N        RANGE 1-5
+*           SUBNAME  DECLARED EXTERNAL IN CALLING ROUTINE
+*
+*      DFXM05      CALL DFXM05(I,X,Y,Z,J)
+*
+*         ROUTINE TRANSFERS CALLS TO THE CURRENT BACKEND -
+*         THIS IS DETERMINED BY THE VALUE OF N IN COMMON BLOCK
+*         DFXCBD. THE TRANSFER ADDRESS MUST HAVE BEEN PLANTED
+*         BY A PREVIOUS CALL TO DFXM06 WITH THE SAME VALUE OF N.
+*         IF DFXM06 HAS NOT BEEN CALLED TRANSFER IS TO ERROR
+*         ROUTINE DFX007.
+*
+*                  CALL DFXM06(FRED,1)
+*                  CALL DFXM05(I,X,Y,Z,J)
+*                     WILL RESULT IN A CALL EQUIVALENT TO
+*                  CALL FRED(I,X,Y,Z,J)
+*
+*
+*       DIMFILM MACHINE DEPENDENT INTERFACE - CRAY VERSION
+*       VERSION 1.0        01/02/84        STEVE WISE,ULCC
+*
+*       VERSION 2.0        14/01/85        STEVE WISE,ULCC
+*        MODIFIED TO DEAL WITH NEW CFT 1.13 CALLING SEQUENCE
+*        CONDITIONAL ASSEMBLY CODE ALLOWS SAME ROUTINE TO BE
+*        ASSEMBLED UNDER NEW AND OLD SYSTEMS
+*
+             COMMON DFXCBD
+N            BSS    6
+             BLOCK
+             EXT    DFX007
+SUBADD       CON    P.DFX007
+             CON    P.DFX007
+             CON    P.DFX007
+             CON    P.DFX007
+             CON    P.DFX007
+*
+*
+DFXM06       ENTER  NP=2
+             ARGADD A1,1          ADDRESS OF EXTERNAL
+             ARGADD A2,2          SAVE ADDRESS IN RELEVANT PLACE
+             A2     ,A2            IN ARRAY SUBADD
+             SUBADD-1,A2 A1
+             EXIT
+*
+*
+DFXM05       ENTER  NP=5
+             A1     N,0                RETRIEVE ADDRESS OF BACKEND
+             A2     SUBADD-1,A1         SUBROUTINE
+             B77    A2                 SAVE FOR LATER
+*
+*   %$NEWSEQ=1 WITH NEW COS 1.13 PRODUCTS
+*           =0 WITH COS 1.12 PRODUCTS
+*
+NEWSEQ     IFE    %$NEWSEQ,EQ,1
+             A2     RETURN             LOAD RETURN ADDRESS IN
+             B00    A2                  B00
+             J      B77                 JUMP TO BACKEND ROUTINE
+RETURN       =      *
+             EXIT
+NEWSEQ     ELSE
+             A0     W.DFXM05-5         STORE ARGUMENT ADDRESS IN
+             B70,A7 ,A0                 B REGISTERS
+             S2     A2                 A2=PARCEL ADDRESS OF BACKEND
+             S2     S2>2               DIVIDE BY 4 FOR WORD ADDRESS
+             A3     S2
+             A0     A3-A7              SUBTRACT 5 FOR ARGUMENT STORAGE
+             ,A0    B70,A7             AND MOVE DFXM05 ARGUMENTS
+             A1     @DFXM05+2,0        RESTORE PREVIOUS TRACEBACK
+             B01    A1                  LINKAGE
+             J      B77                 JUMP TO BACKEND ROUTINE
+NEWSEQ     ENDIF
+             END

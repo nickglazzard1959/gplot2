@@ -1,0 +1,14 @@
+*DECK RGB F
+      SUBROUTINE RGB(RR,GG,BB)
+*CALL,DFXC04
+*CALL,DFXC05A
+      ROUTIN = 'RGB'
+*CALL,RIN
+      CALL DFX160(0,RR,GG,BB,RRR,GGG,BBB,IERR)
+      IF (IERR.LE.0) THEN
+                        DO 1 I=1,NRGB
+    1                   CALL DFX143(I,RRR,GGG,BBB)
+      ENDIF
+*CALL,ROUT
+      RETURN
+      END

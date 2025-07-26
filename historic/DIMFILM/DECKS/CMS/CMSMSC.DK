@@ -1,0 +1,38 @@
+*DECK CMSMSC F
+DFXMSC   TITLE 'ISSUE A CMS COMMAND'                                    CMS00010
+DFXMSC   CSECT ,                                                        CMS00020
+DFXMSC   AMODE ANY                                                      CMS00030
+DFXMSC   RMODE ANY                                                      CMS00040
+*                                                                       CMS00050
+*  CALLABLE AS :                                                        CMS00060
+*                                                                       CMS00070
+*          CALL DFXMSC('COMMAND',LEN,IERR)                              CMS00080
+*              COMMAND - CMS COMMAND (CHARACTER STRING)                 CMS00090
+*              LEN     - LENGTH OF STRING                               CMS00100
+*              IERR    - ANY RETURN CODE ERROR                          CMS00110
+*                                                                       CMS00120
+         PRINT ON,GEN                                                   CMS00130
+         STM   14,12,12(13)                                             CMS00140
+         LR    12,15                                                    CMS00150
+         USING DFXMSC,12                                                CMS00160
+*                                                                       CMS00170
+         LM    2,4,0(1)      R2 -> COMMAND                              CMS00180
+         L     3,0(3)        R3 =  LEN                                  CMS00190
+*                                                                       CMS00200
+         SCAN  TEXT=((2),(3)),BUFFER=(PLSTAREA),TRANS=YES               CMS00210
+*                                                                       CMS00220
+         CMSCALL                                                        CMS00230
+*                                                                       CMS00240
+         ST    15,0(4)       STORE R15 INTO IERR                        CMS00250
+*                                                                       CMS00260
+         LM    2,12,28(13)   RESTORE                                    CMS00270
+         L     14,12(13)                                                CMS00280
+         MVI   12(13),X'FF'   AND                                       CMS00290
+         SR    15,15                                                    CMS00300
+         BR    14              RETURN                                   CMS00310
+*                                                                       CMS00320
+         DS    0D                                                       CMS00330
+RETAREA  DC    CL8'PLSTAREA'                                            CMS00340
+* Area must be at least (40+8*Nfields). 360 Ok for up to 40 fields      CMS00350
+PLSTAREA DS    CL360                                                    CMS00360
+         END                                                            CMS00370

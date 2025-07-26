@@ -1,0 +1,74 @@
+*DECK CVXM20 F
+      SUBROUTINE DFXM20(NBET,NBYTE1,NBYTE2)
+C
+C    ROUTINE UNPACKS DATA FROM COMMON BLOCK DFXC21 AND PUTS
+C    IT IN ARRAY ICDATA IN DFXC22.
+C    UNPACKS NBYTE1 TO NBYTE2 INCLUSIVE OF ALPHABET NBET
+C    INTO ICDATA.
+C
+C    UNPACKS BYTES  NBYTE1 TO NBYTE2 INCLUSIVE OF ALPHABET NBET
+C    STORED IN   COMMON/DFXC21/ IABDAT(...)  (PACKED 8 BIT INTEGERS)
+C    INTO        COMMON/DFXC22/ ICDATA(...)        (32 BIT INTEGERS)
+C
+C    IT IS IMPLEMENTATION DEPENDENT AS TO HOW THE FONT DATA IS
+C    STORED IN /DFXC21/ - ON THE CONVEX DATA IS PACKED AS
+C    BYTES WHICH ARE UNPACKED INTO SIGNED INTEGER VALUES
+C    IN RANGE -127,+127
+C
+C    IT IS IMPORTANT THAT ALL POINTER FOR SEPARATE ALPHABETS/SYMBOLS/
+C    MARKERS ARE CONSISTENT BETWEEN DFXM20 AND DFXM11 WHICH WILL INPUT
+C    THE FONT DATA
+C
+C------------------------------------------------------------------     COSM1119
+C                                                                       COSM1120
+C        COMMON BLOCK DFXC21 IS USED TO STORE THE PACKED DATA           COSM1121
+C        BYTE LIMITS ARE ASSIGNED FOR EACH FONT TYPE AND                COSM1122
+C        PARAMETER STATEMENTS USED TO CALCULATE WORD ADDRESSES          COSM1123
+C        FOR THE FIRST WORD OF EACH FONT AND THE TOTAL LENGTH           COSM1124
+C        NEEDED FOR ADATA. THE THREE PARAMETERS WHICH MUST BE           COSM1125
+C        SET ARE                                                        COSM1126
+C                                                                       COSM1127
+C        NBA  BYTE LIMIT FOR ALPHABETIC FONTS - CURRENTLY 12000         COSM1128
+C        NBS  BYTE LIMIT FOR MARKER FONTS     - CURRENTLY 10000         COSM1129
+C        NBM  BYTE LIMIT FOR MARKER FONTS     - CURRENTLY  2000         COSM1130
+C                                                                       COSM1131
+C        N.B. IF CHANGED THESE VALUES WILL ALSO NEED TO BE              COSM1132
+C             ALTERED IN CAL ROUTINE DFXM20.                            COSM1133
+C                                                                       COSM1134
+C        FROM THESE THE FOLLOWING ARE CALCULATED:                       COSM1135
+C                                                                       COSM1136
+C        PBET1 .. PBET5  POINTERS TO FIRST BYTE OF EACH ALPHABET        COSM1140
+C        NBDATA   # OF WORDS FOR ALL FIVE ALPHABETS                     COSM1141
+C                                                                       COSM1142
+C----------------------------------------------------------------       COSM1150
+C                                                                       COSM1149
+C----------------------------------------------------------------       COSM1173
+C                                                                       COSM1174
+C       DIMFILM MACHINE DEPENDENT INTERFACE - CONVEX VERSION            COSM1175
+C       VERSION 1.0        12/09/91        JOHN GILBERT,ULCC            COSM1176
+C                                                                       COSM1177
+C----------------------------------------------------------------       COSM1173
+C                                                                       COSM1177
+      IMPLICIT INTEGER (A-Z)                                            COSM1179
+      PARAMETER (NBA=12000 , NBS=10000 , NBM=2000)                      COSM1181
+      PARAMETER (PBET1=1, PBET2=1+NBA , PBET3=PBET2+NBA ,               COSM1183
+     +           PBET4=PBET3+NBA, PBET5=PBET4+NBS)                      COSM1184
+      PARAMETER (NBDATA=PBET5+NBM-1)                                    COSM1185
+      INTEGER PBET(5)                                                   COSM1186
+      INTEGER*1 ADATA
+      COMMON /DFXC21/ ADATA(NBDATA)                                     COSM1188
+C    (FOR CONVEX NBDATA = 48000 ===> 12000 INTEGER*4 WORDS)
+*CALL,DFXC22
+C
+      DATA PBET/PBET1,PBET2,PBET3,PBET4,PBET5/
+C
+C    GET OFFSET FOR REQUESTED FONT (SO 1 POINTS TO FIRST ELEMENT)
+C
+      IBASE = PBET(NBET) - 1
+      I = 0
+      DO 1 J=NBYTE1,NBYTE2
+      I = I + 1
+    1 ICDATA(I) = ADATA(IBASE+J)
+      RETURN
+      END
+
