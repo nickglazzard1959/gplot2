@@ -118,7 +118,7 @@ modgitinit.sh
 This can be edited with the Nano editor (which is usually pre-installed on both
 Linux and macOS) using:
 ```
-modgitedit.sh
+modgitedit.sh "GPLOT and DIMFILM"
 ```
 The contents of this file are:
 ```
