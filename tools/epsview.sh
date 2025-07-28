@@ -10,6 +10,16 @@
 #
 # This needs ghostview, imagemagick and pdfcrop to be installed.
 #
+# Also, on Linux ... it seems Imagemagick thinks Ghostview output
+# is a deadly security problem! This make make it refuse to convert
+# PDF to PNG (you could not make this stuff up). To make it do so,
+# edit a security policies file, usually:
+#  /etc/Image-Magick-6/policy.xml (as sudo, version dependent).
+# Change:
+#  <policy domain="coder" rights="none" pattern="PDF" />
+# To:
+#  <policy domain="coder" rights="read|write" pattern="PDF" />
+#
 if [ "$#" -lt "1" ]; then
     echo "Usage: epsview.sh file.eps [fixup] (output file.pdf and file.png)"
     exit 1
@@ -19,6 +29,12 @@ EPSNAME="$1"
 # Ensure the input file exists.
 if [ ! -f "${EPSNAME}" ]; then
     echo "File ${EPSNAME} does not exist."
+    exit 1
+fi
+#
+# Ensure ps2pdf is available.
+if ! command -v ps2pdf &>/dev/null; then
+    echo "Cannot find ps2pdf. Install ghostscript."
     exit 1
 fi
 #
@@ -61,7 +77,19 @@ ps2pdf -g${A} ${EPSNAME} ${EPSFILE}_zztemp.pdf
 # Crop off borders that ps2pdf adds at the bottom and left. Add back small symmetric border.
 pdfcrop --margins 5 ${EPSFILE}_zztemp.pdf ${EPSFILE}.pdf
 rm -f ${EPSFILE}_zztemp.pdf
-magick -density 384 ${EPSFILE}.pdf -quality 100 -alpha remove ${EPSFILE}.png
+if command -v magick &>/dev/null; then
+    magick -density 384 ${EPSFILE}.pdf -quality 100 -alpha remove ${EPSFILE}.png
+else
+    if command -v convert &>/dev/null; then
+        convert -density 384 ${EPSFILE}.pdf -quality 100 -alpha remove ${EPSFILE}.png
+    else
+        echo "Cannot generate PNG version. Install Imagemagick."
+    fi
+fi
 #
 # Open the PDF on macOS to display it.
-open ${EPSFILE}.pdf
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    open ${EPSFILE}.pdf
+else
+    xdg-open ${EPSFILE}.pdf
+fi
