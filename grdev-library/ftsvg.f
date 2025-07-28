@@ -1,11 +1,15 @@
       SUBROUTINE SVGNAM( SFNAME )
 C---------------------------------------------------------------------
-C SET THE SVG OUTPUT FILE NAME STEM TO SFNAME. 4 CHARS MAX.
+C SET THE SVG OUTPUT FILE NAME STEM TO SFNAME. 4 CHARS MAX ON NOS.
 C---------------------------------------------------------------------
       CHARACTER*(*) SFNAME
 C----
       INCLUDE 'svgcmn.cmn'
+#ifdef UNIX
+      SVGNL = MIN(72,LEN(SFNAME))
+#else
       SVGNL = MIN(4,LEN(SFNAME))
+#endif
       SVGN(1:SVGNL) = SFNAME(1:SVGNL)
       END
 C
@@ -37,8 +41,6 @@ C
             ENDIF
             WRITE(SLUN,9)'</^S^V^G>'
  9          FORMAT(A)
-C           WRITE(SLUN,9)'</^B^O^D^Y>'
-C           WRITE(SLUN,9)'</^H^T^M^L>'
 C
 C---- COMPLETE THE SVG HEADER WITH THE VIEWBOX NOW WE KNOW IT.
 C
@@ -73,8 +75,13 @@ C
 C
 C---- CREATE A FILE NAME FOR THE NEW FRAME.
 C
+#ifdef UNIX
+      WRITE(FNO,100)SVGN(1:SVGNL), FRNO, '.^S^V^G'
+ 100  FORMAT(A,I3.3,A)
+#else
       WRITE(FNO,100)SVGN(1:SVGNL), FRNO
  100  FORMAT(A,I3.3)
+#endif
 C
 C---- CREATE THE NEW FILE. OVERWRITE EXISTING.
 C
@@ -97,9 +104,6 @@ C
 C
 C---- WRITE OUT THE PARTIAL SVG HEADER TO THE MAIN OUTPUT FILE.
 C
-C     WRITE(LUN,9)'<^H^T^M^L>'
-C     WRITE(LUN,9)'<^H^E^A^D></^H^E^A^D>'
-C     WRITE(LUN,9)'<^B^O^D^Y>'
       WRITE(LUN,9)'<^S^V^G '
       WRITE(LUN,9)TID
 C
@@ -192,7 +196,6 @@ C----
       INTEGER IPEN(3), I, IOUT
       DATA STYLE /'^S^T^Y^L^E="^S^T^R^O^K^E:^R^G^B('/
       DATA STYWID /'^S^T^R^O^K^E-^W^I^D^T^H:'/
-C     DATA MATRIX /'^T^R^A^N^S^F^O^R^M="^M^A^T^R^I^X(1 0 0 -1 0 800)"'/
       DATA MATRIX /'^T^R^A^N^S^F^O^R^M="^M^A^T^R^I^X(1 0 0  1 0   0)"'/
       DATA LB /'<^L^I^N^E*^X1="'/
       IF( ON )THEN

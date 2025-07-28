@@ -8,7 +8,11 @@ C
       INCLUDE 'dfxpsn.cmn'
       INCLUDE 'dfxpcn.cmn'
 C
-      EPFNL = LEN(EFNAME)
+#ifdef UNIX
+      EPFNL = MIN(72,LEN(EFNAME))
+#else
+      EPFNL = MIN(4,LEN(EFNAME))
+#endif
       EPFN(1:EPFNL) = EFNAME
 C
       END

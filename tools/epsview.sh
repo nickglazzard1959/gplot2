@@ -2,10 +2,13 @@
 #
 # This started because macOS can no longer "just" display
 # .eps files by double clicking on them. However, it is
-# useful to get "the right size" output and decent quality.
+# useful to get "the right size" output and decent quality
+# on all systems.
+#
 # It also fixes up lower case being lost on COS to NOS
 # transfers.
-# This needs ghostview and imagemagick to be installed.
+#
+# This needs ghostview, imagemagick and pdfcrop to be installed.
 #
 if [ "$#" -lt "1" ]; then
     echo "Usage: epsview.sh file.eps [fixup] (output file.pdf and file.png)"
@@ -53,8 +56,12 @@ fi
 A="$(grep BoundingBox ${EPSNAME} | grep -v '(atend)' | awk '/%%BoundingBox:/ {printf("%dx%d",10 * $4,10 * $5); exit }' -)"
 echo "Calculated output bounds = $A"
 EPSFILE="${EPSNAME%.*}"
-ps2pdf -g${A} ${EPSNAME} ${EPSFILE}.pdf
-magick -density 192 ${EPSFILE}.pdf -quality 100 -alpha remove ${EPSFILE}.png
+ps2pdf -g${A} ${EPSNAME} ${EPSFILE}_zztemp.pdf
+#
+# Crop off borders that ps2pdf adds at the bottom and left. Add back small symmetric border.
+pdfcrop --margins 5 ${EPSFILE}_zztemp.pdf ${EPSFILE}.pdf
+rm -f ${EPSFILE}_zztemp.pdf
+magick -density 384 ${EPSFILE}.pdf -quality 100 -alpha remove ${EPSFILE}.png
 #
 # Open the PDF on macOS to display it.
 open ${EPSFILE}.pdf

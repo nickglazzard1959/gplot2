@@ -5,13 +5,14 @@
 # library, grdev.a
 #
 function get_file() {
+    echo "... getting $1"
     asciify -m grdev-map.json ../../grdev-library/$1 grdev-source/$1
     return 0
 }
 
 function compile() {
     echo "... compiling $1"
-    gfortran -g -c -O${OPT} -Wall -std=legacy -cpp -DPORTF77 $1
+    gfortran -g -c -O${OPT} -Wall -std=legacy -cpp -DPORTF77 -DUNIX $1
     return 0
 }
 

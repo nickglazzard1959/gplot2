@@ -3,12 +3,15 @@ C ===================================================
 C  GPLOT - DIMFILM BASED INTERACTIVE PLOTTING PROGRAM
 C ===================================================
       IMPLICIT LOGICAL (A-Z)
+C
+C DIMENSIONS AND LIMITS
+C      
       INTEGER NCMDS, NDEVS, MAXARG, NGRD, MAXDEP
       INTEGER NSTY, NPOL, NHIST, MAXSTK, NREGS
-      INTEGER NFONTS, NGSTY, NGCS
-      PARAMETER( NCMDS=79, NDEVS=5, MAXARG=6, NGRD=4, MAXDEP=5 )
+      INTEGER NFONTS, NGSTY, NGCS, MAXKEY
+      PARAMETER( NCMDS=83, NDEVS=5, MAXARG=6, NGRD=4, MAXDEP=5 )
       PARAMETER( NSTY=4, NPOL=3, NHIST=5, MAXSTK=9, NREGS=9, NGSTY=3 )
-      PARAMETER( NFONTS=24, NGCS=4 )
+      PARAMETER( NFONTS=24, NGCS=4, MAXKEY=20 )
 C
 C COMMAND CODES.
 C
@@ -28,6 +31,7 @@ C
       INTEGER KRYLAB, KGRIGHT, KGAXCUT, KCIRC, KARC
       INTEGER KRECT, KCRECT, KBSTAR, KBEND, KBSET
       INTEGER KLSYS, KLDPROC, KTXBOX, KSETCSG
+      INTEGER KUSEKEY, KADDKEY, KKEYS, KRESET
       PARAMETER( KDEV=1, KMAXPT=2, KCOL=3, KWID=4, KMARK=5 )
       PARAMETER( KCLR=6, KMOVE=7, KDRAW=8, KTEXT=9, KREAD=10 )
       PARAMETER( KXYPT=11, KXYLN=12, KXYAUT=13, KXRAN=14, KYRAN=15 )
@@ -44,6 +48,7 @@ C
       PARAMETER( KRYLAB=66, KGRIGHT=67, KGAXCUT=68, KCIRC=69, KARC=70 )
       PARAMETER( KRECT=71, KCRECT=72, KBSTAR=73, KBEND=74, KBSET=75 )
       PARAMETER( KLSYS=76, KLDPROC=77, KTXBOX=78, KSETCSG=79 )
+      PARAMETER( KUSEKEY=80, KADDKEY=81, KKEYS=82, KRESET=83 )
 C
 C DEVICE CODES.
 C
@@ -85,7 +90,7 @@ C
       INTEGER MAXPTS, NDEFPTS
       PARAMETER( MAXPTS=10000, NDEFPTS=1000 )
       INTEGER MAXFNL
-#ifdef PORTF77
+#ifdef UNIX
       PARAMETER( MAXFNL=72 )
 #else
       PARAMETER( MAXFNL=7 )
@@ -132,7 +137,12 @@ C
       INTEGER FONTNUM(NFONTS), IDXABT1, IDXABT2, IDXABT3, IDXSYMB
       INTEGER IDXMARK, IFONT, ICSGRP
       REAL FSYMHT, FSYMANG, ZEROVAL, AXCX0, AXCY0, BB(4)
-      LOGICAL BBEMPTY, SEVERR
+      LOGICAL BBEMPTY, SEVERR, DORESET
+      CHARACTER*10 KEYTEXT(MAXKEY)
+      REAL KEYRED(MAXKEY), KEYGRN(MAXKEY), KEYBLU(MAXKEY)
+      REAL KEYWID(MAXKEY)
+      INTEGER KEYSTY(MAXKEY), NKEYS
+      REAL REDGEN, GRNGEN, BLUGEN
 C
 C VARIABLES FOR DYNAMIC MEMORY POINT STORAGE
 C
@@ -234,6 +244,10 @@ C
       CMDS(KLDPROC) = 'LOADPROC'
       CMDS(KTXBOX) = 'BOXTEXT'
       CMDS(KSETCSG) = 'CSGROUP'
+      CMDS(KUSEKEY) = 'USEKEY'
+      CMDS(KADDKEY) = 'ADDKEY'
+      CMDS(KKEYS) = 'KEYS'
+      CMDS(KRESET) = 'RESET'
 C
 C DEVICE NAMES.
 C
@@ -472,6 +486,10 @@ C
       DCMDS(KTXBOX) = '"TEXT" - DRAW TEXT IN A BOX. (TEST ONLY).'
       DCMDS(KSETCSG) = 'SELECT COLOUR/STYLE GROUP FOR COLOUR, STYLE '//
      +                 'TO AFFECT. "ALL" "GENERAL" "TEXT" "ANNOT".'
+      DCMDS(KUSEKEY) = 'PREPARE TO CREATE A KEY FOR THE GRAPH.'
+      DCMDS(KADDKEY) = 'ADD A KEY FOR THE CURRENT GRAPH LINE/POINTS.'
+      DCMDS(KKEYS) = 'DRAW THE GRAPH KEYS.'
+      DCMDS(KRESET) = 'RESET STATE TO INITIAL VALUES.'
 C
 C DEVICE DESCRIPTIONS.
 C
@@ -562,6 +580,11 @@ C
       NARGS(KLDPROC) = 2
       NARGS(KTXBOX) = 1
       NARGS(KSETCSG) = 1
+      NARGS(KUSEKEY) = 0
+      NARGS(KADDKEY) = 1
+      NARGS(KKEYS) = 0
+      NARGS(KRESET) = 0
+      
 C
 C DEFAULT STATE ON START UP.
 C NO DATA READ YET. NO DEVICE OPENED. ETC.
@@ -575,7 +598,15 @@ C---- DEVICE STATE
       SLIDE = .TRUE.
       HAVDEV = .FALSE.
       IDEV = 0
+      DORESET = .FALSE.
+C---- DEBUGGING STATE
+      DEBUGON = .FALSE.
+      QUIET = .TRUE.
+C---- LOG FILE STATE
+      HAVFLOG = .FALSE.
 C---- ANNOTATION STATE
+C---- A RESET COMMAND ALSO COMES TO HERE.
+ 2831 CONTINUE      
       DOANNOT = .TRUE.
       HAVTIT = .FALSE.
       HAVXLAB = .FALSE.
@@ -594,6 +625,16 @@ C---- ANNOTATION STATE
       DORIGHT = .FALSE.
       AXCX0 = 0.0
       AXCY0 = 0.0
+C---- DRAWING COLOURS
+      RED = 1.0
+      GRN = 0.0
+      BLU = 0.0
+      REDGEN = 1.0
+      GRNGEN = 0.0
+      BLUGEN = 0.0
+C---- LINE WIDTH AND STYLE
+      WID = 1.0
+      ISTY = 1
 C---- BOUNDS STATE
       XLO = 0.0
       XHI = 1.0
@@ -616,11 +657,6 @@ C---- PLOT AND GRAPH CURRENT COORDINATES
       YPOS = 0.0
       GXPOS = 0.0
       GYPOS = 0.0
-C---- DEBUGGING STATE
-      DEBUGON = .FALSE.
-      QUIET = .TRUE.
-C---- LOG FILE STATE
-      HAVFLOG = .FALSE.
 C---- INTERPOLATION STATE
       INTERPM = KILIN
       NINTERP = 5
@@ -656,6 +692,12 @@ C---- TEXT/SYMBOL DRAWING (APART FROM FONTS, SEE ABOVE).
       TXTCON = .FALSE.
 C---- COLOUR/STYLE GROUP TO SET WITH COLOUR, ETC.
       ICSGRP = KCSALL
+C---- KEYS DEFINED
+      NKEYS = 0
+C
+C IF DOING A RESET COMMAND, FINISH IT.
+C
+      IF( DORESET )GOTO 2832
 C
 C STARTUP ANNOUNCEMENT.
 C
@@ -881,12 +923,12 @@ C
 #endif
       IF(ICMD .EQ. 0 )THEN
          IF( HAVDEV )CALL GFLUSH(IDEV,NDEVS,.TRUE.)
-         WRITE(6,102)
- 102     FORMAT(1X,'UNKNOWN COMMAND. TRY HELP.')
+         WRITE(6,102)CMD(1:LNBC(CMD,1,1))
+ 102     FORMAT(1X,'UNKNOWN COMMAND (',A,'). TRY HELP.')
       ELSE IF( ICMD .LT. 0 )THEN
          IF( HAVDEV )CALL GFLUSH(IDEV,NDEVS,.TRUE.)
-         WRITE(6,103)
- 103     FORMAT(1X,'AMBIGUOUS COMMAND. TRY HELP.')
+         WRITE(6,103)CMD(1:LNBC(CMD,1,1))
+ 103     FORMAT(1X,'AMBIGUOUS COMMAND (',A,'). TRY HELP.')
       ELSE
 C
 C CHECK ARGUMENTS PRESENT IF REQUIRED, NOT IF NOT.
@@ -1000,7 +1042,8 @@ C
      +        241,242,243,244,245,246,247,248,249,250,
      +        251,252,253,254,255,256,257,258,259,260,
      +        261,262,263,264,265,266,267,268,269,270,
-     +        271,272,273,274,275,276,277,278,279),ICMD
+     +        271,272,273,274,275,276,277,278,279,280,
+     +        281,282,283),ICMD
 C
 C DEVICE
  201     CONTINUE
@@ -1130,8 +1173,14 @@ C COLOUR
          BLU = F3
          IF( ICSGRP .EQ. KCSALL )THEN
             CALL RGB(MAX(0.01,RED),MAX(0.01,GRN),MAX(0.01,BLU))
+            REDGEN = RED
+            GRNGEN = GRN
+            BLUGEN = BLU
          ELSE IF( ICSGRP .EQ. KCSGEN )THEN
             CALL RGB1(MAX(0.01,RED),MAX(0.01,GRN),MAX(0.01,BLU))
+            REDGEN = RED
+            GRNGEN = GRN
+            BLUGEN = BLU            
          ELSE IF( ICSGRP .EQ. KCSTEXT )THEN
             CALL RGB2(MAX(0.01,RED),MAX(0.01,GRN),MAX(0.01,BLU))
          ELSE IF( ICSGRP .EQ. KCSANOT )THEN
@@ -1145,7 +1194,15 @@ C WIDTH
          IF( .NOT.HAVDEV )GOTO 9090
          IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
          WID = F1
-         CALL LINSF(WID)
+         IF( ICSGRP .EQ. KCSALL )THEN
+            CALL LINSF(WID)
+         ELSE IF( ICSGRP .EQ. KCSGEN )THEN
+            CALL LINSF1(WID)
+         ELSE IF( ICSGRP .EQ. KCSTEXT )THEN
+            CALL LINSF2(WID)
+         ELSE IF( ICSGRP .EQ. KCSANOT )THEN
+            CALL LINSF3(WID)
+         ENDIF         
          GCHANGE = .TRUE.
          GOTO 299
 C
@@ -1592,20 +1649,7 @@ C STYLE
             WRITE(6,2302)
  2302       FORMAT(1X,'AMBIGUOUS STYLE MODE TRY HELP.')
          ELSE
-            GOTO(2303,2304,2305,2306),ISTY
- 2303       CONTINUE
-               CALL DSHOFF
-            GOTO 2309
- 2304       CONTINUE
-               CALL DASH
-            GOTO 2309
- 2305       CONTINUE
-               CALL DOT
-            GOTO 2309
- 2306       CONTINUE
-               CALL DSHDOT
-            GOTO 2309
- 2309       CONTINUE
+            CALL SETSTY(ISTY)
             GCHANGE = .TRUE.
          ENDIF
          GOTO 299
@@ -2416,6 +2460,113 @@ C CSGROUP
          ELSE
             ICSGRP = I
          ENDIF
+         GOTO 299
+C
+C USEKEY
+ 280     CONTINUE
+         IF( .NOT. HAVDEV )GOTO 9090
+         IF( LPANE )CALL ENPANE
+         PXL = 0.0
+         PXH = 0.8
+         PYL = 0.0
+         PYH = 0.999
+         CALL PANE(PXL,PXH,PYL,PYH)
+         LPANE = .TRUE.
+         GCHANGE = .TRUE.
+         NKEYS = 0
+         GOTO 299
+C
+C ADDKEY
+ 281     CONTINUE
+         IF( .NOT. HAVDEV )GOTO 9090
+         IF( NKEYS .EQ. MAXKEY )THEN
+            WRITE(6,2811)
+ 2811       FORMAT(1X,'CANNOT ADD ANOTHER KEY, ALL USED.')
+         ELSE
+            NKEYS = NKEYS + 1
+            KEYTEXT(NKEYS) = ARGS(1)(1:MIN(10,LNBC(ARGS(1),1,1)))
+            KEYRED(NKEYS) = RED
+            KEYGRN(NKEYS) = GRN
+            KEYBLU(NKEYS) = BLU
+            KEYWID(NKEYS) = WID
+            KEYSTY(NKEYS) = ISTY
+            print *,'addkey: ',isty
+         ENDIF
+         GOTO 299
+C
+C KEYS
+ 282     CONTINUE
+         IF( .NOT. HAVDEV )GOTO 9090         
+         IF( .NOT. LPANE )THEN
+            WRITE(6,2821)
+ 2821       FORMAT(1X,'EXPECTED ACTIVE PANE. FORGOT USEKEY?')
+         ELSE
+            CALL OPANE
+            CALL ENPANE
+            IF( NKEYS .EQ. 0 )THEN
+               WRITE(6,2822)
+ 2822          FORMAT(1X,'NO KEYS ADDED.')
+            ELSE
+               PXL = 0.82
+               PXH = 0.999
+               PYL = 0.0
+               PYH = 0.999
+               CALL PANE(PXL,PXH,PYL,PYH)
+               LPANE = .TRUE.
+               GCHANGE = .TRUE.        
+               XPOS = 0.91
+               YPOS = 0.95
+               CALL OFF2(XPOS,YPOS)
+               TWD = 0.1
+               TWIDTH = STRING('KEY')
+               CALL SYMHT(TWD/TWIDTH)
+               TWIDTH = TWD
+               CALL OFF2(XPOS-TWIDTH/2,YPOS)
+               CALL SYMTXT('KEY')
+               XPOS = 0.85
+               YPOS = 0.9
+               CALL SYMHT(0.02)
+               DO 2823 I=1,NKEYS
+                  CALL RGB1(KEYRED(I),KEYGRN(I),KEYBLU(I))
+                  CALL LINSF1(KEYWID(I))
+                  CALL SETSTY(KEYSTY(I))
+                  XPOS = 0.85
+                  CALL OFF2(XPOS,YPOS)
+                  XPOS = 0.97
+                  CALL ON2(XPOS,YPOS)
+                  CALL DSHOFF
+                  XPOS = 0.85
+                  YPOS = YPOS - 0.02
+                  CALL OFF2(XPOS,YPOS)
+                  CALL SYMTXT(KEYTEXT(I)(1:LNBC(KEYTEXT(I),1,1)))
+                  YPOS = YPOS - 0.03
+ 2823          CONTINUE
+               CALL RGB1(REDGEN,GRNGEN,BLUGEN)
+               CALL DSHOFF
+               CALL OPANE
+               CALL ENPANE
+               LPANE = .FALSE.
+            ENDIF
+         ENDIF
+         GOTO 299
+C
+C RESET
+ 283     CONTINUE
+         DORESET = .TRUE.
+         IF( LPANE )CALL ENPANE
+         GOTO 2831
+ 2832    CONTINUE
+         IF( SLIDE )CALL GRCONA
+         IF( QUIET )CALL NOCHCK
+         CALL BOUNDS(0.0,1.0,0.0,1.0)
+         CALL LINSF(1.0)
+         CALL RGB(1.0,0.0,0.0)
+         CALL SETFR(1.0,0.0,0.13)
+         CALL AUTOXY
+         CALL LDSYM(8001)
+         CALL LDMARK(9001)
+         CALL GFLUSH(IDEV,NDEVS,.FALSE.)
+         DORESET = .FALSE.
          GOTO 299
 C
 C END OF COMMAND SWITCH
@@ -3314,6 +3465,34 @@ C
       DO 1 I=1,N
          WRITE(6,*)'X(',I,')=',X(I),' Y(',I,')=',Y(I)
  1    CONTINUE
+      RETURN
+      END
+C
+      SUBROUTINE SETSTY(ISTY)
+C--------------------------------------------
+C SET LINE DRAWING STYLE.
+C--------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      INTEGER ISTY
+C
+      IF( (ISTY .LT. 1) .OR. (ISTY .GT. 4) )THEN
+         WRITE(6,100)ISTY
+ 100     FORMAT(1X,'SETSTY PASSED INVALID ISTY',I6)
+         RETURN
+      ENDIF
+      GOTO(1,2,3,4),ISTY
+ 1    CONTINUE
+      CALL DSHOFF
+      GOTO 5
+ 2    CONTINUE
+      CALL DASH
+      GOTO 5
+ 3    CONTINUE
+      CALL DOT
+      GOTO 5
+ 4    CONTINUE
+      CALL DSHDOT
+ 5    CONTINUE
       RETURN
       END
 C

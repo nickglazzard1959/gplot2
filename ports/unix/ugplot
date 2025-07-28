@@ -1,4 +1,19 @@
 #!/bin/bash
-ln -s /usr/local/share/dimfilm/DADIMFO ./DADIMFO
+# -*- sh-shell: bash -*-
+#
+# Run GPLOT on Unix arranging for DADIMFO to be
+# present as a transitory symbolic link.
+#
+if [ -f ./DADIMFO ]; then
+    if [ -L ./DADIMFO ]; then
+        unlink ./DADIMFO
+        ln -s /usr/local/share/dimfilm/DADIMFO ./DADIMFO
+    fi
+    # DADIMFO is a "regular file", not a symlink. Leave it alone.
+else
+    ln -s /usr/local/share/dimfilm/DADIMFO ./DADIMFO
+fi
 gplot "${@}"
-unlink ./DADIMFO
+if [ -L ./DADIMFO ]; then
+    unlink ./DADIMFO
+fi

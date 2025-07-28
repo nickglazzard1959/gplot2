@@ -235,7 +235,7 @@ is not intended to be portable. It uses seven letter identifiers, dynamic memory
 the Common Memory Manager), and makes free use of NOS system calls.
 \newpara
 That said, it can be built and used on ``Unix-like'' systems (Debian Linux and macOS have been tested)
-where it behaves identically to the NOS version.
+where it behaves almost identically to the NOS version.
 \newpara
 In overall intent, \textbf{GPLOT} is like a stripped down Gnuplot. 
 \textbf{GPLOT} relies on character
@@ -254,12 +254,17 @@ used by the \textbf{PMDHTML} Markdown to HTML program and the \textbf{PLNOTES} s
 (which is not described further here) as well as for HTML documents in general. The former is useful for \LaTeX and other
 `print' style document systems.
 \newpara
-\textbf{GPLOT} is currently at version 0.6. The first usable version (0.1) could not output EPSF files as such, but used a
-limited character set format that could be trivially translated to EPSF. V0.2 improved Tektronix 401x support. V0.58
-added significant -- if idiosyncratic -- facilities for function evaluation and other programmability features, as well as SVG
-output. It also exposed a lot more of DIMFILM's capabilities. Most of what can be done with DIMFILM using a specially
-written Fortran program can now be done from \textbf{GPLOT}. V0.59 fixed some bugs in parameter substitution. V0.6 tidied
-up a few things and supported building on ``Unix-like'' systems as well as NOS.
+\textbf{GPLOT} is currently at version 0.6. The first usable version (0.1, late 2013) 
+could not output EPSF files as such, but used a
+limited character set format that could be trivially translated to EPSF. V0.2 (2022) improved Tektronix 401x support. V0.58
+(developed between late 2022 and early 2023) added significant -- if idiosyncratic -- facilities for function evaluation 
+and other programmability features, as well as SVG output. It also exposed a lot more of DIMFILM's capabilities and directly
+generated "true" EPS files. Most of what can be done with DIMFILM using a specially
+written Fortran program can now be done from \textbf{GPLOT}. V0.59 fixed some bugs in parameter substitution. V0.6 (July 2025)
+tidied up a few things and supported building on ``Unix-like'' systems as well as NOS. This version also uses the NOS MODIFY --
+Git inter-operability tools so that the source can be managed equally well on NOS or with Git, with changes made on one system
+being automatically reflected in the other. This version also automatically generates minor variations of the source code
+needed for building on COS and Unix, using a single, NOS compatible, code base.
 \newpara
 A major goal for \textbf{GPLOT} is that it should be \textit{very easy to use} --- as easy as other graph plotting
 programs on modern operating systems (such an Gnuplot, matplotlib, etc.) --- although \textbf{GPLOT} will never rival
@@ -267,10 +272,6 @@ the full capabilities of those systems.
 \newpara
 To build and install \textbf{GPLOT} on an emulated CYBER mainframe (with DtCyber), or on a ``Unix-like'' system,
 please refer to the main \textbf{GPLOT} Github project \texttt{README.md}.
-\newpara
-\textbf{GPLOT} V0.1 was written in late 2013. A `package' that might be installable fairly easily was put together in March 2015. Improvements
-to Tektronix support were made in 2022 and major enhancements were made in late 2022 to early 2023. Some bug fixes and a
-documentation update were done in May 2024. V0.6 was completed in July 2025.
 
 \section{Running \textbf{GPLOT}}
 \textbf{GPLOT} needs two files: \texttt{GPLOT} (the pre-loaded binary executable) 
@@ -324,7 +325,8 @@ GPLOT,OBEY=DOPLOT,PARM=$X Y 'A TITLE'$.
 \end{center}
 \textbf{GPLOT} can be run as any other command on ``Unix-like'' systems, but the current directory
 must contain the fonts file \texttt{DADIMFO} when the command is issued otherwise \textbf{GPLOT} will
-immediately exit with an error message.
+immediately exit with an error message. To avoid this problem, run \textbf{GPLOT} via the script \texttt{ugplot}
+which arranges things so that this problem is avoided.
 \end{quote}
 
 \section{Commands}
@@ -341,12 +343,15 @@ if desired.
 \textbf{Warning}\\
 \end{center}
 \textbf{GPLOT} should
-\textit{not} be used in \texttt{ASCII} mode on NOS (in which lower case characters are \textit{really} lower case).
-That does not mean that lower case text cannot be plotted -- it can.
+\textit{not} be used in \texttt{ASCII} mode on NOS (in which lower case characters are \textit{really} lower case),
+otherwise command names will not be recognised, amongst other problems.
+This does not mean that lower case text cannot be plotted, though -- it can.
 
 \newpara
-On ``Unix-like'' systems, all lower case input is converted to upper case. That is, \textbf{GPLOT}
-behaves exactly as it does on NOS.
+On ``Unix-like'' systems, lower case input can be used freely. Command names are converted to upper case internally.
+Strings and file names preserve the case as entered. Also, EPS and SVG output files are given their usual extensions
+(extensions are alien to NOS and COS). However, RPN evaluator operator names must still be given in
+upper case.
 \end{quote}
 
 \newpara
@@ -359,7 +364,7 @@ These are the lowest level facilities on which graph plotting is built.
 \item \textttc{DEVICE NAME [OUTPUT-FILE]} --- Select the output device.\\
    The EPS and SVG devices need an output file name to write to. Note that this
    will be created as a \texttt{LOCAL} file and will need to be made permanent with
-   \texttt{SAVE} or \texttt{REPLACE}. See Section \ref{devs} for the available devices and their
+   \texttt{SAVE} or \texttt{REPLACE} on NOS. See Section \ref{devinfolabel} for the available devices and their
    characteristics.
 \item \textttc{CLEAR} --- Clear the drawing area.\\
    The device display will be set to its default background colour.
@@ -388,11 +393,27 @@ These are the lowest level facilities on which graph plotting is built.
 \item \textttc{BLANKOUTLINE} --- Outline the blank area.\\
    A rectangle is drawn that matches the blank area.
 \item \textttc{COLOUR R G B} --- Set the RGB colour to use for drawing.\\
-   All lines (and all the graphical elements are lines) will be drawn in this
-   colour.
+   \textbf{DIMFILM} maintains a separate drawing colour and line width for three
+   different classes of graphical objects: lines, including those on graph plots;
+   text (character strings); and graph plot annotations. This \texttt{COLOUR}
+   command will be applied to the colour/style group last selected with
+   a \texttt{CSGROUP} command (all 3 groups being the default if \texttt{CSGROUP} hasn't
+   been used).
 \item \textttc{WIDTH WIDTH} --- Set the line width.\\
    The width is a multiple of a device dependent "base width" and not all devices
-   can draw wide lines (currently, only the Tektronix device cannot).
+   can draw wide lines (currently, only the Tektronix device cannot). This \texttt{WIDTH} will
+   apply to the currently selected colour/style group as explained for \texttt{COLOUR}.
+\item \textttc{CSGROUP GROUPNAME} --- Set the current colour/style group.\\
+	This chooses which class of graphical objects any subsequent \texttt{COLOUR} and \texttt{WIDTH}
+	commands apply to. The \texttt{GROUPNAME} values are: 
+	\begin{itemize}
+	\item \textttc{ALL} -- Apply COLOUR and WIDTH to all three colour/style groups.
+	\item \textttc{GENERAL} -- Apply them to line drawing operations.
+	\item \textttc{TEXT} -- Apply them to text drawing operations.
+	\item \textttc{ANNOT} -- Apply them to graph plot annotation operations.
+	\end{itemize}
+	As usual, these group names can be abbreviated, providing the abbreviation
+	remains unique.
 \item \textttc{STYLE STYLENAME} --- Set the line style.\\
    The following styles are defined: \texttt{SOLID}, \texttt{DASH},
    \texttt{DOT}, \texttt{DASHDOT}. These are
@@ -408,6 +429,7 @@ These are the lowest level facilities on which graph plotting is built.
    formatting sequences. The most frequently useful are \texttt{*L} to switch to lower case
    and \texttt{*U} to switch back to upper. The full set of format controls are described in
    the \textbf{DIMFILM} manual, and a summary of most of them is given in Table~\ref{tab:textformats}.
+   On systems other than NOS, lower case letters will be preserved.
 \item \textttc{FILL} --- Fill the drawing area with the current colour.\\
    This clears the graphics area to the current colour, erasing it. It differs from
    \texttt{CLEAR} in that \texttt{CLEAR} always fills with white and empties any buffered graphics commands
@@ -605,7 +627,7 @@ data omitting the undesired items.
 \end{itemize}
 
 
-\subsection{Graph Annotation Commands}\label{devs}
+\subsection{Graph Annotation Commands}
 Graphs almost always need some annotation. Minimal annotation is: ticks on the axes, numeric values
 against those ticks, and a framing rectangle drawn around the graph plotting area. These are always
 drawn after each graph drawing command (\texttt{XYPOINT}, \texttt{XYLINE}, \texttt{XYHISTOGRAM}) 
@@ -1114,14 +1136,15 @@ The (single) parameter that must be passed to this is the number of iterations t
 before drawing the result. This example draws something that looks remarkably similar to
 a straw-like plant.
 
-\section{Output Devices}
+\section{Output Devices}\label{devinfolabel}
 \textbf{GPLOT} supports these devices:
 \begin{itemize}
 \item \textttc{GTERM} --- \textbf{GTerm} colour graphics terminal.\\
    This is a Python program I wrote to allow APL to be used with its proper character set, as
    well as to function as a better alternative to an \texttt{xterm} emulation of a Tektronix 401x for
    vector graphics output (e.g. that from \textbf{GPLOT}). Unlike Tek 401x emulations, it supports colour,
-   anti-aliasing and anything displayed can be saved as SVG. \textbf{GTerm} runs on Linux and macOS, but not
+   anti-aliasing\footnote{Ren\'{e} Richarz's 4014 emulator is nicely anti-aliased, but \texttt{xterm} is not.} 
+   and anything displayed can be saved as SVG. \textbf{GTerm} runs on Linux and macOS, but not
    on any version of Windows.
 \item \textttc{TEK4K} --- Tektronix 4014 graphics terminal emulation.\\
    This should work with any Tek 401x emulator. It has been tested with \texttt{xterm} and with Ren\'{e} Richarz's
@@ -1133,12 +1156,26 @@ a straw-like plant.
    `real' EPS is generated directly in NOS, using 6/12 character encoding which supports all printable ASCII
    characters.
 \item \textttc{SVG NAME} --- Output SVG (Scalable Vector Graphics) to a file. This can be included in HTML files, and
-	this format is used by the \texttt{PLNOTES} application to insert graphs and graphics into documents. 
+	this format is used by the \texttt{PLNOTES} application on NOS to insert graphs and graphics into documents. 
 \end{itemize}
 \newpara
 There is also an \textttc{EPSBIN} device, which supports only black and white (i.e. binary) output colours, but this
 is no longer thought to be useful and will not be described further.
-
+\newpara
+The length of \texttt{NAME} must be kept to 4 (!) characters on NOS and COS. The full output file name is formed from
+the name supplied here, followed by 3 leading zero padded decimal digits (starting at 001). With a 4 character
+\texttt{NAME}, this makes 7 characters in total, which is the maximum NOS and COS file name length. If \texttt{NAME} is longer than 4
+characters, it is truncated to 4 by \textbf{GPLOT}.
+\newpara
+On Unix, the length of \texttt{NAME} may be up 72 characters (before truncation by \textbf{GPLOT}). 
+\newpara
+At the end of each frame (i.e. when a \texttt{CLEAR} command is used or when \textbf{GPLOT} is exited), the frame number part
+of the name is incremented after the output file has been written. So, if \texttt{NAME} is \texttt{EPXA} then a series of
+output files may be generated on NOS and COS: \texttt{EPXA001, EPXA002 ...}
+\newpara
+On Unix systems, the name may be more descriptive, use mixed case and will also be automatically given the 
+appropriate extension. E.g. If \texttt{NAME} is \texttt{ExampleA}, the output files may be named
+\texttt{ExampleA001.eps, ExampleA002.eps ...}
 
 \section{Examples}
 
