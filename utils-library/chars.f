@@ -427,11 +427,12 @@ C ASSUMING S IS PARTLY NUMERIC, CONVERT IT TO AN INTEGER IN V.  IF
 C IT IS FOUND THAT S IS NOT NUMERIC, RETURN FALSE ELSE TRUE.
 C BEGIN THE CONVERSION FROM CHARACTER B. RETURN THE POSITION OF THE
 C LAST NON-DIGIT CHARACTER SCANNED IN P (OR LEN(S) ).
+C INTEGERS ARE SILENTLY TRUNCATED AT A MAXIMUM OF 9 DIGITS.
 C----------------------------------------------------------------------
       CHARACTER*(*) S
       INTEGER V, B, P
 C----
-      INTEGER I, J, ISIGN
+      INTEGER I, J, ISIGN, NDUSED
 C
       IB = B
 C
@@ -446,14 +447,18 @@ C
          IB = IB + 1
       ENDIF
 C
-C---- CONVERT THE VALUE
+C---- CONVERT THE VALUE. PROTECT AGAINST INTEGER OVERFLOW.
 C
       V = 0
       P = LEN(S)
+      NDUSED = 0
       DO 1 I = IB, LEN(S)
          J = INDEX('0123456789', S(I:I))
          IF( J .GT. 0 )THEN
-            V = 10 * V + (J - 1)
+            IF( NDUSED .LT. 9 )THEN
+               V = 10 * V + (J - 1)
+               NDUSED = NDUSED + 1
+            ENDIF
          ELSE
             IF( I .EQ. IB )IFROMC = .FALSE.
             P = I
@@ -470,11 +475,12 @@ C ASSUMING S IS PARTLY HEXADECIMAL, CONVERT IT TO AN INTEGER IN V.  IF
 C IT IS FOUND THAT S IS NOT NUMERIC, RETURN FALSE ELSE TRUE.
 C BEGIN THE CONVERSION FROM CHARACTER B. RETURN THE POSITION OF THE
 C LAST NON-DIGIT CHARACTER SCANNED IN P (OR LEN(S) ).
+C INTEGERS ARE SILENTLY TRUNCATED AT A MAXIMUM OF 7 HEX DIGITS.      
 C----------------------------------------------------------------------
       CHARACTER*(*) S
       INTEGER V, B, P
 C----
-      INTEGER I, J, ISIGN
+      INTEGER I, J, ISIGN, NDUSED
 C
       IB = B
 C
@@ -491,10 +497,14 @@ C---- CONVERT THE VALUE
 C
       V = 0
       P = LEN(S)
+      NDUSED = 0
       DO 1 I = IB, LEN(S)
          J = INDEX('0123456789ABCDEF', S(I:I))
          IF( J .GT. 0 )THEN
-            V = 16 * V + (J - 1)
+            IF( NDUSED .LT. 7 )THEN
+               V = 16 * V + (J - 1)
+               NDUSED = NDUSED + 1
+            ENDIF
          ELSE
             IF( I .EQ. IB )XFROMC = .FALSE.
             P = I
@@ -828,7 +838,7 @@ C
 C---- WE ARE NOW READY TO ASSEMBLE V FROM THE BITS.
 C
       IF( GDMAN )THEN
-         DMAN = FLOAT(IDMAN) / ( 10.0 ** NDMAN )
+         DMAN = FLOAT(IDMAN) / ( 10.0 ** MIN(NDMAN,9) )
       ELSE
          DMAN = 0.0
       ENDIF
