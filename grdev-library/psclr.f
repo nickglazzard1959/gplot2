@@ -140,13 +140,14 @@ C
       WRITE(LUN,9)DEFW
       WRITE(LUN,9)CMTEP
       WRITE(LUN,9)SETWD
-      WRITE(LUN, 300)FNO(1:50),EPRT(1:EPRTL)
+      WRITE(LUN,300)FNO(1:50)
+      WRITE(LUN,301)EPRT(1:EPRTL)
 C
 C --- NOTE - BOUNDING BOX MUST BE INTEGER.
 C
-  100 FORMAT(A,I6,I6,I6,I6)
-  300 FORMAT('%%PLOTFILE ',A/
-     & '%%ROUTE ',A)
+ 100  FORMAT(A,I6,I6,I6,I6)
+ 300  FORMAT('%%PLOTFILE ',A)
+ 301  FORMAT('%%ROUTE ',A)
       END
 C
 C --- ------------------------------------------------------------------
