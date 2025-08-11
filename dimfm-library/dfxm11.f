@@ -27,6 +27,72 @@ C --- 5 IS THE MARKER FONT.
 C
 C --- ENTRY POINTS IN THIS ROUTINE PERFORM OTHER FONT-RELATED TASKS.
 C
+C *********************************
+C * ORIGINAL DESCRIPTION OF FONT  *
+C * FILE CONTENTS AND FORMAT FROM *
+C * UNMODIFIED DIMFILM SOURCE     *
+C *********************************
+C
+C------------------------------------------------------
+C
+C      FONT FILE STRUCTURE
+C
+C      FILE HEADER:                                                     GENM1133
+C           WORD 1:   FONT NUMBER (+VE VALUE, -VE END OF DATA FILE)     GENM1134
+C                       (THE FOLLOWING TWO POINTERS ARE IMPLEMENTATION
+C                        DEPENDENT IN THEIR INTERPRETATION:
+C                        THEY MAY BE ABSOLUTE OR RELATIVE, AND IF
+C                        RELATIVE MAY RELATE ONLY TO INDEX+DATA
+C                        RECORDS OR INCLUDE ALLOWANCE FOR ANY
+C                        OPTIONAL INTER-FONT FLAG RECORD.
+C                        THAT IS THE POINTER MAY BE THE RECORD
+C                        NUMBER OF THE PRECEDING/CURRENT FONT OR BE
+C                        THE NUMBER OF INDEX+DATA RECORDS IN THE
+C                        PRECEDING/CURRENT FONT.  THEY MAY BE USED FOR
+C                        BACKWARD/FORWARD SKIPPING.  AN OPTIONAL
+C                        INTER-FONT FLAG RECORD MAY ALSO BE USED FOR
+C                        THIS PURPOSE.  THIS STRUCTURE IS CREATED BY
+C                        THE FONT GENERATION PROGRAM: SEE FNTSRC
+C                        TEMPLATE PROGRAM.)
+C                2:   BACKWARD POINTER  (RECORD NUMBER OF HEADER FOR    GENM1135
+C                                        PRECEDING FONT, OR NUMBER OF   GENM1136
+C                                        INDEX+DATA RECORDS IN
+C                                        PRECEDING FONT, -1 IF NONE)    GENM1136
+C                3:   FORWARD POINTER    (RECORD NUMBER FOR HEADER OF   GENM1137
+C                                         NEXT FONT, OR NUMBER OF       GENM1138
+C                                         INDEX+DATA RECORDS IN THIS    GENM1138
+C                                         FONT.   REDUNDANT FOR         GENM1138
+C                                         FONT=-1)                      GENM1139
+C                4:   NUMBER OF CHARACTERS IN FONT (INCLUDING ACCENTS)  GENM1140
+C                                                   = <NUM>
+C                5:   MONO HALF-WIDTH LEFT
+C                6:   MONO HALF-WIDTH RIGHT
+C                7:   BASE LINE OFFSET
+C                8:   HEIGHT
+C                9:   LINE SPACING
+C                               (NOTE: 5-9 IN CHARACTRER RASTER UNITS)
+C      INDEX:
+C            <NUM> 5 WORD ENTRIES, BEING FOR EACH CHARACTER:
+C           WORD 1:   LAST BYTE POINTER (I.E. FIRST BYTE-1 OF NEXT
+C                                        CHARACTER)
+C                2:   LEFT EXTENT (PROPORTIONAL)
+C                3:   RIGHT EXTENT (PROPORTIONAL)
+C                4:   LOWEST EXTENT (HEIGHT MIN)
+C                5:   HIGHEST EXTENT (HEIGHT MAX)
+C                     (FOR ACCENTS 4/5 ARE MIN/MAX HEIGHTS:
+C                      WHEN ABSOLUTE VALUE LESS THAN 100 ARE
+C                      ABSOLUTE MIN/MAX,
+C                      WHEN ABSOLUTE VALUE IS 100 OR GREATER ARE
+C                      MIN/MAX HEIGHTS RELATIVE TO PRECEDING
+C                      CHARACTER,
+C                      BOTH ZERO IF ACCENT DOES NOT AFFECT HEIGHT
+C                      OF PRECEDING CHARACTER)
+C
+C      DATA:
+C            CHARACTER DATA - DESCRIBED IN DFX202
+C
+C------------------------------------------------------                 COSM1128
+C
 CDC      IMPLICIT NONE
 C
 C --- ARGUMENTS.

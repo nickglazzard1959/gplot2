@@ -328,6 +328,8 @@ C--- TRACK GRAPHICS/TEXT MODE AND IF ANYTHING DRAWN.
       DRAWN = 0
 C--- SET UP FOR "8-IN-12" OUTPUT TO LUN.
       CALL A12GO( LUN )
+C--- SWITCH TO TEXT MODE WITH A SPECIFIC CHAR SIZE.
+      CALL TEKTEXT
       RETURN
       END
 C
@@ -386,6 +388,8 @@ C----------------------------------------------------
 C ENTER TEXT MODE.
 C----------------------------------------------------
       INCLUDE 'tekcmn.cmn'
+      CALL A12OUT(27)
+      CALL A12OUT(57)      
       CALL A12OUT(31)
       INGRAF = 0
       DRAWN = 0

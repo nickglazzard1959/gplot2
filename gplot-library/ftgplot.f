@@ -26,7 +26,7 @@ C
 #else
       PARAMETER( MAXFNL=7 )
 #endif
-      PARAMETER( NCMDS=93, NFONTS=24, NREGS=9 )
+      PARAMETER( NCMDS=94, NFONTS=24, NREGS=9 )
 C
 C INITIAL DEFAULT NUMBER OF POINTS THAT CAN BE GRAPHED.
 C USED ONLY ON SYSTEMS THAT SUPPORT DYNAMIC MEMORY ALLOCATION.
@@ -54,7 +54,7 @@ C
       INTEGER KLSYS, KLDPROC, KTXBOX, KSETCSG
       INTEGER KUSEKEY, KADDKEY, KKEYS, KRESET, KTXBPS
       INTEGER KTXBPH, KTXBPT, KTXBPB, KLINE, KGLABEL, KALABEL
-      INTEGER KARPARM, KANPARM, KWAIT
+      INTEGER KARPARM, KANPARM, KWAIT, KAXINT
       PARAMETER( KDEV=1, KMAXPT=2, KCOL=3, KWID=4, KMARK=5 )
       PARAMETER( KCLR=6, KMOVE=7, KDRAW=8, KTEXT=9, KREAD=10 )
       PARAMETER( KXYPT=11, KXYLN=12, KXYAUT=13, KXRAN=14, KYRAN=15 )
@@ -74,7 +74,7 @@ C
       PARAMETER( KUSEKEY=80, KADDKEY=81, KKEYS=82, KRESET=83 )
       PARAMETER( KTXBPS=84, KTXBPH=85, KTXBPT=86, KTXBPB=87, KLINE=88 )
       PARAMETER( KGLABEL=89, KALABEL=90, KARPARM=91, KANPARM=92 )
-      PARAMETER( KWAIT=93 )
+      PARAMETER( KWAIT=93, KAXINT=94 )
 C
 C DEVICE CODES.
 C
@@ -83,7 +83,7 @@ C
       INTEGER KDGT, KDTK, KDEC, KDEB, KSVG
       PARAMETER( KDGT=1, KDTK=2, KDEC=3, KDEB=4, KSVG=5 )
 C
-C GRID MODE CODES.
+C GRID MODE CODES. ALSO INTEGER/REAL AXIS VALUE SELECTION.
 C
       INTEGER NGRD
       PARAMETER( NGRD=4 )
@@ -206,7 +206,7 @@ C
       REAL REDGEN, GRNGEN, BLUGEN
       REAL WTXBOX, HTXBOX, WFTXBOX, DHTXBOX, FSYMHTL
       REAL ARSIZE, ARSHARP, ARBARB, ANSKPSL, ANSCALE
-      INTEGER IATXBOX, IHTXBOX, ITTXBOX, IBTXBOX, IARTYPE
+      INTEGER IATXBOX, IHTXBOX, ITTXBOX, IBTXBOX, IARTYPE, IAXINT
       CHARACTER*(MAXFNL) PATHNAM, FULLNAM
 C
 C VARIABLES FOR DYNAMIC MEMORY POINT STORAGE.
@@ -336,6 +336,7 @@ C
       CMDS(KARPARM) = 'ARROWPARM'
       CMDS(KANPARM) = 'LINEPARM'
       CMDS(KWAIT) = 'WAIT'
+      CMDS(KAXINT) = 'INTVALUES'
 C
 C DEVICE NAMES.
 C
@@ -345,7 +346,7 @@ C
       DEVNAM(KDEB) = 'EPSBIN'
       DEVNAM(KSVG) = 'SVG'
 C
-C GRID MODE NAMES.
+C GRID MODE NAMES. ALSO FOR INT AXIS VALUES.
 C
       GRDNAM(KGNO) = 'NONE'
       GRDNAM(KGX) = 'XAXIS'
@@ -620,6 +621,8 @@ C
       DCMDS(KANPARM) = 'SKIPSCALE ANNOTSCALE - DECORATED LINE ' //
      +     'PARAMETERS.'
       DCMDS(KWAIT) = 'WAIT FOR USER RESPONSE ON INTERACTIVE DEVICE.'
+      DCMDS(KAXINT) = '"NONE" "X" "Y" "BOTH" - TRY TO USE INTEGERS ' //
+     +     'FOR AXIS VALUES.'
 C
 C DEVICE DESCRIPTIONS.
 C
@@ -724,6 +727,7 @@ C
       NARGS(KARPARM) = 4
       NARGS(KANPARM) = 2
       NARGS(KWAIT) = 0
+      NARGS(KAXINT) = 1
 C
 C DEFAULT STATE ON START UP.
 C NO DATA READ YET. NO DEVICE OPENED. ETC.
@@ -770,6 +774,7 @@ C---- ANNOTATION STATE
       DORIGHT = .FALSE.
       AXCX0 = 0.0
       AXCY0 = 0.0
+      IAXINT = 1
 C---- DRAWING COLOURS
       RED = 1.0
       GRN = 0.0
@@ -888,7 +893,7 @@ C
       WRITE(6,66)
   66  FORMAT(1X,'==============================================')
       WRITE(6,100)
- 100  FORMAT(1X,'GPLOT INTERACTIVE PLOTTING PROGRAM. V0.69')
+ 100  FORMAT(1X,'GPLOT INTERACTIVE PLOTTING PROGRAM. V0.73')
       WRITE(6,66)
       WRITE(6,177)
  177  FORMAT(1X,'BASED ON ULCC DIMFILM BY JOHN GILBERT.')
@@ -1256,7 +1261,7 @@ C
      +        261,262,263,264,265,266,267,268,269,270,
      +        271,272,273,274,275,276,277,278,279,280,
      +        281,282,283,284,285,286,287,288,289,290,
-     +        291,292,293),ICMD
+     +        291,292,293,294),ICMD
 C
 C DEVICE
  201     CONTINUE
@@ -1372,7 +1377,7 @@ C MAXPOINTS. FREE AND RE-ALLOCATE POINT DATA STORE.
             WRITE(6,400)NPOINTS
             HAVDATA = .FALSE.
             IF( NEVAL .GT. NPOINTS )NEVAL = 0
-            CALL TXEND
+            CALL TXENDGR
          ELSE
             CALL TXBEGIN
             WRITE(6,2022)
@@ -1641,6 +1646,25 @@ C---- ADD ANNOTATION, TICKS, GRIDS, FRAME / EDGES / AXES
             IF( HAVTIT )CALL UTITLE(TITLE(1:LNBC(TITLE,1,1)))
             IF( HAVXLAB )CALL LXLAB(XLABEL(1:LNBC(XLABEL,1,1)))
             IF( HAVYLAB )CALL LYLAB(YLABEL(1:LNBC(YLABEL,1,1)))
+            IF( (.NOT. DOXLOG) .AND. (.NOT. DOYLOG) )THEN
+               GOTO(2121,2122,2123,2124),IAXINT
+ 2121          CONTINUE
+                  CALL RXAX
+                  CALL RYAX
+                  GOTO 2129
+ 2122          CONTINUE
+                  CALL IXAX
+                  CALL RYAX
+                  GOTO 2129
+ 2123          CONTINUE
+                  CALL RXAX
+                  CALL IYAX
+                  GOTO 2129
+ 2124          CONTINUE
+                  CALL IXAX
+                  CALL IYAX
+ 2129          CONTINUE
+            ENDIF
             IF( IGSTY .EQ. KGNORM )THEN
                CALL LUXTIK
                CALL LRYTIK
@@ -1670,8 +1694,12 @@ C---- ADD ANNOTATION, TICKS, GRIDS, FRAME / EDGES / AXES
  2119       CONTINUE
             IF( IGSTY .EQ. KGNORM )THEN
                CALL GRFRAM
-               CALL DRAWXA
-               CALL DRAWYA
+C              AXES DO NOT EVEN GET TICKS BY DEFAULT.
+C              HOWEVER, EXPLICITLY DRAWING AXES GETS THEM DRAWN
+C              IN CS GENERAL RATHER THAN CS ANNOTATION.
+C              NOT SURE WHAT IS BEST TO DO HERE.
+C               CALL DRAWXA
+C               CALL DRAWYA
             ELSE IF( IGSTY .EQ. KGOPEN )THEN
                CALL EDGES(0011,0)
             ELSE
@@ -1893,6 +1921,7 @@ C
 C STATUS
  232     CONTINUE
          CALL TXBEGIN
+         WRITE(6,*)' '
 C
          WRITE(6,2329)'SYSTEM'
  2329    FORMAT(1X,'-----',A,'-----')
@@ -1922,6 +1951,7 @@ C
             WRITE(6,*)'NO LOG FILE OPEN.'
          ENDIF
 C
+         CALL TXPAGE
          WRITE(6,2329)'GRAPH PLOTTING'
          IF( HAVDATA )THEN
             WRITE(6,*)'DATA POINTS READ/EVALUATED = ',NDATA
@@ -1964,24 +1994,27 @@ C
          ELSE
              WRITE(6,*)'RIGHT EDGE ANNOTATION OFF.'
          ENDIF
+         WRITE(6,*)'GRID MODE = ',GRDNAM(IDOGRID)
+         WRITE(6,*)'AXIS INT VALUE MODE = ',GRDNAM(IAXINT)
          WRITE(6,*)'INTERPOLATION = ',POLNAM(INTERPM)
          WRITE(6,*)'HISTOGRAM MODE = ',HISTNAM(IHIST)
          WRITE(6,*)'HISTOGRAM BAR WIDTH = ',WHIST
          WRITE(6,*)'GRAPH STYLE = ',GSTYNAM(IGSTY)
          WRITE(6,*)'AXES CROSS AT ',AXCX0,' , ',AXCY0
 C
+         CALL TXPAGE
          WRITE(6,2329)'DRAWING'
-         WRITE(6,*)'BOUNDS = ',XLO,' TO ',XHI,' BY ',
-     +                         YLO,' TO ',YHI
+         WRITE(6,*)'BOUNDS = ',XLO,' TO ',XHI,' BY '
+         WRITE(6,*)'         ',YLO,' TO ',YHI
          IF( LPANE )THEN
-            WRITE(6,*)'PANE = ',PXL,' TO ',PXH,' BY ',
-     +                          PYL,' TO ',PYH
+            WRITE(6,*)'PANE = ',PXL,' TO ',PXH,' BY '
+            WRITE(6,*)'       ',PYL,' TO ',PYH
          ELSE
             WRITE(6,*)'NO PANE ACTIVE.'
          ENDIF
          IF( LBLNK )THEN
-            WRITE(6,*)'BLANK = ',BXL,' TO ',BXH,' BY ',
-     +                           BYL,' TO ',BYH
+            WRITE(6,*)'BLANK = ',BXL,' TO ',BXH,' BY '
+            WRITE(6,*)'        ',BYL,' TO ',BYH
          ELSE
             WRITE(6,*)'NO BLANK AREA ACTIVE.'
          ENDIF
@@ -1989,6 +2022,7 @@ C
          WRITE(6,*)'GXPOS,GYPOS = ',GXPOS,' , ',GYPOS
          WRITE(6,*)'MARKER NUMBER = ',MARKNUM
 C
+         CALL TXPAGE
          WRITE(6,2329)'EVALUATOR'
          DO 2321 I=1,NREGS
             IF( PROCLEN(I) .GT. 0 )THEN
@@ -2009,6 +2043,7 @@ C
      +                ' XHI=',BB(2),' YLO=',BB(3),' YHI=',BB(4)
          ENDIF
 C
+         CALL TXPAGE
          WRITE(6,2329)'FONTS AND TEXT'
          WRITE(6,*)'ALPHABET 1: ',
      +             FONTNAM(IDXABT1)(1:LNBC(FONTNAM(IDXABT1),1,1))
@@ -2034,6 +2069,7 @@ C
             WRITE(6,*)'TEXT CONTINUATION OFF'
          ENDIF
 C
+         CALL TXPAGE
          WRITE(6,2329)'HIGHER LEVEL DRAWING'
          WRITE(6,*)'BOXTEXT WIDTH: ',WTXBOX
          WRITE(6,*)'BOXTEXT HEIGHT: ',HTXBOX
@@ -2051,7 +2087,7 @@ C
          WRITE(6,*)'LINE SKIP SCALE: ',ANSKPSL
          WRITE(6,*)'LINE ANNOTATION SCALE: ',ANSCALE
 C         
-         CALL TXEND
+         CALL TXENDGR
          GOTO 299
 C
 C ANNOT
@@ -2237,45 +2273,49 @@ C---- SHARED EVAL/ITEVAL.
          IF( NEVAL .EQ. 0 )THEN
             CALL TXBEGIN
             WRITE(6,2471)
- 2471       FORMAT(1X,'NO ERANGE HAS BEEN SET.')
-            CALL TXEND
-         ELSE
-            LEXPROC = EXPROC(ARGS(IAP)(1:LNBC(ARGS(IAP),1,1)), PROCEXP,
-     +                       PROC, PROCLEN, NREGS )
-            IF( LEXPROC .GT. 0 )THEN
-               DO 2472 ITER=ITERST,ITEREN,ITERIN
-                  IF( EVAL(DA(IXOFF),NEVAL,NPOINTS,NWORDS,NSTACK,
-     +                     PROCEXP(1:LEXPROC),
-     +                     HAVDEV,IDEV,NDEVS,ITER,MEMS,
-     +                     GCHANGE,RBASE,RSTART,RSTOP,
-     +                     STRINGS, STRILEN, TXTCON,
-     +                     ZEROVAL, BB, DOBB) .EQ. 0 )THEN
-                     HAVDATA = .TRUE.
-                     NDATA = NEVAL
-                  ELSE
-                     HAVDATA = .FALSE.
-                     NDATA = 0
-                     IF( IDEP .GT. 0 .OR. INUNIT .EQ. 8 )THEN
-                        CALL TXBEGIN
-                        WRITE(6,2474)
+ 2471       FORMAT(1X,'NO ERANGE HAS BEEN SET.  DEFAULTING.')
+            CALL TXENDGR
+            RBASE = 1.0
+            RSTART = 0.0
+            RSTOP = 1.0
+            NEVAL = 101
+            CALL LINSPC(DA(IXOFF),NEVAL,RSTART,RSTOP)
+         ENDIF
+         LEXPROC = EXPROC(ARGS(IAP)(1:LNBC(ARGS(IAP),1,1)), PROCEXP,
+     +        PROC, PROCLEN, NREGS )
+         IF( LEXPROC .GT. 0 )THEN
+            DO 2472 ITER=ITERST,ITEREN,ITERIN
+               IF( EVAL(DA(IXOFF),NEVAL,NPOINTS,NWORDS,NSTACK,
+     +              PROCEXP(1:LEXPROC),
+     +              HAVDEV, IDEV, NDEVS, ITER, MEMS,
+     +              GCHANGE, RBASE, RSTART, RSTOP,
+     +              STRINGS, STRILEN, TXTCON,
+     +              ZEROVAL, BB, DOBB, FSYMHT) .EQ. 0 )THEN
+                  HAVDATA = .TRUE.
+                  NDATA = NEVAL
+               ELSE
+                  HAVDATA = .FALSE.
+                  NDATA = 0
+                  IF( IDEP .GT. 0 .OR. INUNIT .EQ. 8 )THEN
+                     CALL TXBEGIN
+                     WRITE(6,2474)
  2474      FORMAT(1X,'EVAL ERROR IN SCRIPT, RETURNING TO INTERACTIVE.')
-                        CALL TXEND
-                        SEVERR = .TRUE.
-                        GOTO 1000
-                     ENDIF
-                  ENDIF
- 2472          CONTINUE
-               IF( DOBB )THEN
-                  IF( BBEMPTY(BB) )THEN
-                     CALL TXBEGIN
-                     WRITE(6,*)'EVAL BOUNDING BOX IS EMPTY.'
                      CALL TXEND
-                  ELSE
-                     CALL TXBEGIN
-                     WRITE(6,*)'EVAL BOUNDING BOX UPDATED, XLO=',BB(1),
-     +                    ' XHI=',BB(2),' YLO=',BB(3),' YHI=',BB(4)
-                     CALL TXEND
+                     SEVERR = .TRUE.
+                     GOTO 1000
                   ENDIF
+               ENDIF
+ 2472       CONTINUE
+            IF( DOBB )THEN
+               IF( BBEMPTY(BB) )THEN
+                  CALL TXBEGIN
+                  WRITE(6,*)'EVAL BOUNDING BOX IS EMPTY.'
+                  CALL TXEND
+               ELSE
+                  CALL TXBEGIN
+                  WRITE(6,*)'EVAL BOUNDING BOX UPDATED, XLO=',BB(1),
+     +                 ' XHI=',BB(2),' YLO=',BB(3),' YHI=',BB(4)
+                  CALL TXEND
                ENDIF
             ENDIF
          ENDIF
@@ -2372,7 +2412,7 @@ C NSTACK
  2526       FORMAT(1X,'ALLOCATED SPACE FOR ',I2,' STACK LEVELS.')
             HAVDATA = .FALSE.
             IF( NEVAL .GT. NPOINTS )NEVAL = 0
-            CALL TXEND
+            CALL TXENDGR
          ELSE
             GOTO 9093
          ENDIF
@@ -2454,12 +2494,14 @@ C CTEXT
          TWD = F1
          TWIDTH = STRING( ARGS(2)(1:LNBC(ARGS(2),1,1)) )
          IF( TWD .GT. 0.0 )THEN
-            CALL SYMHT(TWD/TWIDTH)
+            F2 = TWD / TWIDTH
+            CALL SYMHT(F2)
             TWIDTH = TWD
          ELSE
-            TWIDTH = FSYMHT * TWIDTH
+            F2 = FSYMHT
+            TWIDTH = F2 * TWIDTH
          ENDIF
-         CALL OFF2(XPOS-TWIDTH/2,YPOS)
+         CALL OFF2(XPOS-TWIDTH/2,YPOS-0.5*F2)
          CALL SYMTXT( ARGS(2)(1:LNBC(ARGS(2),1,1)) )
          IF( TWD .GT. 0.0 )THEN
             CALL SYMHT(FSYMHT)
@@ -2968,6 +3010,18 @@ C WAIT
          CALL DEVWAIT(IDEV,NDEVS)
          GOTO 299
 C
+C USE INTEGERS FOR GRAPH AXIS VALUES IF POSSIBLE.
+ 294     CONTINUE
+         IARG = LOOKUP(GRDNAM,NGRD,ARGS(1),LOWEROK,.TRUE.)
+         IF( IARG .LE. 0 )THEN
+            ILKUPE = IARG
+            CLKUPE = 'AXIS VALUE INT MODE'
+            GOTO 9100
+         ELSE
+            IAXINT = IARG
+         ENDIF
+         GOTO 299         
+C
 C END OF COMMAND SWITCH
 C IF THE GRAPHICS DISPLAY HAS BEEN CHANGED, TRY TO ENSURE THE
 C CHANGES ARE MADE VISIBLE - BUT ONLY IF AT INTERACTIVE LEVEL.
@@ -3067,6 +3121,9 @@ C
       INTEGER I, LWHAT, ICMD, J, LENC, ISTEP, ILIMIT
       INTEGER LNBC, LOOKUP
       CHARACTER*80 OLIST
+C
+C OUTPUT A BLANK LINE TO IMPROVE TEK401X BEHAVIOUR.
+      WRITE(6,110)
 C
 C SORT THE COMMAND NAMES.
       CALL SORTIDX(CMDS, NCMDS, INCMDS )
@@ -3715,6 +3772,22 @@ C
       SUBROUTINE TXSETUP( IDEVU, NDEVU )
 C----------------------------------------
 C PROVIDE A COMPACT METHOD OF SWITCHING TO AND FROM TEXT MODE.
+C TXBEGIN() SHOULD BE CALLED BEFORE OUTPUTTING TEXT.
+C TXEND() OR TXENDGR() SHOULD BE CALLED AFTER OUTPUTTING TEXT.
+C THIS IS IMPORTANT MOSTLY FOR THE TEK 401X DEVICE.
+C
+C BEFORE A COMMAND IS READ, DEVICES ARE SWITCHED TO "TEXT MODE".
+C AFTER A COMMAND IS READ, DEVICES ARE SWITCHED BACK TO "GRAPHICS MODE".
+C BEFORE TEXT IS OUTPUT (USUALLY AN ERROR MESSAGE WHILE EXECUTING
+C A COMMAND, OR TEXT FROM HELP OR STATUS) THE DEVICE IS SWITCHED BACK
+C TO "TEXT MODE" HERE (AND SOME "PADDING" IS OUTPUT FOR TEK4K TO TRY
+C TO REDUCE OUTPUT TRAMPLING ON EXISTING OUTPUT).
+C USUALLY, AFTER AN ERROR MESSAGE IS OUTPUT, CONTROL RETURNS TO THE
+C TOP OF THE COMMAND LOOP (WHICH GOES BACK TO "GRAPHICS MODE" BEFORE
+C ANOTHER COMMAND IS EXECUTED). USE TXEND() - WHICH DOES NOTHING NOW.
+C IN A FEW CASES, A MESSAGE IS OUTPUT *AND* A GRAPHICS OUTPUTTING
+C COMMAND IS EXECUTED. IN THIS CASE, USE TXENDGR() TO GO BACK
+C TO "GRAPHICS MODE" BEFORE EXECUTING THE REST OF THE COMMAND.
 C----------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INTEGER IDEVU, NDEVU
@@ -3733,17 +3806,38 @@ C BEGIN TEXT MODE, IF POSSIBLE.
       ENTRY TXBEGIN
       IF( IDEV .LE. 0 )RETURN
       CALL GFLUSH(IDEV, NDEV, .TRUE.)
+      IF( IDEV .EQ. 2 )WRITE(6,*)' '
       RETURN
 C
 C END TEXT MODE, IF POSSIBLE.
       ENTRY TXEND
       IF( IDEV .LE. 0 )RETURN
+C DO NOTHING AT PRESENT. GOGRAF WILL ERASE
+C TEK 401X WHICH WE DO NOT WANT HERE.
 C      CALL GOGRAF(IDEV, NDEV)
       RETURN
+C
+C END TEXT MODE, GO GRAPHICAL.
+      ENTRY TXENDGR
+      IF( IDEV .LE. 0 )RETURN
+      IF( IDEV .EQ. 2 )THEN
+         CALL TEKWAIT
+         CALL GOGRAF(IDEV, NDEV)
+      ENDIF
+      RETURN      
 C
 C CHECK IF TEK 401X OR NOT.
       ENTRY ISTEK4K(YES)
       YES = (IDEV .EQ. 2)
+      RETURN
+C
+C END A DISPLAY PAGE FOR A TEK401X DEVICE.
+      ENTRY TXPAGE
+      IF( IDEV .EQ. 2 )THEN
+         CALL TEKWAIT
+         WRITE(6,*)' '
+         WRITE(6,*)' '
+      ENDIF
       RETURN
       END
 C
@@ -4115,7 +4209,7 @@ C
       INTEGER FUNCTION EVAL(STACK,NELEM,NPOINTS,NWORDS,NSTACK,COPS,
      +                      HAVDEV,IDEV,NDEVS,ITER,MEMS,GCHANGE,
      +                      RBASE,RSTART,RSTOP,STRINGS,STRILEN,TXTCON,
-     +                      ZEROVAL,BB,DOBB)
+     +                      ZEROVAL,BB,DOBB,FSYMHT)
 C---------------------------------------------
 C ULTRA SIMPLE RPN FUNCTION EVALUATOR THAT OPERATES ON VECTORS.
 C COPS IS A STRING CONTAINING OPERANDS AND OPERATORS SEPARATED BY COMMAS
@@ -4133,6 +4227,7 @@ C---------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INTEGER NELEM, NPOINTS, NWORDS, IDEV, NDEVS, NSTACK, ITER
       REAL STACK(NWORDS), MEMS(9), RBASE, RSTART, RSTOP, ZEROVAL, BB(4)
+      REAL FSYMHT
       CHARACTER*(*) COPS
       CHARACTER*80 STRINGS(9)
       INTEGER STRILEN(9)
@@ -4154,7 +4249,7 @@ C
       CHARACTER*5 VFMT
       LOGICAL RFROMC, CLOSED, VALDFMT, TRPDIV0
       INTEGER LNBC
-      REAL X, Y, XO, YO, ROP, STRING, ZEROTST
+      REAL X, Y, XO, YO, ROP, STRING, ZEROTST, SFSYMHT, LFSYMHT
       SAVE
       DATA X/0.0/, Y/0.0/
       DATA OPNAMES/    '+',    '-',    '*',    '/',    'P',
@@ -4215,6 +4310,10 @@ C---- ALSO, IF TRPDIV0, TRAP DIVIDE BY < ABS(1E-9) ELSE USE 1E-9.
       ELSE
          ZEROTST = ABS(ZEROVAL)
       ENDIF
+C
+C---- SAVE SYMHT VALUE AS IT IS ON ENTRY, TO RESTORE ON EXIT.
+      SFSYMHT = FSYMHT
+      LFSYMHT = FSYMHT
 C
 C---- THE STACK INDEX GIVES THE TOP OCCUPIED ITEM. INITIALLY RANGE IN O.
 C---- PUSH: INCREMENT ISTACK, CHECK <= NS1, PUT THINGS IN STACK[ISTACK].
@@ -5012,7 +5111,9 @@ C--- T : ( C1 -- ) : DRAW CONTENTS OF STRING REGISTER C1 AS TEXT.
                IF( IREG .LT. 1 .OR. IREG .GT. 9 )GOTO 9006
                IF( STRILEN(IREG) .EQ. 0 )GOTO 9010
                IF( .NOT. DOBB )THEN
+                  CALL OFF2(X,Y-0.5*LFSYMHT)
                   CALL SYMTXT(STRINGS(IREG)(1:STRILEN(IREG)))
+                  CALL OFF2(X,Y)
                   GCHANGE = .TRUE.
                ENDIF
                ISTACK = ISTACK - 1
@@ -5029,11 +5130,15 @@ C--- TVI : ( C1 C2 -- C1 ) : DRAW INT(C1) AS TEXT, AS PER TVF.
      +            GOTO 9011
                IF( .NOT. DOBB )THEN
                   IF( IOP .EQ. 56 )THEN
+                     CALL OFF2(X,Y-0.5*LFSYMHT)
                      CALL RNUM(STACK(ISTKPOP),
      +                         STRINGS(IREG)(1:STRILEN(IREG)))
+                     CALL OFF2(X,Y)
                   ELSE
+                     CALL OFF2(X,Y-0.5*LFSYMHT)
                      CALL INUM(INT(STACK(ISTKPOP)),
      +                         STRINGS(IREG)(1:STRILEN(IREG)))
+                     CALL OFF2(X,Y)
                   ENDIF
                   GCHANGE = .TRUE.
                ENDIF
@@ -5062,7 +5167,9 @@ C--- TC : ( C1 -- ) : DRAW CHARACTER FROM CUR ALPHABET WITH CODE C1
                NFMT = 4
  2260          CONTINUE
                IF( .NOT. DOBB )THEN
+                  CALL OFF2(X,Y-0.5*LFSYMHT)
                   CALL SYMTXT(VFMT(1:NFMT))
+                  CALL OFF2(X,Y)
                   GCHANGE = .TRUE.
                ENDIF
                ISTACK = ISTACK - 1
@@ -5072,6 +5179,7 @@ C--- TH : ( C1 -- ) : SET TEXT/MARKER/SYMBOL HEIGHT
  261           CONTINUE
                CALL SYMHT(STACK(ISTKTOP))
                CALL MARKHT(STACK(ISTKTOP))
+               LFSYMHT = STACK(ISTKTOP)
                ISTACK = ISTACK - 1
                GOTO 299
 C
@@ -5288,6 +5396,7 @@ C--- LOOK FOR THE NEXT TOKEN.
 C
 C--- NO MORE TOKENS.
  2    CONTINUE
+      CALL SYMHT(SFSYMHT)   
       EVAL = IERR
       RETURN
 C
@@ -5367,6 +5476,7 @@ C--- ERROR MESSAGES.
  9992    FORMAT(1X,'ARGUMENT CAUSING DOMAIN ERROR: ',G13.6)
       ENDIF
       CALL TXEND
+      CALL SYMHT(SFSYMHT)   
       EVAL = IERR
       RETURN
       END
@@ -5693,9 +5803,9 @@ C           WRITE(6,*)CC
             GOTO 20
  21      CONTINUE
          IF( IPASS .EQ. 1 )THEN
-            CALL TXBEGIN
-            WRITE(6,*)'SETTING BOUNDS TO: ',XLO,XHI,YLO,YHI,' +5%'
-            CALL TXEND
+C            CALL TXBEGIN
+C            WRITE(6,*)'SETTING BOUNDS TO: ',XLO,XHI,YLO,YHI,' +5%'
+C            CALL TXEND
             DX = 0.05 * (XHI - XLO)
             DY = 0.05 * (YHI - YLO)
             CALL BOUNDS(XLO-DX,XHI+DX,YLO-DY,YHI+DY)
@@ -5934,7 +6044,7 @@ C ENABLE DRAWING IN THE INNER BOX.
 C
 C DRAW TEXT IN THE INNER BOX (TEXT CSG).
       IF( LFIXED )ADJHI = ADJHI - 0.05 * H
-      YCUR = YC + 0.5 * (NLINES-1) * ADJHI
+      YCUR = YC + 0.5 * (NLINES-1) * ADJHI - 0.5 * FSYMHTL
       DO 30 I=1,NLINES
          TWIDTH = STRING(LINES(I)(1:LNBC(LINES(I),1,1)))
          IF( LFIXED )THEN
@@ -6151,7 +6261,7 @@ C IN THE MIDDLE OF THE LINE. DRAW THE JOINING LINE IN 2 HALVES.
          CSIZE = CSHRINK * ASIZEL / TWIDTH
 C        print *,'asizel,csize,cshrink',asizel,csize,cshrink
          CALL SYMHT(CSIZE)
-         CALL OFF2(XC-0.5*CSHRINK*ASIZEL,YC)
+         CALL OFF2(XC-0.5*CSHRINK*ASIZEL,YC-0.5*CSIZE)
          CALL SYMTXT(CANNOT(1:NANNOT))
          CALL SYMHT(FSYMHT)
 C
@@ -6393,6 +6503,7 @@ C DRAW THE TEXT.
       TY = YBL + 0.5 * SBH
       TW = FSYMHT * STRING(TEXT)
       TX = TX - 0.5 * TW
+      TY = TY - 0.5 * FSYMHT
       CALL OFF2(TX, TY)
       CALL SYMTXT(TEXT)
 C
