@@ -12,12 +12,14 @@ function get_file() {
 
 function compile() {
     echo "... compiling $1"
-    gfortran -g -c -O${OPT} -Wall -Wno-unused-dummy-argument -Wno-unused-label -std=legacy -cpp -DPORTF77 $1
+    gfortran -g -c -O${OPT} ${FPE} -Wall -Wno-unused-dummy-argument -Wno-unused-label -std=legacy -cpp -DPORTF77 $1
     return 0
 }
 
 echo "Build DIMFM library."
 #
+FPE=
+#FPE="-ffpe-trap=invalid,zero,overflow"
 if [ -z "${OPT}" ]; then
     OPT=0
 fi
@@ -39,6 +41,7 @@ autot.f
 autox.f
 autoxy.f
 autoy.f
+
 axcut.f
 axtik.f
 blank.f
