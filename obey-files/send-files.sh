@@ -19,3 +19,10 @@ nosftp -p $NOSPW -e "put obplant obplant display" $NOSUSER $NOSHOST
 nosftp -p $NOSPW -e "put obright obright display" $NOSUSER $NOSHOST
 nosftp -p $NOSPW -e "put obspiro obspiro display" $NOSUSER $NOSHOST
 nosftp -p $NOSPW -e "put obhitom obhitom display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "put obblk1 obblk1 display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "put obdiag obdiag display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "put obdiag2 obdiag2 display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "put obeqn obeqn display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "put obfont obfont display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "put obgran obgran display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "put obsamfo obsamfo display" $NOSUSER $NOSHOST
