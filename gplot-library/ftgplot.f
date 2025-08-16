@@ -14,14 +14,18 @@ C  FOR INSTALLATION AND SOME USAGE INFORMATION, SEE
 C  THE PROJECT'S README.MD. FOR MORE DETAILED
 C  USAGE INFORMATION, SEE THE GPLOT MANUAL.
 C
-C  GPLOT RELIES ENTIRELY ON THE DIMFILM GRAPHICS
-C  LIBRARY, WRITTEN BY JOHN C. GILBERT AT U.L.C.C.
-C  AND USED THERE BETWEEN 1973 AND AROUND 1996.
+C ***************************************************
+C * GPLOT RELIES ENTIRELY ON THE DIMFILM GRAPHICS   *
+C * LIBRARY, WRITTEN BY JOHN C. GILBERT AT U.L.C.C. *
+C * AND USED THERE BETWEEN 1973 AND AROUND 1996.    *
+C * ONE GOAL OF GPLOT IS TO PRESERVE DIMFILM.       *
+C ***************************************************
 C
 C  GPLOT IS OPEN SOURCE SOFTWARE AND USES THE MIT
-C  LICENSE, A COPY OF WHICH IS INCLUDED IN THE PROJECT'S
-C  GIT REPOSITORY.
+C  LICENSE, A COPY OF WHICH IS INCLUDED IN THE GIT
+C  REPOSITORY FOR THE PROJECT.
 C
+C  --------------------------------------------------
 C  GPLOT (C) 2013-2025 NICK GLAZZARD NICK@HCCC.ORG.UK
 C ===================================================
       IMPLICIT LOGICAL (A-Z)
@@ -2355,7 +2359,9 @@ C---- SHARED EVAL/ITEVAL.
      +              HAVDEV, IDEV, NDEVS, ITER, MEMS,
      +              GCHANGE, RBASE, RSTART, RSTOP,
      +              STRINGS, STRILEN, TXTCON,
-     +              ZEROVAL, BB, DOBB, FSYMHT) .EQ. 0 )THEN
+     +              ZEROVAL, BB, DOBB, FSYMHT,
+     +              ARSIZE, ARSHARP, ARBARB,
+     +              IARTYPE, ANSKPSL, ANSCALE) .EQ. 0 )THEN
                   HAVDATA = .TRUE.
                   NDATA = NEVAL
                ELSE
@@ -4283,7 +4289,8 @@ C
       INTEGER FUNCTION EVAL(STACK,NELEM,NPOINTS,NWORDS,NSTACK,COPS,
      +                      HAVDEV,IDEV,NDEVS,ITER,MEMS,GCHANGE,
      +                      RBASE,RSTART,RSTOP,STRINGS,STRILEN,TXTCON,
-     +                      ZEROVAL,BB,DOBB,FSYMHT)
+     +                      ZEROVAL,BB,DOBB,FSYMHT,ASIZE,ASHARP,BARB,
+     +                      ISTYLE,SKIPSCL,ANNSCL)
 C---------------------------------------------
 C ULTRA SIMPLE RPN FUNCTION EVALUATOR THAT OPERATES ON VECTORS.
 C COPS IS A STRING CONTAINING OPERANDS AND OPERATORS SEPARATED BY COMMAS
@@ -4301,10 +4308,11 @@ C---------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INTEGER NELEM, NPOINTS, NWORDS, IDEV, NDEVS, NSTACK, ITER
       REAL STACK(NWORDS), MEMS(9), RBASE, RSTART, RSTOP, ZEROVAL, BB(4)
-      REAL FSYMHT
+      REAL FSYMHT, ASIZE, ASHARP, BARB, SKIPSCL, ANNSCL
       CHARACTER*(*) COPS
       CHARACTER*80 STRINGS(9)
       INTEGER STRILEN(9)
+      INTEGER ISTYLE
       LOGICAL HAVDEV, GCHANGE, TXTCON, DOBB
 #ifdef PORTF77
       REAL RANF
@@ -4314,8 +4322,9 @@ C
       INTEGER NOPS, JUNK, IERR, NS1, ISTKPTR, ISTACK, ISTKPO2, ISTKPO3
       INTEGER ISTKNEW, IREG, NEWELEM, IARG, IOEN, IOST, IMPOS, NFMT
       INTEGER ISTKPO4
-      REAL ARG, DOMLIM, CEILING, V, FLOOR
-      PARAMETER( NOPS=80 )
+      REAL ARG, DOMLIM, CEILING, V, FLOOR, MPI
+      PARAMETER( NOPS=90 )
+      PARAMETER( MPI=3.14159265359 )
       CHARACTER*4 OPNAMES(NOPS)
       INTEGER MINSTK(NOPS), OPLEN(NOPS)
       CHARACTER*20 COP
@@ -4341,7 +4350,10 @@ C
      +                'TH',   'TA',  'TSC',  'TEC', 'TLEN',
      +                'PE',   'GT',   'LT',   'LE',   'GE',
      +                'EQ',   'NE',  'NOT',  'SEL',  'IDX',
-     +              'SETY',    'C',    'A',  'BOX',   'PC'/
+     +              'SETY',    'C',    'A',  'BOX',   'PC',
+     +                 '#',    '=',    '&',    'S',  'ROT',
+     +               'TRN',  'SCL',   'R2D', 'D2R',  'LAB'/
+C 1 CHARACTER SYNONMYS FOR:   RCL:#, STO:=, DUP:&, SWAP:S.
       DATA MINSTK/2, 2, 2, 2, 1,
      +            2, 2, 1, 1, 1,
      +            1, 1, 1, 1, 1,
@@ -4357,7 +4369,9 @@ C
      +            1, 1, 0, 0, 1,
      +            3, 2, 2, 2, 2,
      +            2, 2, 1, 3, 0,
-     +            1, 3, 5, 4, 1/
+     +            1, 3, 5, 4, 1,
+     +            1, 2, 1, 2, 3,
+     +            4, 4, 1, 1, 4/
       DATA OPLEN/1, 1, 1, 1, 1,
      +           2, 2, 3, 3, 3,
      +           4, 4, 4, 3, 4,
@@ -4373,7 +4387,9 @@ C
      +           2, 2, 3, 3, 4,
      +           2, 2, 2, 2, 2,
      +           2, 2, 3, 3, 3,
-     +           4, 1, 1, 3, 2/
+     +           4, 1, 1, 3, 2,
+     +           1, 1, 1, 1, 3,
+     +           3, 3, 3, 3, 3/
 C
 C---- THE DOMAIN OF SEVERAL MATHEMATICAL FUNCTIONS IS LIMITED TO THIS:
 C---- ALSO, IF TRPDIV0, TRAP DIVIDE BY < ABS(1E-9) ELSE USE 1E-9.
@@ -4401,6 +4417,7 @@ C---- POP: CHECK > 0, GET THINGS FROM STACK[ISTACK], DECREMENT ISTACK.
       IERR = 0
 C
 C---- SPLIT THE RPN STRING INTO TOKENS ON COMMAS.
+      CALL UPCASE(COPS)
       LCOPS = LNBC(COPS,1,1)
       IBEG = 1
  1    CONTINUE
@@ -4446,7 +4463,7 @@ C--- PI : (    -- A1 ) : SET ARRAY TO PI.
                IF( ISTACK .GT. NS1 )GOTO 9000
                ISTKTOP = ISTACK * NPOINTS + 1
                DO 12 I=ISTKTOP,ISTKTOP+NELEM
-                  STACK(I) = 3.14159265358
+                  STACK(I) = MPI
  12            CONTINUE
 C
 C--- E MEANS PUT 2.71828 ... ON THE STACK.
@@ -4476,7 +4493,7 @@ C--- TWPI : (  -- A1 ) : SET ARRAY TO 2 * PI.
                IF( ISTACK .GT. NS1 )GOTO 9000
                ISTKTOP = ISTACK * NPOINTS + 1
                DO 15 I=ISTKTOP,ISTKTOP+NELEM
-                  STACK(I) = 2.0*3.14159265358
+                  STACK(I) = 2.0*MPI
  15            CONTINUE
 C
 C--- PI/2 MEANS PUT 0.5*3.14159... ON THE STACK.
@@ -4486,7 +4503,7 @@ C--- PI/2 : (  -- A1 ) : SET ARRAY TO PI / 2.
                IF( ISTACK .GT. NS1 )GOTO 9000
                ISTKTOP = ISTACK * NPOINTS + 1
                DO 16 I=ISTKTOP,ISTKTOP+NELEM
-                  STACK(I) = 0.5*3.14159265358
+                  STACK(I) = 0.5*MPI
  16            CONTINUE
 C
 C--- NOT AN OPERAND. IS IT AN OPERATOR?
@@ -4526,7 +4543,9 @@ C--- IT IS A KNOWN OPERATOR. TRY TO APPLY IT.
      +              261,262,263,264,265,
      +              266,267,268,269,270,
      +              271,272,273,274,275,
-     +              276,277,278,279,280),IOP
+     +              276,277,278,279,280,
+     +              237,236,234,222,285,
+     +              286,287,288,289,290),IOP
 C
 C--- + : ADD ( A1 A2 -- A1 ) : A1 = A1 + A2
  201           CONTINUE
@@ -5459,6 +5478,92 @@ C--- PC : ( C1 -- C1 ) : PRINT C1 (TOS A[1]), FREE FORMAT.
                CALL TXEND
                GOTO 299
 C
+C--- ROT: ( A1 A2 C3 -- A1 A2 ) : ROTATE X=A1,Y=A2 BY C3 RADIANS.
+ 285           CONTINUE
+               ARG = STACK(ISTKTOP)
+               XO = COS(ARG)
+               YO = SIN(ARG)
+               DO 2851 I=1,NELEM
+                  X = STACK(ISTKPO2)
+                  Y = STACK(ISTKPOP)
+                  STACK(ISTKPO2) = X * XO - Y * YO
+                  STACK(ISTKPOP) = X * YO + Y * XO
+                  ISTKPOP = ISTKPOP + 1
+                  ISTKPO2 = ISTKPO2 + 1
+ 2851          CONTINUE
+               ISTACK = ISTACK - 1
+               GOTO 299
+C
+C--- TRN: ( A1 A2 C3 C4 -- A1 A2 ) : TRANSLATE X=A1, Y=A2 BY C3,C4
+ 286           CONTINUE
+               XO = STACK(ISTKPOP)
+               YO = STACK(ISTKTOP)
+               DO 2861 I=1,NELEM
+                  X = STACK(ISTKPO3)
+                  Y = STACK(ISTKPO2)
+                  STACK(ISTKPO3) = X + XO
+                  STACK(ISTKPO2) = Y + YO
+                  ISTKPO3 = ISTKPO3 + 1
+                  ISTKPO2 = ISTKPO2 + 1
+ 2861          CONTINUE
+               ISTACK = ISTACK - 2
+               GOTO 299
+C
+C--- SCL: ( A1 A2 C3 C4 -- A1 A2 ) : SCALE X=A1, Y=A2 BY C3,C4
+ 287           CONTINUE
+               XO = STACK(ISTKPOP)
+               YO = STACK(ISTKTOP)
+               DO 2871 I=1,NELEM
+                  X = STACK(ISTKPO3)
+                  Y = STACK(ISTKPO2)
+                  STACK(ISTKPO3) = X * XO
+                  STACK(ISTKPO2) = Y * YO
+                  ISTKPO3 = ISTKPO3 + 1
+                  ISTKPO2 = ISTKPO2 + 1
+ 2871          CONTINUE
+               ISTACK = ISTACK - 2
+               GOTO 299
+C
+C--- R2D: ( C1 -- C1 ) : RADIANS TO DEGREES.
+ 288           CONTINUE
+               V = STACK(ISTKTOP)
+               DO 2881 I=1,NELEM
+                  STACK(ISTKTOP) = V * 180.0 / MPI
+                  ISTKTOP = ISTKTOP + 1
+ 2881          CONTINUE               
+               GOTO 299
+C
+C--- D2R: ( C1 -- C1 ) : DEGREES TO RADIANS.
+ 289           CONTINUE
+               V = STACK(ISTKTOP)
+               DO 2891 I=1,NELEM
+                  STACK(ISTKTOP) = V * MPI / 180.0
+                  ISTKTOP = ISTKTOP + 1
+ 2891          CONTINUE               
+               GOTO 299
+C
+C--- LAB: ( C1 C2 C3 C4 C5 -- ) : LABEL AT (C1,C2), LEN C3, ANG C4, SR C5 
+ 290           CONTINUE
+               I = INT(STACK(ISTKTOP))
+               I = MIN(9,I)
+               ARG = STACK(ISTKPOP)
+               V = STACK(ISTKPO2)
+               Y = STACK(ISTKPO3)
+               X = STACK(ISTKPO4)
+               IF( I. LE. 0 )THEN
+                  CALL GLABEL(X, Y, V, ARG, ' ', FSYMHT, .TRUE.,
+     +                 ISTYLE, ASIZE, ASHARP, BARB, SKIPSCL, ANNSCL )
+               ELSE
+                  IF( STRILEN(I) .GT. 0 )THEN
+                     CALL GLABEL(X, Y, V, ARG,
+     +                    STRINGS(I)(1:STRILEN(I)),
+     +                    FSYMHT, .TRUE.,
+     +                    ISTYLE, ASIZE, ASHARP, BARB, SKIPSCL, ANNSCL )
+                  ENDIF
+               ENDIF
+               ISTKTOP = ISTKTOP - 5
+               GOTO 299
+C
 C--- END OF OPERATOR SWITCH.
  299           CONTINUE
 C
@@ -6015,16 +6120,20 @@ C
 C
 C--- LOOK FOR THE PROCEDURE NAME
 C
+      CALL UPCASE(PRNAME)
       ILINE = 1
       LPRNAME = LNBC(PRNAME,1,1)
  3    CONTINUE
       READ(30,100,END=4,ERR=5)LINE
  100  FORMAT(A)
+      CALL UPCASE(LINE)
       LLINE = LNBC(LINE,1,1)
       IF( LLINE .EQ. LPRNAME )THEN
-         READ(30,100,END=6,ERR=5)LINE
-         PREGS(IPREG) = LINE
-         GOTO 99
+         IF( LINE(1:LLINE) .EQ. PRNAME(1:LPRNAME) )THEN
+            READ(30,100,END=6,ERR=5)LINE
+            PREGS(IPREG) = LINE
+            GOTO 99
+         ENDIF
       ENDIF
       ILINE = ILINE + 1
       GOTO 3
@@ -6401,9 +6510,7 @@ C IN THE MIDDLE OF THE LINE. DRAW THE JOINING LINE IN 2 HALVES.
          CALL OFF2(XS,YS)
          CALL ON2(XPE,YPE)
          TWIDTH = STRING(CANNOT(1:NANNOT))
-C        PRINT *,'TWIDTH=',TWIDTH,' ASIZEL=',ASIZEL,' CSHRINK=',CSHRINK
          CSIZE = CSHRINK * ASIZEL / TWIDTH
-C        PRINT *,'ASIZEL,CSIZE,CSHRINK',ASIZEL,CSIZE,CSHRINK
          CALL SYMHT(CSIZE)
          CALL OFF2(XC-0.5*CSHRINK*ASIZEL,YC-0.5*CSIZE)
          CALL SYMTXT(CANNOT(1:NANNOT))
@@ -6599,6 +6706,7 @@ C------------------------------------
 C
       REAL BX, BY, EX, EY, SBW, SBH, XBL, YBL, DX, DY, TW, TX, TY
       REAL STRING
+      INTEGER LNBC
 C
 C FIND WHERE THE GRAPH COORDINATE IS IN BOUNDS SPACE.
       IF( LUBC )THEN
@@ -6612,6 +6720,9 @@ C FIND THE BOUNDS COORDINATE OF THE OTHER END OF THE LINE.
 C TREAT THIS AS THE CENTER OF A BOX THAT ENCLOSES THE TEXT.
       EX = BL * COS(ANGLE * 6.283 / 360.0) + BX
       EY = BL * SIN(ANGLE * 6.283 / 360.0) + BY
+C
+C IF THE TEXT IS ENTIRELY BLANK, JUST DRAW THE ARROW.
+      IF( LNBC(TEXT,1,0) .EQ. 0 )GOTO 1
 C
 C GET THE WIDTH AND HEIGHT OF A BOX FOR THE TEXT.
       SBH = 1.05 * FSYMHT
@@ -6652,6 +6763,7 @@ C DRAW THE TEXT.
       CALL SYMTXT(TEXT)
 C
 C DRAW THE ARROW.
+ 1    CONTINUE
       CALL ARROWL(BX, BY, EX, EY, 2, 0,
      +     ARSIZE, ARSHARP, ARBARB, IARTYPE, ' ',
      +     ANSKPSL, ANSCALE, FSYMHT)
@@ -6773,7 +6885,7 @@ C------------------------------------
       IMPLICIT LOGICAL (A-Z)
       CHARACTER*4 OUTSTR
 C
-      OUTSTR = '0.75'
+      OUTSTR = '0.76'
       RETURN
       END
 C
@@ -6845,7 +6957,6 @@ C
       FULLNAM = FILENAM
 #endif
       IFNE = MIN(LNBC(FULLNAM,1,1), MAXFNL)
-C      PRINT *,'[',FULLNAM(1:IFNE),']'
 C
       RETURN
       END
