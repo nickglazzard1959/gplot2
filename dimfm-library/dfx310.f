@@ -1,4 +1,5 @@
       SUBROUTINE DFX310(ITEXT,I1,LEFT)
+C --- NG: THIS OUTPUTS GRAPH LABELS (NOT VALUES).
       CHARACTER*(*) ITEXT
       INCLUDE 'dfxc01.cmn'
       INCLUDE 'dfxc01s.cmn'
@@ -6,6 +7,7 @@
       LOGICAL LEFT
       INCLUDE 'dfxc00.cmn'
       INCLUDE 'dfxc00s.cmn'
+C      PRINT *,'DFX310  [',ITEXT,']'
       I = I1
       XD = XTB2 - XTB1
       YD = YTB2 - YTB1

@@ -1,4 +1,5 @@
       SUBROUTINE DFX317(I1,T,Z)
+C NG: DEALS WITH MONTH VALUES, I THINK.
       INCLUDE 'dfxc06.cmn'
       INCLUDE 'dfxc00.cmn'
       INCLUDE 'dfxc00s.cmn'
@@ -6,6 +7,7 @@
       INCLUDE 'dfxc02s.cmn'
       LOGICAL LAB,LEFT
       LOGICAL GRID
+C      PRINT *,'DFX317'
       CALL DFX300
       GRID = .FALSE.
       I = I1

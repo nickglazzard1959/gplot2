@@ -2,6 +2,7 @@
 C---------------------------------------------------------------------
 C SET THE SVG OUTPUT FILE NAME STEM TO SFNAME. 4 CHARS MAX ON NOS.
 C---------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
       CHARACTER*(*) SFNAME
 C----
       INCLUDE 'svgcmn.cmn'
@@ -11,15 +12,19 @@ C----
       SVGNL = MIN(4,LEN(SFNAME))
 #endif
       SVGN(1:SVGNL) = SFNAME(1:SVGNL)
+C
+      RETURN
       END
 C
       SUBROUTINE SVGCLR
 C----------------------------------------------------------------------
 C CLOSE ANY EXISTING OUTPUT FILE AND OPEN A NEW ONE.
 C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
       INCLUDE 'svgcmn.cmn'
       CHARACTER*80 FNO, ALINE
       INTEGER IOS, FRNO, LNBC
+      INTEGER IXMIN, IYMIN, IWIDTH, IHEIGHT
       CHARACTER*53 TID
       DATA FRNO/1/
       DATA TID/'^X^M^L^N^S="^H^T^T^P://^W^W^W.^W3.^O^R^G/2000/^S^V^G"'/
@@ -45,15 +50,15 @@ C
 C---- COMPLETE THE SVG HEADER WITH THE VIEWBOX NOW WE KNOW IT.
 C
             IXMIN = INT(MAX(0.0,XMIN))
-            IYMIN = 800 - INT(MIN(800.0,YMAX))
+            IYMIN = INT(DVYMAX - MIN(DVYMAX,YMAX))
             IWIDTH = INT(XMAX - XMIN) + 1
             IHEIGHT = INT(YMAX - YMIN) + 1
             WRITE(LUN,29)IWIDTH
- 29         FORMAT(' ^W^I^D^T^H="',I3,'"')
+ 29         FORMAT(' ^W^I^D^T^H="',I4,'"')
             WRITE(LUN,39)IHEIGHT
- 39         FORMAT(' ^H^E^I^G^H^T="',I3,'"')
+ 39         FORMAT(' ^H^E^I^G^H^T="',I4,'"')
             WRITE(LUN,19)IXMIN-1, IYMIN-1, IWIDTH+1, IHEIGHT+1
- 19         FORMAT(' ^V^I^E^WB^O^X="',I4,I4,I4,I4,'">')
+ 19         FORMAT(' ^V^I^E^WB^O^X="',I5,I5,I5,I5,'">')
 C
 C---- COPY THE CONTENTS OF THE SCRATCH FILE TO THE OUTPUT FILE.
 C
@@ -109,17 +114,19 @@ C
 C
 C---- SET BOUNDS TRACKING VARIABLES.
 C
-      XMIN = 801.0
-      YMIN = 801.0
+      XMIN = DVYMAX + 1
+      YMIN = DVYMAX + 1
       XMAX = -1.0
       YMAX = -1.0
 C
+      RETURN
       END
 C
       SUBROUTINE SVGWID( WIDTH )
 C----------------------------------------------------------------------
 C SET THE WIDTH OF THE SVG PEN.
 C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
       REAL WIDTH
 C----
       INCLUDE 'svgcmn.cmn'
@@ -131,12 +138,15 @@ C---- END GROUP SO THE NEXT LINE WILL CREATE NEW GROUP WITH THIS WIDTH.
  9       FORMAT(A)
          INGROUP = .FALSE.
       ENDIF
+C
+      RETURN
       END
 C
       SUBROUTINE SVGRGBC( R, G, B )
 C----------------------------------------------------------------------
 C SET THE COLOUR OF THE SVG PEN.
 C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
       REAL R, G, B
 C----
       INCLUDE 'svgcmn.cmn'
@@ -150,25 +160,51 @@ C---- END GROUP SO THE NEXT LINE WILL CREATE NEW GROUP WITH THIS COLOUR.
  9       FORMAT(A)
          INGROUP = .FALSE.
       ENDIF
+C
+      RETURN
+      END
+C
+      SUBROUTINE SVGDIM( XTOP, YTOP )
+C----------------------------------------------------------------------
+C SET THE SVG CANVAS SIZE IN PIXELS.
+C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      REAL XTOP, YTOP
+C
+      INCLUDE 'svgcmn.cmn'
+      DVXMAX = MIN(9999.0,XTOP)
+      DVYMAX = MIN(9999.0,YTOP)
+      DVSET = .TRUE.
+C
+      RETURN
       END
 C
       SUBROUTINE SVGBEGN
 C----------------------------------------------------------------------
 C INITIALIZE SVG OUTPUT.
 C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
       INCLUDE 'svgcmn.cmn'
       LUN = 12
       SLUN = 13
       OPENED = .FALSE.
       EMPTYF = .TRUE.
       INGROUP = .FALSE.
+      IF( .NOT. DVSET )THEN
+         DVXMAX = 800.0
+         DVYMAX = 800.0
+         DVSET = .TRUE.
+      ENDIF
       CALL SVGCLR
+C
+      RETURN
       END
 C
       SUBROUTINE SVGEND
 C----------------------------------------------------------------------
 C TERMINATE SVG OUTPUT.
 C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
       INCLUDE 'svgcmn.cmn'
       IF( EMPTYF )THEN
          CLOSE(UNIT=LUN, STATUS='DELETE')
@@ -178,13 +214,16 @@ C----------------------------------------------------------------------
       CLOSE(UNIT=SLUN, STATUS='DELETE')
       OPENED = .FALSE.
       EMPTYF = .TRUE.
+C
+      RETURN
       END
 C
-      SUBROUTINE SVGMOVE( X, Y, ON )
+      SUBROUTINE SVGMOVE( XU, YU, ON )
 C----------------------------------------------------------------------
-C MOVE OR DRAW TO (X,Y).
+C MOVE OR DRAW TO (XU,YU).
 C----------------------------------------------------------------------
-      REAL X, Y
+      IMPLICIT LOGICAL (A-Z)
+      REAL XU, YU
       LOGICAL ON
 C----
       INCLUDE 'svgcmn.cmn'
@@ -192,12 +231,17 @@ C----
       CHARACTER*24 STYWID
       CHARACTER*52 MATRIX
       CHARACTER*15 LB
-      CHARACTER*68 COUT, CFMT
+      CHARACTER*72 COUT, CFMT
       INTEGER IPEN(3), I, IOUT
+      REAL X, Y
       DATA STYLE /'^S^T^Y^L^E="^S^T^R^O^K^E:^R^G^B('/
       DATA STYWID /'^S^T^R^O^K^E-^W^I^D^T^H:'/
       DATA MATRIX /'^T^R^A^N^S^F^O^R^M="^M^A^T^R^I^X(1 0 0  1 0   0)"'/
       DATA LB /'<^L^I^N^E*^X1="'/
+C
+      X = DVXMAX * XU
+      Y = DVYMAX * YU
+C
       IF( ON )THEN
 C
 C---- IF NOT IN A GROUP, OPEN A GROUP SETTING COLOUR AND WIDTH.
@@ -218,9 +262,9 @@ C---- OUTPUT A LINE. DO NOT USE NICE FORMATTING TO SAVE SPACE.
 C---- UNFORTUNATELY, SAFARI CANNOT DEAL WITH LEADING SPACES SUCH AS
 C---- X1=" 23.987" (CHROME, FIREFOX, ETC. CAN, BUT NOT SAFARI).
 C---- DO FIXED WIDTH OUTPUT TO CFMT, THEN REMOVE SPACES TO COUT.
-         WRITE(CFMT,100)LB,XPOS,800.0-YPOS,X,800.0-Y
+         WRITE(CFMT,100)LB,XPOS,DVYMAX-YPOS,X,DVYMAX-Y
          IOUT = 0
-         DO 2 I=1,68
+         DO 2 I=1,72
             IF( CFMT(I:I) .NE. ' ' )THEN
                IOUT = IOUT + 1
                COUT(IOUT:IOUT) = CFMT(I:I)
@@ -235,7 +279,7 @@ C---- DO FIXED WIDTH OUTPUT TO CFMT, THEN REMOVE SPACES TO COUT.
  101     FORMAT(A)
          EMPTYF = .FALSE.
       ENDIF
- 100  FORMAT(A,F7.3,'"*^Y1="',F7.3,'"*^X2="',F7.3,'"*^Y2="',F7.3,'" />')
+ 100  FORMAT(A,F8.3,'"*^Y1="',F8.3,'"*^X2="',F8.3,'"*^Y2="',F8.3,'" />')
 C
 C--- KEEP TRACK OF WHERE WE ARE AND THE BOUNDS OF WHERE WE'VE BEEN.
       XPOS = X
@@ -245,4 +289,5 @@ C--- KEEP TRACK OF WHERE WE ARE AND THE BOUNDS OF WHERE WE'VE BEEN.
       XMAX = MAX(XMAX,XPOS)
       YMAX = MAX(YMAX,YPOS)
 C
+      RETURN
       END

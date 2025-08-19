@@ -1,10 +1,12 @@
       SUBROUTINE DFX328(Y,TEXT)
+C --- NG: THIS OUTPUTS GRAPH TITLES (I THINK).
       INCLUDE 'dfxc01.cmn'
       INCLUDE 'dfxc01s.cmn'
       INCLUDE 'dfxc06.cmn'
       INCLUDE 'dfxc00.cmn'
       INCLUDE 'dfxc00s.cmn'
       CHARACTER*(*) TEXT
+C      PRINT *,'DFX328 [',TEXT,'], Y=',Y
       XD = XTB2 - XTB1
       XTT0 = XD*DC2
       AVAILX = XD*DC1

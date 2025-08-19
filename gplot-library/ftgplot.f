@@ -208,7 +208,7 @@ C
       LOGICAL HAVFLOG, DOANNOT, GCHANGE, DOGRON, DOBB
       REAL RED, GRN, BLU, WID, XLO, YLO, XHI, YHI, XPOS, YPOS
       REAL PXL, PXH, PYL, PYH, BXL, BXH, BYL, BYH, GXPOS, GYPOS
-      REAL RBASE, RSTART, RSTOP
+      REAL RBASE, RSTART, RSTOP, XLOGR, XHIGR, YLOGR, YHIGR, VDIM(4)
       REAL F1, F2, F3, F4, F5, WHIST, FBW, SHDSPC, WHISTIN, TWD, TWIDTH
       INTEGER NEVAL, NSTACK, ITER, IREG, INT1, I, IDOGRID, NINTERP
       INTEGER IHIST, IENUNIT, ISTAT, IDEP, JCMT, IEND, ISTART, IECMD
@@ -224,8 +224,8 @@ C
       INTEGER FONTNUM(NFONTS), IDXABT1, IDXABT2, IDXABT3, IDXSYMB
       INTEGER IDXMARK, IFONT, ICSGRP, ILKUPE
       REAL FSYMHT, FSYMANG, ZEROVAL, AXCX0, AXCY0, BB(4)
-      LOGICAL BBEMPTY, SEVERR, DORESET, LOWEROK
-      CHARACTER*10 KEYTEXT(MAXKEY)
+      LOGICAL BBEMPTY, SEVERR, DORESET, LOWEROK, DOAXES
+      CHARACTER*15 KEYTEXT(MAXKEY)
       REAL KEYRED(MAXKEY), KEYGRN(MAXKEY), KEYBLU(MAXKEY)
       REAL KEYWID(MAXKEY)
       INTEGER KEYSTY(MAXKEY), NKEYS
@@ -623,7 +623,8 @@ C
       DCMDS(KRYLAB) = '"LABEL" - RIGHT HAND EDGE LABEL.'
       DCMDS(KGRIGHT) = '"ON" "OFF" - DO RIGHT EDGE ANNOTATION (IF '//
      +                 'ANNOTATE OFF).'
-      DCMDS(KGAXCUT) = 'X Y - SET POINT THRU WHICH AXES ARE DRAWN.'
+      DCMDS(KGAXCUT) = 'X Y OR Y/N - SET POINT THRU WHICH AXES ARE'//
+     +     'DRAWN, OR TURN OFF AND ON.'
       DCMDS(KCIRC) = 'X Y R - CIRCLE, CENTER X,Y RADIUS R.'
       DCMDS(KARC) = 'X Y R A1 A2 - CIRCULAR ARC, CENTER X,Y RADIUS R '//
      +                 'ANGLE A1 TO A2.'
@@ -664,9 +665,9 @@ C DEVICE DESCRIPTIONS.
 C
       DDEVS(KDGT) = 'GTERM COLOUR GRAPHICS TERMINAL'
       DDEVS(KDTK) = 'TEKTRONIX 4014 GRAPHICS TERMINAL'
-      DDEVS(KDEC) = 'NAME - COLOUR EPS FILE'
+      DDEVS(KDEC) = 'NAME [W,H+XO+YO] - COLOUR EPS FILE'
       DDEVS(KDEB) = 'NAME - BLACK/WHITE EPS FILE'
-      DDEVS(KSVG) = 'NAME - SVG FILE'
+      DDEVS(KSVG) = 'NAME [W,H] - SVG FILE'
 C
 C NUMBER OF ARGUMENTS REQUIRED FOR EACH COMMAND.
 C
@@ -811,6 +812,7 @@ C---- ANNOTATION STATE
       DORIGHT = .FALSE.
       AXCX0 = 0.0
       AXCY0 = 0.0
+      DOAXES = .TRUE.
       IAXINT = 1
 C---- DRAWING COLOURS
       RED = 1.0
@@ -839,6 +841,11 @@ C---- BLANK STATE
       BYL = 0.0
       BYH = 1.0
       LBLNK = .FALSE.
+C---- EXPLICIT GRAPH RANGES
+      XLOGR = 0.0
+      XHIGR = 1.0
+      YLOGR = 0.0
+      YHIGR = 1.0      
 C---- PLOT AND GRAPH CURRENT COORDINATES
       XPOS = 0.0
       YPOS = 0.0
@@ -921,6 +928,8 @@ C
          CALL AUTOXY
          CALL LDSYM(8001)
          CALL LDMARK(9001)
+         CALL DSHOFF
+         CALL AXCUT(0.0,0.0)
          IF(HAVDEV)CALL GFLUSH(IDEV,NDEVS,.FALSE.)
          DORESET = .FALSE.
          IF( IDEP .EQ. 0 )THEN
@@ -1237,17 +1246,19 @@ C
  130     CONTINUE
 C
 C CHECK CORRECT NUMBER OF ARGUMENTS FOR COMMAND.
-C ALLOW 1 OR 2 ARGUMENTS FOR DEVICE, HISTSTYLE AND OBEY AS SPECIAL CASES
+C ALLOW 1 OR 2 ARGUMENTS FOR HISTSTYLE, EVAL, AXCUT
+C              AND OBEY AS SPECIAL CASES
+C ALLOW 1, 2 OR 3 ARGUMENTS FOR DEVICE AS A SPECIAL CASE.
 C ALLOW 3, 4 0R 5 ARGUMENTS FOR READ AS A SPECIAL CASE.
 C ALLOW 0 OR 1 ARGUMENTS FOR HELP AS A SPECIAL CASE.
-C ALLOW 1 OR 2 ARGUMENTS FOR EVAL AS A SPECIAL CASE.
 C ALLOW 4 OR 5 ARGUMENTS FOR ITEVAL AS A SPECIAL CASE.
 C
          IF( ICARGS .NE. NARGS(ICMD) )THEN
             IF( ICMD .EQ. KDEV .OR. ICMD .EQ. KOBEY .OR.
      +           ICMD .EQ. KREAD .OR. ICMD .EQ. KHISTMD .OR.
      +           ICMD .EQ. KHELP .OR. ICMD .EQ. KEVAL .OR.
-     +           ICMD .EQ. KIEVAL )THEN
+     +           ICMD .EQ. KEVAL .OR. ICMD .EQ. KIEVAL .OR.
+     +           ICMD .EQ. KGAXCUT )THEN
                IF( ICMD .EQ. KREAD )THEN
                   IF( ICARGS .LT. 3 .OR. ICARGS .GT. 5 )THEN
                      CALL TXBEGIN
@@ -1262,17 +1273,17 @@ C
                      CALL TXEND
                      GOTO 1
                   ENDIF
-               ELSE IF( ICMD .EQ. KEVAL )THEN
-                  IF( ICARGS .LT. 1 .OR. ICARGS .GT. 2 )THEN
-                     CALL TXBEGIN
-                     WRITE(6,124)CMDS(ICMD)(1:LNBC(CMDS(ICMD),1,1)),1,2
-                     CALL TXEND
-                     GOTO 1
-                  ENDIF
                ELSE IF( ICMD .EQ. KIEVAL )THEN
                   IF( ICARGS .LT. 4 .OR. ICARGS .GT. 5 )THEN
                      CALL TXBEGIN
                      WRITE(6,124)CMDS(ICMD)(1:LNBC(CMDS(ICMD),1,1)),4,5
+                     CALL TXEND
+                     GOTO 1
+                  ENDIF
+               ELSE IF( ICMD .EQ. KDEV )THEN
+                  IF( ICARGS .GT. 3 )THEN
+                     CALL TXBEGIN
+                     WRITE(6,124)CMDS(ICMD)(1:LNBC(CMDS(ICMD),1,1)),1,3
                      CALL TXEND
                      GOTO 1
                   ENDIF
@@ -1355,13 +1366,21 @@ C---- TEK4K DEVICE
             GOTO 2017
 C---- EPSCOL DEVICE
  2013       CONTINUE
-            IF( ICARGS .NE. 2 )THEN
+            IF( ICARGS .LT. 2 )THEN
                WRITE(6,9010)
  9010          FORMAT(1X,'DEVICE NEEDS A FILE NAME.')
                GOTO 299
             ENDIF
             IE = LNBC(ARGS(2),1,1)
             CALL EPSNAM(ARGS(2)(1:IE))
+            IF( ICARGS .EQ. 3 )THEN
+               VDIM(1) = 5.0
+               VDIM(2) = 5.0
+               VDIM(3) = 0.5
+               VDIM(4) = 0.5
+               CALL PRSDIM(ARGS(3), VDIM, 4)
+               CALL EPSDIM(VDIM(1),VDIM(2),VDIM(3),VDIM(4))
+            ENDIF
             CALL DEPCOL
             GOTO 2017
 C---- EPSBIN DEVICE
@@ -1376,12 +1395,18 @@ C---- EPSBIN DEVICE
             GOTO 2017
 C---- SVG DEVICE
  2015       CONTINUE
-            IF( ICARGS .NE. 2 )THEN
+            IF( ICARGS .LT. 2 )THEN
                WRITE(6,9010)
                GOTO 299
             ENDIF
             IE = LNBC(ARGS(2),1,1)
             CALL SVGNAM(ARGS(2)(1:IE))
+            IF( ICARGS .EQ. 3 )THEN
+               VDIM(1) = 800.0
+               VDIM(2) = 800.0
+               CALL PRSDIM(ARGS(3), VDIM, 2)
+               CALL SVGDIM(VDIM(1), VDIM(2))
+            ENDIF            
             CALL DSVGCL
             GOTO 2017
  2017       CONTINUE
@@ -1460,14 +1485,14 @@ C COLOUR
          BLU = F3
          IF( ICSGRP .EQ. KCSALL )THEN
             CALL RGB(MAX(0.01,RED),MAX(0.01,GRN),MAX(0.01,BLU))
-            REDGEN = RED
-            GRNGEN = GRN
-            BLUGEN = BLU
+            REDGEN = MAX(0.01,RED)
+            GRNGEN = MAX(0.01,GRN)
+            BLUGEN = MAX(0.01,BLU)
          ELSE IF( ICSGRP .EQ. KCSGEN )THEN
             CALL RGB1(MAX(0.01,RED),MAX(0.01,GRN),MAX(0.01,BLU))
-            REDGEN = RED
-            GRNGEN = GRN
-            BLUGEN = BLU            
+            REDGEN = MAX(0.01,RED)
+            GRNGEN = MAX(0.01,GRN)
+            BLUGEN = MAX(0.01,BLU)
          ELSE IF( ICSGRP .EQ. KCSTEXT )THEN
             CALL RGB2(MAX(0.01,RED),MAX(0.01,GRN),MAX(0.01,BLU))
          ELSE IF( ICSGRP .EQ. KCSANOT )THEN
@@ -1608,13 +1633,13 @@ C---- SET AXIS MODES AND RANGES.
             IF( DOXYAUT )THEN
                CALL AUTOXY
             ELSE IF( DOXRAN .AND. DOYRAN )THEN
-               CALL XAXIS(XLO,XHI)
-               CALL YAXIS(YLO,YHI)
+               CALL XAXIS(XLOGR,XHIGR)
+               CALL YAXIS(YLOGR,YHIGR)
             ELSE IF( DOXRAN )THEN
-               CALL XAXIS(XLO,XHI)
+               CALL XAXIS(XLOGR,XHIGR)
                CALL AUTOY
             ELSE IF( DOYRAN )THEN
-               CALL YAXIS(YLO,YHI)
+               CALL YAXIS(YLOGR,YHIGR)
                CALL AUTOX
             ELSE
                CALL AUTOXY
@@ -1646,9 +1671,18 @@ C---- DRAW THE GRAPH.
                FBW = WHIST
             ENDIF
             IF( IHIST .EQ. KHABUTS .OR. IHIST .EQ. KHWIDS )THEN
-               SHDSPC = 0.02 * ( XHI - XLO )
+               IF( LPANE )THEN
+                  SHDSPC = 0.02 * ( PXH - PXL )
+               ELSE
+                  SHDSPC = 0.02 * ( XHI - XLO )
+               ENDIF
                CALL SHDEGR(DA(IXOFF),DA(IYOFF),NDATA,FBW,45.0,SHDSPC)
+C         THESE NEXT TWO LINES WORK AROUND WHAT SEEMS TO BE A
+C         BUG IN DIMFILM. WITHOUT ENPANE, ALL ANNOTATION APPEARS INSIDE
+C         THE LAST HISTOGRAM BAR. WITHOUT PANE, ANY PREVIOUSLY SET PANE
+C         IS IGNORED, SO ANNOTATION MAY OVERWRITE OTHER PANES.
                CALL ENPANE
+               CALL PANE(PXL,PXH,PYL,PYH)
             ELSE
                CALL HISTGR(DA(IXOFF),DA(IYOFF),NDATA,FBW)
             ENDIF
@@ -1706,6 +1740,7 @@ C---- DRAW THE GRAPH.
          ENDIF
 C---- ADD ANNOTATION, TICKS, GRIDS, FRAME / EDGES / AXES
          IF( DOANNOT )THEN
+            CALL DSHOFF
             IF( HAVTIT )CALL UTITLE(TITLE(1:LNBC(TITLE,1,1)))
             IF( HAVXLAB )CALL LXLAB(XLABEL(1:LNBC(XLABEL,1,1)))
             IF( HAVYLAB )CALL LYLAB(YLABEL(1:LNBC(YLABEL,1,1)))
@@ -1759,16 +1794,21 @@ C---- ADD ANNOTATION, TICKS, GRIDS, FRAME / EDGES / AXES
                CALL GRFRAM
 C              AXES DO NOT EVEN GET TICKS BY DEFAULT.
 C              HOWEVER, EXPLICITLY DRAWING AXES GETS THEM DRAWN
-C              IN CS GENERAL RATHER THAN CS ANNOTATION.
+C              IN CSG GENERAL RATHER THAN CSG ANNOTATION.
 C              NOT SURE WHAT IS BEST TO DO HERE.
-C               CALL DRAWXA
-C               CALL DRAWYA
+C              (FIXED BY MODIFYING DIMFILM, 17-AUG-2025).
+               IF( DOAXES )THEN
+                  CALL AXCUT(AXCX0,AXCY0)
+                  CALL DRAWXA
+                  CALL DRAWYA
+               ENDIF
             ELSE IF( IGSTY .EQ. KGOPEN )THEN
                CALL EDGES(0011,0)
             ELSE
                CALL DRAWXA
                CALL DRAWYA
             ENDIF
+            CALL SETSTY(ISTY)
          ELSE IF( DORIGHT )THEN
             IF(HAVRLAB)CALL RYLAB(RYLABEL(1:LNBC(RYLABEL,1,1)))
             CALL RYOPT
@@ -1795,8 +1835,8 @@ C XRANGE
  214     CONTINUE
          IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
          IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         XLO = F1
-         XHI = F2
+         XLOGR = F1
+         XHIGR = F2
          KEEPAX = .FALSE.
          DOXYAUT = .FALSE.
          DOXRAN = .TRUE.
@@ -1806,8 +1846,8 @@ C YRANGE
  215     CONTINUE
          IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
          IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         YLO = F1
-         YHI = F2
+         YLOGR = F1
+         YHIGR = F2
          KEEPAX = .FALSE.
          DOXYAUT = .FALSE.
          DOYRAN = .TRUE.
@@ -2716,10 +2756,14 @@ C
 C AXCUT
  268     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         AXCX0 = F1
-         AXCY0 = F2
+         IF( ICARGS .EQ. 1 )THEN
+            DOAXES = GETYN(ARGS(1))
+         ELSE
+            IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
+            IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+            AXCX0 = F1
+            AXCY0 = F2
+         ENDIF
          GOTO 299
 C
 C CIRCLE
@@ -2895,9 +2939,9 @@ C ADDKEY
          ELSE
             NKEYS = NKEYS + 1
             KEYTEXT(NKEYS) = ARGS(1)(1:MIN(10,LNBC(ARGS(1),1,1)))
-            KEYRED(NKEYS) = RED
-            KEYGRN(NKEYS) = GRN
-            KEYBLU(NKEYS) = BLU
+            KEYRED(NKEYS) = REDGEN
+            KEYGRN(NKEYS) = GRNGEN
+            KEYBLU(NKEYS) = BLUGEN
             KEYWID(NKEYS) = WID
             KEYSTY(NKEYS) = ISTY
          ENDIF
@@ -2928,7 +2972,7 @@ C KEYS
                LPANE = .TRUE.
                GCHANGE = .TRUE.        
                XPOS = 0.91
-               YPOS = 0.95
+               YPOS = 0.92
                CALL OFF2(XPOS,YPOS)
                TWD = 0.1
                TWIDTH = STRING('KEY')
@@ -3084,7 +3128,7 @@ C WAIT
          CALL DEVWAIT(IDEV,NDEVS)
          GOTO 299
 C
-C USE INTEGERS FOR GRAPH AXIS VALUES IF POSSIBLE.
+C INTVALUES (USE INTEGERS FOR GRAPH AXIS VALUES IF POSSIBLE.)
  294     CONTINUE
          IARG = LOOKUP(GRDNAM,NGRD,ARGS(1),LOWEROK,.TRUE.)
          IF( IARG .LE. 0 )THEN
@@ -3096,7 +3140,7 @@ C USE INTEGERS FOR GRAPH AXIS VALUES IF POSSIBLE.
          ENDIF
          GOTO 299
 C
-C PUT VERSION INFORMATION IN STRING REGISTER 9.
+C VERSION (PUT VERSION INFORMATION IN STRING REGISTER 9.)
  295     CONTINUE
          CALL GETVRI(STRINGS(NREGS))
          STRILEN(NREGS) = LNBC(STRINGS(NREGS),1,0)
@@ -3322,7 +3366,7 @@ C
      +   (B(N).EQ.IB) )THEN
          WRITE(6,*)'OK - DYNAMIC ALLOCATION TEST PASSED.'
          DO 2 I=1,N
-            X(I) = 3.0 * 6.283 * FLOAT(I)/N
+            X(I) = 3.0 * 6.283 * FLOAT(I-1)/(N-1)
             Y(I) = SIN(X(I))
   2      CONTINUE
          WRITE(6,*)'GENERATED TEST DATA.'
@@ -3340,6 +3384,13 @@ C READ X,Y DATA FROM FILE FNAME USING COLUMNS COL1, COL2.
 C RETURN NUMBER OF DATA POINTS READ IN NOUT. MAX NP.
 C IF FNAME=HERE, READ FROM IUN UNTIL LINE STARTING EOF FOUND.
 C IF COL1=0, USE THE NUMBER OF PTS SO FAR, NOT READ COLUMN.
+C ISTAT: RETURNS 1 IF OK, ELSE 0.
+C IUN: COMMAND STREAM LOGICAL UNIT NUMBER FOR "HERE" FILE.
+C COL3, COL4: ADDITIONAL COL NUMBERS FOR BELOW/ABOVE ERR BARS.
+C XE, YE: OUTPUT DATA ARRAYS IF COL3/4 TO BE USED.
+C NARG: NO. OF READ CMD ARGS. 3 FOR X,Y, 4 FOR X/Y/YE, 5 X/Y/YE/XE
+C PATHNAM: PREFIX FOR FNAME (E.G. DIRECTORY, IGNORED ON NOS)
+C FULLNAM: TEMP BUFFER FOR PATHNAM+FNAME STRING.
 C--------------------------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       CHARACTER*(*) FNAME, COL1, COL2, COL3, COL4, PATHNAM, FULLNAM
@@ -3375,7 +3426,7 @@ C
          IF( ICOL4 .LE. 0 )GOTO 25
       ENDIF
 C
-C OPEN THE DATA FILE.
+C OPEN THE DATA FILE. READ FROM LUN 4 UNLESS "HERE".
 C
       IFNE = LNBC(FNAME,1,1)
       IF( IFNE .GT. MAXFNL )IFNE = MAXFNL
@@ -3401,11 +3452,12 @@ C
  102  FORMAT(A)
       ILINE = ILINE + 1
 C
-C IGNORE BLANK LINES AND LINES BEGINNING WITH C IN COLUMN 1
+C IGNORE BLANK LINES AND LINES BEGINNING WITH C OR # IN COLUMN 1
 C
       ILNBC = LNBC(LINE,1,0)
       IF( ILNBC .EQ. 0 )GOTO 900
-      IF( LINE(1:1) .EQ. 'C' )GOTO 900
+      IF( LINE(1:1) .EQ. 'C' .OR.
+     +     LINE(1:1) .EQ. '#' )GOTO 900
 C
 C IF IN "HERE" MODE, STOP READING IF LINE BEGINS "EOF"
 C
@@ -3637,6 +3689,42 @@ C
          TARG(I:I) = ' '
   2   CONTINUE
       ARGSTR = TARG
+      RETURN
+      END
+C
+      SUBROUTINE PRSDIM( C, V, MAXV )
+C----------------------------------------------------
+C SET THE PHYSICAL DIMENSIONS OF A DEVICE'S OUTPUT
+C FORMAT: XDIM,YDIM+XMAR+YMAR
+C----------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      CHARACTER*(*) C
+      REAL V(4)
+      INTEGER MAXV
+C
+      INTEGER IS, IE, ICLEN, NV, JUNK
+      INTEGER NOCC, LNBC
+      REAL ROP
+      LOGICAL RFROMC
+C
+      ICLEN = LNBC(C,1,0)
+      IS = 1
+      NV = 0
+ 10   CONTINUE
+      IE = NOCC(C,',+',IS,ICLEN+1)
+      IF( .NOT. RFROMC(C(IS:IE-1),ROP,1,JUNK) )THEN
+         CALL TXBEGIN
+         WRITE(6,100)C(1:ICLEN)
+ 100     FORMAT(1X,'ERROR PARSING DEVICE DIMENSIONS: ',A)
+         CALL TXEND
+         GOTO 11
+      ENDIF
+      NV = NV + 1
+      V(NV) = ROP
+      IF( NV .EQ. MAXV .OR. IE .GT. ICLEN )GOTO 11
+      IS = IE + 1
+      GOTO 10
+ 11   CONTINUE
       RETURN
       END
 C
@@ -4409,7 +4497,7 @@ C---- SAVE SYMHT VALUE AS IT IS ON ENTRY, TO RESTORE ON EXIT.
       SFSYMHT = FSYMHT
       LFSYMHT = FSYMHT
 C
-C---- THE STACK INDEX GIVES THE TOP OCCUPIED ITEM. INITIALLY RANGE IN O.
+C---- THE STACK INDEX GIVES THE TOP OCCUPIED ITEM. INITLY X RANGE IN O.
 C---- PUSH: INCREMENT ISTACK, CHECK <= NS1, PUT THINGS IN STACK[ISTACK].
 C---- POP: CHECK > 0, GET THINGS FROM STACK[ISTACK], DECREMENT ISTACK.
       ISTACK = 0
@@ -6885,7 +6973,7 @@ C------------------------------------
       IMPLICIT LOGICAL (A-Z)
       CHARACTER*4 OUTSTR
 C
-      OUTSTR = '0.76'
+      OUTSTR = '0.79'
       RETURN
       END
 C

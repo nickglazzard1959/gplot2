@@ -1,4 +1,5 @@
       SUBROUTINE DFX204(K,RNUMB,INUMB,FMT)
+C NG - THIS DOES FORMATTED NUMERIC OUTPUT.
       INCLUDE 'dfxc01.cmn'
       INCLUDE 'dfxc01s.cmn'
       INCLUDE 'dfxc00.cmn'

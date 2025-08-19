@@ -38,6 +38,7 @@ C
       INCLUDE 'dfxc05.cmn'
       INCLUDE 'dfxc12.cmn'
       INCLUDE 'dfxc23.cmn'
+C      PRINT *,'DFX216 [',ITEXT,']'
       IF ((AVAILX.LE.0.0).OR.(AVAILY.LE.0.0)) GO TO 100
       LENGTH = .TRUE.
       CALL DFX214(ITEXT)

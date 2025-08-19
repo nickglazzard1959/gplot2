@@ -776,7 +776,7 @@ C
 C---- THE NEXT CHARACTER MUST BE: A) START OF EXPONENT, OR
 C---- B) START OF DECIMAL PART OF MANTISSA OR C) END OF NUMBER
 C
-      IF( S(P:P) .EQ. 'E' .OR. S(P:P) .EQ. 'E' )THEN
+      IF( IACHAR(S(P:P)) .EQ. 69 .OR. IACHAR(S(P:P)) .EQ. 101 )THEN
          GE = .TRUE.
          IDMAN = 0
          P = P + 1
@@ -801,10 +801,12 @@ C
          GOTO 999
       ENDIF
 C
-C---- IF NEXT CHARACTER IS E OR E AND WE HAVE NOT ALREADY GOT
+C---- IF NEXT CHARACTER IS E AND WE HAVE NOT ALREADY GOT
 C---- EXPONENT START, THEN IT COULD BE START OF EXPONENT
 C
-      IF( .NOT. GE .AND. ( S(P:P) .EQ. 'E' .OR. S(P:P) .EQ. 'E' ) )THEN
+      IF( .NOT. GE .AND.
+     +     ( IACHAR(S(P:P)) .EQ. 69 .OR.
+     +       IACHAR(S(P:P)) .EQ. 101 ) )THEN
          GE = .TRUE.
          P = P + 1
          IF( P .GT. ISLEN )GOTO 999
