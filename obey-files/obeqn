@@ -1,0 +1,6 @@
+RESET
+BOUNDS -1 1 -1 1
+FONT 1 SANS.SIMPLEX
+MOVE 0 0
+C CTEXT 0 "*LZ = *,X*+2$+ + 1*.*,1*.2Y$.$."
+TEXT "*LZ = *,X*+2$+ + 1*.*,1*.2Y$.$."

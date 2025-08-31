@@ -20,8 +20,35 @@
 # To:
 #  <policy domain="coder" rights="read|write" pattern="PDF" />
 #
-if [ "$#" -lt "1" ]; then
-    echo "Usage: epsview.sh file.eps [fixup] (output file.pdf and file.png)"
+#if [ "$#" -lt "1" ]; then
+#    echo "Usage: epsview.sh file.eps [fixup] (output file.pdf and file.png)"
+#   exit 1
+#fi
+FIXUP=0
+CROP=0
+PNG=0
+while getopts 'fcp' opt; do
+      case "$opt" in
+          f)
+              FIXUP=1
+              ;;
+          c)
+              CROP=1
+              ;;
+          p)
+              PNG=1
+              ;;
+          ?|h)
+              echo "Usage: $(basename $0) [-f] [-c] file.eps"
+              echo "  -f to fixup files transferred from COS"
+              echo "  -c to crop to active region"
+              exit 1
+              ;;
+      esac
+done
+shift "$(($OPTIND -1))"
+if [ "$#" -ne "1" ]; then
+    echo "No .eps file name supplied or excess arguments."
     exit 1
 fi
 EPSNAME="$1"
@@ -42,7 +69,7 @@ fi
 # omitted by ... something. Try to fix that.  It should be
 # possible to transfer files with lower case intact from COS
 # to NOS, but I cannot find the right options to do it.
-if [ "$#" -eq 2 ]; then
+if [ "$FIXUP" -eq 1 ]; then
     sed -e '1,11d' ${EPSNAME} | \
         tr '[:upper:]' '[:lower:]' | \
         sed -e 's/boundingbox/BoundingBox/g' > zzzztemp
@@ -75,15 +102,23 @@ EPSFILE="${EPSNAME%.*}"
 ps2pdf -g${A} ${EPSNAME} ${EPSFILE}_zztemp.pdf
 #
 # Crop off borders that ps2pdf adds at the bottom and left. Add back small symmetric border.
-pdfcrop --margins 5 ${EPSFILE}_zztemp.pdf ${EPSFILE}.pdf
-rm -f ${EPSFILE}_zztemp.pdf
-if command -v magick &>/dev/null; then
-    magick -density 384 ${EPSFILE}.pdf -quality 100 -alpha remove ${EPSFILE}.png
+if [ "$CROP" -eq "1" ]; then
+    pdfcrop --margins 5 ${EPSFILE}_zztemp.pdf ${EPSFILE}.pdf
+    rm -f ${EPSFILE}_zztemp.pdf
 else
-    if command -v convert &>/dev/null; then
-        convert -density 384 ${EPSFILE}.pdf -quality 100 -alpha remove ${EPSFILE}.png
+    mv ${EPSFILE}_zztemp.pdf ${EPSFILE}.pdf
+fi
+#
+# Create a PNG version if desired.
+if [ "$PNG" -eq "1" ]; then
+    if command -v magick &>/dev/null; then
+        magick -density 384 ${EPSFILE}.pdf -quality 100 -alpha remove ${EPSFILE}.png
     else
-        echo "Cannot generate PNG version. Install Imagemagick."
+        if command -v convert &>/dev/null; then
+            convert -density 384 ${EPSFILE}.pdf -quality 100 -alpha remove ${EPSFILE}.png
+        else
+            echo "Cannot generate PNG version. Install Imagemagick."
+        fi
     fi
 fi
 #

@@ -52,7 +52,7 @@ C
 #else
       PARAMETER( MAXFNL=7 )
 #endif
-      PARAMETER( NCMDS=95, NFONTS=24, NREGS=9 )
+      PARAMETER( NCMDS=98, NFONTS=24, NREGS=9 )
 C
 C INITIAL DEFAULT NUMBER OF POINTS THAT CAN BE GRAPHED.
 C USED ONLY ON SYSTEMS THAT SUPPORT DYNAMIC MEMORY ALLOCATION.
@@ -80,7 +80,8 @@ C
       INTEGER KLSYS, KLDPROC, KTXBOX, KSETCSG
       INTEGER KUSEKEY, KADDKEY, KKEYS, KRESET, KTXBPS
       INTEGER KTXBPH, KTXBPT, KTXBPB, KLINE, KGLABEL, KALABEL
-      INTEGER KARPARM, KANPARM, KWAIT, KAXINT, KVRI
+      INTEGER KARPARM, KANPARM, KWAIT, KAXINT, KVRI, K2DEVAL
+      INTEGER KGRFMOD, KTXBPD
       PARAMETER( KDEV=1, KMAXPT=2, KCOL=3, KWID=4, KMARK=5 )
       PARAMETER( KCLR=6, KMOVE=7, KDRAW=8, KTEXT=9, KREAD=10 )
       PARAMETER( KXYPT=11, KXYLN=12, KXYAUT=13, KXRAN=14, KYRAN=15 )
@@ -100,7 +101,8 @@ C
       PARAMETER( KUSEKEY=80, KADDKEY=81, KKEYS=82, KRESET=83 )
       PARAMETER( KTXBPS=84, KTXBPH=85, KTXBPT=86, KTXBPB=87, KLINE=88 )
       PARAMETER( KGLABEL=89, KALABEL=90, KARPARM=91, KANPARM=92 )
-      PARAMETER( KWAIT=93, KAXINT=94, KVRI=95 )
+      PARAMETER( KWAIT=93, KAXINT=94, KVRI=95, K2DEVAL=96, KGRFMOD=97 )
+      PARAMETER( KTXBPD=98 )
 C
 C DEVICE CODES.
 C
@@ -179,6 +181,11 @@ C
       INTEGER KARTOP, KARTCL, KARTBA
       PARAMETER( KARTOP=1, KARTCL=2, KARTBA=3 )
 C
+C SUNDRIES
+C
+      REAL INPOINT
+      PARAMETER( INPOINT=(1.0/72.0) )
+C
 C VARIABLES.
 C
       CHARACTER*15 CMDS(NCMDS)
@@ -205,7 +212,7 @@ C
       LOGICAL HAVTIT, HAVXLAB, HAVYLAB, HAVXE, LBLNK, HAVRLAB
       LOGICAL DOXYAUT, DOXRAN, DOYRAN, HAVAX, KEEPAX, LPANE, DORIGHT
       LOGICAL DOXLOG, DOYLOG, DEBUGON, HAVCCL, QUIET, LASYME, TXTCON
-      LOGICAL HAVFLOG, DOANNOT, GCHANGE, DOGRON, DOBB
+      LOGICAL HAVFLOG, DOANNOT, GCHANGE, DOGRON, DOBB, DOTXBL, DOTXFL
       REAL RED, GRN, BLU, WID, XLO, YLO, XHI, YHI, XPOS, YPOS
       REAL PXL, PXH, PYL, PYH, BXL, BXH, BYL, BYH, GXPOS, GYPOS
       REAL RBASE, RSTART, RSTOP, XLOGR, XHIGR, YLOGR, YHIGR, VDIM(4)
@@ -229,9 +236,9 @@ C
       REAL KEYRED(MAXKEY), KEYGRN(MAXKEY), KEYBLU(MAXKEY)
       REAL KEYWID(MAXKEY)
       INTEGER KEYSTY(MAXKEY), NKEYS
-      REAL REDGEN, GRNGEN, BLUGEN
-      REAL WTXBOX, HTXBOX, WFTXBOX, DHTXBOX, FSYMHTL
-      REAL ARSIZE, ARSHARP, ARBARB, ANSKPSL, ANSCALE
+      REAL REDGEN, GRNGEN, BLUGEN, XBOXCUR, YBOXCUR
+      REAL WTXBOX, HTXBOX, WFTXBOX, DHTXBOX, FSYMHTL, USEASP, XBOXSTP
+      REAL ARSIZE, ARSHARP, ARBARB, ANSKPSL, ANSCALE, DEVASP, YBOXSTP
       INTEGER IATXBOX, IHTXBOX, ITTXBOX, IBTXBOX, IARTYPE, IAXINT
       CHARACTER*(MAXFNL) PATHNAM, FULLNAM
       CHARACTER*4 VSTR
@@ -369,6 +376,9 @@ C
       CMDS(KWAIT) = 'WAIT'
       CMDS(KAXINT) = 'INTVALUES'
       CMDS(KVRI) = 'VERSION'
+      CMDS(K2DEVAL) = '2DEVAL'
+      CMDS(KGRFMOD) = 'GRAPHMODE'
+      CMDS(KTXBPD) = 'BOXPDELTAS'
 C
 C DEVICE NAMES.
 C
@@ -574,7 +584,8 @@ C
       DCMDS(KXLAB) = '"TEXT" - SET X AXIS LABEL'
       DCMDS(KYLAB) = '"TEXT" - SET Y AXIS LABEL'
       DCMDS(KTEST) = 'TEST DYNAMIC MEMORY. GENERATE PLOT TEST DATA.'
-      DCMDS(KSTYLE) = '"SOLID" "DASH" "DOT" "DASHDOT" - LINE STYLE.'
+      DCMDS(KSTYLE) = '"SOLID"/"DASH"/"DOT"/"DASHDOT" [SCALE] - LINE'//
+     +     '  STYLE. SCALE CONTROLS DOT/DASH SPACING.'
       DCMDS(KGET) = 'NAME - GET AN INDIRECT PERMANENT FILE.'
       DCMDS(KSTAT) = 'DISPLAY STATUS INFORMATION.'
       DCMDS(KANNOT) = '"ON" "OFF" - TURN GRAPH ANNOTATION ON/OFF.'
@@ -642,11 +653,13 @@ C
       DCMDS(KADDKEY) = 'ADD A KEY FOR THE CURRENT GRAPH LINE/POINTS.'
       DCMDS(KKEYS) = 'DRAW THE GRAPH KEYS.'
       DCMDS(KRESET) = 'RESET MOST STATE TO INITIAL VALUES.'
-      DCMDS(KTXBPS) = 'W H - SET TEXT BOX SIZE (WIDTH, HEIGHT)'
+      DCMDS(KTXBPS) = 'W H BOTLEFT - SET TEXT BOX SIZE (WIDTH, '//
+     +     'HEIGHT). X,Y=CENTER UNLESS BOTLEFT "YES"'
       DCMDS(KTXBPH) = 'SPACING ISLOPE MODE - HATCH SPACING, SLOPE '//
      +     'ANGLE (SPACINGS, INT), "NONE"/"VERT"/"HORIZ"/"BOTH"'
-      DCMDS(KTXBPT) = 'WIDTHFRAC MODE - BOX TEXT SIZE AND STYLE. '//
-     +     'SIZE AS FRAC OF BOX WIDTH, SIZE MODE "FIX"/"SCALE".'
+      DCMDS(KTXBPT) = 'WIDTHFRAC MODE FLL - BOX TEXT SIZE AND STYLE. '//
+     +     'SIZE AS FRAC OF BOX WIDTH, SIZE MODE "FIX"/"SCALE". '//
+     +     'FLL "YES", FLUSH LEFT.'
       DCMDS(KTXBPB) = 'MODE - DRAW "NONE"/"OUTER"/"INNER"/"BOTH".'
       DCMDS(KLINE) = 'LINESTRING - DRAW A DECORATED LINE AS PER ' //
      +     'LINESTRING. P/A/SX,Y[,ANN]>P/A/SX,Y[,ANN] ...'
@@ -659,7 +672,13 @@ C
       DCMDS(KWAIT) = 'WAIT FOR USER RESPONSE ON INTERACTIVE DEVICE.'
       DCMDS(KAXINT) = '"NONE" "X" "Y" "BOTH" - TRY TO USE INTEGERS ' //
      +     'FOR AXIS VALUES.'
-      DCMDS(KVRI) = 'VERSION - PUT VERSION INFO IN STRING REG 9'
+      DCMDS(KVRI) = 'VERSION [N] - PUT VERSION INFO IN STRING REG ' //
+     +     'OR JUST PRINT IT IF N OMITTED.'
+      DCMDS(K2DEVAL) = '"RPN" [ARGS] - AS EVAL, BUT DO NOT USE RANGE'//
+     +     ' USE READ X AND Y DATA INSTEAD.'
+      DCMDS(KGRFMOD) = '"ON" "OFF" - TURN GRAPH MODE ON/OFF. "ON" '//
+     +     'SETS BOUNDS TO DEVICE ASPECT RATIO. "OFF" = 0 1 0 1'
+      DCMDS(KTXBPD) = 'DX DY - SET BOX AUTO STEPS.'
 C
 C DEVICE DESCRIPTIONS.
 C
@@ -754,9 +773,9 @@ C
       NARGS(KADDKEY) = 1
       NARGS(KKEYS) = 0
       NARGS(KRESET) = 0
-      NARGS(KTXBPS) = 2
+      NARGS(KTXBPS) = 3
       NARGS(KTXBPH) = 3
-      NARGS(KTXBPT) = 2
+      NARGS(KTXBPT) = 3
       NARGS(KTXBPB) = 1
       NARGS(KLINE) = 1
       NARGS(KGLABEL) = 5
@@ -765,7 +784,10 @@ C
       NARGS(KANPARM) = 2
       NARGS(KWAIT) = 0
       NARGS(KAXINT) = 1
-      NARGS(KVRI) = 0
+      NARGS(KVRI) = 1
+      NARGS(K2DEVAL) = 1
+      NARGS(KGRFMOD) = 1
+      NARGS(KTXBPD) = 2
 C
 C DEFAULT STATE ON START UP.
 C NO DATA READ YET. NO DEVICE OPENED. ETC.
@@ -780,6 +802,7 @@ C---- DEVICE STATE
       HAVDEV = .FALSE.
       IDEV = 0
       DORESET = .FALSE.
+      DEVASP = 1.0
 C---- DEBUGGING STATE
       DEBUGON = .FALSE.
       QUIET = .TRUE.
@@ -829,6 +852,7 @@ C---- BOUNDS STATE
       XHI = 1.0
       YLO = 0.0
       YHI = 1.0
+      USEASP = 1.0
 C---- PANE STATE
       PXL = 0.0
       PXH = 1.0
@@ -901,6 +925,12 @@ C---- TEXT BOX STATE
       ITTXBOX = KHBFIX
       IBTXBOX = KHBBOU
       FSYMHTL = FSYMHT
+      DOTXBL = .FALSE.
+      DOTXFL = .FALSE.
+      XBOXSTP = 0.2
+      YBOXSTP = 0.15
+      XBOXCUR = 0.0
+      YBOXCUR = 0.0
 C---- ARROW DRAWING PARAMETERS.
       IARTYPE = KARTBA - 1
       ARSIZE = 0.7 * FSYMHT
@@ -1184,7 +1214,7 @@ C
       ELSE
 C
 C CHECK ARGUMENTS PRESENT IF REQUIRED, NOT IF NOT.
-C HELP, WHICH CAN HAVE NO ARGUMENTS, NEEDS A SPECIAL CASE.
+C HELP AND VERSION , WHICH CAN HAVE NO ARGUMENTS, NEED SPECIAL CASES.
 C
          IF( HAVARG .AND. NARGS(ICMD) .EQ. 0 )THEN
             CALL TXBEGIN
@@ -1194,7 +1224,7 @@ C
             GOTO 1
          ENDIF
          IF( .NOT. HAVARG .AND. NARGS(ICMD) .GT. 0 )THEN
-            IF( ICMD .NE. KHELP )THEN
+            IF( (ICMD .NE. KHELP) .AND. (ICMD .NE. KVRI) )THEN
                CALL TXBEGIN
                WRITE(6,121)CMDS(ICMD)(1:LNBC(CMDS(ICMD),1,1)),
      +              NARGS(ICMD)
@@ -1246,19 +1276,22 @@ C
  130     CONTINUE
 C
 C CHECK CORRECT NUMBER OF ARGUMENTS FOR COMMAND.
-C ALLOW 1 OR 2 ARGUMENTS FOR HISTSTYLE, EVAL, AXCUT
-C              AND OBEY AS SPECIAL CASES
+C ALLOW 1 OR 2 ARGUMENTS FOR HISTSTYLE, EVAL, AXCUT,
+C              STYLE AND OBEY AS SPECIAL CASES.
 C ALLOW 1, 2 OR 3 ARGUMENTS FOR DEVICE AS A SPECIAL CASE.
 C ALLOW 3, 4 0R 5 ARGUMENTS FOR READ AS A SPECIAL CASE.
 C ALLOW 0 OR 1 ARGUMENTS FOR HELP AS A SPECIAL CASE.
+C ALLOW 0 OR 1 ARGUMENTS FOR VERSION AS A SPECIAL CASE.
 C ALLOW 4 OR 5 ARGUMENTS FOR ITEVAL AS A SPECIAL CASE.
+C ALLOW 1 OR 3 ARGUMENTS FOR BOXTEXT AS A SPECIAL CASE.
 C
          IF( ICARGS .NE. NARGS(ICMD) )THEN
             IF( ICMD .EQ. KDEV .OR. ICMD .EQ. KOBEY .OR.
      +           ICMD .EQ. KREAD .OR. ICMD .EQ. KHISTMD .OR.
      +           ICMD .EQ. KHELP .OR. ICMD .EQ. KEVAL .OR.
      +           ICMD .EQ. KEVAL .OR. ICMD .EQ. KIEVAL .OR.
-     +           ICMD .EQ. KGAXCUT )THEN
+     +           ICMD .EQ. KGAXCUT .OR. ICMD .EQ. KVRI .OR.
+     +           ICMD .EQ. KTXBOX .OR. ICMD .EQ. KSTYLE )THEN
                IF( ICMD .EQ. KREAD )THEN
                   IF( ICARGS .LT. 3 .OR. ICARGS .GT. 5 )THEN
                      CALL TXBEGIN
@@ -1266,7 +1299,7 @@ C
                      CALL TXEND
                      GOTO 1
                   ENDIF
-               ELSE IF( ICMD .EQ. KHELP )THEN
+               ELSE IF( ICMD .EQ. KHELP .OR. ICMD .EQ. KVRI )THEN
                   IF( ICARGS .GT. 1 )THEN
                      CALL TXBEGIN
                      WRITE(6,124)CMDS(ICMD)(1:LNBC(CMDS(ICMD),1,1)),0,1
@@ -1287,6 +1320,13 @@ C
                      CALL TXEND
                      GOTO 1
                   ENDIF
+               ELSE IF( ICMD .EQ. KTXBOX )THEN
+                  IF( ICARGS .NE. 3 .AND. ICARGS .NE. 1 )THEN
+                     CALL TXBEGIN
+                     WRITE(6,124)CMDS(ICMD)(1:LNBC(CMDS(ICMD),1,1)),1,3
+                     CALL TXEND
+                     GOTO 1
+                  ENDIF                     
                ELSE
                   IF( ICARGS .GT. 2 )THEN
                      CALL TXBEGIN
@@ -1335,7 +1375,7 @@ C
      +        261,262,263,264,265,266,267,268,269,270,
      +        271,272,273,274,275,276,277,278,279,280,
      +        281,282,283,284,285,286,287,288,289,290,
-     +        291,292,293,294,295),ICMD
+     +        291,292,293,294,295,296,297,298),ICMD
 C
 C DEVICE
  201     CONTINUE
@@ -1359,10 +1399,12 @@ C---- GTERM DEVICE
  2011       CONTINUE
             CALL DGTERM
             CALL GTWIDTH(2.0)
+            DEVASP = 1.33
             GOTO 2017
 C---- TEK4K DEVICE
  2012       CONTINUE
             CALL DTEK4K
+            DEVASP = 1.33
             GOTO 2017
 C---- EPSCOL DEVICE
  2013       CONTINUE
@@ -1379,7 +1421,11 @@ C---- EPSCOL DEVICE
                VDIM(3) = 0.5
                VDIM(4) = 0.5
                CALL PRSDIM(ARGS(3), VDIM, 4)
-               CALL EPSDIM(VDIM(1),VDIM(2),VDIM(3),VDIM(4))
+               CALL EPSDIM(VDIM(1)-INPOINT,VDIM(2)-INPOINT,
+     +              VDIM(3),VDIM(4))
+               DEVASP = VDIM(1) / VDIM(2)
+            ELSE
+               DEVASP = 1.0
             ENDIF
             CALL DEPCOL
             GOTO 2017
@@ -1392,6 +1438,7 @@ C---- EPSBIN DEVICE
             IE = LNBC(ARGS(2),1,1)
             CALL EPSNAM(ARGS(2)(1:IE))
             CALL DEPBIN
+            DEVASP = 1.0
             GOTO 2017
 C---- SVG DEVICE
  2015       CONTINUE
@@ -1405,7 +1452,10 @@ C---- SVG DEVICE
                VDIM(1) = 800.0
                VDIM(2) = 800.0
                CALL PRSDIM(ARGS(3), VDIM, 2)
-               CALL SVGDIM(VDIM(1), VDIM(2))
+               CALL SVGDIM(VDIM(1)-1, VDIM(2)-1)
+               DEVASP = VDIM(1) / VDIM(2)
+            ELSE
+               DEVASP = 1.0
             ENDIF            
             CALL DSVGCL
             GOTO 2017
@@ -1443,18 +1493,29 @@ C MAXPOINTS. FREE AND RE-ALLOCATE POINT DATA STORE.
 #else
             CALL CMMGFS(1,0,NAVAIL)
 #endif
-            CALL TXBEGIN
-            WRITE(6,2023)NAVAIL
+            IF( IDEV .NE. KDTK )THEN
+               CALL TXBEGIN
+               WRITE(6,2023)NAVAIL
  2023       FORMAT(1X,'WORDS AVAILABLE: ',I6,' INCLUDING 1000 EXCESS.')
+               CALL TXEND
+            ENDIF
             NWORDS = NSTACK * NPOINTS
             IF( NWORDS .GT. (NAVAIL-1000) )THEN
-               WRITE(6,2024)NSTACK,NPOINTS,NWORDS,NAVAIL-1000
+               IF( IDEV .NE. KDTK )THEN
+                  CALL TXBEGIN
+                  WRITE(6,2024)NSTACK,NPOINTS,NWORDS,NAVAIL-1000
  2024          FORMAT(1X,'NSTACK:',I6,' NPOINTS:',I6,' = ',I6,' WORDS,',
-     +                ' EXCEEDS MAX AVAIL:',I6)
+     +                 ' EXCEEDS MAX AVAIL:',I6)
+                  CALL TXEND
+               ENDIF
                NWORDS = NAVAIL - 1000
                NPOINTS = NWORDS / NSTACK
-               WRITE(6,2025)NPOINTS
+               IF( IDEV .NE. KDTK )THEN
+                  CALL TXBEGIN
+                  WRITE(6,2025)NPOINTS
  2025          FORMAT(1X,'ALLOCATING MAXIMUM. NPOINTS = ',I6)
+                  CALL TXEND
+               ENDIF
             ENDIF
             CALL CMMALF(NWORDS,0,0,IFWA)
             IOFF = IFWA - LOCF(DA(1))
@@ -1462,10 +1523,13 @@ C MAXPOINTS. FREE AND RE-ALLOCATE POINT DATA STORE.
             IYOFF = IXOFF + NPOINTS
             IAOFF = IYOFF + NPOINTS
             IBOFF = IAOFF + NPOINTS
-            WRITE(6,400)NPOINTS
+            IF( IDEV .NE. KDTK )THEN
+               CALL TXBEGIN
+               WRITE(6,400)NPOINTS
+               CALL TXEND
+            ENDIF
             HAVDATA = .FALSE.
             IF( NEVAL .GT. NPOINTS )NEVAL = 0
-            CALL TXENDGR
          ELSE
             CALL TXBEGIN
             WRITE(6,2022)
@@ -1995,13 +2059,18 @@ C
 C STYLE
  230     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         ISTY = LOOKUP(STYNAM,NSTY,ARGS(1),LOWEROK,.TRUE.)
-         IF( ISTY .LE. 0 )THEN
-            ILKUPE = ISTY
+         IARG = LOOKUP(STYNAM,NSTY,ARGS(1),LOWEROK,.TRUE.)
+         IF( ICARGS .EQ. 2 )THEN
+            IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+         ENDIF
+         IF( IARG .LE. 0 )THEN
+            ILKUPE = IARG
             CLKUPE = 'STYLE MODE'
             GOTO 9100
          ELSE
+            ISTY = IARG
             CALL SETSTY(ISTY)
+            IF( ICARGS .EQ. 2 )CALL XUNIT(F2)
             GCHANGE = .TRUE.
          ENDIF
          GOTO 299
@@ -2037,6 +2106,7 @@ C
          WRITE(6,*)'PATH PREFIX = [',PATHNAM(1:LNBC(PATHNAM,1,1)),']'
          IF( HAVDEV )THEN
             WRITE(6,*)'DEVICE = ',DEVNAM(IDEV)
+            WRITE(6,*)'DEVICE ASPECT RATIO = ',DEVASP
          ELSE
             WRITE(6,*)'NO DEVICE OPEN YET.'
          ENDIF
@@ -2183,6 +2253,8 @@ C
          WRITE(6,*)'BOXTEXT HATCH MODE: ',HBHNAM(IHTXBOX)
          WRITE(6,*)'BOXTEXT TEXT MODE: ',HBTNAM(ITTXBOX)
          WRITE(6,*)'BOXTEXT BOX MODE: ',HBBNAM(IBTXBOX)
+         WRITE(6,*)'BOXTEXT POSITION: ',XBOXCUR,YBOXCUR
+         WRITE(6,*)'BOXTEXT AUTO STEPS: ',XBOXSTP,YBOXSTP
          WRITE(6,*)'ARROW TYPE: ',ARTNAM(IARTYPE+1)
          WRITE(6,*)'ARROW SIZE: ',ARSIZE
          WRITE(6,*)'ARROW SHARPNESS: ',ARSHARP
@@ -2291,10 +2363,12 @@ C PANEOUTLINE
  241     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
          IF( .NOT. LPANE )THEN
-            CALL TXBEGIN
-            WRITE(6,2411)
- 2411       FORMAT(1X,'WARNING - NO PANE ACTIVE.')
-            CALL TXEND
+            IF( IDEV .NE. KDTK )THEN
+               CALL TXBEGIN
+               WRITE(6,2411)
+ 2411          FORMAT(1X,'WARNING - NO PANE ACTIVE.')
+               CALL TXEND
+            ENDIF
          ELSE
             CALL OPANE
             GCHANGE = .TRUE.
@@ -2335,10 +2409,12 @@ C BLANKOUTLINE
  244     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
          IF( .NOT. LBLNK )THEN
-            CALL TXBEGIN
-            WRITE(6,2441)
- 2441       FORMAT(1X,'WARNING - NO BLANK AREA ACTIVE.')
-            CALL TXEND
+            IF( IDEV .NE. KDTK )THEN
+               CALL TXBEGIN
+               WRITE(6,2441)
+ 2441          FORMAT(1X,'WARNING - NO BLANK AREA ACTIVE.')
+               CALL TXEND
+            ENDIF
          ELSE
             CALL OBLANK
             GCHANGE = .TRUE.
@@ -2358,6 +2434,11 @@ C PATHPREFIX
 C
 C EVAL
 C ITEVAL
+C 2DEVAL
+ 296     CONTINUE
+C---- 2DEVAL.
+         IF( .NOT. HAVDATA )GOTO 9095
+         NEVAL = NDATA
  247     CONTINUE
 C---- EVAL.
          ITERST = 1
@@ -2380,10 +2461,12 @@ C---- ITEVAL.
  2473    CONTINUE
 C---- SHARED EVAL/ITEVAL.
          IF( NEVAL .EQ. 0 )THEN
-            CALL TXBEGIN
-            WRITE(6,2471)
- 2471       FORMAT(1X,'NO ERANGE HAS BEEN SET.  DEFAULTING.')
-            CALL TXENDGR
+            IF( IDEV .NE. KDTK )THEN
+               CALL TXBEGIN
+               WRITE(6,2471)
+ 2471          FORMAT(1X,'NO ERANGE HAS BEEN SET.  DEFAULTING.')
+               CALL TXEND
+            ENDIF
             RBASE = 1.0
             RSTART = 0.0
             RSTOP = 1.0
@@ -2401,7 +2484,8 @@ C---- SHARED EVAL/ITEVAL.
      +              STRINGS, STRILEN, TXTCON,
      +              ZEROVAL, BB, DOBB, FSYMHT,
      +              ARSIZE, ARSHARP, ARBARB,
-     +              IARTYPE, ANSKPSL, ANSCALE) .EQ. 0 )THEN
+     +              IARTYPE, ANSKPSL, ANSCALE,
+     +              (ICMD .EQ. K2DEVAL)) .EQ. 0 )THEN
                   HAVDATA = .TRUE.
                   NDATA = NEVAL
                ELSE
@@ -2417,7 +2501,7 @@ C---- SHARED EVAL/ITEVAL.
                   ENDIF
                ENDIF
  2472       CONTINUE
-            IF( DOBB )THEN
+            IF( DOBB .AND. (IDEV .NE. KDTK) )THEN
                IF( BBEMPTY(BB) )THEN
                   CALL TXBEGIN
                   WRITE(6,*)'EVAL BOUNDING BOX IS EMPTY.'
@@ -2500,18 +2584,29 @@ C NSTACK
 #else
             CALL CMMGFS(1,0,NAVAIL)
 #endif
-            CALL TXBEGIN
-            WRITE(6,2523)NAVAIL
+            IF( IDEV .NE. KDTK )THEN
+               CALL TXBEGIN
+               WRITE(6,2523)NAVAIL
  2523       FORMAT(1X,'WORDS AVAILABLE: ',I6,' INCLUDING 1000 EXCESS.')
+               CALL TXEND
+            ENDIF
             NWORDS = NSTACK * NPOINTS
             IF( NWORDS .GT. (NAVAIL-1000) )THEN
-               WRITE(6,2524)NSTACK,NPOINTS,NWORDS,NAVAIL-1000
+               IF( IDEV .NE. KDTK )THEN
+                  CALL TXBEGIN
+                  WRITE(6,2524)NSTACK,NPOINTS,NWORDS,NAVAIL-1000
  2524          FORMAT(1X,'NSTACK:',I6,' NPOINTS:',I6,' = ',I6,' WORDS,',
      +                ' EXCEEDS MAX AVAIL:',I6)
+                  CALL TXEND
+               ENDIF
                NWORDS = NAVAIL - 1000
                NPOINTS = NWORDS / NSTACK
-               WRITE(6,2525)NPOINTS
+               IF( IDEV .NE. KDTK )THEN
+                  CALL TXBEGIN
+                  WRITE(6,2525)NPOINTS
  2525          FORMAT(1X,'ALLOCATING MAXIMUM. NPOINTS = ',I6)
+                  CALL TXEND
+               ENDIF
             ENDIF
             CALL CMMALF(NWORDS,0,0,IFWA)
             IOFF = IFWA - LOCF(DA(1))
@@ -2519,11 +2614,14 @@ C NSTACK
             IYOFF = IXOFF + NPOINTS
             IAOFF = IYOFF + NPOINTS
             IBOFF = IAOFF + NPOINTS
-            WRITE(6,2526)NSTACK
+            IF( IDEV .NE. KDTK )THEN
+               CALL TXBEGIN
+               WRITE(6,2526)NSTACK
  2526       FORMAT(1X,'ALLOCATED SPACE FOR ',I2,' STACK LEVELS.')
+               CALL TXEND
+            ENDIF
             HAVDATA = .FALSE.
             IF( NEVAL .GT. NPOINTS )NEVAL = 0
-            CALL TXENDGR
          ELSE
             GOTO 9093
          ENDIF
@@ -2847,7 +2945,8 @@ C LSYSTEM
          IF( .NOT. IFROMC(ARGS(1),INT1,1,LNBC(ARGS(1),1,1)) )GOTO 9093
          IF( .NOT. IFROMC(ARGS(2),INT2,1,LNBC(ARGS(2),1,1)) )GOTO 9093
          IF( .NOT. RFROMC(ARGS(3),F1,1,LNBC(ARGS(3),1,1)) )GOTO 9098
-         IF( LSYSTEM(INT1, INT2, F1, STRINGS, STRILEN, MEMS) .NE. 0)THEN
+         IF( LSYSTEM(INT1, INT2, F1, STRINGS, STRILEN, MEMS, USEASP)
+     +        .NE. 0)THEN
             IF( IDEP .GT. 0 .OR. INUNIT .EQ. 8 )THEN
                CALL TXBEGIN
                WRITE(6,2761)
@@ -2874,15 +2973,26 @@ C LOADPROC
          ENDIF
          GOTO 299
 C
-C TXBOX
+C BOXTEXT
  278     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
+         IF( ICARGS .EQ. 3 )THEN
+            IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+            IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
+            XBOXCUR = F2
+            YBOXCUR = F3
+         ELSE
+            F2 = XBOXCUR
+            F3 = YBOXCUR
+         ENDIF
          IF( ITTXBOX .EQ. KHBFIX )THEN
             F4 = WFTXBOX
          ELSE
             F4 = WFTXBOX * WTXBOX
+         ENDIF
+         IF( DOTXBL )THEN
+            F2 = F2 + 0.5 * WTXBOX
+            F3 = F3 + 0.5 * HTXBOX
          ENDIF
          CALL HTBOX(ARGS(1)(1:LNBC(ARGS(1),1,1)),
      +        IATXBOX,
@@ -2897,8 +3007,10 @@ C TXBOX
      +        ITTXBOX .EQ. KHBFIX,
      +        FSYMHT,
      +        (IBTXBOX .EQ. KHBBOU) .OR. (IBTXBOX .EQ. KHBBBT),
-     +        FSYMHTL)
+     +        FSYMHTL, DOTXFL .AND. (ITTXBOX .EQ. KHBFIX))
          GCHANGE = .TRUE.
+         XBOXCUR = XBOXCUR + XBOXSTP
+         YBOXCUR = YBOXCUR + YBOXSTP
          GOTO 299
 C
 C CSGROUP
@@ -2918,7 +3030,7 @@ C USEKEY
          IF( .NOT. HAVDEV )GOTO 9090
          IF( LPANE )CALL ENPANE
          PXL = 0.0
-         PXH = 0.8
+         PXH = 0.8 * USEASP
          PYL = 0.0
          PYH = 0.999
          CALL PANE(PXL,PXH,PYL,PYH)
@@ -2964,35 +3076,35 @@ C KEYS
  2822          FORMAT(1X,'NO KEYS ADDED.')
                CALL TXEND
             ELSE
-               PXL = 0.82
-               PXH = 0.999
+               PXL = 0.82 * USEASP
+               PXH = 0.999 * USEASP
                PYL = 0.0
                PYH = 0.999
                CALL PANE(PXL,PXH,PYL,PYH)
                LPANE = .TRUE.
                GCHANGE = .TRUE.        
-               XPOS = 0.91
+               XPOS = 0.91 * USEASP
                YPOS = 0.92
                CALL OFF2(XPOS,YPOS)
                TWD = 0.1
                TWIDTH = STRING('KEY')
                CALL SYMHT(TWD/TWIDTH)
                TWIDTH = TWD
-               CALL OFF2(XPOS-TWIDTH/2,YPOS)
+               CALL OFF2(USEASP*(XPOS-TWIDTH/2),YPOS)
                CALL SYMTXT('KEY')
-               XPOS = 0.85
+               XPOS = 0.85 * USEASP
                YPOS = 0.9
                CALL SYMHT(0.02)
                DO 2823 I=1,NKEYS
                   CALL RGB1(KEYRED(I),KEYGRN(I),KEYBLU(I))
                   CALL LINSF1(KEYWID(I))
                   CALL SETSTY(KEYSTY(I))
-                  XPOS = 0.85
+                  XPOS = 0.85 * USEASP
                   CALL OFF2(XPOS,YPOS)
-                  XPOS = 0.97
+                  XPOS = 0.97 * USEASP
                   CALL ON2(XPOS,YPOS)
                   CALL DSHOFF
-                  XPOS = 0.85
+                  XPOS = 0.85 * USEASP
                   YPOS = YPOS - 0.02
                   CALL OFF2(XPOS,YPOS)
                   CALL SYMTXT(KEYTEXT(I)(1:LNBC(KEYTEXT(I),1,1)))
@@ -3018,11 +3130,12 @@ C       INITIALISATIONS HERE, SO ACCEPT A BIT OF MESSINESS.
          IF( LPANE )CALL ENPANE
          GOTO 2831
 C
-C BOXPSIZE W H
+C BOXPSIZE W H BOTLEFT
  284     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
          IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
          IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+         DOTXBL = GETYN(ARGS(3))
          WTXBOX = F1
          HTXBOX = F2
          GOTO 299
@@ -3043,7 +3156,7 @@ C BOXPHATCH SPACING IANGLE MODE
          IATXBOX = INT1
          GOTO 299
 C
-C BOXPTEXT WIDTHFRAC MODE
+C BOXPTEXT WIDTHFRAC MODE FLUSHLEFT
  286     CONTINUE
          IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
          I = LOOKUP(HBTNAM,NHBT,ARGS(2),LOWEROK,.TRUE.)
@@ -3055,6 +3168,7 @@ C BOXPTEXT WIDTHFRAC MODE
             ITTXBOX = I
          ENDIF
          WFTXBOX = F1
+         DOTXFL = GETYN(ARGS(3))
          GOTO 299
 C
 C BOXPBOX MODE
@@ -3140,10 +3254,46 @@ C INTVALUES (USE INTEGERS FOR GRAPH AXIS VALUES IF POSSIBLE.)
          ENDIF
          GOTO 299
 C
-C VERSION (PUT VERSION INFORMATION IN STRING REGISTER 9.)
+C VERSION (PUT VERSION INFORMATION IN STRING REGISTER OR PRINT IT)
  295     CONTINUE
-         CALL GETVRI(STRINGS(NREGS))
-         STRILEN(NREGS) = LNBC(STRINGS(NREGS),1,0)
+         IF( ICARGS .EQ. 0 )THEN
+            CALL GETVRI(VALUE)
+            CALL TXBEGIN
+            WRITE(6,2951)VALUE(1:LNBC(VALUE,1,1))
+ 2951       FORMAT(1X,A)
+         ELSE
+            IF(.NOT. IFROMC(ARGS(1),INT1,1,LNBC(ARGS(2),1,1)))GOTO 9093
+            INT1 = MAX(1, MIN(INT1, 9))
+            CALL GETVRI(STRINGS(INT1))
+            STRILEN(INT1) = LNBC(STRINGS(INT1),1,0)
+         ENDIF
+         GOTO 299
+C
+C 2DEVAL - 296 - SEE 247 EVAL.
+C
+C GRAPHMODE
+ 297     CONTINUE
+         IF( .NOT. HAVDEV )GOTO 9090
+         IF( GETYN(ARGS(1)) )THEN
+            USEASP = DEVASP
+         ELSE
+            USEASP = 1.0
+         ENDIF
+         XLO = 0.0
+         XHI = USEASP
+         YLO = 0.0
+         YHI = 1.0
+         CALL BOUNDS(XLO,XHI,YLO,YHI)
+         LPANE = .FALSE.
+         GOTO 299
+C
+C BOXPDELTAS DX DY
+ 298     CONTINUE
+         IF( .NOT. HAVDEV )GOTO 9090
+         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+         XBOXSTP = F1
+         YBOXSTP = F2
          GOTO 299
 C
 C END OF COMMAND SWITCH
@@ -3373,7 +3523,7 @@ C
       ELSE
          WRITE(6,*)'ERROR - DYNAMIC ALLOCATION TEST FAILED.'
       ENDIF
-      CALL TXEND
+      CALL TXENDGR
       RETURN
       END
 C
@@ -4378,7 +4528,7 @@ C
      +                      HAVDEV,IDEV,NDEVS,ITER,MEMS,GCHANGE,
      +                      RBASE,RSTART,RSTOP,STRINGS,STRILEN,TXTCON,
      +                      ZEROVAL,BB,DOBB,FSYMHT,ASIZE,ASHARP,BARB,
-     +                      ISTYLE,SKIPSCL,ANNSCL)
+     +                      ISTYLE,SKIPSCL,ANNSCL,LEV2D)
 C---------------------------------------------
 C ULTRA SIMPLE RPN FUNCTION EVALUATOR THAT OPERATES ON VECTORS.
 C COPS IS A STRING CONTAINING OPERANDS AND OPERATORS SEPARATED BY COMMAS
@@ -4401,7 +4551,7 @@ C---------------------------------------------
       CHARACTER*80 STRINGS(9)
       INTEGER STRILEN(9)
       INTEGER ISTYLE
-      LOGICAL HAVDEV, GCHANGE, TXTCON, DOBB
+      LOGICAL HAVDEV, GCHANGE, TXTCON, DOBB, LEV2D
 #ifdef PORTF77
       REAL RANF
 #endif
@@ -4498,9 +4648,14 @@ C---- SAVE SYMHT VALUE AS IT IS ON ENTRY, TO RESTORE ON EXIT.
       LFSYMHT = FSYMHT
 C
 C---- THE STACK INDEX GIVES THE TOP OCCUPIED ITEM. INITLY X RANGE IN O.
+C---- OR, IF LEV2D, X AND Y DATA IN 0 AND 1.
 C---- PUSH: INCREMENT ISTACK, CHECK <= NS1, PUT THINGS IN STACK[ISTACK].
 C---- POP: CHECK > 0, GET THINGS FROM STACK[ISTACK], DECREMENT ISTACK.
-      ISTACK = 0
+      IF( LEV2D )THEN
+         ISTACK = 1
+      ELSE
+         ISTACK = 0
+      ENDIF
       NS1 = NSTACK - 1
       IERR = 0
 C
@@ -5932,7 +6087,7 @@ C
       END
 C
       INTEGER FUNCTION LSYSTEM( NRULES, NITER, ANGLE,
-     +                          STRINGS, STRILEN, REGS )
+     +                          STRINGS, STRILEN, REGS, USEASP )
 C-----------------------------------------
 C GENERATE AND DRAW AN L-SYSTEM.
 C THE AXIOM IS IN STRING REGISTER 1.
@@ -5941,7 +6096,7 @@ C THE ANGLE FOR TURNS IS ANGLE.
 C-----------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INTEGER NRULES, NITER, STRILEN(9)
-      REAL ANGLE, REGS(9)
+      REAL ANGLE, REGS(9), USEASP
       CHARACTER*80 STRINGS(9)
 C
       INTEGER NSUBST, NVALID, NSTACK
@@ -6080,7 +6235,7 @@ C
             XHI = XPOS
             YHI = YPOS
          ELSE
-            CALL OFF2(XPOS, YPOS)
+            CALL OFF2(XPOS*USEASP, YPOS)
          ENDIF
  20      CONTINUE
             READ(OUTLUN,100,END=21)CC
@@ -6090,9 +6245,9 @@ C           WRITE(6,*)CC
                YNEW = YPOS + SIN(CANGLE)
                IF( IPASS .EQ. 2 )THEN
                   IF( CC .EQ. 'F' )THEN
-                     CALL ON2(XNEW, YNEW)
+                     CALL ON2(XNEW*USEASP, YNEW)
                   ELSE
-                     CALL OFF2(XNEW, YNEW)
+                     CALL OFF2(XNEW*USEASP, YNEW)
                   ENDIF
                ELSE
                   XLO = MIN(XLO, XNEW)
@@ -6132,7 +6287,7 @@ C           WRITE(6,*)CC
                   YPOS = YSTK(ISTK)
                   CANGLE = ASTK(ISTK)
                   IF( IPASS .EQ. 2 )THEN
-                     CALL OFF2(XPOS, YPOS)
+                     CALL OFF2(XPOS*USEASP, YPOS)
                   ENDIF
                ENDIF
             ENDIF
@@ -6259,7 +6414,8 @@ C
       END
 C
       SUBROUTINE HTBOX(TEXT, IANGLE, XC, YC, W, H, WI, DH, XBL, XBH,
-     +     LHORIZ, LVERT, LINBOX, LFIXED, FSYMHT, LOUTBOX, FSYMHTL)
+     +     LHORIZ, LVERT, LINBOX, LFIXED, FSYMHT, LOUTBOX, FSYMHTL,
+     +     FLSLEFT)
 C------------------------------------
 C HATCHED TEXT BOX.
 C THIS MAIN PURPOSE OF THIS IS TO PROVIDE A "PRIMITIVE" ELEMENT
@@ -6269,10 +6425,10 @@ C------------------------------------
       CHARACTER*(*) TEXT
       REAL XC, YC, W, H, WI, DH, XBL, XBH, FSYMHT, FSYMHTL
       INTEGER IANGLE
-      LOGICAL LHORIZ, LINBOX, LVERT, LFIXED, LOUTBOX
+      LOGICAL LHORIZ, LINBOX, LVERT, LFIXED, LOUTBOX, FLSLEFT
 C
       INTEGER MAXLINL, MAXLINS
-      PARAMETER( MAXLINL=30, MAXLINS=5 )
+      PARAMETER( MAXLINL=80, MAXLINS=5 )
       REAL XL, YL, XH, YH, XLI, YLI, XHI, YHI, XP, DXI, TWIDTH, ADJWID
       REAL ADJHI, XPE, YP, YPE, YCUR, ADJHIL, ADJWIL
       REAL STRING
@@ -6330,8 +6486,13 @@ C THEY ARE FOUND DIRECTLY FROM WI IF SCALING THE TEXT.
          CALL SYMHT(FSYMHTL)
          ADJWID = FSYMHTL * TWIDTH + 0.03 * W
          ADJHI = FSYMHTL + 0.05 * H
-         XLI = XC - 0.5 * ADJWID
-         XHI = XC + 0.5 * ADJWID
+         IF( FLSLEFT )THEN
+            XLI = XC - 0.49 * W
+            XHI = XC + 0.49 * W            
+         ELSE
+            XLI = XC - 0.5 * ADJWID
+            XHI = XC + 0.5 * ADJWID
+         ENDIF
          ADJWID = ADJWID - 0.03 * W
       ELSE
          XLI = XC - 0.5 * WI
@@ -6394,7 +6555,11 @@ C DRAW TEXT IN THE INNER BOX (TEXT CSG).
             ADJHIL = ADJWID / TWIDTH
             CALL SYMHT(ADJHIL)
          ENDIF
-         CALL OFF2(XC-ADJWIL/2,YCUR)
+         IF( FLSLEFT )THEN
+            CALL OFF2(XC-0.475*W, YCUR)
+         ELSE
+            CALL OFF2(XC-ADJWIL/2,YCUR)
+         ENDIF
          CALL SYMTXT(LINES(I)(1:LNBC(LINES(I),1,1)))
          YCUR = YCUR - ADJHI
  30   CONTINUE
@@ -6450,7 +6615,6 @@ C
 C KEEP ARROW "SHARPNESS" AND ARROW "BARB" WITHIN REASONABLE LIMITS.
       ASHARPL = MAX(0.5, MIN(5.0, ASHARP))
       BARBL = MAX(0.05, MIN(0.95, BARB))
-C      print *,asize,asharp,barb,istyle,skipscl,annscl
 C
 C FIND LINE DELTAS AND LENGTH. IF VERY SHORT, DO NOTHING.
       DX = X2 - X1
@@ -6973,7 +7137,7 @@ C------------------------------------
       IMPLICIT LOGICAL (A-Z)
       CHARACTER*4 OUTSTR
 C
-      OUTSTR = '0.79'
+      OUTSTR = '0.82'
       RETURN
       END
 C
@@ -6986,20 +7150,23 @@ C------------------------------------
       CHARACTER*80 OUTSTR
 C
       CHARACTER*4 VERSTR
+      CHARACTER*9 LASTMD
+      PARAMETER( LASTMD='27-AUG-25' )
 C
 #ifdef UNIX
       INTEGER DMY(3)
       CALL IDATE(DMY)
       CALL VERSION(VERSTR)
-      WRITE(OUTSTR,100)VERSTR, DMY(1), DMY(2), DMY(3)
+      WRITE(OUTSTR,100)VERSTR, DMY(1), DMY(2), DMY(3), LASTMD
  100  FORMAT('GPLOT V',A4,' FOR UNIX-LIKE SYSTEMS. RUN DATE: ',
-     +     I2,'/',I2.2,'/',I4)
+     +     I2,'/',I2.2,'/',I4,' LAST MOD: ',A)
 #endif
 #ifndef PORTF77
       CHARACTER*10 DATE
       CALL VERSION(VERSTR)
-      WRITE(OUTSTR,100)VERSTR, DATE()
- 100  FORMAT('GPLOT V',A4,' FOR CDC NOS 2.8.7  RUN DATE: ',A10)
+      WRITE(OUTSTR,100)VERSTR, DATE(), LASTMD
+ 100  FORMAT('GPLOT V',A4,' FOR CDC NOS 2.8.7  RUN DATE: ',A10,
+     +     ' LAST MOD: ',A)
 #endif
 C
       RETURN
@@ -7010,6 +7177,9 @@ C------------------------------------
 C POTENTIALLY ADD A PATH NAME AS A PREFIX TO A FILE NAME AND
 C AND RETURN THE RESULT. RETURN THE LENGTH OF THE FULL NAME
 C WITHOUT TRAILING BLANKS.
+C ON UNIX-LIKE SYSTEMS, CONVERT FILENAM TO LOWER CASE. THIS
+C COULD BE AN OPTION, BUT IT IS PROBABLY BEST TO ALWAYS DO
+C THIS GIVEN THE ALLERGY TO UPPER CASE ON THOSE SYSTEMS.
 C THIS JUST RETURNS FILENAM ON NOS, WHERE LONGER PATHS ARE
 C MEANINGLESS.
 C------------------------------------
@@ -7045,6 +7215,9 @@ C
       FULLNAM = FILENAM
 #endif
       IFNE = MIN(LNBC(FULLNAM,1,1), MAXFNL)
+#ifdef UNIX
+      CALL LOCASE(FULLNAM(1:IFNE))
+#endif
 C
       RETURN
       END

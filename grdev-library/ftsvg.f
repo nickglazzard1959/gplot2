@@ -22,7 +22,7 @@ C CLOSE ANY EXISTING OUTPUT FILE AND OPEN A NEW ONE.
 C----------------------------------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INCLUDE 'svgcmn.cmn'
-      CHARACTER*80 FNO, ALINE
+      CHARACTER*80 FNO, ALINE, CFMT
       INTEGER IOS, FRNO, LNBC
       INTEGER IXMIN, IYMIN, IWIDTH, IHEIGHT
       CHARACTER*53 TID
@@ -53,12 +53,16 @@ C
             IYMIN = INT(DVYMAX - MIN(DVYMAX,YMAX))
             IWIDTH = INT(XMAX - XMIN) + 1
             IHEIGHT = INT(YMAX - YMIN) + 1
-            WRITE(LUN,29)IWIDTH
+            WRITE(CFMT,29)IWIDTH
  29         FORMAT(' ^W^I^D^T^H="',I4,'"')
-            WRITE(LUN,39)IHEIGHT
+            CALL SQSPACE(CFMT,ALINE,LUN)
+            WRITE(CFMT,39)IHEIGHT
  39         FORMAT(' ^H^E^I^G^H^T="',I4,'"')
-            WRITE(LUN,19)IXMIN-1, IYMIN-1, IWIDTH+1, IHEIGHT+1
- 19         FORMAT(' ^V^I^E^WB^O^X="',I5,I5,I5,I5,'">')
+            CALL SQSPACE(CFMT,ALINE,LUN)
+C            WRITE(LUN,19)IXMIN-1, IYMIN-1, IWIDTH+1, IHEIGHT+1
+            WRITE(CFMT,19)0, 0, INT(DVXMAX+1), INT(DVYMAX+1)
+ 19         FORMAT(' ^V^I^E^WB^O^X="',I5,'*',I5,'*',I5,'*',I5,'">')
+            CALL SQSPACE(CFMT,ALINE,LUN)
 C
 C---- COPY THE CONTENTS OF THE SCRATCH FILE TO THE OUTPUT FILE.
 C
@@ -179,6 +183,18 @@ C
       RETURN
       END
 C
+      SUBROUTINE SVGDGT( UXS, UYS )
+C --- ------------------------------------------------------------------
+C --- RETURN THE SVG CANVAS SIZE PREVIOUSLY SET WITH SVGDIM().
+C
+      INCLUDE 'svgcmn.cmn'
+C
+      UXS = DVXMAX
+      UYS = DVYMAX
+C
+      RETURN
+      END
+C
       SUBROUTINE SVGBEGN
 C----------------------------------------------------------------------
 C INITIALIZE SVG OUTPUT.
@@ -191,8 +207,8 @@ C----------------------------------------------------------------------
       EMPTYF = .TRUE.
       INGROUP = .FALSE.
       IF( .NOT. DVSET )THEN
-         DVXMAX = 800.0
-         DVYMAX = 800.0
+         DVXMAX = 799.0
+         DVYMAX = 799.0
          DVSET = .TRUE.
       ENDIF
       CALL SVGCLR
@@ -218,6 +234,39 @@ C
       RETURN
       END
 C
+      SUBROUTINE SQSPACE( CFMT, COUT, SLUN )
+C----------------------------------------------------------------------
+C REMOVE BLANKS FROM CFMT TO COUT.
+C ANY SPACES THAT MUST BE PRESERVED IN CFMT SHOULD BE REPLACED BY *.
+C ALL * IN CFMT WILL BECOME BLANKS IN COUT.
+C WRITE RESULT TO LUN SLUN.
+C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      CHARACTER*(*) CFMT, COUT
+      INTEGER SLUN
+C
+      INTEGER I, IOUT
+C
+      IOUT = 0
+      DO 2 I=1,72
+         IF( CFMT(I:I) .NE. ' ' )THEN
+            IOUT = IOUT + 1
+            COUT(IOUT:IOUT) = CFMT(I:I)
+         ENDIF
+ 2    CONTINUE
+C
+      DO 3 I=1,IOUT
+         IF( COUT(I:I) .EQ. '*' )THEN
+            COUT(I:I) = ' '
+         ENDIF
+ 3    CONTINUE
+C
+      WRITE(SLUN,101)COUT(1:IOUT)
+ 101  FORMAT(A)
+C
+      RETURN
+      END
+C
       SUBROUTINE SVGMOVE( XU, YU, ON )
 C----------------------------------------------------------------------
 C MOVE OR DRAW TO (XU,YU).
@@ -232,15 +281,15 @@ C----
       CHARACTER*52 MATRIX
       CHARACTER*15 LB
       CHARACTER*72 COUT, CFMT
-      INTEGER IPEN(3), I, IOUT
+      INTEGER IPEN(3), I
       REAL X, Y
       DATA STYLE /'^S^T^Y^L^E="^S^T^R^O^K^E:^R^G^B('/
       DATA STYWID /'^S^T^R^O^K^E-^W^I^D^T^H:'/
-      DATA MATRIX /'^T^R^A^N^S^F^O^R^M="^M^A^T^R^I^X(1 0 0  1 0   0)"'/
+      DATA MATRIX /'^T^R^A^N^S^F^O^R^M="^M^A^T^R^I^X(1 0 0 1 0 0)"'/
       DATA LB /'<^L^I^N^E*^X1="'/
 C
-      X = DVXMAX * XU
-      Y = DVYMAX * YU
+      X = MIN(DVXMAX, MAX(0.0, XU))
+      Y = MIN(DVYMAX, MAX(0.0, YU))
 C
       IF( ON )THEN
 C
@@ -251,10 +300,12 @@ C---- IF NOT IN A GROUP, OPEN A GROUP SETTING COLOUR AND WIDTH.
  1          CONTINUE
  9          FORMAT('<^G ',A)
             WRITE(SLUN,9)MATRIX
-            WRITE(SLUN,102)STYLE,IPEN(1),IPEN(2),IPEN(3)
- 102        FORMAT(A,I3,I4,I4,');')
-            WRITE(SLUN,103)STYWID,MIN(9.9,WPEN)
+            WRITE(CFMT,102)STYLE,IPEN(1),IPEN(2),IPEN(3)
+ 102        FORMAT(A,I3,',',I3,',',I3,');')
+            CALL SQSPACE(CFMT,COUT,SLUN)
+            WRITE(CFMT,103)STYWID,MIN(9.9,WPEN)
  103        FORMAT(A,F3.1,'" >')
+            CALL SQSPACE(CFMT,COUT,SLUN)
             INGROUP = .TRUE.
           ENDIF
 C
@@ -263,20 +314,7 @@ C---- UNFORTUNATELY, SAFARI CANNOT DEAL WITH LEADING SPACES SUCH AS
 C---- X1=" 23.987" (CHROME, FIREFOX, ETC. CAN, BUT NOT SAFARI).
 C---- DO FIXED WIDTH OUTPUT TO CFMT, THEN REMOVE SPACES TO COUT.
          WRITE(CFMT,100)LB,XPOS,DVYMAX-YPOS,X,DVYMAX-Y
-         IOUT = 0
-         DO 2 I=1,72
-            IF( CFMT(I:I) .NE. ' ' )THEN
-               IOUT = IOUT + 1
-               COUT(IOUT:IOUT) = CFMT(I:I)
-            ENDIF
- 2       CONTINUE
-         DO 3 I=1,IOUT
-            IF( COUT(I:I) .EQ. '*' )THEN
-               COUT(I:I) = ' '
-            ENDIF
- 3       CONTINUE
-         WRITE(SLUN,101)COUT(1:IOUT)
- 101     FORMAT(A)
+         CALL SQSPACE(CFMT,COUT,SLUN)
          EMPTYF = .FALSE.
       ENDIF
  100  FORMAT(A,F8.3,'"*^Y1="',F8.3,'"*^X2="',F8.3,'"*^Y2="',F8.3,'" />')

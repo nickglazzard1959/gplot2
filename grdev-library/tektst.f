@@ -222,14 +222,16 @@ C---------------------------------------------------
       REAL CX, CY
       INTEGER IX, IY
       BOOLEAN SMOV(3)
+      REAL UNSCALE
+      PARAMETER( UNSCALE=9999.0/7500.0 )
       DATA SMOV /27,91,51/
       SMOV(3) = 51
       IF(IPEN.EQ.1)SMOV(3) = 52
       CALL A12SEQ( SMOV, 3 )
-      CX = MAX(0.0,MIN(X,1.0))
-      CY = MAX(0.0,MIN(Y,1.0))
-      IX = NINT(9999.0*CX)
-      IY = NINT(9999.0*CY)
+      CX = MAX(0.0,MIN(X,9999.0))
+      CY = MAX(0.0,MIN(Y*UNSCALE,9999.0))
+      IX = NINT(CX)
+      IY = NINT(CY)
 C      PRINT 999,IX,IY,IPEN
 C 999  FORMAT(1X,'IX,IY=',I6,',',I6,',','IPEN=',I3)
       CALL GTONUM(IX,4)

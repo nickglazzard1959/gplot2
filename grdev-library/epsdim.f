@@ -1,6 +1,5 @@
       SUBROUTINE EPSDIM( UXS, UYS, UXOFF, UYOFF )
 C --- ------------------------------------------------------------------
-C
 C --- SET THE EPS SIZE TO UXS X UYS INCHES OFFSET BY (UXOFF,UYOFF)
 C --- INCHES
 C
@@ -14,7 +13,19 @@ C
          DIMXXX = .TRUE.
       ENDIF
 C
+      RETURN
       END
 C
-C
+      SUBROUTINE EPSDGT( UXS, UYS, UXOFF, UYOFF )
 C --- ------------------------------------------------------------------
+C --- RETURN THE EPS SIZE PREVIOUSLY SET WITH EPSDIM().
+C
+      INCLUDE 'dfxpsn.cmn'
+C
+      UXS = XSIZE
+      UYS = YSIZE
+      UXOFF = XOFFST
+      UYOFF = YOFFST
+C
+      RETURN
+      END

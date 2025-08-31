@@ -30,8 +30,10 @@ C      PRINT 999,X,XSIZE,XOFFST,Y,YSIZE,YOFFST
 C 999  FORMAT(1X,'X=',F12.6,' XS=',F12.6,' XO=',F12.6,
 C     1         ' Y=',F12.6,' YS=',F12.6,' YO=',F12.6)
 C
-      XPS = (X * XSIZE + XOFFST) * INPS
-      YPS = (Y * YSIZE + YOFFST) * INPS
+C      XPS = (X * XSIZE + XOFFST) * INPS
+C      YPS = (Y * YSIZE + YOFFST) * INPS
+      XPS = (X + XOFFST) * INPS
+      YPS = (Y + YOFFST) * INPS
 C
 C --- BRANCH ACCORDING TO THE BEAM BRIGHTNESS.
 C
