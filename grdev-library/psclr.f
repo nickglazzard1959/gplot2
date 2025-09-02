@@ -12,7 +12,8 @@ C
       PARAMETER( EVERY = .TRUE. )
 C
       CHARACTER FNO*80
-      INTEGER IOS, FRNO
+      INTEGER IOS
+      INTEGER LNBC
 C
       INCLUDE 'dfxpsn.cmn'
       INCLUDE 'dfxpcn.cmn'
@@ -49,7 +50,6 @@ C
       DATA CMTLR/'%%T^R^A^I^L^E^R'/
       DATA CMTBE/'%%B^O^U^N^D^I^N^GB^O^X: '/
       DATA EPEXT/'.^E^P^S'/
-      DATA FRNO/1/
 C
 C --- CLOSE ANY EXISTING FILLED FILE, AFTER WRITING THE TRAILER.
 C
@@ -66,7 +66,6 @@ C 888           FORMAT(1X,'PSCLR ASKED FOR EMPTY FILE TO BE DELETED.')
                WRITE(LUN, 100) CMTBE, INT(XMIN), INT(YMIN),
      &                         INT(XMAX+0.5), INT(YMAX+0.5)
                CLOSE( UNIT=LUN, STATUS='KEEP' )
-               FRNO = FRNO + 1
             END IF
          END IF
 C
@@ -78,26 +77,23 @@ C
                WRITE(LUN,9)CMTLR
                WRITE(LUN, 100) CMTBE, INT(XMIN), INT(YMIN),
      &                         INT(XMAX+0.5), INT(YMAX+0.5)
-            FRNO = FRNO + 1
          ENDIF
       ENDIF
 C
-C --- GENERATE A FRAME NAME.
-C
-#ifdef UNIX
-      WRITE( FNO, 200 )EPFN(1:EPFNL),FRNO,EPEXT
-  200 FORMAT( A,I3.3,A )
-#else
-      WRITE( FNO, 200 )EPFN(1:EPFNL),FRNO
-  200 FORMAT( A,I3.3 )
-#endif
-C      PRINT *,FNO
-C
-C --- OPEN THE OUTPUT FILE, IF DOING ONE FRAME PER FILE.
+C --- OPEN THE OUTPUT FILE. IF DOING ONE FRAME PER FILE,
+C --- CONSTRUCT A FILE NAME WITH THE FRAME NUMBER IN IT.
 C
       IF( .NOT. OPENED .OR. EVERY )THEN
+         FRNO = FRNO + 1
          IF( EVERY )THEN
-            OPEN( UNIT=LUN, FILE=FNO,
+#ifdef UNIX
+            WRITE( FNO, 200 )EPFN(1:EPFNL),FRNO,EPEXT
+ 200        FORMAT( A,I3.3,A )
+#else
+            WRITE( FNO, 200 )EPFN(1:EPFNL),FRNO
+ 200        FORMAT( A,I3.3 )
+#endif            
+            OPEN( UNIT=LUN, FILE=FNO(1:LNBC(FNO,1,1)),
      &       STATUS='UNKNOWN', FORM='FORMATTED',
      &       IOSTAT=IOS )
 C
@@ -123,7 +119,7 @@ C
       YPOS = YMAX
 C
       PRINT 889,XSIZE,YSIZE,XOFFST,YOFFST
- 889  FORMAT(1X,'SIZE ',F12.6,' X ',F12.6,' OFFSET ',F12.6,', ',F12.6)
+ 889  FORMAT(1X,'SIZE ',F7.3,' X ',F7.3,' OFFSET ',F7.3,', ',F7.3,' IN')
 C
 C
 C --- WRITE OUT THE POSTSCRIPT HEADER.

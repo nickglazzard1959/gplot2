@@ -1,6 +1,8 @@
       SUBROUTINE SVGNAM( SFNAME )
 C---------------------------------------------------------------------
 C SET THE SVG OUTPUT FILE NAME STEM TO SFNAME. 4 CHARS MAX ON NOS.
+C 72 CHARS MAX ON "UNIX". ALLOWS FOR 4 CHAR EXT AND 3 DIGIT FRNO.
+C RESET FRAME NUMBER. SFNAME SHOULD BE 79 OR MORE CHARACTERS.
 C---------------------------------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       CHARACTER*(*) SFNAME
@@ -12,6 +14,7 @@ C----
       SVGNL = MIN(4,LEN(SFNAME))
 #endif
       SVGN(1:SVGNL) = SFNAME(1:SVGNL)
+      FRNO = 0
 C
       RETURN
       END
@@ -23,10 +26,9 @@ C----------------------------------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INCLUDE 'svgcmn.cmn'
       CHARACTER*80 FNO, ALINE, CFMT
-      INTEGER IOS, FRNO, LNBC
+      INTEGER IOS, LNBC
       INTEGER IXMIN, IYMIN, IWIDTH, IHEIGHT
       CHARACTER*53 TID
-      DATA FRNO/1/
       DATA TID/'^X^M^L^N^S="^H^T^T^P://^W^W^W.^W3.^O^R^G/2000/^S^V^G"'/
 C
 C---- COMPLETE AND CLOSE ANY EXISTING OPEN FILE.
@@ -59,7 +61,6 @@ C
             WRITE(CFMT,39)IHEIGHT
  39         FORMAT(' ^H^E^I^G^H^T="',I4,'"')
             CALL SQSPACE(CFMT,ALINE,LUN)
-C            WRITE(LUN,19)IXMIN-1, IYMIN-1, IWIDTH+1, IHEIGHT+1
             WRITE(CFMT,19)0, 0, INT(DVXMAX+1), INT(DVYMAX+1)
  19         FORMAT(' ^V^I^E^WB^O^X="',I5,'*',I5,'*',I5,'*',I5,'">')
             CALL SQSPACE(CFMT,ALINE,LUN)
@@ -74,16 +75,17 @@ C
  2          CONTINUE
 C
 C---- CLOSE THE MAIN OUTPUT FILE, KEEPING IT, AND SCRATCH, DELETING IT.
+C---- INCREMENT FRAME NUMBER.
 C
             CLOSE(UNIT=LUN, STATUS='KEEP')
             CLOSE(UNIT=SLUN, STATUS='DELETE')
-            FRNO = FRNO + 1
             OPENED = .FALSE.
          ENDIF
       ENDIF
 C
 C---- CREATE A FILE NAME FOR THE NEW FRAME.
 C
+      FRNO = FRNO + 1
 #ifdef UNIX
       WRITE(FNO,100)SVGN(1:SVGNL), FRNO, '.^S^V^G'
  100  FORMAT(A,I3.3,A)
@@ -122,6 +124,9 @@ C
       YMIN = DVYMAX + 1
       XMAX = -1.0
       YMAX = -1.0
+C
+      PRINT 889,DVXMAX,DVYMAX
+ 889  FORMAT(1X,'SIZE ',F7.3,' X ',F7.3,' PIXELS')
 C
       RETURN
       END
@@ -185,7 +190,10 @@ C
 C
       SUBROUTINE SVGDGT( UXS, UYS )
 C --- ------------------------------------------------------------------
-C --- RETURN THE SVG CANVAS SIZE PREVIOUSLY SET WITH SVGDIM().
+C RETURN THE SVG CANVAS SIZE PREVIOUSLY SET WITH SVGDIM().
+C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      REAL UXS, UYS
 C
       INCLUDE 'svgcmn.cmn'
 C
@@ -201,6 +209,7 @@ C INITIALIZE SVG OUTPUT.
 C----------------------------------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INCLUDE 'svgcmn.cmn'
+C      
       LUN = 12
       SLUN = 13
       OPENED = .FALSE.
@@ -222,6 +231,7 @@ C TERMINATE SVG OUTPUT.
 C----------------------------------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INCLUDE 'svgcmn.cmn'
+C
       IF( EMPTYF )THEN
          CLOSE(UNIT=LUN, STATUS='DELETE')
       ELSE
@@ -294,6 +304,7 @@ C
       IF( ON )THEN
 C
 C---- IF NOT IN A GROUP, OPEN A GROUP SETTING COLOUR AND WIDTH.
+C---- NOTE THAT R, G, B VALUES MUST BE SEPARATED WITH COMMAS NOT SPACES.
          IF( .NOT. INGROUP )THEN
             DO 1 I=1,3
                IPEN(I) = INT(255.9*CPEN(I))

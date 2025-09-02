@@ -1,7 +1,7 @@
       SUBROUTINE EPSNAM( EFNAME )
 C --- ------------------------------------------------------------------
 C
-C --- SET THE OUTPUT FILENAME STEM TO EFNAME
+C --- SET THE OUTPUT FILENAME STEM TO EFNAME, RESET FRAME NUMBER.
 C
       CHARACTER*(*) EFNAME
 C
@@ -14,6 +14,7 @@ C
       EPFNL = MIN(4,LEN(EFNAME))
 #endif
       EPFN(1:EPFNL) = EFNAME
+      FRNO = 0
 C
       END
 C

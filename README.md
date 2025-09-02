@@ -3,25 +3,35 @@ GPLOT - A Graph Plotting Program based on DIMFILM
 =================================================
 
 GPLOT is a graph plotting program, similar in intent to Gnuplot but very
-different in detail (and less capable). It is intended to run primarily
+different in detail (and less capable -- although it also does some things
+Gnuplot does not). It is intended to run primarily
 on CDC NOS 2.8.7, but it will also run on "Unix-like" systems and the
-Cray Operating System (COS 1.17).
+Cray Operating System (COS 1.17). In addition to plotting graphs of
+data (stored in files), the current version of GPLOT has some features
+which can be useful for general drawing, especially of things such as
+block diagrams.
 
-It is based on the DIMFILM library (Descriptive Instructions for MicroFILM)
+GPLOT is based on the DIMFILM library (Descriptive Instructions for MicroFILM)
 which was written by Dr. John Gilbert at ULCC between 1972 and the mid 1990s.
-The version of DIMFILM used is the second major version, from around 1982.
+The version of DIMFILM used is the second major version, from around 1983.
 The first version was CDC specific, while the second was much more easily 
 ported and ran on IBM MVS, Cray COS and UNICOS as well as Convex machines.
 
-I do not have the original fonts for DIMFILM and the source may be an
-early beta version. At any rate, I did some work on it in 2008 to get
-it to work using Hershey fonts, amongst other things. 
+DIMFILM source was obtained from Dr. Gilbert via Dr. Adrian Clark in 2005.
+Unfortunately, due to a malfunctioning RAID controller, the ULCC production
+code was no longer available by that point and, to some degree, things had
+to be pieced together from multiple sources by Dr. Gilbert. Consequently,
+I do not have the original fonts for DIMFILM and the source may be, at least 
+partially, an early beta version. I did some work in 2008 to get
+it to work using Hershey fonts, and some minor modifications have been made
+then and since as needed to make it functional on NOS and "Unix". Only 
+necessary changes have been made, though, and they have been few. The
+original source as received is also included in this repository.
 
 I am not aware of DIMFILM being preserved anywhere else. Although the code
 does not contain any copyright notices, it is the work of John Gilbert.
 I am reluctant to include it, but GPLOT is largely a "front end" to it, so
-it isn't optional. Also, I fear DIMFILM might be entirely lost otherwise,
-as I can find no trace of it elsewhere.
+it isn't optional. Also, I fear DIMFILM might be entirely lost otherwise.
 
 Both GPLOT and DIMFILM are written in FORTRAN-77, which was often the
 best supported language prior to the dominance of "Unix-like" and Windows
@@ -48,6 +58,9 @@ a useful sub-project.
 
 The GPLOT project therefore establishes a fair amount of infrastructure that
 allows MODIFY and Git to inter-operate without too much pain.
+
+Please note that neither GPLOT nor DIMFILM have been built on any version
+of Windows. 
 
 
 MODIFY/Git Interoperability Infrastructure
@@ -723,18 +736,23 @@ A script called `epsview.sh` is included in the `tools` directory
 and installed along with the other tools by `install.sh` in that
 location. This uses programs in the `ghostscript` package to
 convert EPS to PDF and then open the PDF version. This displays
-output in macOS Preview. It also produces a `.png` image version 
-using Imagemagick tools. This script takes steps to ensure that
+output in macOS `Preview`. It can also produces a `.png` image version 
+using Imagemagick tools if the `-p` option is supplied. 
+This script takes steps to ensure that
 EPS files output by DIMFILM can be opened correctly and displayed
 in good quality.
 
+It is also possible to crop the output to match the true extents
+of the EPS data rather than using the paper size specified when
+the file was generated. This is done with the `-c` option.
+
 For this to work, `ghostscript` and `imagemagick` must be installed
 with Homebrew or MacPorts. Once this is done, EPS files can be displayed
-from the command line :
+from the command line:
 ```
 $ epsview.sh NW009 
 ```
-will open new Preview window or tab displaying the contents of the
+will open a new `Preview` window or tab displaying the contents of the
 given EPS file (the name of which need not have the `.eps` extension).
 
 
@@ -767,14 +785,14 @@ found nothing.
 
 Kevin Jordan has created a complete toolchain to replace this missing
 critical software. This includes an assembler, loader and librarian that
-can be used for cross-development on "Unix". After adding a Cray X-MP
+can be used for cross-development on "Unix". After he added a Cray X-MP
 back end to the Amsterdam Compiler Kit ("ack") C compiler, these tools
 can also be cross-compiled and  run natively on COS. 
 Finally, a newly written FORTRAN-77
 compiler ("kFTC") can also be used either for cross-development on
 "Unix" or run natively on COS.
 
-Thew DIMFILM library can be built with kFTC and the other toolchain
+The DIMFILM library can be built with kFTC and the other toolchain
 components so that FORTRAN-77 programs running on COS can generate
 graphical output. 
 
@@ -1091,15 +1109,115 @@ closest is `BB` ("blocked binary") but there are some errors even
 with that (which doesn't sound like it is the right option anyway).
 This will need more investigation.
 
-Meanwhile, the `epsview.sh` shell script has a `fixup` option which
+Meanwhile, the `epsview.sh` shell script has a "fixup" option which
 will convert the files obtained by FTP to valid EPSF. This will only
-work with DIMFILM output files! For example:
+work with COS DIMFILM output files! For example:
 ```
-$ epsview.sh nw009.eps fixup
+$ epsview.sh -f -p nw009.eps
 ```
 will convert the file to PDF after fixing the transfer issues,
-and display it in Preview on macOS as well as producing a decent resolution
+and display it in Preview on macOS, as well as producing a decent resolution
 PNG image version.
+
+
+
+GPLOT examples and mini tutorial
+--------------------------------
+
+### The simplest graph
+Let's start by plotting a very simple graph. Normally, data to be
+plotted exists in disk files, but, in this first example, the data
+will be internally generated by the `MEMTEST` command, which dynamically
+allocates data arrays on NOS (static arrays are used on "Unix-like" systems)
+and fills X,Y values with a sine wave.
+
+---
+
+![](sveg001.svg)
+
+---
+
+The script file (obey file) to generate this contains:
+```
+C SIMPLEST GRAPH
+C
+RESET
+MEMTEST
+TITLE "A*L VERY SIMPLE GRAPH"
+XLABEL "X*L AXIS"
+YLABEL "Y*L AXIS"
+XYLINE
+```
+
+Although very minimal, there are a few points worth noting.
+
+- For maximum NOS / "Unix" compatibility, it is best to use only UPPER CASE in obey files. If you use lower case, it will work on both systems, but the results may be different. NOS (in `NORMAL` mode) will internally convert lower case to upper case. So "A very simple graph" will appear exactly as that on "Unix", but as "A VERY SIMPLE GRAPH" on NOS. Using upper case and DIMFILM "string markup" is portable and handles subscripts, superscripts, fractions and so on too. Note that GPLOT should *not* be used in `ASCII` mode on NOS! GPLOT does not attempt to deal with 6/12 Display Code, but will convert it (mostly!) to upper case. However, internal arrays are not sized for 6/12 representations, so there will be problems.
+- The `RESET` command re-establishes a default state. If multiple obey files are used in one GPLOT session without using `RESET` at the top of each file, the results will be unpredictable (the state at the end on one obey file will be inherited by the next).
+- This script is device independent. It can be used "as is" with any of the supported devices. To generate SVG from it, we can use:
+```
+/ GPLOT or $ UGPLOT
+? dev svg sveg 1200,800
+? prefix obey-files
+? obey obgraf1
+? ex
+```
+which will create an SVG file called `sveg001` (`sveg001.svg` on "Unix") using a "resolution" of 1200 by 800 pixels (with SVG, this is
+really a "size" rather than a resolution, as the vector data can be scaled without losing detail). 
+
+- The various annotations associated with a graph (title, axis labels, etc.) should appear before the command which plots the data
+(`XYLINE` here).
+- The ranges of the X and Y axes are automatically determined from the supplied data.
+- The graph is drawn in a square area in the center of the output device "canvas". When plotting graphs, it is often better to fill the output canvas.
+- Everything is drawn in a single colour (red).
+
+We will address these last two deficiencies in the next example.
+
+### Using different colours and filling the canvas
+Here is the same graph, but with different classes of things in different
+colours and filling the output canvas.
+
+---
+
+![](sv2g001.svg)
+
+---
+
+The code for this is:
+```
+C USING COLOUR/STYLE GROUPS
+C
+RESET
+GRAPHMODE ON
+MEMTEST
+CSGROUP GENERAL
+COL 1 0 0
+CSG TEXT
+COL 0 0 0
+CSG ANNOT
+COL 0 0.1 1
+TITLE "A*L SIMPLE GRAPH WITH BETTER COLOURS"
+XLABEL "X*L AXIS"
+YLABEL "Y*L AXIS"
+XYLINE
+```
+
+In GPLOT/DIMFILM there are 3 "different classes of things", namely:
+
+- Text (`TEXT`): this refers to all types of "strings".
+- Annotation (`ANNOT`): this refers to the various things that annotate graphs specifically.
+- Other (`GENERAL`): All elements not in the above classes. This includes all lines and points.
+
+All of them are members of the class `ALL`.
+
+These 3 classes are called "colour/style groups" and the current class is selected with the
+`CSGROUP` command. Following this, `COLOUR` and `STYLE` commands set the colour (as normalised RGB)
+and line style (solid, dashed, etc.) for that `CSGROUP` only.
+
+Note that any command can be abbreviated -- so long as the abbreviation remains unique, it will work.
+(Note that this is *not* true of evaluator operators, as we will see).
+
+### Adding a grid or graticule
+Hmm
 
 
 GPLOT cheat sheet
