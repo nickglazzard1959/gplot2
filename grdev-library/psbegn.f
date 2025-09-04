@@ -15,12 +15,16 @@ C
          YOFFST = 0.5
          DIMXXX = .TRUE.
       ENDIF
+      RED = 0.0
+      GREEN = 0.0
+      BLUE = 0.0
+      WIDTH = 1.5
 C      PRINT 888
 C 888  FORMAT(1X,'PSBEGN SET SIZE/OFFSET')
 C
 C --- CHOOSE A LUN TO OUTPUT ON.
 C
-      LUN = 11
+      LUN = 15
       OPENED = .FALSE.
       CALL PSCLR
 C

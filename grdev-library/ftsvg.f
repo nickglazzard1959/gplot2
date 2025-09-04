@@ -125,8 +125,8 @@ C
       XMAX = -1.0
       YMAX = -1.0
 C
-      PRINT 889,DVXMAX,DVYMAX
- 889  FORMAT(1X,'SIZE ',F7.3,' X ',F7.3,' PIXELS')
+C      PRINT 889,DVXMAX,DVYMAX
+C 889  FORMAT(1X,'SIZE ',F7.2,' X ',F7.2,' PIXELS')
 C
       RETURN
       END
@@ -338,5 +338,32 @@ C--- KEEP TRACK OF WHERE WE ARE AND THE BOUNDS OF WHERE WE'VE BEEN.
       XMAX = MAX(XMAX,XPOS)
       YMAX = MAX(YMAX,YPOS)
 C
+      RETURN
+      END
+C
+      SUBROUTINE SVGBORD
+C----------------------------------------------------------------------
+C DRAW A BLACK, 1 PIXEL WIDE,  BORDER AROUND THE EDGE OF THE DEFINED
+C CANVAS. RESTORE THE STATE ON ENTRY BEFORE RETURNING.
+C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      INCLUDE 'svgcmn.cmn'
+C
+      REAL SCPEN(3), SWPEN
+      INTEGER I
+C
+      DO 1 I=1,3
+         SCPEN(I) = CPEN(I)
+ 1    CONTINUE
+      SWPEN = WPEN
+      CALL SVGRGBC(0.0,0.0,0.0)
+      CALL SVGWID(0.5)
+      CALL SVGMOVE(0.5,0.5,.FALSE.)
+      CALL SVGMOVE(DVXMAX-0.5,0.5,.TRUE.)
+      CALL SVGMOVE(DVXMAX-0.5,DVYMAX-0.5,.TRUE.)
+      CALL SVGMOVE(0.5,DVYMAX-0.5,.TRUE.)
+      CALL SVGMOVE(0.5,0.5,.TRUE.)
+      CALL SVGWID(0.5*SWPEN)
+      CALL SVGRGBC(SCPEN(1),SCPEN(2),SCPEN(3))
       RETURN
       END

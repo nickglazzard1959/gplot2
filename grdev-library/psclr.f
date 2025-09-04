@@ -1,10 +1,10 @@
       SUBROUTINE PSCLR
 C --- ------------------------------------------------------------------
-C
 C --- THIS ROUTINE CLOSES AN EXISTING OUTPUT FILE AND OPENS A NEW ONE.
 C --- OR, IF EVERY IS .FALSE. ONLY OPEN A SINGLE OUTPUT FILE AND PUT ALL
 C --- FRAMES IN TO IT.
-C
+C --- ------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
       REAL INPS
       PARAMETER( INPS = 72.0 )
 C
@@ -118,8 +118,8 @@ C
       XPOS = XMAX
       YPOS = YMAX
 C
-      PRINT 889,XSIZE,YSIZE,XOFFST,YOFFST
- 889  FORMAT(1X,'SIZE ',F7.3,' X ',F7.3,' OFFSET ',F7.3,', ',F7.3,' IN')
+C      PRINT 889,XSIZE,YSIZE,XOFFST,YOFFST
+C 889  FORMAT(1X,'SIZE ',F7.3,' X ',F7.3,' OFFSET ',F7.3,', ',F7.3,' IN')
 C
 C
 C --- WRITE OUT THE POSTSCRIPT HEADER.
@@ -145,5 +145,3 @@ C
  300  FORMAT('%%PLOTFILE ',A)
  301  FORMAT('%%ROUTE ',A)
       END
-C
-C --- ------------------------------------------------------------------

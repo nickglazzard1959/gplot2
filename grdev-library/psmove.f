@@ -1,8 +1,10 @@
       SUBROUTINE PSMOVE( X, Y, ON )
 C --- ------------------------------------------------------------------
-C
-C --- THIS ROUTINE PERFORMS  MOVE' AND  DRAW' OPERATIONS.
-C
+C --- MOVE (ON=.FALSE.) OR DRAW (ON=.TRUE.) FROM (XPOS,YPOS) TO (X,Y),
+C --- X,Y ARE IN INCHES. ALL OUTPUT IS IN POINTS (72 PTS/INCH).
+C --- NOTE: XPOS,YPOS IS KEPT IN POINTS.
+C --- ------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
       REAL INPS
       PARAMETER( INPS = 72.0 )
 C
@@ -30,8 +32,6 @@ C      PRINT 999,X,XSIZE,XOFFST,Y,YSIZE,YOFFST
 C 999  FORMAT(1X,'X=',F12.6,' XS=',F12.6,' XO=',F12.6,
 C     1         ' Y=',F12.6,' YS=',F12.6,' YO=',F12.6)
 C
-C      XPS = (X * XSIZE + XOFFST) * INPS
-C      YPS = (Y * YSIZE + YOFFST) * INPS
       XPS = (X + XOFFST) * INPS
       YPS = (Y + YOFFST) * INPS
 C
@@ -58,4 +58,38 @@ C
 C
   100 FORMAT(F12.6, 1X, F12.6, 1X, F12.6, 1X, F12.6, ' ^L')
   200 FORMAT(F12.6, 1X, F12.6, ' ^M')
+      END
+C
+      SUBROUTINE PSBORD
+C----------------------------------------------------------------------
+C DRAW A BLACK, 1 POINT WIDE,  BORDER AROUND THE EDGE OF THE DEFINED
+C CANVAS. RESTORE THE STATE ON ENTRY BEFORE RETURNING.
+C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      REAL PSIN
+      PARAMETER( PSIN = 1.0/72.0 )
+C
+      INCLUDE 'dfxpsn.cmn'
+C
+      REAL SRGB(3), SWIDTH, X, Y
+      SRGB(1) = RED
+      SRGB(2) = GREEN
+      SRGB(3) = BLUE
+      SWIDTH = WIDTH
+      CALL PSRGBC(0.0,0.0,0.0)
+      CALL PSWID(1.0)
+      X = XOFFST + PSIN
+      Y = YOFFST + PSIN
+      CALL PSMOVE(X,Y,.FALSE.)
+      X = XOFFST + XSIZE - PSIN
+      CALL PSMOVE(X,Y,.TRUE.)
+      Y = YOFFST + YSIZE - PSIN
+      CALL PSMOVE(X,Y,.TRUE.)
+      X = XOFFST + PSIN
+      CALL PSMOVE(X,Y,.TRUE.)
+      Y = YOFFST + PSIN
+      CALL PSMOVE(X,Y,.TRUE.)
+      CALL PSWID(SWIDTH)
+      CALL PSRGBC(SRGB(1),SRGB(2),SRGB(3))
+      RETURN
       END
