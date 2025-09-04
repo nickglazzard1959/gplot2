@@ -17,6 +17,7 @@
 !depcomp
 !Makefile
 !.gitignore
+!ob*
 #
 # Stop ignoring some autoconf things specifically.
 # Never sure what that mess actually needs TBH.
