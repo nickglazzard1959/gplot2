@@ -1,0 +1,34 @@
+# FOUR DISPARATE PLOTS, ONE FIGURE.
+#
+#===========================
+RESET
+GRAPHMODE ON
+# --- BOTTOM LEFT OF 4
+SUBFIG 2 2 1 1 0.98
+#
+OBEY OBGF28A
+#===========================
+RESET
+GRAPHMODE ON
+# --- TOP RIGHT OF 4
+SUBFIG 2 2 2 2 0.98
+#
+OBEY OBGF28B
+#
+# ========================
+RESET
+GRAPHMODE ON
+# --- TOP LEFT OF 4
+SUBFIG 2 2 1 2 0.98
+#
+OBEY OBGF28C
+# ========================
+# --- BOTTOM RIGHT OF 4
+RESET
+GRAPHMODE ON
+SUBFIG 2 2 2 1 0.98
+#
+OBEY OBGF28D
+OUTLINE PANE
+#
+OUTLINE DEV

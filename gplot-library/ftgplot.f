@@ -60,7 +60,7 @@ C
       INTEGER MAXARG, MAXDEP, MAXSTK, MAXKEY, MAXPTS, MAXFNL
       INTEGER NCMDS, NFONTS, NREGS, NNARGX
       PARAMETER( MAXARG=9, MAXDEP=5, MAXSTK=9, MAXKEY=20 )
-      PARAMETER( MAXPTS=10000, NNARGX=14 )
+      PARAMETER( MAXPTS=10000, NNARGX=16 )
 #ifdef UNIX
       PARAMETER( MAXFNL=72 )
 #else
@@ -84,7 +84,7 @@ C
       INTEGER KTIT, KXLAB, KYLAB, KTEST, KSTYLE
       INTEGER KGET, KSTAT, KANNOT, KFLOG, KINTERP
       INTEGER KEBASM, KHIST, KHISTMD, KPANE, KUNP
-      INTEGER KOUTLN, KBLNK, KUNBL, KBLNKO, KFILL
+      INTEGER KOUTLN, KBLNK, KUNBL, KSUBFG, KFILL
       INTEGER KPATHP, KEVAL, KERNG, KPATH, KGRMOVE
       INTEGER KGRDRAW, KNSTACK, KIEVAL, KPROC, KSTO
       INTEGER KRCL, KCANVAS, KCTEXT, KFONT, KLFONT
@@ -104,7 +104,7 @@ C
       PARAMETER( KTIT=26, KXLAB=27, KYLAB=28, KTEST=29, KSTYLE=30 )
       PARAMETER( KGET=31, KSTAT=32, KANNOT=33, KFLOG=34, KINTERP=35 )
       PARAMETER( KEBASM=36, KHIST=37, KHISTMD=38, KPANE=39, KUNP=40 )
-      PARAMETER( KOUTLN=41, KBLNK=42, KUNBL=43, KBLNKO=44, KFILL=45 )
+      PARAMETER( KOUTLN=41, KBLNK=42, KUNBL=43, KSUBFG=44, KFILL=45 )
       PARAMETER( KPATHP=46, KEVAL=47, KERNG=48, KPATH=49, KGRMOVE=50 )
       PARAMETER( KGRDRAW=51, KNSTACK=52, KIEVAL=53, KPROC=54, KSTO=55 )
       PARAMETER( KRCL=56, KCANVAS=57, KCTEXT=58, KFONT=59, KLFONT=60 )
@@ -245,15 +245,15 @@ C
       INTEGER IGRID, ISTY, IFNE, INTM, IHMD, ITERST, ITEREN, NWORDS
       INTEGER IAP, LEXPROC, ITERIN, IARG, NAVAIL, IGSTY, INT2, NEWPOS
       CHARACTER*80 PROC(NREGS), STRINGS(NREGS)
-      CHARACTER PROCEXP*(NREGS*80)
+      CHARACTER PROCEXP*(NREGS*80), PROCEXT*(NREGS*80)
       INTEGER PROCLEN(NREGS), STRILEN(NREGS)
       REAL MEMS(NREGS)
       CHARACTER*1 CFONMK
       CHARACTER*30 FONTNAM(NFONTS), CLKUPE
       INTEGER FONTNUM(NFONTS), IDXABT1, IDXABT2, IDXABT3, IDXSYMB
-      INTEGER IDXMARK, IFONT, ICSGRP, ILKUPE
+      INTEGER IDXMARK, IFONT, ICSGRP, ILKUPE, IVALS(4)
       REAL FSYMHT, FSYMANG, ZEROVAL, AXCX0, AXCY0, BB(4)
-      LOGICAL BBEMPTY, SEVERR, DORESET, LOWEROK, DOAXES
+      LOGICAL BBEMPTY, SEVERR, DORESET, LOWEROK, DOAXES, UKPANE
       CHARACTER*15 KEYTEXT(MAXKEY)
       REAL KEYRED(MAXKEY), KEYGRN(MAXKEY), KEYBLU(MAXKEY)
       REAL KEYWID(MAXKEY)
@@ -264,6 +264,7 @@ C
       INTEGER IATXBOX, IHTXBOX, ITTXBOX, IBTXBOX, IARTYPE, IAXINT
       CHARACTER*(MAXFNL) PATHNAM, FULLNAM
       CHARACTER*4 VSTR
+      CHARACTER*9 GETMOD
       LOGICAL SETREGS
 C
 C VARIABLES FOR DYNAMIC MEMORY POINT STORAGE.
@@ -338,7 +339,7 @@ C
       CMDS(KANNOT) = 'ANNOTATE'
       CMDS(KFLOG) = 'LOGFILE'
       CMDS(KINTERP) = 'INTERPOLATE'
-      CMDS(KEBASM) = 'ASYMYERRORBARS'
+      CMDS(KEBASM) = 'ASYMYERRORS'
       CMDS(KHIST) = 'XYHISTOGRAM'
       CMDS(KHISTMD) = 'HISTSTYLE'
       CMDS(KPANE) = 'PANE'
@@ -346,7 +347,7 @@ C
       CMDS(KOUTLN) = 'OUTLINE'
       CMDS(KBLNK) = 'BLANK'
       CMDS(KUNBL) = 'UNBLANK'
-      CMDS(KBLNKO) = 'BLANKOUTLINE'
+      CMDS(KSUBFG) = 'SUBFIGGRID'
       CMDS(KFILL) = 'FILL'
       CMDS(KPATHP) = 'PREFIXPATH'
       CMDS(KEVAL) = 'EVAL'
@@ -633,7 +634,8 @@ C
      +     'ITEM.'
       DCMDS(KBLNK) = 'XL XH YL YH - SET BLANK AREA.'
       DCMDS(KUNBL) = 'STOP USING ANY BLANK AREA.'
-      DCMDS(KBLNKO) = 'OUTLINE THE BLANK AREA.'
+      DCMDS(KSUBFG) = 'NX NY X Y [S] - SELECT SUBFIG X,Y FROM A GRID '//
+     +     'OF NX BY NY SUBFIGS. OPTIONALLY SHRINK REGIONS BY S.'
       DCMDS(KFILL) = 'FILL SCREEN WITH COLOUR (DEV. DEP.).'
       DCMDS(KPATHP) = 'PATH PREFIX FOR FILE NAMES. IGNORED ON NOS.'
       DCMDS(KEVAL) = '"RPN" [ARGS] - EVALUATE FUNCTION USING AN RPN '//
@@ -766,7 +768,7 @@ C
       NARGS(KOUTLN) = 1
       NARGS(KBLNK) = 4
       NARGS(KUNBL) = 0
-      NARGS(KBLNKO) = 0
+      NARGS(KSUBFG) = 4
       NARGS(KFILL) = 0
       NARGS(KPATHP) = 1
       NARGS(KEVAL) = 1
@@ -853,6 +855,10 @@ C
       NARGXMX(13) = 2      
       NARGXCM(14) = K2DEVAL
       NARGXMX(14) = 2
+      NARGXCM(15) = KSUBFG
+      NARGXMX(15) = 5
+      NARGXCM(16) = KMARK
+      NARGXMX(16) = 2
 C
 C DEFAULT STATE ON START UP.
 C NO DATA READ YET. NO DEVICE OPENED. ETC.
@@ -981,6 +987,7 @@ C---- COLOUR/STYLE GROUP TO SET WITH COLOUR, ETC.
       ICSGRP = KCSALL
 C---- KEYS DEFINED
       NKEYS = 0
+      UKPANE = .FALSE.
 C---- TEXT BOX STATE
       WTXBOX = 0.2
       HTXBOX = 0.15
@@ -1043,6 +1050,9 @@ C
       WRITE(6,100)VSTR
  100  FORMAT(1X,'GPLOT INTERACTIVE PLOTTING PROGRAM. V',A)
       WRITE(6,66)
+      WRITE(6,180)GETMOD()
+ 180  FORMAT(1X,'LAST MODIFIED DATE: ',A)
+      WRITE(6,176)
       WRITE(6,177)
  177  FORMAT(1X,'BASED ON ULCC DIMFILM BY JOHN GILBERT.')
       WRITE(6,178)
@@ -1555,9 +1565,9 @@ C
 C COLOUR
  203     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(3),F3,1,NEWPOS) )GOTO 9098
          RED = F1
          GRN = F2
          BLU = F3
@@ -1582,7 +1592,7 @@ C
 C WIDTH
  204     CONTINUE
          IF( .NOT.HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
          WID = F1
          IF( ICSGRP .EQ. KCSALL )THEN
             CALL LINSF(WID)
@@ -1598,15 +1608,21 @@ C WIDTH
 C
 C MARKER
  205     CONTINUE
-         IF( .NOT. IFROMC(ARGS(1),INT1,1,LNBC(ARGS(1),1,1)) )
+         IF( .NOT.HAVDEV )GOTO 9090
+         IF( .NOT. IFROMC(ARGS(1),INT1,1,NEWPOS) )
      +      GOTO 9093
          MARKNUM = INT1
-         IF( MARKNUM .LT. 3 .OR. MARKNUM .GT. 25 )THEN
+         IF( MARKNUM .LT. 1 .OR. MARKNUM .GT. 48 )THEN
             CALL TXBEGIN
             WRITE(6,2052)
- 2052       FORMAT(1X,'MARK NUMBERS 3 (DEF) TO 25 ONLY DEFINED.')
+ 2052       FORMAT(1X,'ONLY MARK NUMBERS 1 TO 48 ARE DEFINED. USING 3.')
             CALL TXEND
             MARKNUM = 3
+         ENDIF
+         IF( ICARGS .EQ. 2 )THEN
+            IF( GETYN(ARGS(2)) )THEN
+               CALL MARKER(MARKNUM)
+               ENDIF
          ENDIF
          GOTO 299
 C
@@ -1629,8 +1645,8 @@ C
 C MOVE
  207     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
          XPOS = F1
          YPOS = F2
          CALL OFF2(XPOS,YPOS)
@@ -1640,8 +1656,8 @@ C
 C DRAW
  208     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
          XPOS = F1
          YPOS = F2
          CALL ON2(XPOS,YPOS)
@@ -1925,8 +1941,8 @@ C XYAUTO
 C
 C XRANGE
  214     CONTINUE
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
          XLOGR = F1
          XHIGR = F2
          KEEPAX = .FALSE.
@@ -1936,8 +1952,8 @@ C XRANGE
 C
 C YRANGE
  215     CONTINUE
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
          YLOGR = F1
          YHIGR = F2
          KEEPAX = .FALSE.
@@ -2038,10 +2054,10 @@ C
 C BOUNDS
  225     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(4),F4,1,LNBC(ARGS(4),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(3),F3,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(4),F4,1,NEWPOS) )GOTO 9098
          IF( F1 .GE. F2 .OR. F3 .GE. F4 )THEN
             CALL TXBEGIN
             WRITE(6,2251)
@@ -2094,7 +2110,7 @@ C STYLE
          IF( .NOT. HAVDEV )GOTO 9090
          IARG = LOOKUP(STYNAM,NSTY,ARGS(1),LOWEROK,.TRUE.)
          IF( ICARGS .EQ. 2 )THEN
-            IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+            IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
          ENDIF
          IF( IARG .LE. 0 )THEN
             ILKUPE = IARG
@@ -2332,7 +2348,7 @@ C INTERP
             INTERPM = INTM
          ENDIF
          IF( ICARGS .EQ. 2 )THEN
-            IF( .NOT. IFROMC(ARGS(2),NINTERP,1,LNBC(ARGS(2),1,1)) )
+            IF( .NOT. IFROMC(ARGS(2),NINTERP,1,NEWPOS) )
      +          GOTO 9093
             IF(NINTERP .LT. 5)NINTERP = 5
          ENDIF
@@ -2354,7 +2370,7 @@ C HISTSTYLE
             IHIST = IHMD
          ENDIF
          IF( ICARGS .EQ. 2 )THEN
-            IF( .NOT. RFROMC(ARGS(2),F1,1,LNBC(ARGS(2),1,1)) )
+            IF( .NOT. RFROMC(ARGS(2),F1,1,NEWPOS) )
      +         GOTO 9098
             WHISTIN = F1
             IF(WHISTIN .LT. 0.0)WHISTIN = 0.0
@@ -2365,10 +2381,10 @@ C
 C PANE
  239     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(4),F4,1,LNBC(ARGS(4),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(3),F3,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(4),F4,1,NEWPOS) )GOTO 9098
          IF( F1 .GE. F2 .OR. F3 .GE. F4 )THEN
             CALL TXBEGIN
             WRITE(6,2391)
@@ -2380,9 +2396,9 @@ C PANE
             PYL = F3
             PYH = F4
             CALL PANE(PXL,PXH,PYL,PYH)
+            LPANE = .TRUE.
+            GCHANGE = .TRUE.
          ENDIF
-         LPANE = .TRUE.
-         GCHANGE = .TRUE.
          GOTO 299
 C
 C UNPANE
@@ -2452,10 +2468,10 @@ C
 C BLANK
  242     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(4),F4,1,LNBC(ARGS(4),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(3),F3,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(4),F4,1,NEWPOS) )GOTO 9098
          IF( F1 .GE. F2 .OR. F3 .GE. F4 )THEN
             CALL TXBEGIN
             WRITE(6,2421)
@@ -2479,20 +2495,47 @@ C UNBLANK
          LBLNK = .FALSE.
          GOTO 299
 C
-C BLANKOUTLINE
+C SUBFIGGRID
  244     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. LBLNK )THEN
-            IF( IDEV .NE. KDTK )THEN
-               CALL TXBEGIN
-               WRITE(6,2441)
- 2441          FORMAT(1X,'WARNING - NO BLANK AREA ACTIVE.')
-               CALL TXEND
-            ENDIF
+         IF( .NOT. IFROMC(ARGS(1),IVALS(1),1,NEWPOS) )
+     +        GOTO 9093
+         IF( .NOT. IFROMC(ARGS(2),IVALS(2),1,NEWPOS) )
+     +        GOTO 9093
+         IF( .NOT. IFROMC(ARGS(3),IVALS(3),1,NEWPOS) )
+     +        GOTO 9093
+         IF( .NOT. IFROMC(ARGS(4),IVALS(4),1,NEWPOS) )
+     +        GOTO 9093
+         IF( ICARGS .EQ. 5 )THEN
+            IF( .NOT. RFROMC(ARGS(5),F5,1,NEWPOS) )GOTO 9098
+            F5 = 1.0 - MIN(1.0,MAX(0.55,F5))
          ELSE
-            CALL OBLANK
-            GCHANGE = .TRUE.
+            F5 = 0.0
          ENDIF
+         IF( IVALS(1) .LT. 1 .OR. IVALS(2) .LT. 1 )THEN
+            WRITE(6,2441)
+ 2441       FORMAT(1X,'MUST HAVE 1 OR MORE GRID POSITIONS IN EACH ',
+     +           'DIRECTION')
+            GOTO 299
+         ENDIF
+         IF( IVALS(3) .LT. 1 .OR. IVALS(3) .GT. IVALS(1) )THEN
+            WRITE(6,2442)'X',IVALS(1)
+ 2442       FORMAT(1X,A1,' GRID COORD MUST BE BETWEEN 1 AND ',I2)
+            GOTO 299
+         ENDIF
+         IF( IVALS(4) .LT. 1 .OR. IVALS(4) .GT. IVALS(2) )THEN
+            WRITE(6,2442)'Y',IVALS(2)
+            GOTO 299
+         ENDIF
+         F1 = (XHI - XLO) / IVALS(1)
+         F2 = 1.0 / IVALS(2)
+         PXL = (IVALS(3)-1) * F1 + F5 * F1
+         PXH = IVALS(3) * F1 - F5 * F1
+         PYL = (IVALS(4)-1) * F2 + F5 * F2
+         PYH = IVALS(4) * F2 - F5 * F2
+         CALL PANE(PXL,PXH,PYL,PYH)
+         LPANE = .TRUE.
+         GCHANGE = .TRUE.
          GOTO 299
 C
 C FILL
@@ -2525,9 +2568,9 @@ C---- EVAL.
          GOTO 2473
  253     CONTINUE
 C---- ITEVAL.
-         IF( .NOT. IFROMC(ARGS(1),ITERST,1,LNBC(ARGS(1),1,1)) )GOTO 9093
-         IF( .NOT. IFROMC(ARGS(2),ITEREN,1,LNBC(ARGS(2),1,1)) )GOTO 9093
-         IF( .NOT. IFROMC(ARGS(3),ITERIN,1,LNBC(ARGS(3),1,1)) )GOTO 9093
+         IF( .NOT. IFROMC(ARGS(1),ITERST,1,NEWPOS) )GOTO 9093
+         IF( .NOT. IFROMC(ARGS(2),ITEREN,1,NEWPOS) )GOTO 9093
+         IF( .NOT. IFROMC(ARGS(3),ITERIN,1,NEWPOS) )GOTO 9093
          IAP = 4
          IF( ICARGS .EQ. 5 )THEN
             IF( .NOT. SETREGS(ARGS(5), MEMS, NREGS) )GOTO 299
@@ -2549,6 +2592,21 @@ C---- SHARED EVAL/ITEVAL.
          ENDIF
          LEXPROC = EXPROC(ARGS(IAP)(1:LNBC(ARGS(IAP),1,1)), PROCEXP,
      +        PROC, PROCLEN, NREGS )
+         IF( LEXPROC .GT. 0 )THEN
+ 2475       CONTINUE
+            IF( INDEX(PROCEXP(1:LEXPROC), '@') .GT. 0 )THEN
+C              ALLOW "ITERATED EXPANSION" IF THE EXPANSION CONTAINS @
+               PROCEXT(1:LEXPROC) = PROCEXP(1:LEXPROC)
+               LEXPROC = EXPROC(PROCEXT(1:LEXPROC), PROCEXP,
+     +              PROC, PROCLEN, NREGS )
+               IF( LEXPROC .GT. 0 )THEN
+                  GOTO 2475
+               ELSE
+                  WRITE(6,2476)
+ 2476             FORMAT(1X,'EVAL ITERATED RPN EXPANSION FAILED.')
+               ENDIF
+            ENDIF
+         ENDIF
          IF( LEXPROC .GT. 0 )THEN
             DO 2472 ITER=ITERST,ITEREN,ITERIN
                IF( EVAL(DA(IXOFF),NEVAL,NPOINTS,NWORDS,NSTACK,
@@ -2592,10 +2650,10 @@ C---- SHARED EVAL/ITEVAL.
 C
 C ERANGE
  248     CONTINUE
-         IF( .NOT. RFROMC(ARGS(1),RBASE,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),RSTART,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),RSTOP,1,LNBC(ARGS(3),1,1)) )GOTO 9098
-         IF( .NOT. IFROMC(ARGS(4),NEVAL,1,LNBC(ARGS(4),1,1)) )GOTO 9093
+         IF( .NOT. RFROMC(ARGS(1),RBASE,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),RSTART,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(3),RSTOP,1,NEWPOS) )GOTO 9098
+         IF( .NOT. IFROMC(ARGS(4),NEVAL,1,NEWPOS) )GOTO 9093
          IF( (NEVAL .LT. 2) .OR. (NEVAL .GT. NPOINTS) )THEN
             CALL TXBEGIN
             WRITE(6,2481)NEVAL, NPOINTS
@@ -2629,8 +2687,8 @@ C GRDRAW
          DOGRON = .TRUE.
  2502    CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
          GXPOS = F1
          GYPOS = F2
          IF( DOGRON )THEN
@@ -2705,7 +2763,7 @@ C ITEVAL - 253 - SEE 247 EVAL.
 C
 C PROC
  254     CONTINUE
-         IF( .NOT. IFROMC(ARGS(1),IREG,1,LNBC(ARGS(1),1,1)) )GOTO 9093
+         IF( .NOT. IFROMC(ARGS(1),IREG,1,NEWPOS) )GOTO 9093
          IF( IREG .LT. 1 .OR. IREG .GT. 9 )THEN
             CALL TXBEGIN
             WRITE(6,2541)IREG
@@ -2719,20 +2777,20 @@ C PROC
 C
 C STO
  255     CONTINUE
-         IF( .NOT. IFROMC(ARGS(1),IREG,1,LNBC(ARGS(1),1,1)) )GOTO 9093
+         IF( .NOT. IFROMC(ARGS(1),IREG,1,NEWPOS) )GOTO 9093
          IF( IREG .LT. 1 .OR. IREG .GT. NREGS )THEN
             CALL TXBEGIN
             WRITE(6,2541)IREG
             CALL TXEND
          ELSE
-            IF( .NOT. RFROMC(ARGS(2),F1,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+            IF( .NOT. RFROMC(ARGS(2),F1,1,NEWPOS) )GOTO 9098
             MEMS(IREG) = F1
          ENDIF
          GOTO 299
 C
 C RCL
  256     CONTINUE
-         IF( .NOT. IFROMC(ARGS(1),IREG,1,LNBC(ARGS(1),1,1)) )GOTO 9093
+         IF( .NOT. IFROMC(ARGS(1),IREG,1,NEWPOS) )GOTO 9093
          CALL TXBEGIN
          IF( IREG .LT. 1 .OR. IREG .GT. NREGS )THEN
             WRITE(6,2541)IREG
@@ -2746,10 +2804,10 @@ C
 C CANVAS
  257     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(4),F4,1,LNBC(ARGS(4),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(3),F3,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(4),F4,1,NEWPOS) )GOTO 9098
          IF( F1 .GE. F2 .OR. F3 .GE. F4 )THEN
             CALL TXBEGIN
             WRITE(6,2571)
@@ -2773,7 +2831,7 @@ C CANVAS
 C CTEXT
  258     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
          TWD = F1
          TWIDTH = STRING( ARGS(2)(1:LNBC(ARGS(2),1,1)) )
          IF( TWD .GT. 0.0 )THEN
@@ -2868,7 +2926,7 @@ C
 C TEXT / SYMBOL / MARKER DRAWING HEIGHT.
  261     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
          FSYMHT = F1
          FSYMHTL = FSYMHT
          CALL SYMHT(FSYMHT)
@@ -2878,14 +2936,14 @@ C
 C TEXT / SYMBOL DRAWING ANGLE.
  262     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
          FSYMANG = F1
          CALL SYMANG(FSYMANG)
          GOTO 299
 C
 C STRING
  263     CONTINUE
-         IF( .NOT. IFROMC(ARGS(1),IREG,1,LNBC(ARGS(1),1,1)) )GOTO 9093
+         IF( .NOT. IFROMC(ARGS(1),IREG,1,NEWPOS) )GOTO 9093
          IF( IREG .LT. 1 .OR. IREG .GT. 9 )THEN
             CALL TXBEGIN
             WRITE(6,2541)IREG
@@ -2898,7 +2956,7 @@ C STRING
 C
 C ZEROVAL
  264     CONTINUE
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
          ZEROVAL = F1
          GOTO 299
 C
@@ -2931,8 +2989,8 @@ C AXCUT
          IF( ICARGS .EQ. 1 )THEN
             DOAXES = GETYN(ARGS(1))
          ELSE
-            IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-            IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+            IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+            IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
             AXCX0 = F1
             AXCY0 = F2
          ENDIF
@@ -2941,20 +2999,20 @@ C
 C CIRCLE
  269     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(3),F3,1,NEWPOS) )GOTO 9098
          CALL CIRCLE(F1,F2,F3)
          GOTO 299
 C
 C ARC
  270     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(4),F4,1,LNBC(ARGS(4),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(5),F5,1,LNBC(ARGS(5),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(3),F3,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(4),F4,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(5),F5,1,NEWPOS) )GOTO 9098
          CALL CIRARC(F1,F2,F3,F4,F5)
          GOTO 299
 C
@@ -2963,10 +3021,10 @@ C CRECT
  271     CONTINUE
  272     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(4),F4,1,LNBC(ARGS(4),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(3),F3,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(4),F4,1,NEWPOS) )GOTO 9098
          IF( ICMD .EQ. KCRECT )THEN
             F1 = F1 - 0.5 * F3
             F2 = F2 - 0.5 * F4
@@ -3016,9 +3074,9 @@ C BBSET - SET BOUNDS TO EVAL BOUNDING BOX (IF ANY).
 C
 C LSYSTEM
  276     CONTINUE
-         IF( .NOT. IFROMC(ARGS(1),INT1,1,LNBC(ARGS(1),1,1)) )GOTO 9093
-         IF( .NOT. IFROMC(ARGS(2),INT2,1,LNBC(ARGS(2),1,1)) )GOTO 9093
-         IF( .NOT. RFROMC(ARGS(3),F1,1,LNBC(ARGS(3),1,1)) )GOTO 9098
+         IF( .NOT. IFROMC(ARGS(1),INT1,1,NEWPOS) )GOTO 9093
+         IF( .NOT. IFROMC(ARGS(2),INT2,1,NEWPOS) )GOTO 9093
+         IF( .NOT. RFROMC(ARGS(3),F1,1,NEWPOS) )GOTO 9098
          IF( LSYSTEM(INT1, INT2, F1, STRINGS, STRILEN, MEMS, USEASP)
      +        .NE. 0)THEN
             IF( IDEP .GT. 0 .OR. INUNIT .EQ. 8 )THEN
@@ -3035,15 +3093,14 @@ C
 C LOADPROC
  277     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. IFROMC(ARGS(1),IREG,1,LNBC(ARGS(1),1,1)) )GOTO 9093
+         IF( .NOT. IFROMC(ARGS(1),IREG,1,NEWPOS) )GOTO 9093
          IF( IREG .LT. 1 .OR. IREG .GT. 9 )THEN
             CALL TXBEGIN
             WRITE(6,2541)IREG
             CALL TXEND
          ELSE
-            CALL LDPROC(ARGS(2)(1:LNBC(ARGS(2),1,1)),IREG,PROC,IDEV,
-     +                  NDEVS,HAVDEV,PATHNAM,FULLNAM)
-            PROCLEN(IREG) = LNBC(PROC(IREG),1,0)
+            CALL LDPROC(ARGS(2)(1:LNBC(ARGS(2),1,1)),IREG,PROC,PROCLEN,
+     +           IDEV,NDEVS,HAVDEV,PATHNAM,FULLNAM)
          ENDIF
          GOTO 299
 C
@@ -3051,8 +3108,8 @@ C BOXTEXT
  278     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
          IF( ICARGS .EQ. 3 )THEN
-            IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-            IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
+            IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
+            IF( .NOT. RFROMC(ARGS(3),F3,1,NEWPOS) )GOTO 9098
             XBOXCUR = F2
             YBOXCUR = F3
          ELSE
@@ -3108,11 +3165,27 @@ C
 C USEKEY
  280     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( LPANE )CALL ENPANE
-         PXL = 0.0
-         PXH = 0.8 * USEASP
-         PYL = 0.0
-         PYH = 0.999
+C --- IF A PANE IS ACTIVE, SAVE IT IN VDIM. END PANE.
+         IF( LPANE )THEN
+            VDIM(1) = PXL
+            VDIM(2) = PXH
+            VDIM(3) = PYL
+            VDIM(4) = PYH
+            CALL ENPANE
+            UKPANE = .TRUE.
+         ELSE
+C --- NO PANE ON ENTRY, SET SAVED PANE TO BOUNDS.
+            VDIM(1) = XLO
+            VDIM(2) = XHI
+            VDIM(3) = YLO
+            VDIM(4) = YHI
+            UKPANE = .FALSE.
+         ENDIF
+C --- SET A NEW PANE AS FRACTIONS OF THE SAVED PANE.
+         PXL = VDIM(1)
+         PXH = PXL + 0.8 * (VDIM(2) - VDIM(1))
+         PYL = VDIM(3)
+         PYH = PYL + 0.999 * (VDIM(4) - VDIM(3))
          CALL PANE(PXL,PXH,PYL,PYH)
          LPANE = .TRUE.
          GCHANGE = .TRUE.
@@ -3148,6 +3221,7 @@ C KEYS
  2821       FORMAT(1X,'EXPECTED ACTIVE PANE. FORGOT USEKEY?')
             CALL TXEND
          ELSE
+C --- END THE CURRENT PANE, IN WHICH THE GRAPH HAS BEEN DRAWN.
             CALL OPANE
             CALL ENPANE
             IF( NKEYS .EQ. 0 )THEN
@@ -3156,45 +3230,55 @@ C KEYS
  2822          FORMAT(1X,'NO KEYS ADDED.')
                CALL TXEND
             ELSE
-               PXL = 0.82 * USEASP
-               PXH = 0.999 * USEASP
-               PYL = 0.0
-               PYH = 0.999
+C --- SET A PANE FOR THE KEYS AS FRACTIONS OF THE PANE ON USEKEY ENTRY.
+               PXL = VDIM(1) + 0.82 * (VDIM(2) - VDIM(1))
+               PXH = VDIM(1) + 0.999 * (VDIM(2) - VDIM(1))
+               PYL = VDIM(3)
+               PYH = VDIM(3) + 0.999 * (VDIM(4) - VDIM(3))
                CALL PANE(PXL,PXH,PYL,PYH)
                LPANE = .TRUE.
-               GCHANGE = .TRUE.        
+               GCHANGE = .TRUE.
+C --- DRAW THE KEYS / LEGEND.
                XPOS = PXL + 0.5 * (PXH - PXL)
-               YPOS = 0.92
-               CALL OFF2(XPOS,YPOS)
-               TWD = 0.1
+               YPOS = PYL + 0.92 * (PYH - PYL)
+               TWD = 0.1 * ((PYH - PYL) / (YHI - YLO))
                TWIDTH = STRING('KEY')
                CALL SYMHT(TWD/TWIDTH)
                TWIDTH = TWD
                CALL OFF2(XPOS-TWIDTH/2,YPOS)
                CALL SYMTXT('KEY')
-               XPOS = 0.85 * USEASP
-               YPOS = 0.9
-               CALL SYMHT(0.02)
+               XPOS = VDIM(1) + 0.85 * (VDIM(2) - VDIM(1))
+               YPOS = VDIM(3) + 0.89 * (VDIM(4) - VDIM(3))
+               CALL SYMHT(0.02 * ((PYH - PYL) / (YHI - YLO)))
                DO 2823 I=1,NKEYS
                   CALL RGB1(KEYRED(I),KEYGRN(I),KEYBLU(I))
                   CALL LINSF1(KEYWID(I))
                   CALL SETSTY(KEYSTY(I))
-                  XPOS = 0.85 * USEASP
+                  XPOS = VDIM(1) + 0.85 * (VDIM(2) - VDIM(1))
                   CALL OFF2(XPOS,YPOS)
-                  XPOS = 0.97 * USEASP
+                  XPOS = VDIM(1) + 0.97 * (VDIM(2) - VDIM(1))
                   CALL ON2(XPOS,YPOS)
                   CALL DSHOFF
-                  XPOS = 0.85 * USEASP
-                  YPOS = YPOS - 0.02
+                  XPOS = VDIM(1) + 0.85 * (VDIM(2) - VDIM(1))
+                  YPOS = YPOS - 0.02 * (VDIM(4) - VDIM(3))
                   CALL OFF2(XPOS,YPOS)
                   CALL SYMTXT(KEYTEXT(I)(1:LNBC(KEYTEXT(I),1,1)))
-                  YPOS = YPOS - 0.03
+                  YPOS = YPOS - 0.03 * (VDIM(4) - VDIM(3))
  2823          CONTINUE
+C --- RESTORE STATE BEFORE USEKEY (AND OUTLINE KEYS PANE).
                CALL RGB1(REDGEN,GRNGEN,BLUGEN)
                CALL DSHOFF
                CALL OPANE
                CALL ENPANE
                LPANE = .FALSE.
+               IF( UKPANE )THEN
+                  PXL = VDIM(1)
+                  PXH = VDIM(2)
+                  PYL = VDIM(3)
+                  PYH = VDIM(4)
+                  CALL PANE(PXL,PXH,PYL,PYH)
+                  LPANE = .TRUE.
+               ENDIF
                NKEYS = 0
             ENDIF
          ENDIF
@@ -3213,8 +3297,8 @@ C
 C BOXPSIZE W H BOTLEFT
  284     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
          DOTXBL = GETYN(ARGS(3))
          WTXBOX = F1
          HTXBOX = F2
@@ -3222,8 +3306,8 @@ C BOXPSIZE W H BOTLEFT
 C
 C BOXPHATCH SPACING IANGLE MODE
  285     CONTINUE
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. IFROMC(ARGS(2),INT1,1,LNBC(ARGS(2),1,1)) )GOTO 9093
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. IFROMC(ARGS(2),INT1,1,NEWPOS) )GOTO 9093
          I = LOOKUP(HBHNAM,NHBH,ARGS(3),LOWEROK,.TRUE.)
          IF( I .LE. 0 )THEN
             ILKUPE = I
@@ -3238,7 +3322,7 @@ C BOXPHATCH SPACING IANGLE MODE
 C
 C BOXPTEXT WIDTHFRAC MODE FLUSHLEFT
  286     CONTINUE
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
          I = LOOKUP(HBTNAM,NHBT,ARGS(2),LOWEROK,.TRUE.)
          IF( I .LE. 0 )THEN
             ILKUPE = I
@@ -3277,10 +3361,10 @@ C ALABEL
  289     CONTINUE
  290     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(4),F4,1,LNBC(ARGS(4),1,1)) )GOTO 9098         
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(3),F3,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(4),F4,1,NEWPOS) )GOTO 9098         
          CALL GLABEL(F1, F2, F3, F4, ARGS(5)(1:LNBC(ARGS(5),1,1)),
      +        FSYMHT, (ICMD .EQ. KALABEL),
      +        IARTYPE, ARSIZE, ARSHARP, ARBARB, ANSKPSL, ANSCALE )
@@ -3297,9 +3381,9 @@ C ARROWPARM
          ELSE
             IARTYPE = I - 1
          ENDIF
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(3),F3,1,LNBC(ARGS(3),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(4),F4,1,LNBC(ARGS(4),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(3),F3,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(4),F4,1,NEWPOS) )GOTO 9098
          IF( F2 .LT. 0 )THEN
             ARSIZE = 0.7 * FSYMHT
          ELSE
@@ -3311,8 +3395,8 @@ C ARROWPARM
 C
 C LINEPARM
  292     CONTINUE
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
          ANSKPSL = F1
          ANSCALE = F2
          GOTO 299
@@ -3342,7 +3426,7 @@ C VERSION (PUT VERSION INFORMATION IN STRING REGISTER OR PRINT IT)
             WRITE(6,2951)VALUE(1:LNBC(VALUE,1,1))
  2951       FORMAT(1X,A)
          ELSE
-            IF(.NOT. IFROMC(ARGS(1),INT1,1,LNBC(ARGS(2),1,1)))GOTO 9093
+            IF(.NOT. IFROMC(ARGS(1),INT1,1,NEWPOS))GOTO 9093
             INT1 = MAX(1, MIN(INT1, 9))
             CALL GETVRI(STRINGS(INT1))
             STRILEN(INT1) = LNBC(STRINGS(INT1),1,0)
@@ -3370,8 +3454,8 @@ C
 C BOXPDELTAS DX DY
  298     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         IF( .NOT. RFROMC(ARGS(1),F1,1,LNBC(ARGS(1),1,1)) )GOTO 9098
-         IF( .NOT. RFROMC(ARGS(2),F2,1,LNBC(ARGS(2),1,1)) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
+         IF( .NOT. RFROMC(ARGS(2),F2,1,NEWPOS) )GOTO 9098
          XBOXSTP = F1
          YBOXSTP = F2
          GOTO 299
@@ -4679,7 +4763,7 @@ C
       INTEGER ISTKNEW, IREG, NEWELEM, IARG, IOEN, IOST, IMPOS, NFMT
       INTEGER ISTKPO4
       REAL ARG, DOMLIM, CEILING, V, FLOOR, MPI
-      PARAMETER( NOPS=90 )
+      PARAMETER( NOPS=92 )
       PARAMETER( MPI=3.14159265359 )
       CHARACTER*4 OPNAMES(NOPS)
       INTEGER MINSTK(NOPS), OPLEN(NOPS)
@@ -4700,7 +4784,7 @@ C
      +              'TANH',  'MIN',  'MAX',  'DUP', 'DUMP',
      +               'STO',  'RCL',  'ABS', 'SIGN',    'M',
      +                 'D', 'HDSH', 'VDSH', 'XLIN', 'PTHO',
-     +              'PTHC',  'ODD', 'ELEM',  'POP', 'XLOG',
+     +              'PTHC',  'ODD',   'EL',  'POP', 'XLOG',
      +              'SEED',  'MOD', 'I1IJ', 'I0IJ',    'T',
      +               'TVF',  'TVI',   'TS',   'TM',   'TC',
      +                'TH',   'TA',  'TSC',  'TEC', 'TLEN',
@@ -4708,7 +4792,7 @@ C
      +                'EQ',   'NE',  'NOT',  'SEL',  'IDX',
      +              'SETY',    'C',    'A',  'BOX',   'PC',
      +                 '#',    '=',    '&',    'S',  'ROT',
-     +               'TRN',  'SCL',   'R2D', 'D2R',  'LAB'/
+     +               'TRN',  'SCL',   'R2D', 'D2R',  'LAB', 'CL', 'G'/
 C 1 CHARACTER SYNONMYS FOR:   RCL:#, STO:=, DUP:&, SWAP:S.
       DATA MINSTK/2, 2, 2, 2, 1,
      +            2, 2, 1, 1, 1,
@@ -4727,7 +4811,7 @@ C 1 CHARACTER SYNONMYS FOR:   RCL:#, STO:=, DUP:&, SWAP:S.
      +            2, 2, 1, 3, 0,
      +            1, 3, 5, 4, 1,
      +            1, 2, 1, 2, 3,
-     +            4, 4, 1, 1, 4/
+     +            4, 4, 1, 1, 4, 0, 2/
       DATA OPLEN/1, 1, 1, 1, 1,
      +           2, 2, 3, 3, 3,
      +           4, 4, 4, 3, 4,
@@ -4737,7 +4821,7 @@ C 1 CHARACTER SYNONMYS FOR:   RCL:#, STO:=, DUP:&, SWAP:S.
      +           4, 3, 3, 3, 4,
      +           3, 3, 3, 4, 1,
      +           1, 4, 4, 4, 4,
-     +           4, 3, 4, 3, 4,
+     +           4, 3, 2, 3, 4,
      +           4, 3, 4, 4, 1,
      +           3, 3, 2, 2, 2,
      +           2, 2, 3, 3, 4,
@@ -4745,7 +4829,7 @@ C 1 CHARACTER SYNONMYS FOR:   RCL:#, STO:=, DUP:&, SWAP:S.
      +           2, 2, 3, 3, 3,
      +           4, 1, 1, 3, 2,
      +           1, 1, 1, 1, 3,
-     +           3, 3, 3, 3, 3/
+     +           3, 3, 3, 3, 3, 2, 1/
 C
 C---- THE DOMAIN OF SEVERAL MATHEMATICAL FUNCTIONS IS LIMITED TO THIS:
 C---- ALSO, IF TRPDIV0, TRAP DIVIDE BY < ABS(1E-9) ELSE USE 1E-9.
@@ -4889,24 +4973,16 @@ C--- IT IS A KNOWN OPERATOR. TRY TO APPLY IT.
                ISTKPO2 = ISTKPOP - NPOINTS
                ISTKPO3 = ISTKPO2 - NPOINTS
                ISTKPO4 = ISTKPO3 - NPOINTS
-               GOTO(201,202,203,204,205,
-     +              206,207,208,209,210,
-     +              211,212,213,214,215,
-     +              216,217,218,219,220,
-     +              221,222,223,224,225,
-     +              226,227,228,229,230,
-     +              231,232,233,234,235,
-     +              236,237,238,239,240,
-     +              241,242,243,244,245,
-     +              246,247,248,249,250,
-     +              251,252,253,254,255,
-     +              256,257,258,259,260,
-     +              261,262,263,264,265,
-     +              266,267,268,269,270,
-     +              271,272,273,274,275,
-     +              276,277,278,279,280,
-     +              237,236,234,222,285,
-     +              286,287,288,289,290),IOP
+               GOTO(201,202,203,204,205,206,207,208,209,210,
+     +              211,212,213,214,215,216,217,218,219,220,
+     +              221,222,223,224,225,226,227,228,229,230,
+     +              231,232,233,234,235,236,237,238,239,240,
+     +              241,242,243,244,245,246,247,248,249,250,
+     +              251,252,253,254,255,256,257,258,259,260,
+     +              261,262,263,264,265,266,267,268,269,270,
+     +              271,272,273,274,275,276,277,278,279,280,
+     +              237,236,234,222,285,286,287,288,289,290,
+     +              291,292),IOP
 C
 C--- + : ADD ( A1 A2 -- A1 ) : A1 = A1 + A2
  201           CONTINUE
@@ -5493,7 +5569,7 @@ C--- ODD : ( A1 -- A1 ) : A1 = 1 WHERE A1 IS ODD ELSE 0
  2147           CONTINUE
                 GOTO 299
 C
-C--- ELEM : ( A1 C2 : A1 C2 ) : C2 = A1[C2]
+C--- EL : ( A1 C2 : A1 C2 ) : C2 = A1[C2]
  248            CONTINUE
                 I = MAX(1,MIN(NELEM,INT(STACK(ISTKTOP))))
                 V = STACK(ISTKPOP+I-1)
@@ -5680,6 +5756,7 @@ C--- PE : ( A1 C2 C3 -- A1 ): PRINT RANGE OF TOS ELEMENTS FREE FORMAT
                   WRITE(6,*)'TOS[',I,'] (OF ',NELEM,') = ',ARG
  2166          CONTINUE
                CALL TXEND
+               ISTACK = ISTACK - 2
                GOTO 299
 C
 C--- GT : ( A1 A2 -- A1 A2 A3 ) : A3 = (A1 > A2) ? 1 : 0 ;
@@ -5922,7 +5999,43 @@ C--- LAB: ( C1 C2 C3 C4 C5 -- ) : LABEL AT (C1,C2), LEN C3, ANG C4, SR C5
      +                    ISTYLE, ASIZE, ASHARP, BARB, SKIPSCL, ANNSCL )
                   ENDIF
                ENDIF
-               ISTKTOP = ISTKTOP - 5
+               ISTACK = ISTACK - 5
+               GOTO 299
+C
+C--- CL: ( -- ) : CLEAR STACK TO EMPTY.
+ 291           CONTINUE
+               IF( LEV2D )THEN
+                  ISTACK = 1
+               ELSE
+                  ISTACK = 0
+               ENDIF
+               GOTO 299
+C
+C--- G: ( ... AN ... C1 -- AN ) : PUT STACK LEVEL -C1 IN TOS
+ 292           CONTINUE
+               IARG = INT(STACK(ISTKTOP))
+               IF( IARG .GT. 4 )GOTO 9012
+               IF( IARG .LT. 1 )GOTO 9013
+               IF( ISTACK .LT. IARG )GOTO 9001
+               GOTO(2192,2292,2392,2492),IARG
+ 2192          CONTINUE
+               J = ISTKPOP
+               GOTO 2592
+ 2292          CONTINUE
+               J = ISTKPO2
+               GOTO 2592
+ 2392          CONTINUE
+               J = ISTKPO3
+               GOTO 2592
+ 2492          CONTINUE
+               J = ISTKPO4
+               GOTO 2592
+ 2592          CONTINUE
+               DO 2692 I=1,NELEM
+                  STACK(ISTKTOP) = STACK(J)
+                  J = J + 1
+                  ISTKTOP = ISTKTOP + 1
+ 2692          CONTINUE
                GOTO 299
 C
 C--- END OF OPERATOR SWITCH.
@@ -5993,6 +6106,14 @@ C--- ERROR MESSAGES.
       EMSG = 'INVALID FORMAT STRING'
       IERR = 12
       GOTO 9990
+ 9012 CONTINUE
+      EMSG = 'G (GET) FROM MORE THAN 4 LEVELS DEEP'
+      IERR = 13
+      GOTO 9990
+ 9013 CONTINUE
+      EMSG = 'G (GET) LEVEL MUST BE .GT. 0'
+      IERR = 14
+      GOTO 9990      
  9990 CONTINUE
       CALL TXBEGIN
       WRITE(6,9991)EMSG(1:LNBC(EMSG,1,1))
@@ -6054,13 +6175,14 @@ C--------------------------------------------------
       INTEGER NREGS, PROCLEN(NREGS)
       CHARACTER*(*) RPN, PROCEXP, PROC(NREGS)
 C---
-      INTEGER INPOS, OUTPOS, LRPN, LPROC, IREG
+      INTEGER INPOS, OUTPOS, LRPN, LPROC, IREG, LEXP
       INTEGER LNBC
       CHARACTER*80 MARKER
       CHARACTER*9 REGNAME
       SAVE
       DATA REGNAME/'123456789'/
 C
+      LEXP = LEN(PROCEXP)
       LRPN = LNBC(RPN,1,1)
       INPOS = 0
       OUTPOS = 0
@@ -6092,6 +6214,7 @@ C--- IF @ DECODE NEXT INPUT CHARACTER AS A SINGLE DIGIT.
 C
 C--- INSERT THE CONTENTS OF PROC REGISTER IREG.
 C--- PROCEXP CANNOT OVERFLOW DUE TO THE SIZES OF IT AND PROC REGISTERS.
+C--- WELL, IT CAN IF WE ALLOW ITERATED EXPANSION, SO CHECK.
          LPROC = PROCLEN(IREG)
          IF( LPROC .EQ. 0 )THEN
             CALL TXBEGIN
@@ -6100,6 +6223,12 @@ C--- PROCEXP CANNOT OVERFLOW DUE TO THE SIZES OF IT AND PROC REGISTERS.
             GOTO 900
          ENDIF
          OUTPOS = OUTPOS + 1
+         IF( OUTPOS+LPROC-1 .GT. LEXP )THEN
+            CALL TXBEGIN
+            WRITE(6,103)IREG
+            CALL TXEND
+            GOTO 900
+         ENDIF
          PROCEXP(OUTPOS:OUTPOS+LPROC-1) = PROC(IREG)(1:LPROC)
          OUTPOS = OUTPOS + LPROC - 1
       ENDIF
@@ -6123,6 +6252,7 @@ C--- DEAL WITH ERRORS.
       EXPROC = 0
       RETURN
 C
+ 103  FORMAT(1X,'RPN ERROR: ITERATED EXPANSION TOO LONG.')
  102  FORMAT(1X,A)
  101  FORMAT(1X,'RPN ERROR: NOT INSERTING ZERO LENGTH PROC: ',I1)
  100  FORMAT(1X,'RPN ERROR: @ MUST BE FOLLOWED BY A DIGIT.')
@@ -6431,20 +6561,28 @@ C
       RETURN
       END
 C
-      SUBROUTINE LDPROC(PRNAME, IPREG, PREGS, IDEV, NDEVS, HAVDEV,
+      SUBROUTINE LDPROC(PRNAME, IPREG, PREGS, LPREGS,
+     +     IDEV, NDEVS, HAVDEV,
      +     PATHNAM, FULLNAM)
 C------------------------------------------------
 C TRY TO FIND PRNAME IN GPLPROC. IF FOUND, TRY TO LOAD PROCEDURE INTO
-C PROCEDURE REGISTER IPREG
+C PROCEDURE REGISTER IPREG.
+C ALLOW PROCEDURES TO OPTIONALLY HAVE MULTIPLE LINES. IF THEY DO, PLACE
+C LINES IN SUCCESSIVE PROCEDURE REGISTERS AND ADD ",@N" TO THE END OF
+C LINES SO THAT ITERATED EXPANSION "CHAINS" THEN TOGETHER.
 C------------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       CHARACTER*(*) PRNAME, PATHNAM, FULLNAM
-      INTEGER IPREG, IDEV, NDEVS
+      INTEGER IPREG, IDEV, NDEVS, LPREGS(9)
       CHARACTER*80 PREGS(9)
       LOGICAL HAVDEV
 C---
-      INTEGER IPFERR, LNBC, LPRNAME, ILINE, LLINE, IFNE
-      CHARACTER*80 LINE
+      INTEGER IPFERR, LPRNAME, ILINE, LNAME, IFNE, I, JLINE
+      INTEGER NLINES, IEND, ISTART, IENAME, ISARG, JPREG
+      CHARACTER*80 LINE, NAME
+      CHARACTER*3 CHAIN
+      LOGICAL IFROMC
+      INTEGER LNBC, NNBC, NBC
       INTEGER MAXFNL
 #ifdef PORTF77
       PARAMETER( MAXFNL=72 )
@@ -6479,25 +6617,90 @@ C
  2    CONTINUE
       REWIND(UNIT=30)
 C
-C--- LOOK FOR THE PROCEDURE NAME
-C
+C--- CONVERT REQUESTED PROCEDURE NAME TO UPPER CASE.
       CALL UPCASE(PRNAME)
-      ILINE = 1
       LPRNAME = LNBC(PRNAME,1,1)
+C
+C--- LOOK FOR THE PROCEDURE NAME AND AN OPTIONAL LINE COUNT
+C      
+      ILINE = 0
  3    CONTINUE
       READ(30,100,END=4,ERR=5)LINE
  100  FORMAT(A)
-      CALL UPCASE(LINE)
-      LLINE = LNBC(LINE,1,1)
-      IF( LLINE .EQ. LPRNAME )THEN
-         IF( LINE(1:LLINE) .EQ. PRNAME(1:LPRNAME) )THEN
-            READ(30,100,END=6,ERR=5)LINE
-            PREGS(IPREG) = LINE
-            GOTO 99
-         ENDIF
-      ENDIF
       ILINE = ILINE + 1
-      GOTO 3
+      CALL UPCASE(LINE)
+C
+C--- SKIP COMMENTS.
+C
+      IF( LINE(1:1) .EQ. '#' )GOTO 3
+      IF( LINE(1:2) .EQ. 'C ' )GOTO 3
+C
+C--- IF LINE NOT BLANK, GET PROCEDURE NAME.
+C
+      IEND = LNBC(LINE,1,0)
+      IF( IEND .EQ. 0 )GOTO 3
+      ISTART = NNBC(LINE,1,0)
+      IF( ISTART .EQ. 0 )GOTO 3
+      IENAME = NBC(LINE,ISTART,IEND+1)
+      NAME = LINE(ISTART:IENAME-1)
+C
+C--- IS THIS THE DESIRED NAME?
+C
+      LNAME = IENAME - ISTART
+      IF( LNAME .EQ. LPRNAME .AND.
+     +     NAME(1:LNAME) .EQ. PRNAME(1:LPRNAME) )THEN
+C
+C--- IF MORE THAN NAME ON LINE, TRY TO GET LINE COUNT. DEFAULT=1.
+C
+         IF( IENAME .NE. IEND )THEN
+            ISARG = NNBC(LINE,IENAME,0)
+            IF( ISARG .EQ. 0 )THEN
+               NLINES = 1
+            ELSE
+               IF( .NOT. IFROMC(LINE(ISARG:IEND),NLINES,1,I) )
+     +              GOTO 7
+               IF( NLINES .GT. 1 )THEN
+                  IF( (IPREG+NLINES-1) .GT. 9 )GOTO 8
+               ENDIF
+            ENDIF
+         ELSE
+            NLINES = 1
+         ENDIF
+C
+C--- READ THE PROCEDURE LINES.
+C
+         JPREG = IPREG
+         JLINE = 0
+         DO 10 I=1,NLINES
+            READ(30,100,END=6,ERR=5)LINE
+            ILINE = ILINE + 1
+            JLINE = JLINE + 1
+            IEND = LNBC(LINE,1,0)
+            IF( IEND .EQ. 0 )GOTO 6
+C
+C--- IF MORE THAN 1 PROCEDURE LINE AND NOT LAST, ADD CHAIN TO NEXT PREG.
+C
+            IF( NLINES .GT. 1 .AND. JLINE .NE. NLINES )THEN
+               IF( IEND .GT. 77 )GOTO 9
+               WRITE(CHAIN,101)JPREG+1
+ 101           FORMAT(',@',I1)
+               LINE(IEND+1:IEND+3) = CHAIN
+               IEND = IEND + 3
+            ENDIF
+C
+C--- PUT POSSIBLY MODIFIED LINE IN PREG AND INC CUR PREG NO.
+C
+            PREGS(JPREG) = LINE
+            LPREGS(JPREG) = IEND
+            JPREG = JPREG + 1
+ 10      CONTINUE
+         GOTO 99
+      ELSE
+C
+C--- NOT DESIRED NAME. READ NEXT LINE.
+C
+         GOTO 3
+      ENDIF
 C
 C--- DID NOT FIND PROCEDURE CALLED PRNAME
 C
@@ -6515,13 +6718,38 @@ C
       CALL TXEND
       GOTO 99
 C
-C--- PROCEDURE NAME NOT FOLLOWED BY PROCEDURE
+C--- PROCEDURE NAME NOT FOLLOWED BY PROCEDURE, UNEXPECTED EOF.
 C
  6    CONTINUE
       CALL TXBEGIN
-      WRITE(6,*)'MISSING PROCEDURE BODY AT LINE ',ILINE
+      WRITE(6,*)'UNEXPECTED EOF OR EMPTY LINE AT LINE ',ILINE
       CALL TXEND
       GOTO 99
+C
+C--- FAILED TO PARSE LINE COUNT.
+C
+ 7    CONTINUE
+      CALL TXBEGIN
+      WRITE(6,*)'FAILED TO PARSE LINE COUNT AT LINE ',ILINE
+      CALL TXEND
+      GOTO 99
+C
+C--- NOT ENOUGH PREGS FOR PROCEDURE LENGTH.
+C
+ 8    CONTINUE
+      CALL TXBEGIN
+      WRITE(6,*)'NOT ENOUGH PROC REGS STARTING AT REG ', IPREG,
+     +     'AT LINE ',ILINE
+      CALL TXEND
+      GOTO 99
+C
+C--- LINE TOO LONG TO ADD CHAIN.
+C
+ 9    CONTINUE
+      CALL TXBEGIN
+      WRITE(6,*)'LINE TOO LONG (>77) TO ADD CHAIN AT LINE ',ILINE
+      CALL TXEND
+      GOTO 99  
 C
 C--- CLOSE GPLPROC AND RETURN
 C
@@ -6905,7 +7133,7 @@ C------------------------------------
       REAL X, Y
       CHARACTER*(*) A
 C
-      INTEGER LPDESC, IC, ICA
+      INTEGER LPDESC, IC, ICA, NEWPOS
       INTEGER NOCC
       CHARACTER*1 TC
 C
@@ -6949,7 +7177,7 @@ C TRY TO GET THE X COORDINATE.
          CALL TXEND
          RETURN
       ENDIF
-      IF( .NOT. RFROMC(PDESC,X,2,IC-1) )THEN
+      IF( .NOT. RFROMC(PDESC,X,2,NEWPOS) )THEN
          IERR = 4
          CALL TXBEGIN
          WRITE(6,103)
@@ -6969,7 +7197,7 @@ C STRING THAT SHOULD FOLLOW IT. ELSE SET ANNOTATION BLANK.
       ENDIF
 C
 C GET THE Y COORDINATE.
-      IF( .NOT. RFROMC(PDESC,Y,IC+1,ICA) )THEN
+      IF( .NOT. RFROMC(PDESC,Y,IC+1,NEWPOS) )THEN
          IERR = 5
          CALL TXBEGIN
          WRITE(6,104)
@@ -7255,7 +7483,17 @@ C------------------------------------
       IMPLICIT LOGICAL (A-Z)
       CHARACTER*4 OUTSTR
 C
-      OUTSTR = '0.84'
+      OUTSTR = '0.85'
+      RETURN
+      END
+C
+      CHARACTER*9 FUNCTION GETMOD()
+C------------------------------------
+C GET LAST MODIFIED DATE.
+C------------------------------------
+      CHARACTER*9 LASTMD
+      PARAMETER( LASTMD='15-SEP-25' )
+      GETMOD = LASTMD
       RETURN
       END
 C
@@ -7268,13 +7506,13 @@ C------------------------------------
       CHARACTER*80 OUTSTR
 C
       CHARACTER*4 VERSTR
-      CHARACTER*9 LASTMD
-      PARAMETER( LASTMD='04-SEP-25' )
+      CHARACTER*9 LASTMD, GETMOD
 C
 #ifdef UNIX
       INTEGER DMY(3)
       CALL IDATE(DMY)
       CALL VERSION(VERSTR)
+      LASTMD = GETMOD()
       WRITE(OUTSTR,100)VERSTR, DMY(1), DMY(2), DMY(3), LASTMD
  100  FORMAT('GPLOT V',A4,' FOR UNIX-LIKE SYSTEMS. RUN DATE: ',
      +     I2,'/',I2.2,'/',I4,' LAST MOD: ',A)
@@ -7282,6 +7520,7 @@ C
 #ifndef PORTF77
       CHARACTER*10 DATE
       CALL VERSION(VERSTR)
+      LASTMD = GETMOD()
       WRITE(OUTSTR,100)VERSTR, DATE(), LASTMD
  100  FORMAT('GPLOT V',A4,' FOR CDC NOS 2.8.7  RUN DATE: ',A10,
      +     ' LAST MOD: ',A)

@@ -182,8 +182,8 @@ C    FROM THE VARIOUS PASSES
       ASSIGN 3 TO GOFRAC
 C+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
       IF (FIT) THEN
-                  FITPT1 = 0
-                  FITPT2 = 0
+         FITPT1 = 0
+         FITPT2 = 0
       ENDIF
 C+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
    32 NTHL = NTH
@@ -220,9 +220,9 @@ C    SAVE HEIGHT AND ANY OTHER DYNAMICALLY MODIFIABLE VALUES
 C    NOW SET ANY NON-STANDARD BASIC SELECTIONS
       XUNLIN(0,0) = -1000.
       IF (NUN) THEN
-               XUNLIN(0,0) = CX
+         XUNLIN(0,0) = CX
 C    ALLOW FOR MINIMUM VERTICAL EXTENT IF UNDERLINED
-               YMIN(0) = MIN(YMIN(0),CY-UNYSP*HT)
+         YMIN(0) = MIN(YMIN(0),CY-UNYSP*HT)
       ENDIF
       YUNLIN(0,0) = CY
       NUITAL = 0.0
@@ -272,14 +272,14 @@ CFT  N AS CHARACTER LIMIT
       IF ((NE1+NE2).EQ.0) GO TO 7
 C    IF NO ESCAPES DO REMAINDER OF STRING
       IF (NE1.EQ.0) THEN
-                        N2 = NE2 - 1
-                        ESC = .FALSE.
+         N2 = NE2 - 1
+         ESC = .FALSE.
       ELSE IF (NE2.EQ.0) THEN
-                        N2 = NE1 - 1
-                        ESC = .TRUE.
+         N2 = NE1 - 1
+         ESC = .TRUE.
       ELSE
-                        N2 = MIN0(NE1,NE2) - 1
-                        ESC = NE1.LT.NE2
+         N2 = MIN0(NE1,NE2) - 1
+         ESC = NE1.LT.NE2
       ENDIF
       N2 = N2 + N1 - 1
       NE1 = NE1 + N1 - 1
@@ -299,15 +299,15 @@ C******* START OF CHARACTER LOOP *******
 C++++++++++++++NCHAR NEGATIVE (OR ZERO) INVALID CHAR ISYM(I)++++++++++
       IF (NCHAR.LE.0) GO TO 4020
       IF (MODIFY.NE.0) THEN
-                            NCHAR = NCHAR + MODIFY
-                            IF (NCHAR.LE.0.OR.NCHAR.GT.96) GO TO 4022
-                            MODIFY = 0
+         NCHAR = NCHAR + MODIFY
+         IF (NCHAR.LE.0.OR.NCHAR.GT.96) GO TO 4022
+         MODIFY = 0
       ENDIF
       IF (NLOW.EQ.0) GO TO 8
       IF (NLOW.LT.0) THEN
-             IF (NCHAR.GT.96) NCHAR = NCHAR + NLOW
+         IF (NCHAR.GT.96) NCHAR = NCHAR + NLOW
       ELSE
-             IF ((NCHAR.LE.64).AND.(NCHAR.GE.33)) NCHAR = NCHAR + NLOW
+         IF ((NCHAR.LE.64).AND.(NCHAR.GE.33)) NCHAR = NCHAR + NLOW
       ENDIF
     8 IXTENT = RXTENT(NCHAR,NBET) - LXTENT(NCHAR,NBET)
       L1 = LBYTEA(NCHAR-1,NBET) + 1
@@ -331,25 +331,25 @@ C    BASE LEVEL ONLY
 C
 C
 C+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-                               IF (FIT) THEN
-                                         IF (CX.GE.XFIT) THEN
-                                                 FITPT2 = I-1
-                                                 SPACE2 = SPACES
-                                                 XFIT2 = CX
-                                                 N2 = N
-                                                 I = N2 + 1
-                                         ELSE
-                                                 FITPT1 = I - 1
-                                                 SPACE1 = SPACES
-                                                 XFIT1 = CX
-                                         ENDIF
-                                ENDIF
+         IF (FIT) THEN
+            IF (CX.GE.XFIT) THEN
+               FITPT2 = I-1
+               SPACE2 = SPACES
+               XFIT2 = CX
+               N2 = N
+               I = N2 + 1
+            ELSE
+               FITPT1 = I - 1
+               SPACE1 = SPACES
+               XFIT1 = CX
+            ENDIF
+         ENDIF
 C+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 C
 C    SPACES MAY BE PROPORTIONAL IN EITHER MONO OR PROPORTIONAL MODE
-                               XTENT = XTENT*SPFACT
-                               RXT = RXT*SPFACT
-                               SPACES = SPACES + XTENT
+         XTENT = XTENT*SPFACT
+         RXT = RXT*SPFACT
+         SPACES = SPACES + XTENT
 C    ACCUMULATE LENGTH OF SPACES IN SPACES FOR LEFT+RIGHT JUSTIFICATION
 C
       ENDIF
@@ -384,10 +384,10 @@ C   SN.10 EQUIVALENT CONTINUE AT END OF LOOP
 C******* END OF CHARACTER LOOP *******
    17 CONTINUE
       IF ((LEV+FRAC).EQ.0) THEN
-                               IF (CZ.GT.CZ1) THEN
-                                              CXX = CZ - CSEP
-                                              CXS = CX - CSEP
-                               ENDIF
+         IF (CZ.GT.CZ1) THEN
+            CXX = CZ - CSEP
+            CXS = CX - CSEP
+         ENDIF
       ENDIF
       N1 = N2 + 1
 C    NOW SEE IF WHOLE STRING COMPLETE
@@ -398,7 +398,7 @@ C**   SIEMENS FORTAN GIVES ERROR:
 C**          "JZK112I-E .. SYMBOLIC NAME EXCEEDS 6 CHARACTERS"
 C**   WHEN ASSIGNED GO TO FOLLOWS IF .. HENCE CRUDE WORKAROUND!
       IF (SPEC) THEN
-          GO TO OUTGO,(1125,1226)
+         GO TO OUTGO,(1125,1226)
       ENDIF
 C**
       IF (N2.EQ.N) GO TO 999
@@ -425,19 +425,19 @@ C    +  SUPERSCRIPT IN
       HTLEV(LEV,FRAC) = HT
       YLEVEL(LEV,FRAC) = CY
       IF (OVERUN) THEN
-                    CY = CY + HT + HT*OVERY
+         CY = CY + HT + HT*OVERY
 C               FIRST HT SHOULD BE ACTUAL HEIGHT OF PREVIOUS CHARACTER
-                    HT = HT*OVERH
-                  ELSE
-                    IF (RELSUP) THEN
+         HT = HT*OVERH
+      ELSE
+         IF (RELSUP) THEN
 C     IF SUPERCRIPT RELATIVE TO ACTUAL TOP OF LAST CHARACTER
-                       CY = MAX((CY+HT*SUBY),(CY+HT+HT*SUPY))
+            CY = MAX((CY+HT*SUBY),(CY+HT+HT*SUPY))
 C     WHEN RELATIVE FIRST HT IS ACTUAL HEIGHT OF LAST CHARACTER
 C     SUPY IS NORMALLY NEGATIVE (SO LIES BELOW TOP)
-                                ELSE
-                       CY = CY + HT + HT*SUPY
-                                ENDIF
-                       HT = HT*SUPH
+         ELSE
+            CY = CY + HT + HT*SUPY
+         ENDIF
+         HT = HT*SUPH
       ENDIF
       GO TO 1102
 C    - SUBSCRIPT IN
@@ -446,20 +446,20 @@ C    - SUBSCRIPT IN
       HTLEV(LEV,FRAC) = HT
       YLEVEL(LEV,FRAC) = CY
       IF (OVERUN) THEN
-                       CY = CY -HT*UNDERY
+         CY = CY -HT*UNDERY
 C               OLD CY SHOULD BE ACTUAL BASE OF PREVIOUS CHARACTER
-                       HT = HT*OVERH
-                       CY = CY - HT
-                  ELSE
-                       CY = CY + HT*SUBY
-                       HT = HT*SUBH
+         HT = HT*OVERH
+         CY = CY - HT
+      ELSE
+         CY = CY + HT*SUBY
+         HT = HT*SUBH
       ENDIF
  1102 ASSIGN 1202 TO CYGOTO
  1302 DO 1402 I=0,FRAC
       IF (I.EQ.FRAC) THEN
-                          L = LEV
-                     ELSE
-                          L = LEVEL(I)
+         L = LEV
+      ELSE
+         L = LEVEL(I)
       ENDIF
       DO 1502 J=0,L
       IF (XUNLIN(J,I).GE.0.) YUNLIN(J,I) = MIN(YUNLIN(J,I),CY)
@@ -543,40 +543,40 @@ C    CLEAR SUPER-/SUB- SCRIPTS TO BASE LEVEL HERE
       ASSIGN 1108 TO SUGOTO
       IF (LEV.GT.0) GO TO 2604
  1108 IF (LENGTH) THEN
-           CXND(2,FRAC) = CX
-           GAPDN(FRAC) = (FRACYL(FRAC) + GAP(FRAC)) - YMIN(FRAC)
-           YMAX(FRAC) = YMAX(FRAC) + GAPDN(FRAC)
-           YMIN(FRAC) = YMIN(FRAC) + GAPDN(FRAC)
-           YMAX(FRAC-1) = MAX(YMAX(FRAC-1),YMAX(FRAC))
-           YMIN(FRAC-1) = MIN(YMIN(FRAC-1),YMIN(FRAC))
+         CXND(2,FRAC) = CX
+         GAPDN(FRAC) = (FRACYL(FRAC) + GAP(FRAC)) - YMIN(FRAC)
+         YMAX(FRAC) = YMAX(FRAC) + GAPDN(FRAC)
+         YMIN(FRAC) = YMIN(FRAC) + GAPDN(FRAC)
+         YMAX(FRAC-1) = MAX(YMAX(FRAC-1),YMAX(FRAC))
+         YMIN(FRAC-1) = MIN(YMIN(FRAC-1),YMIN(FRAC))
 C NG- INDEF-HUNT
-           CX = CXND(1,FRAC)
-           LEV = 0
-           CY = FRACYL(FRAC) - GAP(FRAC) - HT
-           YMIN(FRAC) = CY
-           YMAX(FRAC) = CY
+         CX = CXND(1,FRAC)
+         LEV = 0
+         CY = FRACYL(FRAC) - GAP(FRAC) - HT
+         YMIN(FRAC) = CY
+         YMAX(FRAC) = CY
       ELSE
-           IF (NUN) THEN
+         IF (NUN) THEN
 C    DO ANY UNDERLINING
-                   Y = YUNLIN(LEV,FRAC) - UNYSP*HT
-                   CALL DFX110(XUNLIN(LEV,FRAC),Y)
+            Y = YUNLIN(LEV,FRAC) - UNYSP*HT
+            CALL DFX110(XUNLIN(LEV,FRAC),Y)
 C NG- INDEF-HUNT
-                   CALL DFX106(CX,Y)
-           ENDIF
+            CALL DFX106(CX,Y)
+         ENDIF
 C    DO FRACTION BAR
 C NG- 11-AUG-2025 - IF THE FONTS ARE CHANGED SO THAT THE BASELINE
 C IS OTHER THAN ZERO, THE FRACTION BAR IS DRAWN TOO LOW. BUT THE
 C FONTS NEED THIS CHANGE, OTHERWISE GRAPH VALUE LABLES ARE NOT CORRECTLY
 C PLACED VERTICALLY (AND NEVER HAVE BEEN WITH "MY" FONTS!)
 C SHIFTING THE BAR UP BY HALF THE CHARACTER HEIGHT SEEMS TO FIX THIS.
-           CALL DFX110(CXND(1,FRAC),FRACYL(FRAC)+0.5*HT)
-           CALL DFX106(CXND(3,FRAC),FRACYL(FRAC)+0.5*HT)
+         CALL DFX110(CXND(1,FRAC),FRACYL(FRAC)+0.5*HT)
+         CALL DFX106(CXND(3,FRAC),FRACYL(FRAC)+0.5*HT)
 C NG- INDEF-HUNT
-           CX = CXND(1,FRAC) + CXD(FRAC)
-           LEV = 0
-           XUNLIN(LEV,FRAC) = -1000.
-           NUN = .FALSE.
-           CY = FRACYL(FRAC) - GAP(FRAC) - GAPDD(FRAC) -HT
+         CX = CXND(1,FRAC) + CXD(FRAC)
+         LEV = 0
+         XUNLIN(LEV,FRAC) = -1000.
+         NUN = .FALSE.
+         CY = FRACYL(FRAC) - GAP(FRAC) - GAPDD(FRAC) -HT
 C    THIS VERTICAL POSITIONING ASSUMES DENOMINATOR HAS A MINIMUM
 C    HEIGHT ALLOWANCE OF HT.  COMPENSATION FOR CUMULATIVE
 C    SUPERSCRIPT HEIGHTS BEYOND THAT IS MADE AT SN.2210 IN
@@ -658,9 +658,9 @@ C    END IF NO CHARACTER
       SBACK = BACK
       CXA = CX
       IF (.NOT.LENGTH.AND.(N1.LT.N).AND..NOT.NMONSP) THEN
-                        LENGTH = .TRUE.
-                        APASS = .TRUE.
-                        NACCNT = N1
+         LENGTH = .TRUE.
+         APASS = .TRUE.
+         NACCNT = N1
       ENDIF
  1925 N2 = N1
 C    GO DO SINGLE CHARACTER
@@ -686,9 +686,9 @@ C    HERE IF SINGLE DIACRITIC ONLY
 C    LENGTH ENTRY TO DFX203 RETURNS L2 AS RELATIVE/ABSOLUTE
       CALL DFX203(NCHAR,NCHARA,L1,L2)
       IF (.NOT.NMONSP.AND.LENGTH) THEN
-            RXTB = -FLOAT(LXTENT(NCHARA,NBET))*CXF
+         RXTB = -FLOAT(LXTENT(NCHARA,NBET))*CXF
 C    ABSOLUTE ACCENT COORDINATES (L2 = 0)
-            IF(L2.EQ.0) RXTB=(RXTB-FLOAT(LXTENT(NCHAR,NBET))*CXF)+RXTA
+         IF(L2.EQ.0) RXTB=(RXTB-FLOAT(LXTENT(NCHAR,NBET))*CXF)+RXTA
       ENDIF
       ASSIGN 1225 TO ACCGO
 C    NOW ACCUMULATE VERTICAL MINIMUM/MAXIMUM
@@ -700,57 +700,57 @@ C    NOW ACCUMULATE VERTICAL MINIMUM/MAXIMUM
 C    BOTH ZERO --> ACCENT WITHIN CHARACTER SPACE
 C
 C    FIRST LOOK AT MINIMUM
-          IF (IAA1.LT.100) THEN
+         IF (IAA1.LT.100) THEN
 C        ABSOLUTE MINIMUM
-              YMIN(FRAC) = MIN(YMIN(FRAC),CY+IA1*CYF)
-          ELSE
+            YMIN(FRAC) = MIN(YMIN(FRAC),CY+IA1*CYF)
+         ELSE
 C        OTHERWISE RELATIVE TO CHARACTER
-              IF (IA1.GT.0) THEN
+            IF (IA1.GT.0) THEN
 C           RELATIVE TO CHARACTER MAXIMUM
-                 IA1 = IA1 - 100
-                 YMIN(FRAC) = MIN(YMIN(FRAC),CY+IB2+IA1*CYF)
-              ELSE
+               IA1 = IA1 - 100
+               YMIN(FRAC) = MIN(YMIN(FRAC),CY+IB2+IA1*CYF)
+            ELSE
 C           RELATIVE TO CHARACTER MINIMUM
-                 IA1 = IA1 + 100
-                 YMIN(FRAC) = MIN(YMIN(FRAC),CY+IB1+IA1*CYF)
-              ENDIF
-          ENDIF
+               IA1 = IA1 + 100
+               YMIN(FRAC) = MIN(YMIN(FRAC),CY+IB1+IA1*CYF)
+            ENDIF
+         ENDIF
 C    SECOND LOOK AT MAXIMUM
-          IF (IAA2.LT.100) THEN
+         IF (IAA2.LT.100) THEN
 C        ABSOLUTE MAXIMUM
-              YMAX(FRAC) = MAX(YMAX(FRAC),CY+IA2*CYF)
-          ELSE
+            YMAX(FRAC) = MAX(YMAX(FRAC),CY+IA2*CYF)
+         ELSE
 C        OTHERWISE RELATIVE TO CHARACTER
-              IF (IA2.GT.0) THEN
+            IF (IA2.GT.0) THEN
 C           RELATIVE TO CHARACTER MAXIMUM
-                 IA2 = IA2 - 100
-                 YMAX(FRAC) = MAX(YMAX(FRAC),CY+IB2+IA2*CYF)
-              ELSE
+               IA2 = IA2 - 100
+               YMAX(FRAC) = MAX(YMAX(FRAC),CY+IB2+IA2*CYF)
+            ELSE
 C           RELATIVE TO CHARACTER MINIMUM
-                 IA2 = IA2 + 100
-                 YMAX(FRAC) = MAX(YMAX(FRAC),CY+IB1+IA2*CYF)
-              ENDIF
-          ENDIF
+               IA2 = IA2 + 100
+               YMAX(FRAC) = MAX(YMAX(FRAC),CY+IB1+IA2*CYF)
+            ENDIF
+         ENDIF
       ENDIF
 C    HAVE ACCUMULATED ACCENT VERTICAL EXTENTS
       GO TO ACCGO,(1225,1426,1625)
  1225 N1 = N1 + 1
  1825 RXTA = MAX(RXTB-RXTA,0.0)
       IF (APASS) THEN
-                 APASS = .FALSE.
-                 LENGTH = .FALSE.
+         APASS = .FALSE.
+         LENGTH = .FALSE.
 C NG- INDEF-HUNT
-                 CX = CXA + RXTA
-                 N1 = NACCNT
-                 GO TO 1925
+         CX = CXA + RXTA
+         N1 = NACCNT
+         GO TO 1925
       ENDIF
       IF (LENGTH) THEN
 C NG- INDEF-HUNT
-                 CX = CX + RXTA
-                 CXX = CXX + RXTA
-                 CXS = CXX
-                 XLEVEL(LEV,FRAC) = CX
-                 XRESUM(LEV,FRAC) = CX
+         CX = CX + RXTA
+         CXX = CXX + RXTA
+         CXS = CXX
+         XLEVEL(LEV,FRAC) = CX
+         XRESUM(LEV,FRAC) = CX
       ENDIF
       GO TO 20
 C    ELSE DO COMPOSITE ACCENTS
@@ -758,13 +758,13 @@ C    ELSE DO COMPOSITE ACCENTS
       IF (N1.GT.N) GO TO 999
       N3 = INDEX(ISYM(N1:N),')')
       IF (N3.EQ.1) THEN
-                       N1 = N1 + 1
-                       GO TO 1825
+         N1 = N1 + 1
+         GO TO 1825
       ENDIF
       IF (N3.LE.0) THEN
-                       N3 = N
-                   ELSE
-                       N3 = (N1 - 2) + N3
+         N3 = N
+      ELSE
+         N3 = (N1 - 2) + N3
       ENDIF
 C    SKIP ACCENTS IF INVALID CHARACTER
       IF ((NCHAR.LE.0).OR.(NCHAR.GT.96)) GO TO 1625
@@ -779,19 +779,19 @@ C    SKIP ACCENTS IF INVALID CHARACTER
 C    LENGTH ENTRY TO DFX203 RETURNS L2 AS RELATIVE/ABSOLUTE
       CALL DFX203(NCHAR,NCHARA,L1,L2)
       IF (.NOT.NMONSP.AND.LENGTH) THEN
-            RXTC = -FLOAT(LXTENT(NCHARA,NBET))*CXF
+         RXTC = -FLOAT(LXTENT(NCHARA,NBET))*CXF
 C    ABSOLUTE ACCENT COORDINATES (L2 = 0)
-            IF(L2.EQ.0) RXTC=(RXTC-FLOAT(LXTENT(NCHAR,NBET))*CXF)+RXTA
-            RXTB = MAX(RXTB,RXTC)
+         IF(L2.EQ.0) RXTC=(RXTC-FLOAT(LXTENT(NCHAR,NBET))*CXF)+RXTA
+         RXTB = MAX(RXTB,RXTC)
       ENDIF
 C    MUST AVOID TRANSFER BACK INTO LOOP
       IF (I.EQ.N3) THEN
 C    LOOP FINISHED - SO QUIT IT
-           ASSIGN 1625 TO ACCGO
+         ASSIGN 1625 TO ACCGO
       ELSE
 C    LOOP INCOMPLETE - SO RESTART IT
-           ASSIGN 1426 TO ACCGO
-           ILOOP1 = I + 1
+         ASSIGN 1426 TO ACCGO
+         ILOOP1 = I + 1
       ENDIF
       GO TO 2025
  1525 CONTINUE
@@ -817,14 +817,14 @@ C            (-1 AT END OF STRING ACCEPTED)
       SMMON = NMONSP
       IF (IS.EQ.2) THEN
 C    MARKERS ALWAYS CONSIDERED MONO
-                    NMONSP = .TRUE.
-                    IXTENT = MHWRRU(NBET) - MHWLRU(NBET)
-                    L1 = LBYTEM(NCHAR-1) + 1
-                    L2 = LBYTEM(NCHAR)
-                   ELSE
-                    IXTENT = RXTENT(NCHAR,NBET) - LXTENT(NCHAR,NBET)
-                    L1 = LBYTES(NCHAR-1) + 1
-                    L2 = LBYTES(NCHAR)
+         NMONSP = .TRUE.
+         IXTENT = MHWRRU(NBET) - MHWLRU(NBET)
+         L1 = LBYTEM(NCHAR-1) + 1
+         L2 = LBYTEM(NCHAR)
+      ELSE
+         IXTENT = RXTENT(NCHAR,NBET) - LXTENT(NCHAR,NBET)
+         L1 = LBYTEA(NCHAR-1,NBET) + 1
+         L2 = LBYTEA(NCHAR,NBET)                    
       ENDIF
 C    SET CHARACTER DEFINITION FOR ALPHABET NBET (N.B. NOT IBET)
       NCOX = -MHWLRU(NBET)
@@ -868,8 +868,20 @@ C          - ILIM RETURN SHOULD BE POSITIVE (0 IF INVALID CHARACTER)
 C            (-1 AT END OF STRING ACCEPTED)
       IF (ILIM.LT.-1) GO TO 4026
       IF (NCHAR.LE.0.OR.NCHAR.GT.ISNO) GO TO 4028
+C NG- WARNING! I HAVE HACKED THINGS HERE. THE ORIGINAL CODE LOOPED
+C     INFINITELY, REPEATING THE REQUESTED CHARACTER. I DO NOT REALLY
+C     UNDERSTAND THE CODE, BUT THE CHANGES MADE *SEEM* TO FIX THE
+C     PROBLEM FOR SIMPLE CASES (WHICH IS BETTER THAN AN INFINITE LOOP).
+C     ORIGINAL CODE GIT DIFF:
+C       N2 = N1 - 1
+C-      I = N2
+C+      I = N1
+C+      NE1 = N1
+C       GO TO 8
+C CHANGED: 9-SEP-2025
       N2 = N1 - 1
-      I = N2
+      I = N1
+      NE1 = N1
       GO TO 8
 C    S TAB SET
  1032 IF (.NOT.BLKTXT) GO TO 4050
@@ -940,8 +952,8 @@ C NG- INDEF-HUNT
 C NG- INDEF-HUNT
       CX = XRESUM(LEV,FRAC)
       IF ((LEV+FRAC).EQ.0) THEN
-                        CXX = CX
-                        CXS = CX
+         CXX = CX
+         CXS = CX
       ENDIF
       NUN = (XUNLIN(LEV,FRAC).GE.0.0)
       IF (LEV.GE.ILAST) GO TO 2604
@@ -983,8 +995,8 @@ C NG- INDEF-HUNT
  2108 XUNLIN(LEV,FRAC) = -1000.
 C    NECESSARY TO COMPUTE CORRECT LENGTH IN CASE UNDERLINED BLANKS
       IF ((LEV+FRAC).EQ.0) THEN
-                        CXX = CX
-                        CXS = CX
+         CXX = CX
+         CXS = CX
       ENDIF
       GO TO UNGOTO,(20,997)
 C    , TERMINATE FRACTION NUMERATOR
@@ -1001,40 +1013,40 @@ C    CLEAR SUPER-/SUB- SCRIPTS TO BASE LEVEL HERE
       IF (LEV.GT.0) GO TO 2604
  2210 CXMAX = MAX(CX,CXND(2,FRAC))
       IF (LENGTH) THEN
-           GAPDD(FRAC) = YMAX(FRAC) - (FRACYL(FRAC) - GAP(FRAC))
-           YMIN(FRAC) = YMIN(FRAC) - GAPDD(FRAC)
-           YMAX(FRAC) = YMAX(FRAC) - GAPDD(FRAC)
-           YMIN(FRAC-1) = MIN(YMIN(FRAC-1),YMIN(FRAC))
-           YMAX(FRAC-1) = MAX(YMAX(FRAC-1),YMAX(FRAC))
-           IF (PASS.EQ.FRAC) THEN
-                CDIFF = .5*(CXND(2,FRAC)-CX)
-                CXND(3,FRAC) = CXMAX
-                IF (CDIFF.LT.0.) THEN
+         GAPDD(FRAC) = YMAX(FRAC) - (FRACYL(FRAC) - GAP(FRAC))
+         YMIN(FRAC) = YMIN(FRAC) - GAPDD(FRAC)
+         YMAX(FRAC) = YMAX(FRAC) - GAPDD(FRAC)
+         YMIN(FRAC-1) = MIN(YMIN(FRAC-1),YMIN(FRAC))
+         YMAX(FRAC-1) = MAX(YMAX(FRAC-1),YMAX(FRAC))
+         IF (PASS.EQ.FRAC) THEN
+            CDIFF = .5*(CXND(2,FRAC)-CX)
+            CXND(3,FRAC) = CXMAX
+            IF (CDIFF.LT.0.) THEN
 C NG- INDEF-HUNT
-                     CX = CXND(1,FRAC) - CDIFF
-                     CXD(FRAC) = 0.0
-                ELSE
+               CX = CXND(1,FRAC) - CDIFF
+               CXD(FRAC) = 0.0
+            ELSE
 C NG- INDEF-HUNT
-                     CX = CXND(1,FRAC)
-                     CXD(FRAC) = CDIFF
-                ENDIF
-                N1 = N1FRAC
-                LENGTH = .FALSE.
-                PASS = 0
-                ICSAVE = 0
+               CX = CXND(1,FRAC)
+               CXD(FRAC) = CDIFF
+            ENDIF
+            N1 = N1FRAC
+            LENGTH = .FALSE.
+            PASS = 0
+            ICSAVE = 0
 C         AVOID DUPLICATE DIAGNOSTICS DURING REPEAT PASS OF FRACTION(S)
-                ASSIGN 2110 TO GOFRAC
-                GO TO 34
-           ENDIF
+            ASSIGN 2110 TO GOFRAC
+            GO TO 34
+         ENDIF
       ENDIF
       IF (.NOT.LENGTH) THEN
-                           IF (NUN) THEN
+         IF (NUN) THEN
 C    DO ANY UNDERLINING
-                                 Y = YUNLIN(LEV,FRAC) - UNYSP*HT
-                                 CALL DFX110(XUNLIN(LEV,FRAC),Y)
+            Y = YUNLIN(LEV,FRAC) - UNYSP*HT
+            CALL DFX110(XUNLIN(LEV,FRAC),Y)
 C NG- INDEF-HUNT
-                                 CALL DFX106(CX,Y)
-                           ENDIF
+            CALL DFX106(CX,Y)
+         ENDIF
       ENDIF
 C NG- INDEF-HUNT
       CX = CXMAX
@@ -1147,15 +1159,15 @@ C
 C
 C+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
       IF (FIT.AND.FITPT2.EQ.0) THEN
-                 IF (CXX.GE.XFIT) THEN
-                                 SPACE2 = SPACES
-                                 XFIT2 = CXX
-                                 FITPT2 = N
-                 ELSE
-                                 SPACE1 = SPACES
-                                 XFIT1 = CXX
-                                 FITPT1 = N
-                 ENDIF
+         IF (CXX.GE.XFIT) THEN
+            SPACE2 = SPACES
+            XFIT2 = CXX
+            FITPT2 = N
+         ELSE
+            SPACE1 = SPACES
+            XFIT1 = CXX
+            FITPT1 = N
+         ENDIF
       ENDIF
 C+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 C
@@ -1223,11 +1235,11 @@ C    IN CASE LENGTH CALL
      1 BELOW BASE LEVEL WAS IGNORED')
       GO TO 20000
  4005 IF (SEND) THEN
-                     C = 'SUPER'
-                     IC = 5
-                ELSE
-                     C = 'SUB'
-                     IC = 3
+         C = 'SUPER'
+         IC = 5
+      ELSE
+         C = 'SUB'
+         IC = 3
       ENDIF
       IF (ICSAVE.LE.0) GO TO 20
       ICHECK = ICSAVE
@@ -1280,11 +1292,11 @@ C    THEN SYMTXT EXECUTION ABORTED
       IF (ICSAVE.LE.0) GO TO 15
       ICHECK = ICSAVE
       IF (MODIFY.GT.0) THEN
-                            J = 5
-                            CERR(1:J) = 'RIGHT'
-                       ELSE
-                            J = 4
-                            CERR(1:J) = 'LEFT'
+         J = 5
+         CERR(1:J) = 'RIGHT'
+      ELSE
+         J = 4
+         CERR(1:J) = 'LEFT'
       ENDIF
       NCHAR2 = NCHAR - MODIFY
       MODIFY = 0
@@ -1300,7 +1312,7 @@ C**   SIEMENS FORTAN GIVES ERROR:
 C**          "JZK112I-E .. SYMBOLIC NAME EXCEEDS 6 CHARACTERS"
 C**   WHEN ASSIGNED GO TO FOLLOWS IF .. HENCE CRUDE WORKAROUND!
       IF ((ICSAVE.LE.0).OR.(APASS)) THEN
-          GO TO RESGO,(1225,1425)
+         GO TO RESGO,(1225,1425)
       ENDIF
 C**
       ICHECK = ICSAVE
@@ -1361,18 +1373,18 @@ C    REDUCE ERROR COUNT BY 1 BEFORE OUTPUT - AS CONTINUATION DIAGNOSTIC
 20001 FORMAT(1H0,21X,'TEXT STRING ERROR ORIGINATED IN USER REFERENCE TO
      1',A/1H0,21X,'ERROR DETECTED AT POSITION ',I4,'(/',I4,')')
       IF (NX.LE.45.OR.N.LE.50) THEN
-                        J2 = MIN(50,N)
-                        JX = NX
-                        WRITE(ERRREC(3),20002) ISYM(1:J2)
+         J2 = MIN(50,N)
+         JX = NX
+         WRITE(ERRREC(3),20002) ISYM(1:J2)
 20002 FORMAT(1H0,10X,'STRING - ',A)
-                     ELSE
-                         J4 = MIN(NX+10,N)
-                         J3 = J4-21
-                         JX = NX - (J3-1) + 25 + 9
+      ELSE
+         J4 = MIN(NX+10,N)
+         J3 = J4-21
+         JX = NX - (J3-1) + 25 + 9
 C        (25 CHARACTER STRING + 9 SPACES/DOTS)
-                         WRITE(ERRREC(3),20003) ISYM(1:25),ISYM(J3:J4)
+         WRITE(ERRREC(3),20003) ISYM(1:25),ISYM(J3:J4)
 20003 FORMAT(1H0,10X,'STRING - ',A,' . . . . ',A)
-                     ENDIF
+      ENDIF
       J = MIN(JX-1,6)
       IF (J.LE.0) GO TO 20005
       DO 20004 I=1,J
