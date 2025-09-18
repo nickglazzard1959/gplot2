@@ -28,7 +28,7 @@ C----------------------------------------------------------------------
       INCLUDE 'svgcmn.cmn'
       CHARACTER*80 FNO, ALINE, CFMT
       INTEGER IOS, LNBC
-      INTEGER IXMIN, IYMIN, IWIDTH, IHEIGHT
+      INTEGER IXMIN, IYMIN, IWIDTH, IHEIGHT, i
       CHARACTER*53 TID
       DATA TID/'^X^M^L^N^S="^H^T^T^P://^W^W^W.^W3.^O^R^G/2000/^S^V^G"'/
 C
@@ -69,8 +69,10 @@ C
 C---- COPY THE CONTENTS OF THE SCRATCH FILE TO THE OUTPUT FILE.
 C
             REWIND(UNIT=SLUN)
+            i = 0
  1          CONTINUE
                READ(SLUN,9,END=2)ALINE
+               i = i + 1
                WRITE(LUN,9)ALINE(1:LNBC(ALINE,1,1))
                GOTO 1
  2          CONTINUE
@@ -99,7 +101,7 @@ C
 C
 C---- CREATE THE NEW FILE. OVERWRITE EXISTING.
 C
-      OPEN(UNIT=LUN, FILE=FNO,
+      OPEN(UNIT=LUN, FILE=FNO(1:LNBC(FNO,1,1)),
      +     STATUS='UNKNOWN', FORM='FORMATTED',
      +     IOSTAT=IOS)
       IF( IOS .NE. 0 )STOP 'CANNOT CREATE SVG OUTPUT FILE.'
@@ -213,8 +215,8 @@ C----------------------------------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INCLUDE 'svgcmn.cmn'
 C      
-      LUN = 12
-      SLUN = 13
+      LUN = 17
+      SLUN = 18
       OPENED = .FALSE.
       EMPTYF = .TRUE.
       INGROUP = .FALSE.

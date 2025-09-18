@@ -292,20 +292,34 @@ C
       SUBROUTINE GTWAIT
 C----------------------------------------------------
 C PROMPT AND WAIT FOR RETURN KEY.
+C FOR "UNIX-LIKE" SYSTEMS, NEEDS TO READ FROM STDIN,
+C WHICH IS ALWAYS ASSOCIATED WITH LUN 5.
 C----------------------------------------------------
       INCLUDE 'gtcmn.cmn'
-      CHARACTER*80 C
-      BOOLEAN PROMPT(4)
-      DATA PROMPT /71,111,63,62/
-      CALL A12SEQ( PROMPT, 4 )
+      CHARACTER*1 C
+      BOOLEAN PROMPT(5)
+      DATA PROMPT /71,111,63,62,7/
+      CALL GTFLUSH
+      CALL A12SEQ( PROMPT, 5 )
       CALL A12FLS
-   8  CONTINUE
+ 8    CONTINUE
+#ifndef PORTF77
+      READ(7,101,END=9,ERR=9)C
+#else
       READ(5,101,END=9,ERR=9)C
+#endif
  101  FORMAT(A1)
       IF( C(1:1) .EQ. 'N' )GOTO 8
+      IF( C(1:1) .EQ. 'Q' )THEN
+         STOP 'EXIT REQUESTED'
+      ENDIF
  9    CONTINUE
 #ifndef PORTF77
-      IWEOF = EOF(5)
+C--- ON NOS, AN EMPTY LINE WILL BE TREATED AS EOF. IF INTERACTIVE
+C--- JOB, TRAP THAT AND TREAT IT AS 'Y' (CONTINUE).
+      IF( (EOF(7) .NE. 0) .AND. (IGETOT() .EQ. 3) )GOTO 1
+      STOP 'UNEXPECTED EOF.'
+ 1    CONTINUE
 #endif
       CALL GTCLR
       RETURN
@@ -315,7 +329,7 @@ C
 C---------------------------------------------------
 C PREPARE TO OUTPUT TEKTRONIX 4010 STYLE GRAPHICS TO
 C LOGICAL UNIT LUN. THIS SHOULD BE ASSOCIATED WITH THE
-C TERMINAL (BY A PREVIOUS CALL CONNEC(LUN)).
+C TERMINAL (BY A PREVIOUS CALL CONNEC(LUN) ON NOS).
 C---------------------------------------------------
       INTEGER LUN
       INCLUDE 'tekcmn.cmn'
@@ -413,24 +427,37 @@ C
       SUBROUTINE TEKWAIT
 C----------------------------------------------------
 C PROMPT AND WAIT FOR RETURN KEY.
+C FOR "UNIX-LIKE" SYSTEMS, NEEDS TO READ FROM STDIN,
+C WHICH IS ALWAYS ASSOCIATED WITH LUN 5.
 C----------------------------------------------------
       INCLUDE 'tekcmn.cmn'
-      CHARACTER*80 C
-      BOOLEAN PROMPT(4)
-      DATA PROMPT /71,111,63,62/
+      CHARACTER*1 C
+      BOOLEAN PROMPT(5)
+      DATA PROMPT /71,111,63,62,7/
       IF( INGRAF .EQ. 0 )CALL TEKGRAF
       CALL TEKDRAW( 3, 747, 0 )
       CALL TEKTEXT
-      CALL A12SEQ( PROMPT, 4 )
+      CALL A12SEQ( PROMPT, 5 )
       CALL A12FLS
-   8  CONTINUE
+ 8    CONTINUE
+#ifndef PORTF77
+      READ(7,101,END=9,ERR=9)C
+#else
       READ(5,101,END=9,ERR=9)C
+#endif      
  101  FORMAT(A1)
       IF( C(1:1) .EQ. 'N' )GOTO 8
+      IF( C(1:1) .EQ. 'Q' )THEN
+         STOP 'EXIT REQUESTED'
+      ENDIF      
  9    CONTINUE
 #ifndef PORTF77
-      IWEOF = EOF(5)
-#endif
+C--- ON NOS, AN EMPTY LINE WILL BE TREATED AS EOF. IF INTERACTIVE
+C--- JOB, TRAP THAT AND TREAT IT AS 'Y' (CONTINUE).
+      IF( (EOF(7) .NE. 0) .AND. (IGETOT() .EQ. 3) )GOTO 1
+      STOP 'UNEXPECTED EOF.'
+ 1    CONTINUE
+#endif      
       CALL TEKCLR
       RETURN
       END

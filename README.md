@@ -5,8 +5,9 @@ GPLOT - A Graph Plotting and Drawing Program based on DIMFILM
 GPLOT is a graph plotting program, similar in intent to Gnuplot but very
 different in detail (and less capable -- although it also does some things
 Gnuplot does not). It is intended to run primarily
-on CDC NOS 2.8.7, but it will also run on "Unix-like" systems and the
-Cray Operating System (COS 1.17). In addition to plotting graphs of
+on CDC NOS 2.8.7, but it will also run on "Unix-like" systems.
+
+In addition to plotting graphs of
 data (stored in files), the current version of GPLOT has some features
 which can be useful for general drawing, especially of things such as
 block diagrams.
@@ -39,6 +40,11 @@ systems. Fortunately, FORTRAN-77 remains well supported today on "Unix-like"
 systems thanks to gfortran (along with modern Fortran, which is gfortran's
 main focus, of course).
 
+The DIMFILM library can also be cross-compiled and used on the Cray COS
+operating system on a (simulated) CRAY X-MP. GPLOT itself is currently
+not available for COS, although that should be straightforward to add in
+a future "release".
+
 GPLOT and DIMFILM are developed and maintained primarily on CDC NOS 2.8.7.
 NOS has its own way of managing source code, at the heart of which is 
 a program called MODIFY. 
@@ -60,7 +66,9 @@ The GPLOT project therefore establishes a fair amount of infrastructure that
 allows MODIFY and Git to inter-operate without too much pain.
 
 Please note that neither GPLOT nor DIMFILM have been built on any version
-of Windows. 
+of Windows. If a good FORTRAN-77 compiler is available for Windows (perhaps
+gfortran?), it should be fairly easy to get them working on Windows, but
+that is an "exercise for the reader" ... 
 
 
 MODIFY/Git Interoperability Infrastructure
@@ -277,6 +285,11 @@ files that were changed *in* the last Git commit.
 The `import-modify.sh` and `export-modify.sh` should do all that is needed to
 keep MODIFY and Git versions of the same software "in sync". Those scripts
 use some other tools which may be of interest and more generally useful.
+
+The various components involved and their relationships are shown in this
+diagram:
+
+![](iocd001.svg)
 
 MODIFY source code is extracted from and inserted into PLs by running
 dynamically constructed batch jobs on NOS. The jobs are submitted via

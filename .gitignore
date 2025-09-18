@@ -40,7 +40,7 @@
 *.eps
 *.JPG
 *.EPS
-*.json
+# *.json
 *.gif
 *.dng
 *.raw
