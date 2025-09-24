@@ -1916,13 +1916,13 @@ The column given as the third argument to `READ` supplies the delta from the
 values taken from the column given as the second argument to `READ` at which
 error bar limits will be drawn above and below the value.
 
-### Data with asymettric uncertainties in Y
+### Data with asymmetric uncertainties in Y
 
 It is possible that your data has potential deviations that are larger
 in the negative direction than in the positive direction, perhaps because
 the underlying data distribution is not normal, but skewed, or perhaps the
 device making measurements has errors that are proportional to the magnitude
-of the measured values. To visualise this, you need asymettric error bars in Y.
+of the measured values. To visualise this, you need asymmetric error bars in Y.
 
 To illustrate this, we have concocted another data file (`DAEG3`):
 ```
@@ -1943,6 +1943,9 @@ Note this has 5 columns but here we will use the first four.
 To plot this with asymmetrical error bars only requires a
 change to `READ`. The `XYLINE` (or `XYPOINT`) command will plot
 whatever the last `READ` has read.
+
+Note the command: `ASYMYERRORS YES` which explicitly turns on this
+behaviour. This is not needed, however, as it is the default.
 ```
 # READ AN X,Y,EU,EL DATA FILE AND PLOT THE CONTENTS
 #
@@ -1950,6 +1953,7 @@ RESET
 GRAPHMODE ON
 #
 # --- READ THE DATA FILE, FIRST 4 COLUMNS. THIS ONE USES COMMAS.
+ASYMYERRORS YES
 GET DAEG3
 READ DAEG3 1 2 3 4
 #
@@ -1967,7 +1971,7 @@ XYLINE
 OUTLINE DEV
 ```
 
-Which results in:
+This results in:
 
 ![](gr17001.svg)
 
@@ -1979,7 +1983,7 @@ delta to the *lower* limit of the error bar.
 It is easy to plot points on top of this. This might be useful when the
 points are derived from real measurements and a curve has been fitted
 to these measurements. As an example of this, we take the point Y
-cooedinates from the 5th column of `DAEG3` using this script:
+coordinates from the 5th column of `DAEG3` using this script:
 ```
 # READ AN X,Y,EU,EL DATA FILE AND PLOT THE CONTENTS
 #
@@ -1987,6 +1991,7 @@ RESET
 GRAPHMODE ON
 #
 # --- READ THE DATA FILE, FIRST 3 COLUMNS. THIS ONE USES COMMAS.
+ASYMYERRORS YES
 GET DAEG3
 READ DAEG3 1 2 3 4
 #
@@ -2015,6 +2020,96 @@ OUTLINE DEV
 ```
 
 ![](gr18001.svg)
+
+### Data with symmetric uncertainties in Y and X
+
+It is also easy to plot data with uncertainty estimates in both axes.
+This requires the same 4 data columns as used above, but with the
+command:
+```
+ASYMYERRORS NO
+```
+Note that this *must* appear *before* the `READ` command, as it causes data to
+be rearranged internally immediately after it is read. In this case, the 3rd
+column is interpreted as symmetric Y error and the 4th as symmetric X error.
+
+![](gr1x001.svg)
+
+### Interpolating the data points
+
+The supplied data can be interpolated for the purposes of plotting "smooth" curves
+through, rather than straight lines between, the supplied data. This is generally
+frowned upon in science, but GPLOT/DIMFILM can do it!
+
+In addition to `LINEAR` interpolation (which is usually pointless, as the appearance
+of the graph does not change), a cubic (3rd order) or quintic (5th order) polynomial
+can be drawn through the data points. At least 3 points must be supplied for cubic,
+and 5 for quintic, interpolation. The data must be sorted in X. The number of points 
+to be found between each supplied point must be specified. If the data is not
+reasonably "well behaved", there can be numerical issues.
+
+To demonstrate this capability, here is a very simple example:
+
+![](gr1i001.svg)
+
+This is created by the following script:
+```
+# INTERPOLATION
+#
+RESET
+GRAPHMODE ON
+#
+# --- SOME DATA - VERY UNDERSAMPLED SIN(X)
+READ HERE 1 2
+0.00000  0.00000
+0.78540  0.70711
+1.57080  1.00000
+2.35619  0.70711
+3.14159  0.00000
+3.92699 -0.70711
+4.71239 -1.00000
+5.49779 -0.70711
+6.28319  0.00000
+EOF
+#
+# --- SETUP THE GRAPH
+USEKEY
+CSG ANNOT
+COL 0 0 0
+CSG TEXT
+COL 0 0 0
+CSG GEN
+COL 0.8 0.1 0.1
+YRANGE -1.2 1.2
+TITLE "I*LNTERPOLATIONS"
+XLABEL "X"
+YLABEL "Y"
+#
+# --- LINEAR INTERPOLATION, 9 INTERMEDIATES.
+INTERPOLATE LINEAR 9
+XYLINE
+ADDKEY "L*LINEAR"
+#
+# --- POINTS BEING INTERPOLATED.
+XYSAME
+MARKER 20
+XYPOINT
+#
+# --- CUBIC
+COL 0.1 0.8 0.1
+INTERPOLATE CUBIC 9
+XYLINE
+ADDKEY "C*LUBIC"
+#
+# --- QUINTIC
+COL 0.1 0.1 0.8
+INTERPOLATE QUINTIC 9
+XYLINE
+ADDKEY "Q*LUINTIC"
+#
+# --- FINISH THE GRAPH
+KEYS
+```
 
 ### Log Linear Plots
 
@@ -2408,8 +2503,8 @@ helpful when debugging), but it opens up a lot of possibilities.
 
 When dealing with data from files, GPLOT uses between 2 and 4 arrays to store the
 data to be plotted. Two are used to store X and Y coordinates. If symmetric error
-bars are to be plotted a third array is used to store that, and asymmetric error
-bars use a fourth array.
+bars are to be plotted a third array is used to store that, and asymmetric Y error
+bars or Y and X error bars use a fourth array.
 
 The RPN evaluator treats these four arrays as the first four levels of a stack.
 If `READ` is used, their contents will be overwritten by the read data and the
@@ -2534,10 +2629,10 @@ be the case when it is plotted on a digital computer, though, as all
 numbers on such machines are rational, but the period will be
 enormous.
 
-### General drawing
+### General drawing - Part 1: Basic functions
 
 DIMFILM provides some basic drawing capabilities apart from its extensive
-graph plotting functionality. That functionality is based on these lower
+graph plotting functionality. Graph plotting is based on these lower
 level capabilities, as you would expect.
 
 There is a simple but sound foundation for general drawing with the 
@@ -2572,7 +2667,8 @@ Two GPLOT commands build slightly on this: `CRECT` draws a rectangle centered
 on a given location and `PATH` uses the contents of the X and Y arrays
 to draw a polyline. GPLOT/DIMFILM does not support the drawing of any
 kinds of smooth curves for general drawing purposes (`INTERPOLATE` can
-interpolate smooth curves between data points for graph plotting).
+interpolate smooth curves between data points for graph plotting, but this
+can't be used for general drawing).
 
 DIMFILM has very limited geometric transformation support and GPLOT does
 not provide access to this. GPLOT does provide a more comprehensive
@@ -2585,6 +2681,9 @@ set by the `SYMHT`, `SYMANG` and `FONT` commands. The fonts are specific to
 DIMFILM (there is no way to use any "system fonts"!) and are, in this
 implementation, some of the Hershey fonts. The available fonts
 can be listed with the `LISTFONT` command.
+
+Special "marker" characters can also be drawn using the `MARKER` command
+with the optional 2nd argument set to `YES`.
 
 The text output facility allows
 "markup" to be included in the string to draw, and this extends to sub-scripts,
@@ -2745,11 +2844,44 @@ be "automated". In this case, the end coordinate for the non-horizontal
 found by hand with a calculator! This is the sort of thing a computer
 ought to be able to do for you!
 
-To help with this, in addtion to simple evaluation of `y = f(x)` functions,
+To help with this, in addition to simple evaluation of `y = f(x)` functions,
 the "evaluator" was added.
 
 
+### The RPN Evaluator for drawing 2D parametric functions
 
+Bridging the graph plotting and general drawing worlds is drawing
+functions of a parameter, `t`, that trace out a path on the 2D plane.
+These are of the form:
+```
+x = f(t)
+y = f(t)
+```
+
+Such functions can generate very pleasing patterns and often appear in
+"recreational mathematics". Some of the most familiar examples are the
+curves generated by the "Spirograph" "toy" (see this
+[Wikipedia article](https://en.wikipedia.org/wiki/Spirograph)), which we
+will come to shortly.
+
+As a simpler example (from the point of view of GPLOT only!) we start with
+the "Farris mystery curve". The "mystery" is that a five-fold symmetry
+appears from formula which contain even number and no obvious source of
+such a symmetry.
+
+While "Spirograph" uses two wheels, with one rotating in slip-free contact
+with the other, the Farris curves (many variations are possible) can be
+generated with three wheels in slip-free contact.
+
+Here is the "original" mystery curve:
+
+![](g1fm001.svg)
+
+![](g1sp001.svg)
+
+![](g2sp001.svg)
+
+![](g3sp001.svg)
 
 
 GPLOT cheat sheet
@@ -2766,3 +2898,47 @@ the details when trying to do something.
 ![](cht1001.svg)
 
 ![](cht2001.svg)
+
+
+Fonts
+-----
+
+
+![](fosm001.svg)
+
+![](f01t001.svg)
+
+![](f02t001.svg)
+
+![](f03t001.svg)
+
+![](f04t001.svg)
+
+![](f05t001.svg)
+
+![](f06t001.svg)
+
+![](f07t001.svg)
+
+![](f08t001.svg)
+
+![](f09t001.svg)
+
+![](f10t001.svg)
+
+![](f11t001.svg)
+
+![](f12t001.svg)
+
+![](f13t001.svg)
+
+![](f14t001.svg)
+
+![](f15t001.svg)
+
+![](f16t001.svg)
+
+![](f17t001.svg)
+
+![](f18t001.svg)
+

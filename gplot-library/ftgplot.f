@@ -62,7 +62,7 @@ C
       INTEGER MAXARG, MAXDEP, MAXSTK, MAXKEY, MAXPTS, MAXFNL
       INTEGER NCMDS, NFONTS, NREGS, NNARGX
       PARAMETER( MAXARG=9, MAXDEP=5, MAXSTK=9, MAXKEY=20 )
-      PARAMETER( MAXPTS=10000, NNARGX=16 )
+      PARAMETER( MAXPTS=10000, NNARGX=17 )
 #ifdef UNIX
       PARAMETER( MAXFNL=72 )
 #else
@@ -679,7 +679,8 @@ C
       DCMDS(KCRECT) = 'X Y W H - RECTANGLE CENTER X,Y WIDTH W HEIGHT H.'
       DCMDS(KBSTAR) = 'EVAL/ITEVAL FIND GRAPHICS BOUNDING BOX ONLY.'
       DCMDS(KBEND) = 'EVAL/ITEVAL RETURN TO RENDERING GRAPHICAL ITEMS.'
-      DCMDS(KBSET) = 'SET BOUNDS TO BOUNDING BOX (IF ANY).'
+      DCMDS(KBSET) = '[SCALE] - SET BOUNDS TO (SCALED) BOUNDING BOX '//
+     +     '(IF ANY FOUND WITH BBSTART/BBEND).'
       DCMDS(KLSYS) = 'NRULES NITER ANGLE - DEFINE AND DRAW AN L-SYSTEM.'
       DCMDS(KLDPROC) = 'N NAME - LOAD PROCEDURE NAME INTO REGISTER N.'
       DCMDS(KTXBOX) = '"TEXT" XC YC - DRAW TEXT BOX, CENTER XC,YC.'
@@ -861,6 +862,8 @@ C
       NARGXMX(15) = 5
       NARGXCM(16) = KMARK
       NARGXMX(16) = 2
+      NARGXCM(17) = KBSET
+      NARGXMX(17) = 1
 C
 C DEFAULT STATE ON START UP.
 C NO DATA READ YET. NO DEVICE OPENED. ETC.
@@ -3043,35 +3046,56 @@ C                  IEEE SINGLE WHERE NECESSARY.
          BB(3) = 1.0E300
          BB(4) = -1.0E300
          DOBB = .TRUE.
-         CALL TXBEGIN
-         WRITE(6,*)'EVAL/ITEVAL WILL ACCUMULATE BOUNDING BOX.'
-         CALL TXEND
+         IF( IDEV .NE. KDTK )THEN
+            CALL TXBEGIN
+            WRITE(6,*)'EVAL/ITEVAL WILL ACCUMULATE BOUNDING BOX.'
+            CALL TXEND
+         ENDIF
          GOTO 299
 C
 C BBEND - EVAL/ITEVAL TO RETURN TO DRAWING GRAPHICAL ITEMS.
  274     CONTINUE
          DOBB = .FALSE.
-         CALL TXBEGIN
-         WRITE(6,*)'EVAL/ITEVAL WILL RENDER GRAPHICAL ITEMS.'
-         CALL TXEND
+         IF( IDEV .NE. KDTK )THEN
+            CALL TXBEGIN
+            WRITE(6,*)'EVAL/ITEVAL WILL RENDER GRAPHICAL ITEMS.'
+            CALL TXEND
+         ENDIF
          GOTO 299
 C
 C BBSET - SET BOUNDS TO EVAL BOUNDING BOX (IF ANY).
  275     CONTINUE
          IF( .NOT. HAVDEV )GOTO 9090
-         CALL TXBEGIN
-         IF( BBEMPTY(BB) )THEN
-            WRITE(6,*)'EVAL BOUNDING BOX EMPTY. BOUNDS UNCHANGED.'
+         IF( ICARGS .EQ. 1 )THEN
+            IF( .NOT. RFROMC(ARGS(1),F1,1,NEWPOS) )GOTO 9098
          ELSE
-            XLO = BB(1)
-            XHI = BB(2)
-            YLO = BB(3)
-            YHI = BB(4)
+            F1 = 1.0
+         ENDIF
+         IF( BBEMPTY(BB) )THEN
+            IF( IDEV .NE. KDTK )THEN
+               CALL TXBEGIN
+               WRITE(6,*)'EVAL BOUNDING BOX EMPTY. BOUNDS UNCHANGED.'
+               CALL TXEND
+            ENDIF
+         ELSE
+            XLO = 0.5 * ( (BB(2) + BB(1)) - F1 * (BB(2) - BB(1)) )
+            XHI = 0.5 * ( (BB(2) + BB(1)) + F1 * (BB(2) - BB(1)) )
+            YLO = 0.5 * ( (BB(4) + BB(3)) - F1 * (BB(4) - BB(3)) )
+            YHI = 0.5 * ( (BB(4) + BB(3)) + F1 * (BB(4) - BB(3)) )
+            IF( ABS(XHI-XLO) .LT. 1E-6 .OR. ABS(YHI-YLO) .LT. 1E-6 )THEN
+               CALL TXBEGIN
+               WRITE(6,*)'INVALID BOUNDING BOX, NOT SETTING IT.'
+               CALL TXEND
+               GOTO 299
+            ENDIF
             CALL BOUNDS(XLO,XHI,YLO,YHI)
             GCHANGE = .TRUE.
-            WRITE(6,*)'BOUNDS SET TO EVAL BOUNDING BOX.'
+            IF( IDEV .NE. KDTK )THEN
+               CALL TXBEGIN
+               WRITE(6,*)'BOUNDS SET TO EVAL BOUNDING BOX.'
+               CALL TXEND
+            ENDIF
          ENDIF
-         CALL TXEND
          GOTO 299
 C
 C LSYSTEM
@@ -4765,7 +4789,7 @@ C
       INTEGER ISTKNEW, IREG, NEWELEM, IARG, IOEN, IOST, IMPOS, NFMT
       INTEGER ISTKPO4
       REAL ARG, DOMLIM, CEILING, V, FLOOR, MPI
-      PARAMETER( NOPS=92 )
+      PARAMETER( NOPS=93 )
       PARAMETER( MPI=3.14159265359 )
       CHARACTER*4 OPNAMES(NOPS)
       INTEGER MINSTK(NOPS), OPLEN(NOPS)
@@ -4777,6 +4801,11 @@ C
       REAL X, Y, XO, YO, ROP, STRING, ZEROTST, SFSYMHT, LFSYMHT
       SAVE
       DATA X/0.0/, Y/0.0/
+C WARNING: NOS FTN5 HAS A LIMIT OF 19 CONTINUATION LINES.
+C NOS/VE FORTRAN 1 HAS THE SAME LIMIT.
+C OTHER COMPILERS MAY HAVE SIMILAR LIMITS. IN FACT, 19 SEEMS
+C TO BE DEFINED BY THE FORTRAN STANDARD FOR FIXED FORMAT SOURCE
+C (39 FOR FREE FORMAT). THIS COULD BE COMPACTED IF NEEDED.
       DATA OPNAMES/    '+',    '-',    '*',    '/',    'P',
      +                'R/',   'R-',  'SIN',  'COS',  'TAN',
      +              'ASIN', 'ACOS', 'ATAN',  'CHS', 'SQRT',
@@ -4794,7 +4823,8 @@ C
      +                'EQ',   'NE',  'NOT',  'SEL',  'IDX',
      +              'SETY',    'C',    'A',  'BOX',   'PC',
      +                 '#',    '=',    '&',    'S',  'ROT',
-     +               'TRN',  'SCL',   'R2D', 'D2R',  'LAB', 'CL', 'G'/
+     +               'TRN',  'SCL',   'R2D', 'D2R',  'LAB',
+     +                'CL',    'G',   'GCD'/
 C 1 CHARACTER SYNONMYS FOR:   RCL:#, STO:=, DUP:&, SWAP:S.
       DATA MINSTK/2, 2, 2, 2, 1,
      +            2, 2, 1, 1, 1,
@@ -4813,7 +4843,8 @@ C 1 CHARACTER SYNONMYS FOR:   RCL:#, STO:=, DUP:&, SWAP:S.
      +            2, 2, 1, 3, 0,
      +            1, 3, 5, 4, 1,
      +            1, 2, 1, 2, 3,
-     +            4, 4, 1, 1, 4, 0, 2/
+     +            4, 4, 1, 1, 4,
+     +            0, 2, 2/
       DATA OPLEN/1, 1, 1, 1, 1,
      +           2, 2, 3, 3, 3,
      +           4, 4, 4, 3, 4,
@@ -4831,7 +4862,8 @@ C 1 CHARACTER SYNONMYS FOR:   RCL:#, STO:=, DUP:&, SWAP:S.
      +           2, 2, 3, 3, 3,
      +           4, 1, 1, 3, 2,
      +           1, 1, 1, 1, 3,
-     +           3, 3, 3, 3, 3, 2, 1/
+     +           3, 3, 3, 3, 3,
+     +           2, 1, 3/
 C
 C---- THE DOMAIN OF SEVERAL MATHEMATICAL FUNCTIONS IS LIMITED TO THIS:
 C---- ALSO, IF TRPDIV0, TRAP DIVIDE BY < ABS(1E-9) ELSE USE 1E-9.
@@ -4984,7 +5016,7 @@ C--- IT IS A KNOWN OPERATOR. TRY TO APPLY IT.
      +              261,262,263,264,265,266,267,268,269,270,
      +              271,272,273,274,275,276,277,278,279,280,
      +              237,236,234,222,285,286,287,288,289,290,
-     +              291,292),IOP
+     +              291,292,293),IOP
 C
 C--- + : ADD ( A1 A2 -- A1 ) : A1 = A1 + A2
  201           CONTINUE
@@ -5330,7 +5362,7 @@ C
 C--- MIN : ( A1 A2 -- A1 ) : A1 = MIN(A1,A2)
  232           CONTINUE
                DO 2132 I=1,NELEM
-                  STACK(ISTKTOP) = MIN(STACK(ISTKPOP),STACK(ISTKTOP))
+                  STACK(ISTKPOP) = MIN(STACK(ISTKPOP),STACK(ISTKTOP))
                   ISTKPOP = ISTKPOP + 1
                   ISTKTOP = ISTKTOP + 1
  2132          CONTINUE
@@ -5340,7 +5372,7 @@ C
 C--- MAX : ( A1 A2 -- A1 ) : A1 = MAX(A1,A2)
  233           CONTINUE
                DO 2133 I=1,NELEM
-                  STACK(ISTKTOP) = MAX(STACK(ISTKPOP),STACK(ISTKTOP))
+                  STACK(ISTKPOP) = MAX(STACK(ISTKPOP),STACK(ISTKTOP))
                   ISTKPOP = ISTKPOP + 1
                   ISTKTOP = ISTKTOP + 1
  2133          CONTINUE
@@ -6038,6 +6070,25 @@ C--- G: ( ... AN ... C1 -- AN ) : PUT STACK LEVEL -C1 IN TOS
                   J = J + 1
                   ISTKTOP = ISTKTOP + 1
  2692          CONTINUE
+               GOTO 299
+C
+C--- GCD: ( C1 C2 -- C1) : C1 = GCD(C1,C2) (GREATEST COMMON DIVISOR)
+ 293           CONTINUE
+               J = INT(STACK(ISTKTOP))
+               I = INT(STACK(ISTKPOP))
+ 2193          CONTINUE
+               IF( J .EQ. 0 )GOTO 2293
+               IARG = J
+               J = MOD(I,J)
+               I = IARG
+               GOTO 2193
+ 2293          CONTINUE
+               IARG = ABS(I)
+               DO 2393 I=1,NELEM
+                  STACK(ISTKPOP) = IARG
+                  ISTKPOP = ISTKPOP + 1
+ 2393          CONTINUE
+               ISTACK = ISTACK - 1
                GOTO 299
 C
 C--- END OF OPERATOR SWITCH.
@@ -7494,7 +7545,7 @@ C------------------------------------
 C GET LAST MODIFIED DATE.
 C------------------------------------
       CHARACTER*9 LASTMD
-      PARAMETER( LASTMD='16-SEP-25' )
+      PARAMETER( LASTMD='24-SEP-25' )
       GETMOD = LASTMD
       RETURN
       END
