@@ -2538,8 +2538,8 @@ C SUBFIGGRID
             CALL TXBEGIN
             WRITE(6,2442)'X',IVALS(1)
  2442       FORMAT(1X,A1,' GRID COORD MUST BE BETWEEN 1 AND ',I2)
-            GOTO 299
             CALL TXEND
+            GOTO 299
          ENDIF
          IF( IVALS(4) .LT. 1 .OR. IVALS(4) .GT. IVALS(2) )THEN
             CALL TXBEGIN
