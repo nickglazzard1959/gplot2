@@ -2396,13 +2396,22 @@ C PANE
  2391       FORMAT(1X,'INVALID PANE SPECIFICATION.')
             CALL TXEND
          ELSE
-            PXL = F1
-            PXH = F2
-            PYL = F3
-            PYH = F4
-            CALL PANE(PXL,PXH,PYL,PYH)
-            LPANE = .TRUE.
-            GCHANGE = .TRUE.
+C--- TRAP PANE BEING DISJOINT FROM BOUNDS, AS DIMFILM WILL ABORT ON THIS
+            IF( F1 .GE. XHI .OR. F2 .LE. XLO .OR. F3 .GE. YHI .OR.
+     +           F4 .LE. YLO )THEN
+               CALL TXBEGIN
+               WRITE(6,2392)
+ 2392          FORMAT(1X,'PANE ENTIRELY OUTSIDE BOUNDS. IGNORING IT.')
+               CALL TXEND
+            ELSE
+               PXL = F1
+               PXH = F2
+               PYL = F3
+               PYH = F4
+               CALL PANE(PXL,PXH,PYL,PYH)
+               LPANE = .TRUE.
+               GCHANGE = .TRUE.
+            ENDIF
          ENDIF
          GOTO 299
 C
@@ -2518,29 +2527,50 @@ C SUBFIGGRID
             F5 = 0.0
          ENDIF
          IF( IVALS(1) .LT. 1 .OR. IVALS(2) .LT. 1 )THEN
+            CALL TXBEGIN
             WRITE(6,2441)
  2441       FORMAT(1X,'MUST HAVE 1 OR MORE GRID POSITIONS IN EACH ',
      +           'DIRECTION')
+            CALL TXEND
             GOTO 299
          ENDIF
          IF( IVALS(3) .LT. 1 .OR. IVALS(3) .GT. IVALS(1) )THEN
+            CALL TXBEGIN
             WRITE(6,2442)'X',IVALS(1)
  2442       FORMAT(1X,A1,' GRID COORD MUST BE BETWEEN 1 AND ',I2)
             GOTO 299
+            CALL TXEND
          ENDIF
          IF( IVALS(4) .LT. 1 .OR. IVALS(4) .GT. IVALS(2) )THEN
+            CALL TXBEGIN
             WRITE(6,2442)'Y',IVALS(2)
+            CALL TXEND
             GOTO 299
          ENDIF
          F1 = (XHI - XLO) / IVALS(1)
          F2 = 1.0 / IVALS(2)
+         VDIM(1) = PXL
+         VDIM(2) = PXH
+         VDIM(3) = PYL
+         VDIM(4) = PYH
          PXL = (IVALS(3)-1) * F1 + F5 * F1
          PXH = IVALS(3) * F1 - F5 * F1
          PYL = (IVALS(4)-1) * F2 + F5 * F2
          PYH = IVALS(4) * F2 - F5 * F2
-         CALL PANE(PXL,PXH,PYL,PYH)
-         LPANE = .TRUE.
-         GCHANGE = .TRUE.
+         IF( PXL .GE. XHI .OR. PXH .LE. XLO .OR. PYL .GE. YHI .OR.
+     +        PYH .LE. YLO )THEN
+            CALL TXBEGIN
+            WRITE(6,2392)
+            CALL TXEND
+            PXL = VDIM(1)
+            PXH = VDIM(2)
+            PYL = VDIM(3)
+            PYH = VDIM(4)
+         ELSE
+            CALL PANE(PXL,PXH,PYL,PYH)
+            LPANE = .TRUE.
+            GCHANGE = .TRUE.
+         ENDIF         
          GOTO 299
 C
 C FILL
@@ -6829,10 +6859,10 @@ C
       INTEGER MAXLINL, MAXLINS
       PARAMETER( MAXLINL=80, MAXLINS=5 )
       REAL XL, YL, XH, YH, XLI, YLI, XHI, YHI, XP, DXI, TWIDTH, ADJWID
-      REAL ADJHI, XPE, YP, YPE, YCUR, ADJHIL, ADJWIL
+      REAL ADJHI, XPE, YP, YPE, YCUR, ADJHIL, ADJWIL, BNDS(4)
       REAL STRING
       INTEGER NOCC, NNBC, LNBC, NLINES, IS, IE, NTEXT, LLEN, I, LMAX
-      INTEGER ILMAX, L
+      INTEGER ILMAX, L, IERR
       CHARACTER*(MAXLINL) LINES(MAXLINS)
 C
 C FIND THE OUTER BOX CORNERS
@@ -6906,7 +6936,17 @@ C FINALISE INNER BOX Y
       YHI = YC + 0.5 * ADJHI * NLINES
 C
 C SET AREAS WE CAN AND CANNOT DRAW IN.
+C IF THE PANE IS NOT INSIDE BOUNDS, GIVE UP, OTHERWISE
+C DIMFILM WILL ABORT.
  51   CONTINUE
+      CALL INQB(1,BNDS,IERR)
+      IF( XL .GE. BNDS(2) .OR. XH .LE. BNDS(1) .OR.
+     +     YL .GE. BNDS(4) .OR. YH .LE. BNDS(3) )THEN
+         CALL TXBEGIN
+         WRITE(6,*)'HTBOX: PANE OUTSIDE BOUNDS. NOT DRAWING.'
+         CALL TXEND
+         RETURN
+      ENDIF
       CALL PANE(XL,XH,YL,YH)
       IF(NTEXT .GT. 0 )CALL BLANK(XLI,XHI,YLI,YHI)
 C
@@ -7536,7 +7576,7 @@ C------------------------------------
       IMPLICIT LOGICAL (A-Z)
       CHARACTER*4 OUTSTR
 C
-      OUTSTR = '0.85'
+      OUTSTR = '0.86'
       RETURN
       END
 C
@@ -7545,7 +7585,7 @@ C------------------------------------
 C GET LAST MODIFIED DATE.
 C------------------------------------
       CHARACTER*9 LASTMD
-      PARAMETER( LASTMD='24-SEP-25' )
+      PARAMETER( LASTMD='25-SEP-25' )
       GETMOD = LASTMD
       RETURN
       END
