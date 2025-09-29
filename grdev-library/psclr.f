@@ -11,7 +11,6 @@ C
       LOGICAL EVERY
       PARAMETER( EVERY = .TRUE. )
 C
-      CHARACTER FNO*80
       INTEGER IOS
       INTEGER LNBC
 C
@@ -66,6 +65,14 @@ C 888           FORMAT(1X,'PSCLR ASKED FOR EMPTY FILE TO BE DELETED.')
                WRITE(LUN, 100) CMTBE, INT(XMIN), INT(YMIN),
      &                         INT(XMAX+0.5), INT(YMAX+0.5)
                CLOSE( UNIT=LUN, STATUS='KEEP' )
+C
+C---- ON NOS, MAKE THE LOCAL OUTPUT FILE PERMANENT IF DESIRED.
+C
+#ifndef PORTF77
+               IF( AUTOSAV )THEN
+                  CALL NOSPFRT(FNO(1:LNBC(FNO,1,1)))
+               ENDIF
+#endif
             END IF
          END IF
 C
@@ -146,4 +153,18 @@ C
  100  FORMAT(A,I6,I6,I6,I6)
  300  FORMAT('%%PLOTFILE ',A)
  301  FORMAT('%%ROUTE ',A)
+      END
+C
+      SUBROUTINE EPSSAV( DOSAVE )
+C --- ------------------------------------------------------------------
+C --- SAVE LOCAL OUTPUT FILES TO PERMANENT FILES ON NOS IF DOSAVE .TRUE.
+C --- ------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      LOGICAL DOSAVE
+C
+      INCLUDE 'dfxpsn.cmn'
+C
+      AUTOSAV = DOSAVE
+C
+      RETURN
       END

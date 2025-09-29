@@ -20,15 +20,59 @@ C
       RETURN
       END
 C
+      SUBROUTINE SVGSAV( DOSAVE )
+C----------------------------------------------------------------------
+C SAVE/REPLACE OUTPUT FILES AS PERMANENT FILES ON NOS IF DOSAVE .TRUE.
+C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      LOGICAL DOSAVE
+C----
+      INCLUDE 'svgcmn.cmn'
+      AUTOSAV = DOSAVE
+C
+      RETURN
+      END
+C
+      SUBROUTINE NOSPFRT( NAME )
+C----------------------------------------------------------------------
+C ON NOS, MAKE LOCAL FILE NAME PERMANENT AND DELETE THE LOCAL FILE.
+C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      CHARACTER*(*) NAME
+#ifndef PORTF77
+      INTEGER IPFERR
+C
+      CALL PF('REPLACE',
+     +     NAME, NAME,
+     +     'NA','IGNR','RC',IPFERR)
+      IF( IPFERR .NE. 0 )THEN
+         WRITE(6,100)IPFERR
+ 100     FORMAT(1X,'NOSPFRT - WARNING - PFERROR ',I4,' OCCURRED.')
+      ELSE
+         OPEN(UNIT=1, FILE=NAME, STATUS='OLD', ERR=1)
+         CLOSE(UNIT=1, STATUS='DELETE', ERR=1)
+      ENDIF
+      RETURN
+ 1    CONTINUE
+      WRITE(6,101)
+ 101  FORMAT(1X,'NOSPFRT - ERROR REMOVING LOCAL FILE')
+#else
+      WRITE(6,102)NAME
+ 102  FORMAT(1X,'ERROR, FILE NAME = ',A)
+      STOP 'NOSPFRT MUST ONLY BE CALLED WHEN OS IS NOS.'
+#endif
+      RETURN
+      END
+C
       SUBROUTINE SVGCLR
 C----------------------------------------------------------------------
 C CLOSE ANY EXISTING OUTPUT FILE AND OPEN A NEW ONE.
 C----------------------------------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INCLUDE 'svgcmn.cmn'
-      CHARACTER*80 FNO, ALINE, CFMT
+      CHARACTER*80 ALINE, CFMT
       INTEGER IOS, LNBC
-      INTEGER IXMIN, IYMIN, IWIDTH, IHEIGHT, i
+      INTEGER IXMIN, IYMIN, IWIDTH, IHEIGHT, I
       CHARACTER*53 TID
       DATA TID/'^X^M^L^N^S="^H^T^T^P://^W^W^W.^W3.^O^R^G/2000/^S^V^G"'/
 C
@@ -79,10 +123,10 @@ C
 C---- COPY THE CONTENTS OF THE SCRATCH FILE TO THE OUTPUT FILE.
 C
             REWIND(UNIT=SLUN)
-            i = 0
+            I = 0
  1          CONTINUE
                READ(SLUN,9,END=2)ALINE
-               i = i + 1
+               I = I + 1
                WRITE(LUN,9)ALINE(1:LNBC(ALINE,1,1))
                GOTO 1
  2          CONTINUE
@@ -93,6 +137,14 @@ C
             CLOSE(UNIT=LUN, STATUS='KEEP')
             CLOSE(UNIT=SLUN, STATUS='DELETE')
             OPENED = .FALSE.
+C
+C---- ON NOS, MAKE THE LOCAL OUTPUT FILE PERMANENT IF DESIRED.
+C
+#ifndef PORTF77
+            IF( AUTOSAV )THEN
+               CALL NOSPFRT(FNO(1:LNBC(FNO,1,1)))
+            ENDIF
+#endif
          ENDIF
       ENDIF
 C
@@ -246,11 +298,19 @@ C TERMINATE SVG OUTPUT.
 C----------------------------------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INCLUDE 'svgcmn.cmn'
+#ifndef PORTF77
+      INTEGER LNBC
+#endif      
 C
       IF( EMPTYF )THEN
          CLOSE(UNIT=LUN, STATUS='DELETE')
       ELSE
          CLOSE(UNIT=LUN, STATUS='KEEP')
+#ifndef PORTF77
+         IF( AUTOSAV )THEN
+            CALL NOSPFRT(FNO(1:LNBC(FNO,1,1)))
+         ENDIF
+#endif         
       ENDIF
       CLOSE(UNIT=SLUN, STATUS='DELETE')
       OPENED = .FALSE.
