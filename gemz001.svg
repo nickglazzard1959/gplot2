@@ -3,7 +3,7 @@ xmlns="http://www.w3.org/2000/svg"
 width="1200"
 height="800"
 viewBox="0 0 1200 800">
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,255);
 stroke-width:3.0">
 <line x1="200.000" y1="799.000" x2="219.488" y2="799.000"/>
@@ -1666,7 +1666,7 @@ stroke-width:3.0">
 <line x1="979.512" y1="97.439" x2="979.512" y2="77.951"/>
 <line x1="979.512" y1="9.744" x2="979.512" y2="0.000"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(255,2,2);
 stroke-width:5.0">
 <line x1="794.378" y1="68.207" x2="989.256" y2="68.207"/>
@@ -1674,7 +1674,7 @@ stroke-width:5.0">
 <line x1="989.256" y1="9.744" x2="794.378" y2="9.744"/>
 <line x1="794.378" y1="9.744" x2="794.378" y2="68.207"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="807.834" y1="28.768" x2="807.834" y2="48.256"/>
@@ -1781,7 +1781,7 @@ stroke-width:1.0">
 <line x1="975.800" y1="27.840" x2="974.872" y2="28.768"/>
 <line x1="975.800" y1="35.264" x2="975.800" y2="48.256"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(0,0,0);
 stroke-width:1.0">
 <line x1="0.500" y1="798.500" x2="1198.500" y2="798.500"/>

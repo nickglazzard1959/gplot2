@@ -3,7 +3,7 @@ xmlns="http://www.w3.org/2000/svg"
 width="1200"
 height="800"
 viewBox="0 0 1200 800">
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(255,2,2);
 stroke-width:2.0">
 <line x1="933.075" y1="399.500" x2="931.301" y2="421.911"/>
@@ -2007,7 +2007,7 @@ stroke-width:2.0">
 <line x1="926.022" y1="355.223" x2="931.302" y2="377.093"/>
 <line x1="931.302" y1="377.093" x2="933.075" y2="399.503"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="241.948" y1="745.567" x2="241.948" y2="756.054"/>
@@ -2153,7 +2153,7 @@ stroke-width:1.0">
 <line x1="410.237" y1="746.066" x2="408.739" y2="745.567"/>
 <line x1="408.739" y1="745.567" x2="407.740" y2="745.567"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="248.439" y1="715.105" x2="247.441" y2="714.106"/>
@@ -2242,7 +2242,7 @@ stroke-width:1.0">
 <line x1="319.351" y1="718.101" x2="328.339" y2="718.101"/>
 <line x1="319.351" y1="721.098" x2="328.339" y2="721.098"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="337.827" y1="713.607" x2="332.834" y2="713.607"/>
@@ -2278,7 +2278,7 @@ stroke-width:1.0">
 <line x1="347.316" y1="714.106" x2="345.818" y2="713.607"/>
 <line x1="345.818" y1="713.607" x2="344.819" y2="713.607"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="709.544" y1="52.661" x2="712.934" y2="50.967"/>
@@ -2481,7 +2481,7 @@ stroke-width:1.0">
 <line x1="960.382" y1="47.577" x2="962.077" y2="47.577"/>
 <line x1="962.077" y1="47.577" x2="960.382" y2="45.882"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:2.0">
 <line x1="200.799" y1="798.201" x2="998.201" y2="798.201"/>

@@ -3,7 +3,7 @@ xmlns="http://www.w3.org/2000/svg"
 width="1200"
 height="800"
 viewBox="0 0 1200 800">
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(255,0,0);
 stroke-width:1.0">
 <line x1="91.396" y1="677.472" x2="95.608" y2="677.305"/>
@@ -106,7 +106,7 @@ stroke-width:1.0">
 <line x1="499.931" y1="143.546" x2="504.142" y2="132.592"/>
 <line x1="504.142" y1="132.592" x2="508.354" y2="121.528"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="290.740" y1="48.565" x2="302.366" y2="66.005"/>
@@ -125,20 +125,20 @@ stroke-width:1.0">
 <line x1="309.176" y1="49.727" x2="305.854" y2="53.049"/>
 <line x1="305.854" y1="53.049" x2="310.505" y2="53.049"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="293.350" y1="706.556" x2="306.400" y2="726.131"/>
 <line x1="306.400" y1="706.556" x2="293.350" y2="726.131"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="7.920" y1="405.093" x2="14.912" y2="399.500"/>
 <line x1="14.912" y1="399.500" x2="22.602" y2="399.500"/>
 <line x1="7.920" y1="393.907" x2="14.912" y2="399.500"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="129.301" y1="677.472" x2="129.301" y2="671.599"/>
@@ -151,7 +151,7 @@ stroke-width:1.0">
 <line x1="424.120" y1="677.472" x2="424.120" y2="671.599"/>
 <line x1="466.237" y1="677.472" x2="466.237" y2="671.599"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="129.301" y1="121.528" x2="129.301" y2="127.401"/>
@@ -164,7 +164,7 @@ stroke-width:1.0">
 <line x1="424.120" y1="121.528" x2="424.120" y2="127.401"/>
 <line x1="466.237" y1="121.528" x2="466.237" y2="127.401"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="91.396" y1="566.328" x2="97.269" y2="566.328"/>
@@ -172,7 +172,7 @@ stroke-width:1.0">
 <line x1="91.396" y1="343.928" x2="97.269" y2="343.928"/>
 <line x1="91.396" y1="232.728" x2="97.269" y2="232.728"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="508.354" y1="566.328" x2="502.481" y2="566.328"/>
@@ -180,7 +180,7 @@ stroke-width:1.0">
 <line x1="508.354" y1="343.928" x2="502.481" y2="343.928"/>
 <line x1="508.354" y1="232.728" x2="502.481" y2="232.728"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="120.129" y1="690.902" x2="120.503" y2="690.715"/>
@@ -239,7 +239,7 @@ stroke-width:1.0">
 <line x1="144.089" y1="690.341" x2="143.527" y2="690.153"/>
 <line x1="143.527" y1="690.153" x2="143.153" y2="690.153"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="161.872" y1="691.089" x2="161.872" y2="690.902"/>
@@ -308,7 +308,7 @@ stroke-width:1.0">
 <line x1="186.206" y1="690.341" x2="185.644" y2="690.153"/>
 <line x1="185.644" y1="690.153" x2="185.270" y2="690.153"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="204.176" y1="690.153" x2="206.235" y2="690.153"/>
@@ -378,7 +378,7 @@ stroke-width:1.0">
 <line x1="228.323" y1="690.341" x2="227.761" y2="690.153"/>
 <line x1="227.761" y1="690.153" x2="227.387" y2="690.153"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="247.790" y1="690.153" x2="245.918" y2="692.774"/>
@@ -437,7 +437,7 @@ stroke-width:1.0">
 <line x1="270.440" y1="690.341" x2="269.878" y2="690.153"/>
 <line x1="269.878" y1="690.153" x2="269.504" y2="690.153"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="290.282" y1="690.153" x2="288.410" y2="690.153"/>
@@ -509,7 +509,7 @@ stroke-width:1.0">
 <line x1="312.557" y1="690.341" x2="311.995" y2="690.153"/>
 <line x1="311.995" y1="690.153" x2="311.621" y2="690.153"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="332.586" y1="690.715" x2="332.399" y2="690.341"/>
@@ -587,7 +587,7 @@ stroke-width:1.0">
 <line x1="354.674" y1="690.341" x2="354.112" y2="690.153"/>
 <line x1="354.112" y1="690.153" x2="353.738" y2="690.153"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="374.890" y1="690.153" x2="373.018" y2="694.084"/>
@@ -645,7 +645,7 @@ stroke-width:1.0">
 <line x1="396.791" y1="690.341" x2="396.229" y2="690.153"/>
 <line x1="396.229" y1="690.153" x2="395.855" y2="690.153"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="415.322" y1="690.153" x2="414.761" y2="690.341"/>
@@ -729,7 +729,7 @@ stroke-width:1.0">
 <line x1="438.908" y1="690.341" x2="438.346" y2="690.153"/>
 <line x1="438.346" y1="690.153" x2="437.972" y2="690.153"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="458.937" y1="691.464" x2="458.750" y2="692.025"/>
@@ -807,7 +807,7 @@ stroke-width:1.0">
 <line x1="481.025" y1="690.341" x2="480.463" y2="690.153"/>
 <line x1="480.463" y1="690.153" x2="480.089" y2="690.153"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="493.566" y1="690.902" x2="493.941" y2="690.715"/>
@@ -882,7 +882,7 @@ stroke-width:1.0">
 <line x1="523.142" y1="690.341" x2="522.580" y2="690.153"/>
 <line x1="522.580" y1="690.153" x2="522.206" y2="690.153"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="47.312" y1="673.867" x2="46.314" y2="674.200"/>
@@ -938,7 +938,7 @@ stroke-width:1.0">
 <line x1="78.926" y1="674.200" x2="77.928" y2="673.867"/>
 <line x1="77.928" y1="673.867" x2="77.262" y2="673.867"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="45.648" y1="564.331" x2="45.648" y2="563.998"/>
@@ -991,7 +991,7 @@ stroke-width:1.0">
 <line x1="78.926" y1="563.000" x2="77.928" y2="562.667"/>
 <line x1="77.928" y1="562.667" x2="77.262" y2="562.667"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="48.643" y1="451.467" x2="45.315" y2="456.126"/>
@@ -1034,7 +1034,7 @@ stroke-width:1.0">
 <line x1="78.926" y1="451.800" x2="77.928" y2="451.467"/>
 <line x1="77.928" y1="451.467" x2="77.262" y2="451.467"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="49.641" y1="341.266" x2="49.309" y2="340.600"/>
@@ -1096,7 +1096,7 @@ stroke-width:1.0">
 <line x1="78.926" y1="340.600" x2="77.928" y2="340.267"/>
 <line x1="77.928" y1="340.267" x2="77.262" y2="340.267"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="46.979" y1="229.067" x2="45.981" y2="229.400"/>
@@ -1164,7 +1164,7 @@ stroke-width:1.0">
 <line x1="78.926" y1="229.400" x2="77.928" y2="229.067"/>
 <line x1="77.928" y1="229.067" x2="77.262" y2="229.067"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="36.330" y1="119.198" x2="36.996" y2="118.866"/>
@@ -1223,13 +1223,13 @@ stroke-width:1.0">
 <line x1="78.926" y1="118.200" x2="77.928" y2="117.867"/>
 <line x1="77.928" y1="117.867" x2="77.262" y2="117.867"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="26.797" y1="180.254" x2="19.456" y2="173.372"/>
 <line x1="19.456" y1="180.254" x2="26.797" y2="173.372"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="16.244" y1="168.326" x2="15.786" y2="167.408"/>
@@ -1266,7 +1266,7 @@ stroke-width:1.0">
 <line x1="16.703" y1="132.998" x2="16.520" y2="133.181"/>
 <line x1="16.520" y1="133.181" x2="16.153" y2="133.365"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="91.396" y1="566.328" x2="508.354" y2="566.328"/>
@@ -1274,7 +1274,7 @@ stroke-width:1.0">
 <line x1="91.396" y1="343.928" x2="508.354" y2="343.928"/>
 <line x1="91.396" y1="232.728" x2="508.354" y2="232.728"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="129.301" y1="677.472" x2="129.301" y2="121.528"/>
@@ -1287,7 +1287,7 @@ stroke-width:1.0">
 <line x1="424.120" y1="677.472" x2="424.120" y2="121.528"/>
 <line x1="466.237" y1="677.472" x2="466.237" y2="121.528"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="91.396" y1="677.472" x2="508.354" y2="677.472"/>
@@ -1295,7 +1295,7 @@ stroke-width:1.0">
 <line x1="508.354" y1="121.528" x2="91.396" y2="121.528"/>
 <line x1="91.396" y1="121.528" x2="91.396" y2="677.472"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="6.243" y1="791.010" x2="593.508" y2="791.010"/>
@@ -1303,7 +1303,7 @@ stroke-width:1.0">
 <line x1="593.508" y1="7.990" x2="6.243" y2="7.990"/>
 <line x1="6.243" y1="7.990" x2="6.243" y2="791.010"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,255);
 stroke-width:2.0">
 <line x1="690.646" y1="400.007" x2="691.167" y2="375.767"/>
@@ -2107,7 +2107,7 @@ stroke-width:2.0">
 <line x1="1106.562" y1="306.464" x2="1107.083" y2="287.863"/>
 <line x1="1107.083" y1="287.863" x2="1107.604" y2="269.772"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="760.474" y1="56.665" x2="764.107" y2="65.142"/>
@@ -2298,7 +2298,7 @@ stroke-width:1.0">
 <line x1="1034.749" y1="66.353" x2="1033.538" y2="68.169"/>
 <line x1="1033.538" y1="68.169" x2="1032.327" y2="69.380"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="835.811" y1="718.091" x2="842.540" y2="726.656"/>
@@ -2408,7 +2408,7 @@ stroke-width:1.0">
 <line x1="959.993" y1="727.879" x2="958.769" y2="729.714"/>
 <line x1="958.769" y1="729.714" x2="957.546" y2="730.938"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="616.871" y1="463.273" x2="623.294" y2="460.521"/>
@@ -2568,7 +2568,7 @@ stroke-width:1.0">
 <line x1="624.212" y1="338.021" x2="625.588" y2="338.938"/>
 <line x1="625.588" y1="338.938" x2="626.506" y2="339.856"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="754.793" y1="677.472" x2="754.793" y2="671.599"/>
@@ -2578,7 +2578,7 @@ stroke-width:1.0">
 <line x1="1011.383" y1="677.472" x2="1011.383" y2="671.599"/>
 <line x1="1075.531" y1="677.472" x2="1075.531" y2="671.599"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="754.793" y1="121.528" x2="754.793" y2="127.401"/>
@@ -2588,7 +2588,7 @@ stroke-width:1.0">
 <line x1="1011.383" y1="121.528" x2="1011.383" y2="127.401"/>
 <line x1="1075.531" y1="121.528" x2="1075.531" y2="127.401"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="690.646" y1="608.895" x2="696.519" y2="608.895"/>
@@ -2598,7 +2598,7 @@ stroke-width:1.0">
 <line x1="690.646" y1="260.748" x2="696.519" y2="260.748"/>
 <line x1="690.646" y1="191.118" x2="696.519" y2="191.118"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="1107.604" y1="608.895" x2="1101.732" y2="608.895"/>
@@ -2608,7 +2608,7 @@ stroke-width:1.0">
 <line x1="1107.604" y1="260.748" x2="1101.732" y2="260.748"/>
 <line x1="1107.604" y1="191.118" x2="1101.732" y2="191.118"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="680.040" y1="690.928" x2="679.014" y2="691.270"/>
@@ -2664,7 +2664,7 @@ stroke-width:1.0">
 <line x1="712.542" y1="691.270" x2="711.515" y2="690.928"/>
 <line x1="711.515" y1="690.928" x2="710.831" y2="690.928"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="742.477" y1="692.639" x2="742.477" y2="692.297"/>
@@ -2717,7 +2717,7 @@ stroke-width:1.0">
 <line x1="776.689" y1="691.270" x2="775.663" y2="690.928"/>
 <line x1="775.663" y1="690.928" x2="774.978" y2="690.928"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="809.704" y1="690.928" x2="806.282" y2="695.718"/>
@@ -2760,7 +2760,7 @@ stroke-width:1.0">
 <line x1="840.836" y1="691.270" x2="839.810" y2="690.928"/>
 <line x1="839.810" y1="690.928" x2="839.126" y2="690.928"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="874.877" y1="691.954" x2="874.535" y2="691.270"/>
@@ -2822,7 +2822,7 @@ stroke-width:1.0">
 <line x1="904.984" y1="691.270" x2="903.957" y2="690.928"/>
 <line x1="903.957" y1="690.928" x2="903.273" y2="690.928"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="936.288" y1="690.928" x2="935.261" y2="691.270"/>
@@ -2890,7 +2890,7 @@ stroke-width:1.0">
 <line x1="969.131" y1="691.270" x2="968.105" y2="690.928"/>
 <line x1="968.105" y1="690.928" x2="967.421" y2="690.928"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="989.487" y1="692.297" x2="990.172" y2="691.954"/>
@@ -2949,7 +2949,7 @@ stroke-width:1.0">
 <line x1="1033.279" y1="691.270" x2="1032.252" y2="690.928"/>
 <line x1="1032.252" y1="690.928" x2="1031.568" y2="690.928"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="1053.635" y1="692.297" x2="1054.319" y2="691.954"/>
@@ -3005,7 +3005,7 @@ stroke-width:1.0">
 <line x1="1097.426" y1="691.270" x2="1096.400" y2="690.928"/>
 <line x1="1096.400" y1="690.928" x2="1095.715" y2="690.928"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="633.916" y1="609.228" x2="639.906" y2="609.228"/>
@@ -3049,7 +3049,7 @@ stroke-width:1.0">
 <line x1="678.176" y1="605.567" x2="677.178" y2="605.234"/>
 <line x1="677.178" y1="605.234" x2="676.512" y2="605.234"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="633.916" y1="539.598" x2="639.906" y2="539.598"/>
@@ -3093,7 +3093,7 @@ stroke-width:1.0">
 <line x1="678.176" y1="535.938" x2="677.178" y2="535.605"/>
 <line x1="677.178" y1="535.605" x2="676.512" y2="535.605"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="633.916" y1="469.969" x2="639.906" y2="469.969"/>
@@ -3150,7 +3150,7 @@ stroke-width:1.0">
 <line x1="678.176" y1="466.308" x2="677.178" y2="465.975"/>
 <line x1="677.178" y1="465.975" x2="676.512" y2="465.975"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="646.562" y1="396.346" x2="645.564" y2="396.679"/>
@@ -3206,7 +3206,7 @@ stroke-width:1.0">
 <line x1="678.176" y1="396.679" x2="677.178" y2="396.346"/>
 <line x1="677.178" y1="396.346" x2="676.512" y2="396.346"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="646.562" y1="326.716" x2="645.564" y2="327.049"/>
@@ -3262,7 +3262,7 @@ stroke-width:1.0">
 <line x1="678.176" y1="327.049" x2="677.178" y2="326.716"/>
 <line x1="677.178" y1="326.716" x2="676.512" y2="326.716"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="645.564" y1="258.418" x2="646.229" y2="258.085"/>
@@ -3305,7 +3305,7 @@ stroke-width:1.0">
 <line x1="678.176" y1="257.420" x2="677.178" y2="257.087"/>
 <line x1="677.178" y1="257.087" x2="676.512" y2="257.087"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="645.564" y1="188.789" x2="646.229" y2="188.456"/>
@@ -3348,7 +3348,7 @@ stroke-width:1.0">
 <line x1="678.176" y1="187.790" x2="677.178" y2="187.457"/>
 <line x1="677.178" y1="187.457" x2="676.512" y2="187.457"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="644.898" y1="119.492" x2="644.898" y2="119.159"/>
@@ -3401,7 +3401,7 @@ stroke-width:1.0">
 <line x1="678.176" y1="118.161" x2="677.178" y2="117.828"/>
 <line x1="677.178" y1="117.828" x2="676.512" y2="117.828"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="690.646" y1="677.472" x2="1107.604" y2="677.472"/>
@@ -3409,17 +3409,17 @@ stroke-width:1.0">
 <line x1="1107.604" y1="121.528" x2="690.646" y2="121.528"/>
 <line x1="690.646" y1="121.528" x2="690.646" y2="677.472"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="690.646" y1="400.007" x2="1107.604" y2="400.007"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="690.646" y1="677.472" x2="690.646" y2="121.528"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(2,2,2);
 stroke-width:1.0">
 <line x1="605.493" y1="791.010" x2="1192.758" y2="791.010"/>
@@ -3427,7 +3427,7 @@ stroke-width:1.0">
 <line x1="1192.758" y1="7.990" x2="605.493" y2="7.990"/>
 <line x1="605.493" y1="7.990" x2="605.493" y2="791.010"/>
 </g>
-<g transform="matrix(1 0 0 1 0 0)"
+<g transform="matrix(1 0 0 1 0 0)"                     
 style="stroke:rgb(0,0,0);
 stroke-width:1.0">
 <line x1="0.500" y1="798.500" x2="1198.500" y2="798.500"/>

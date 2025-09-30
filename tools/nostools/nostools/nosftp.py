@@ -258,6 +258,7 @@ def main():
         DEL = 9
         BPUT = 10
         MPUT = 11
+        MGET = 12
         
     commands = {'quit': (0, 0, '', cmds.QUIT, 'Exit NOS FTP.'),
                 'exit': (0, 0, '', cmds.QUIT, 'Exit NOS FTP.'),
@@ -271,7 +272,8 @@ def main():
                 'ls':   (0, 1, '', cmds.LS, '[string] List local working directory, [names containing string].'),
                 'del':  (1, 1, 'nosname', cmds.DEL, 'Delete a permanent file.'),
                 'bput': (2, 3, 'localname nosname [direct]', cmds.BPUT, 'Send a binary file to the server, indirect by default.'),
-                'mput': (2, 2, 'listname display|ascii', cmds.MPUT, 'Send a list of files to the server.')}
+                'mput': (2, 2, 'listname display|ascii', cmds.MPUT, 'Send a list of files to the server.'),
+                'mget': (3, 3, 'listname display|ascii extension', cmds.MGET, 'Get a list of files  the server.')}
 
     def parse_cmd( cmdline, commands ):
         """
@@ -337,6 +339,41 @@ def main():
                     else:
                         if not get_file(ftp, argslist[0], argslist[1], argslist[2]):
                             print('Failed.')
+
+            elif cmdcode == cmds.MGET:
+                nostypes_list = ['ascii','display','binary']
+                if not argslist[1] in nostypes_list:
+                    print('File type must be one of:', nostypes_list)
+                else:                
+                    try:
+                        with open(argslist[0], 'r') as fin:
+                            inlist = fin.readlines()
+                    except Exception as e:
+                        print('Failed to read files list from:',argslist[0])
+                        if args.execute is not None:
+                            quit_ftp(ftp)
+                            sys.exit(0)
+                        else:
+                            continue
+
+                ngot = nfiles = 0
+                for inname in inlist:
+                    inname = inname.strip()
+                    if len(inname) > 0:
+                        if inname[0] != '#':
+                            inname = inname.lower()
+                            nfiles += 1
+                            print('... getting:', inname, '(', nfiles, ')')
+                            if not valid_nos_name(inname):
+                                print('... ... NOS file name is invalid. Skipping ...')
+                            else:
+                                outname = inname + '.' + argslist[2]
+                                if not get_file(ftp, inname, outname, argslist[1]):
+                                    print('... ... Failed to send file. Skipping ...')
+                                else:
+                                    ngot += 1
+
+                print('Got', ngot, 'of', nfiles, 'files OK')                    
 
             elif cmdcode == cmds.PUT:
                 if not valid_nos_name(argslist[1]):
