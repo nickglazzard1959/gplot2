@@ -6435,6 +6435,8 @@ C GENERATE AND DRAW AN L-SYSTEM.
 C THE AXIOM IS IN STRING REGISTER 1.
 C THE RULES ARE IN STRING REGISTERS 2 ... 9 WITH NRULES DEFINED.
 C THE ANGLE FOR TURNS IS ANGLE.
+C INITIAL X,Y POSITION IS IN NUMERIC REGISTERS 1 AND 2.
+C INITIAL STARTING ANGLE IS IN NUMERIC REGISTER 3.
 C-----------------------------------------
       IMPLICIT LOGICAL (A-Z)
       INTEGER NRULES, NITER, STRILEN(9)
@@ -6444,8 +6446,20 @@ C
       INTEGER NSUBST, NVALID, NSTACK
       PARAMETER(NSUBST=9, NVALID=NSUBST+5, NSTACK=20)
       INTEGER I, J, K, INLUN, OUTLUN, TMPLUN, IPASS, ISTK
+C
+C TURNS OUT THAT 32 BIT SINGLE PRECISION IS NOT SUFFICIENT HERE.
+C ANGLE ACCUMULATION ROUNDING LEADS TO BENT PATTERNS, CLEARLY WRONG.
+C 60 BIT SINGLE PRECISION OR MORE IS PROBABLY FINE.
+C DOUBLE PRECISION 64 BIT IS CORRECT.
+#ifndef PORTF77
       REAL XSTK(NSTACK), YSTK(NSTACK), ASTK(NSTACK), CANGLE
       REAL XPOS, YPOS, XNEW, YNEW, XLO, XHI, YLO, YHI, DANGLE, DX, DY
+#else
+      DOUBLE PRECISION XSTK(NSTACK), YSTK(NSTACK), ASTK(NSTACK),
+     +     CANGLE, XPOS, YPOS, XNEW, YNEW, XLO, XHI, YLO, YHI,
+     +     DANGLE, DX, DY
+#endif
+      REAL XX, YY, XH, YH
       LOGICAL CCSUB
       CHARACTER*(NVALID) CVALID
       CHARACTER*(NSUBST) CSUBST
@@ -6577,7 +6591,9 @@ C
             XHI = XPOS
             YHI = YPOS
          ELSE
-            CALL OFF2(XPOS*USEASP, YPOS)
+            XX = REAL(XPOS*USEASP)
+            YY = REAL(YPOS)
+            CALL OFF2(XX, YY)
          ENDIF
  20      CONTINUE
             READ(OUTLUN,100,END=21)CC
@@ -6586,10 +6602,12 @@ C           WRITE(6,*)CC
                XNEW = XPOS + COS(CANGLE)
                YNEW = YPOS + SIN(CANGLE)
                IF( IPASS .EQ. 2 )THEN
+                  XX = REAL(XNEW*USEASP)
+                  YY = REAL(YNEW)
                   IF( CC .EQ. 'F' )THEN
-                     CALL ON2(XNEW*USEASP, YNEW)
+                     CALL ON2(XX, YY)
                   ELSE
-                     CALL OFF2(XNEW*USEASP, YNEW)
+                     CALL OFF2(XX, YY)
                   ENDIF
                ELSE
                   XLO = MIN(XLO, XNEW)
@@ -6629,7 +6647,9 @@ C           WRITE(6,*)CC
                   YPOS = YSTK(ISTK)
                   CANGLE = ASTK(ISTK)
                   IF( IPASS .EQ. 2 )THEN
-                     CALL OFF2(XPOS*USEASP, YPOS)
+                     XX = REAL(XPOS*USEASP)
+                     YY = REAL(YPOS)
+                     CALL OFF2(XX, YY)
                   ENDIF
                ENDIF
             ENDIF
@@ -6639,9 +6659,19 @@ C           WRITE(6,*)CC
 C            CALL TXBEGIN
 C            WRITE(6,*)'SETTING BOUNDS TO: ',XLO,XHI,YLO,YHI,' +5%'
 C            CALL TXEND
+            IF( (XHI-XLO) .LT. 1E-6 .OR. (YHI-YLO) .LT. 1E-6 )THEN
+               WRITE(6,101)
+ 101           FORMAT(1X,'LSYSTEM INVALID BOUNDS. CHECK YOUR STRINGS.')
+               LSYSTEM = 11
+               GOTO 99
+            ENDIF
             DX = 0.05 * (XHI - XLO)
             DY = 0.05 * (YHI - YLO)
-            CALL BOUNDS(XLO-DX,XHI+DX,YLO-DY,YHI+DY)
+            XX = REAL(XLO-DX)
+            XH = REAL(XHI+DX)
+            YY = REAL(YLO-DY)
+            YH = REAL(YHI+DY)
+            CALL BOUNDS(XX,XH,YY,YH)
          ENDIF
  90   CONTINUE
 C
@@ -7596,7 +7626,7 @@ C------------------------------------
 C GET LAST MODIFIED DATE.
 C------------------------------------
       CHARACTER*9 LASTMD
-      PARAMETER( LASTMD='29-SEP-25' )
+      PARAMETER( LASTMD='02-OCT-25' )
       GETMOD = LASTMD
       RETURN
       END

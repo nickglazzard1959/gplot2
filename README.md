@@ -2585,6 +2585,11 @@ They can also be set with the `LOADPROC` command, which looks for a
 named procedure in the file `GPLPROC` and loads it into a specified
 "procedure register" if it is found.
 
+Note that the GPLOT evaluator does not actually do a "call and return" when
+it sees `EVAL @1`, etc. Instead, it uses string substitution to replace `@1`
+with the string in procedure register 1. It does this repeatedly, if necessary,
+until there are no remaining `@n` sequences in the substituted string.
+
 There are also 9 *scalar* "memory" registers, which can be set with the
 `STO` command and recalled with `RCL`. Often, parameters for procedures
 are put into these registers with `STO` then accessed in the RPN with
@@ -2902,6 +2907,16 @@ CTEXT 2 "*IF*LARRIS MYSTERY CURVE"
 OUTLINE BOUNDS
 ```
 
+The script that generates this is quite short and simple. The first `EVAL` fills the X
+array (stack level 0) with 0 to 2 pi in 2001 linear steps. Two procedures are then defined
+(stored in procedure registers 1 and 2). `PROC 1` calculates X values and `PROC 2` finds
+Y values. The second `EVAL` evaluates these two procedures in the order that leaves the
+calculated coordinates on stack for use by the path drawing operator `PTHO`.
+
+It is easy to plot this curve as a graph (i.e. with value labelled axes, etc.) simply
+by replacing `PTHO` with operators that set the calculated X and Y values into the 
+X and Y arrays (stack levels 0 and 1) used by graph plotting commands (here `XYLINE`).
+
 ![](g2fm001.svg)
 
 ```
@@ -2929,13 +2944,66 @@ GRID BOTH
 XYLINE
 ```
 
-Spirograph
+The Spirograph is a toy invented by Denys Fisher in 1962-64 and fondly remembered
+by people of a certain age. It is a simple mechanism which can trace out hypotrochoid
+and epitrochoid curves based on two wheels (with gear teeth, so they can stay
+in contact without slipping). One wheel is fixed and the other rotates on the inside 
+or outside of the fixed wheel. This second wheel has holes in which the tip
+of a pen can be placed to draw curves. If the moving wheel rotates inside the fixed wheel,
+a hypotrochoid curve is traced out, and if it is outside, an epitrochoid curve is drawn.
 
-![](g1sp001.svg)
+Much less accessible mechanisms were
+developed in the 19th century to draw such curves for use in banknote engraving
+as they are visually attractive and are (or were) difficult to forge without
+specialised machinery.
+
+Drawing these curves with GPLOT is an interesting exercise. They can be defined
+with three integer parameters: 
+
+- `R`, the radius of the fixed wheel.
+- `RL`, the radius of the smaller, moving, wheel.
+- `P`, the distance of the "pen hole" from the centre of the moving wheel.
+
+We want to be able to change these easily, so we want to define a script that
+we can call like this:
 
 ```
 OB OBSPIRO "65 25 30"
 ```
+
+where we pass the values of `R`, `RL` and `P` to the script. This is a good 
+opportunity to show how to pass parameters to scripts and to use "nested scripts"
+to reuse code in the way that subroutines and functions allow in more sophisticated
+programming environments.
+
+The script `OBSPIRO` uses these parameters to calculate how many times the moving wheel
+needs to circle the fixed wheel to complete a closed curve, as well as the degree of
+symmetry of the curve. Note that the parameters passed to the script are referred to
+as `$1`, `$2`, etc. as they are in Unix scripting languages. Note also that it is possible
+to use parameters in the RPN strings used by `EVAL`. This can be very useful.
+
+One "problem" with the parametrised Spirograph simulation is that we don't know how
+big the pattern will be -- i.e. what the range of coordinates will be -- so we can't
+easily set the `BOUNDS` for the drawing.
+
+The `OBSPIRO` script deals with this using the `BBSTART`, `BBEND` and `BBSET` commands.
+Between `BBSTART` and `BBEND`, the `DRAW` command doesn't draw anything (all drawing
+ultimately comes down to `MOVE` and `DRAW`). Instead, the range of `X` and `Y` coordinates
+is accumulated. `BBSET` can then be used to set these accumulated ranges as the `BOUNDS`,
+optionally scaled about the center by a scale factor (here, `1.2`).
+
+The tracing out of the Spirograph is done by the script `OBSPIRC`, which `OBSPIRO`
+"calls" twice: once to find the pattern's bounds and once to draw the pattern.
+
+In general, parameters can be passed to obey scripts in two ways:
+
+- Using parameters as described above, where, for example, `OB X "1 2 3"`
+  results in `$1`, `$2` and `$3` in the script `X` being read as `1`, `2` and
+  `3` as a result of *text (string) substitution*.
+- Numerical values and strings can be passed through registers. This is necessary
+  if values are calculated by `EVAL` to be used in a "nested" script.
+  
+The `OBSPIRO` script demonstrates all these features.
 
 ```
 # SPIROGRAPH PATTERNS - OBSPIRO
@@ -3014,6 +3082,9 @@ COL 0 0 0
 OUTLINE BOUNDS
 ```
 
+The `OBSPIRC` script does the actual work of calculating pattern coordinates
+and drawing the result.
+
 ```
 # SPIROGRAPH PATTERN CORE - OBSPIRC
 
@@ -3041,13 +3112,36 @@ PROC 2 X,SIN,5,RCL,*,6,RCL,X,*,SIN,3,RCL,*,- ; Y
 EVAL @1,@2,PTHO
 ```
 
+This is quite similar to the "Farris Mystery Curve" script in its approach. Note that
+it stores the parameters it receives in registers for use in the RPN, although direct
+substitution could be used. It first generates an angle parameter at 2001 points that
+"goes around" the required number of times to generate a closed pattern, then it finds
+the path coordinates based on the angle and draws the result with the open path operator,
+`PTHO`.
+
+Here are some examples of the output of `OBSPIRO` with different parameter sets.
+
+![](g1sp001.svg)
+
 ![](g2sp001.svg)
 
 ![](g3sp001.svg)
 
-Hitomezashi
+Still sticking with procedurally generated patterns, but moving away from traditional
+continuous functions of a variable, there is a traditional form of Japanese Sashiko
+stitching called Hitomezashi, developed in the Edo period.
+
+These stitch patterns consist of short stitches of a single unit length, made either horizontally
+or vertically. If two random sequences of length `N` are generated, one for the horizontal 
+direction and another for the vertical, and a stitch is made if the value of the sequence is 
+odd (and not made if it is even) then a very attractive pattern results.
+
+I came across this thanks to this [Numberphile](https://www.youtube.com/watch?v=JbfhzlMk2eY), 
+video on YouTube, which gives an excellent explanation of things.
 
 ![](gemz001.svg)
+
+The following obey script draws such patterns:
 
 ```
 # GENERATE HITOMEZASHI STITCH PATTERNS
@@ -3081,14 +3175,185 @@ CTEXT 9 "H*LITOMEZASHI"
 OUTLINE DEV
 ```
 
+This introduces a new version of `EVAL` -- iterated evaluation or `ITEVAL`. This repeatedly
+runs an RPN procedure with a "loop variable" that iterates from a start value to a stop value
+(inclusive - FORTRAN DO-loop rules apply) by a step value. The "loop variable" value can be
+accessed inside the RPN using the `I` operator.
 
+This example also shows how to use `BLANK` and `UNBLANK` to temporarily protect a rectangular
+region so that it cannot be drawn in.
 
 ### General drawing - Part 2: Evaluator assisted
 
+It is possible to use the evaluator to assist with general drawing tasks. In many cases,
+it is necessary to calculate coordinates from a small set of supplied parameters in
+order to complete the drawing task. A good example of this was the "labelled angle line pair"
+shown in the manual general drawing section, where we used a calculator to find the
+coordinates of the label text literally by hand.
+
+Probably the most convenient way of using the evaluator for such tasks is to add procedures
+to the *evaluator procedure library* which consists of the file `GPLPROC` (`gplproc` on Unix-like
+systems).
+
+The procedures in this library are, to some extent, a way to extend GPLOT's capabilities, or, at
+least, make some things much more convenient than they otherwise would be.
+
+The contents of `GPLPROC` include comments that document its procedures. Please read it for full
+information. To understand its features, here are a couple of examples.
+
+This `RELLIPSE` procedure draws an ellipse (which GPLOT/DIMFILM cannot do directly). It has five
+parameters, the center position `(XC,YC)`, the semi-major and semi-minor axis lengths and a rotation
+angle (a rotation of the ellipse axes).
+
+```
+C A ROTATED ELLIPSE "XC YC A B ANGLE-DEGREES"
+RELLIPSE
+CL,0,TWPI,360,XLIN,X,&,COS,S,SIN,3,#,4,#,SCL,5,#,D2R,ROT,1,#,2,#,TRN,PTHC
+```
+
+To use this procedure to draw a rotated ellipse, two GPLOT commands are needed:
+```
+LOAD 1 RELLIPSE
+EVAL @1 "5,1,0.5,0.9,33"
+```
+
+The first line loads the required procedure into a procedure register (1 here),
+then the second executes it, passing it the required arguments. If a given procedure
+is to be "called" multiple times, it need only be loaded once, of course.
+
+The second example shows a useful feature unique to `GPLPROC`. A major limitation of the
+evaluator is that RPN strings are limited to 80 characters. This is not enough for many
+"real world" applications. When a procedure is loaded from `GPLPROC`, it can span
+multiple lines. In such a case, the procedure is loaded into multiple successive procedure
+registers and `,@n` sequences are automatically added to line ends so that the when the
+procedure is called from an `EVAL` command, a single long procedure is assembled and
+executed. A side effect of this scheme is that lines can be no more than 77 characters
+long if another line follows in the procedure definition.
+
+```
+C GEAR "X Y R1 R2 N-TEETH ROT-DEGREES"
+GEAR 2
+CL,0,5,#,&,1,+,XLIN,3,#,4,#,X,2,/,ODD,SEL,X,TWPI,*,5,#,/,6,#,D2R,+,&
+COS,S,SIN,3,G,*,S,3,G,*,1,#,2,#,TRN,PTHO
+```
+
+Note that the number of lines in the full procedure (2 here) must be given
+after the procedure name. These procedures must be loaded into a procedure
+register number that leaves enough successive registers to hold the full thing.
+Here, for example, `LOAD 8 GEAR` would work, but `LOAD 9 GEAR` would not.
+
+The script `OBPRTST` calls every procedure currently defined in `GPLPROC` as
+shipped. The output of that is shown below.
+
 ![](gdea001.svg)
+
+It is intended that GPLOT users add their own procedures to `GPLPROC` to "extend"
+GPLOT to do things they want to do.
 
 
 ### General drawing - Part 3: Higher level drawing
+
+Although the evaluator can "extend" the capabilities of GPLOT to some extent,
+it has some pretty severe limitations and inconveniences. The main limitations
+are the maximum size of procedures and the complete lack of branching and
+looping features. In practice, you cannot "draw anything" with GPLOT/DIMFILM
+in the way that you can with PostScript, for example.
+
+There are some drawing operations beyond the (very) basic facilities described
+above which are sufficiently generally useful to "build in" to GPLOT. This hopefully
+makes it relatively easy to draw things that are commonly useful (easier than using
+PostScript, for example), while acknowledging that there are still 
+fundamental limitations to what can be drawn.
+
+To this end, GPLOT has three "higher level" drawing "primitives":
+
+- Decorated lines
+- Boxed text
+- Labels with pointing arrows.
+
+These can be used for a broad range of diagrams, but especially block diagrams.
+
+A **decorated line** is a series of connected and directed line segments, 
+the ends of which may have:
+
+- Arrow heads. These will automatically point in the correct direction (hopefully).
+- "Half skips". These are (close to) quarter circles, and if a line ends and begins
+  with one of these, it can give the appearence of skipping over another line, as
+  was commonly seen in older circuit diagrams.
+- No decorations or "plain".
+
+Such a line is drawn by the `LINE` command which takes a string that defines the
+line segments and their decorations. Each coordinate or *point description* defining 
+a "vertex" in the "polyline" has the following components:
+
+```
+<decoration>x,y[,<annotation_string>]
+
+<decoration> = P (plain) or A (arrow) or S (half skip)
+
+<annotation_string> is a short string (currently limited to 5 characters).
+It may contain DIMFILM string markup. It cannot contain spaces.
+```
+
+The annotation string, if supplied, will be drawn in a circle at the mid-point of the
+line segment ended by the point description that specifies it. This is intended to be
+a *very short* label.
+
+The point descriptions are separated by `">"` characters, which can be read in this
+context as "to".
+
+Here is an example that defines a two segment decorated line, starting with no 
+decoration and ending in an arrow head with a label, `"Le"`, in the middle of the
+first of the two line segments:
+
+```
+LINE P7,6>P7,21,L*LE>A16,21
+```
+
+Additional characteristics of decorated lines are specified by the `ARROWPARM`
+and `LINEPARM` commands. The latter sets scale factors for drawing skips 
+and annotations, while the former sets the type, size and appearance of arrow
+heads. Note that the width and colour of decorated lines are set in the usual
+way (lines, arrows and skips are in `CSG GENERAL`, annotation text in `CSG TEXT`).
+
+**Boxed text** is intended to be a fairly flexible component for constructing
+block diagrams, tables and many other drawings.  The element is basically text
+centered in a box of a specified size at a specified position (given either
+by centre or bottom left).
+
+A number of other features can be added, though.
+
+- The inside of the box can be "filled" with hatched lines.
+- A second box, inside the first and surrounding the text, can
+  be drawn. It is a `BLANK` region, and it can be outlined.
+- The text may have multiple lines (up to 5), separated by backslashes.
+- The text may be centered or left justified.
+- The text can contain DIMFILM string markup.
+- The position of the boxed text can be automatically "stepped" by
+  specified X and Y "deltas" after eah one is drawn. This makes it
+  much easier to use this for constructing tables and other things.
+
+The main command for this element is `BOXTEXT`, which draws a given
+text string at a position given by either a supplied coordinate, or,
+if the coordinate is omitted, at the position of the last `BOXTEXT`
+incremented by previously specified deltas.
+
+A number of secondary commands set current characteristics of
+`BOXTEXT`. These are:
+
+- `BOXPSIZE` which sets the box size and how the position coordinate
+  is to be interpreted.
+- `BOXPHATCH` which sets the hatching parameters (or turns it off).
+- `BOXPTEXT` which sets how text is drawn inside the box. There are
+  two distinct modes: `FIX` and `SCALE`. In `FIX` mode, the `WIDTHSCALE`
+  parameter sets how many lines will fit in the box height, while in `SCALE`
+  mode, it sets the fraction of the box width the text should be scaled to fill.
+- `BOXPBOX` which controls whether the outer and inner boxes are outlined.
+- `BOXPDELTAS` which sets the automatic position step after ecah `BOXTEXT`
+  is drawn.
+
+Here is a simple example of how these facilities can be used to draw a 
+small block diagram.
 
 ![](gh1b001.svg)
 
@@ -3128,6 +3393,27 @@ LINE P12.5,12.5>P13.2,12.5>A14.1,14.1
 OUTLINE DEVICE
 ```
 
+It may look painful to create a diagram such as this by entering coordinates, and
+perhaps it is. However, it may be less painful than it seems at first. A key simplification
+is to use an integer coordinate system with the box size a useful multiple of the unit size
+(e.g. so that middle of the box edges is easy to find). It is also helpful to have a
+grid printed out (!) with the coordinate system shown over a specified range (`BOUNDS`). As
+an aid to this, the script `OBGRID` can draw such a grid which can be used as the background
+of the diagram as it is developed (e.g. using the `gterm` device) or printed to help sketch
+out the diagram.
+
+Surely it would be easier to just use, say, Inkscape? Perhaps. I have drawn many block 
+diagrams with Inkscape and in some ways it is obviously easier. But it still takes longer
+than might be expected to get to a "final" result. It is also very difficult (at least 
+for me) to get lines and boxes to "snap" together precisely (I usually give up on perfecting
+this, to be honest). The GPLOT approach at least results in exact alignment of all elements!
+In summary, I'm not sure it is all that more time consuming to get to an acceptable result.
+Which approach you prefer (using a mouse and relying on hand/eye coordination or working
+out and typing in coordinates) is a matter of personal taste. Obviously, if you want to draw
+a portrait of your dog, Inkscape (or a similar program) is the only sane choice! For more
+exactly defined tasks, a "language based" approach can make sense, as proved by the success
+of vector graphics description languages such as PGF/Tikz.
+
 ![](ghbb001.svg)
 
 ```
@@ -3145,10 +3431,59 @@ ITEVAL $3 $4 1 "$4,$3,-,100,/,TH,$1,I,M,I,9,TVI"
 ITEVAL $1 $2 1 "$4,$3,-,100,/,TH,I,$3,0.5,+,M,I,9,TVI"
 ```
 
+For a more sophisticated example of a block diagram drawn with GPLOT, look at the
+script `OBMODIO` which draws the block diagram at the top of this document showing
+the component parts of the Git-MODIFY inter-operability scheme.
+
+An example of using GPLOT (primarily `BOXTEXT`) to produce a drawing other than a
+block diagram is shown below. This documents the key bindings for the NOS 2 Full
+Screen Editor with a Macbook laptop keyboard.
+
 ![](gh2b001.svg)
+
+Further examples of how the "higher level drawing" features can be used can be seen
+in the `OBCHT1` and `OBCHT2` scripts which generate the GPLOT "cheat sheet" which can
+be found at the end of this document.
 
 
 ### L-Systems
+
+L-systems or Lindenmeyer systems are a type of formal grammar (as in mathematical logic)
+developed by Aristid Lindenmeyer, a theoretical biologist, in 1968 to model the processes
+of plant development. They can be used to generate a variety of attractive images, beyond
+plants and trees, including self-similar fractals. See this 
+[Wikipedia](https://en.wikipedia.org/wiki/L-system) article for more
+background information.
+
+Lindenmeyer systems generating 2D vector graphics are included in GPLOT. The implementation
+is based on Paul Bourke's description of a 1991 commercial product (probably now long dead)
+which can be found [here](https://paulbourke.net/fractals/lsys/). As with many of Paul Bourke's
+web pages, this is very informative and inspirational.
+
+L-systems work by manipulating strings, the characters of which either represent graphical actions
+(such as moving forward, drawing a line, or turning through an angle) or are "variables" with no
+associated graphical meaning.
+
+An L-system is defined by an "axiom string" and a set of "re-writing rules", and, in our case,
+also a fixed "turning angle". The "axiom string" must be set in string register 1 and up to
+8 "re-writing rules" can then appear in string registers 2 to 9 (used consecutively). The initial
+line angle is set by storing the angle (in degrees) in numeric register 3.
+
+The characters allowed ("vocabulary") are: `F A B C D E M X Y + - [ ]` Six of these are associated
+with specific actions. Any alphabetic character can be substituted with a string by a re-writing
+rule. The six "action characters" are:
+
+- `F` - draw a unit length line segment at the current drawing angle.
+- `M` - move by a unit length at the cureent drawing angle.
+- `+` - turn counter-clockwise by the turning angle.
+- `-` - turn clockwise by the turning angle.
+- `[` - push the current position and drawing angle on a stack.
+- `]` - pop the current position and drawing angle off a stack.
+
+This is all very abstract, of course! Paul Bourke's web page gives a simple example which is
+quite easy to follow, but more complex systems are not obvious (to me, anyway). 
+
+Here is a classic example of a plant drawn with an L-system:
 
 ![](lsys001.svg)
 
@@ -3201,6 +3536,38 @@ EVAL @1 "0.3325,0.125,0.45,9"
 
 OUTLINE DEV
 ```
+
+Note that, in general, the complexity of the drawing explodes as the number
+of iterations increases. The GPLOT L-system implementation uses scratch files
+to avoid memory limitations on NOS, so large outputs are possible, but the
+compute times also explode! The maximum stack depth is set to 20, although this
+doesn't seem to be much of a limitation in practice.
+
+Here are some other examples. 
+
+A complicated, bristly plant:
+```
+RESET
+
+# SET THE COLOUR OF THE PLANT.
+CSG GENERAL
+COL 0.05 0.6 0.03
+
+# DEFINE THE LINDENMAYER SYSTEM FOR THE PLANT.
+STRING 1 ABFFF
+STRING 2 A:[+++C][---C]YA
+STRING 3 C:+X[-C]B
+STRING 4 X:-C[+X]B
+STRING 5 Y:YB
+STRING 6 B:[-FFF][+FFF]F
+
+# INITIAL DRAWING ANGLE.
+STO 3 90
+
+# DRAW.
+LSYSTEM 5 $1 20
+```
+
 
 
 GPLOT cheat sheet
