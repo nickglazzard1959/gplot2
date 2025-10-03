@@ -3351,6 +3351,10 @@ A number of secondary commands set current characteristics of
 - `BOXPBOX` which controls whether the outer and inner boxes are outlined.
 - `BOXPDELTAS` which sets the automatic position step after ecah `BOXTEXT`
   is drawn.
+  
+**Labels** are the same graphical entities used to label points on a graph,
+but the coordinates of the thing they point at is in bounds rather than graph 
+coordinates.
 
 Here is a simple example of how these facilities can be used to draw a 
 small block diagram.
@@ -3388,7 +3392,9 @@ LINE P26,3>A30,3
 LINE P35,6>A35,10
 LINE A35,16>P35,21,R*LT>A26,21
 LINE P7,6>P7,21,L*LE>A16,21
+
 LINE P12.5,12.5>P13.2,12.5>A14.1,14.1
+ALABEL 13.2 12.5 2 300 "What is this thing?"
 
 OUTLINE DEVICE
 ```
@@ -3469,11 +3475,12 @@ also a fixed "turning angle". The "axiom string" must be set in string register 
 8 "re-writing rules" can then appear in string registers 2 to 9 (used consecutively). The initial
 line angle is set by storing the angle (in degrees) in numeric register 3.
 
-The characters allowed ("vocabulary") are: `F A B C D E M X Y + - [ ]` Six of these are associated
+The characters allowed ("vocabulary") are: `F A B C D E M X Y + - [ ]` Seven of these are associated
 with specific actions. Any alphabetic character can be substituted with a string by a re-writing
-rule. The six "action characters" are:
+rule. The seven "action characters" are:
 
 - `F` - draw a unit length line segment at the current drawing angle.
+- `D` - as `F`, but some systems need two substitutable drawing characters.
 - `M` - move by a unit length at the cureent drawing angle.
 - `+` - turn counter-clockwise by the turning angle.
 - `-` - turn clockwise by the turning angle.
@@ -3546,6 +3553,9 @@ doesn't seem to be much of a limitation in practice.
 Here are some other examples. 
 
 A complicated, bristly plant:
+
+![](lsbr001.svg)
+
 ```
 RESET
 
@@ -3568,7 +3578,80 @@ STO 3 90
 LSYSTEM 5 $1 20
 ```
 
+A Minkowski island, after 4 iterations. L-systems can generate most
+(all?) fractal curves. Several suck curves follow.
 
+![](lssm001.svg)
+
+```
+RESET
+
+STRING 1 F+F+F+F
+STRING 2 F:F+F-F-FF+F+F-F
+
+STO 3 0
+
+CSG GENERAL
+COL 0.9 0 0.1
+
+LSYSTEM 1 $1 90
+```
+
+A Sierpinski gasket after 6 iterations.
+
+![](lssp001.svg)
+
+```
+RESET
+
+STRING 1 F+F+F        ; AXIOM
+STRING 2 F:F-F+F+F-F  ; GENERATOR
+
+STO 3 0               ; INITIAL ANGLE
+
+CSG GENERAL
+COL 0.9 0 0.1
+
+# DRAW THE GASKET
+LSYSTEM 1 $1 120
+```
+
+A Koch "snowflake" drawn with rectangular elements.
+
+![](lsks001.svg)
+
+```
+RESET
+
+STRING 1 F+F+F+F
+STRING 2 F:FF+F-F+F+FF
+
+STO 3 0
+
+CSG GENERAL
+COL 0.9 0 0.1
+
+LSYSTEM 1 $1 90
+```
+
+A Gosper curve, or "flowsnake", after 4 iterations.
+
+![](lsgo001.svg)
+
+```
+RESET
+
+STRING 1 F
+STRING 2 F:F-D--D+F++FF+D-
+STRING 3 D:+F-DD--D-F++F+D
+
+STO 3 90
+
+CSG GENERAL
+COL 0.9 0 0.1
+
+LSYSTEM 2 $1 60
+```
 
 GPLOT cheat sheet
 -----------------

@@ -6598,16 +6598,16 @@ C
  20      CONTINUE
             READ(OUTLUN,100,END=21)CC
 C           WRITE(6,*)CC
-            IF( (CC .EQ. 'F') .OR. (CC .EQ. 'M') )THEN
+            IF((CC .EQ. 'F') .OR. (CC .EQ. 'M') .OR. (CC .EQ. 'D'))THEN
                XNEW = XPOS + COS(CANGLE)
                YNEW = YPOS + SIN(CANGLE)
                IF( IPASS .EQ. 2 )THEN
                   XX = REAL(XNEW*USEASP)
                   YY = REAL(YNEW)
-                  IF( CC .EQ. 'F' )THEN
-                     CALL ON2(XX, YY)
-                  ELSE
+                  IF( CC .EQ. 'M' )THEN
                      CALL OFF2(XX, YY)
+                  ELSE
+                     CALL ON2(XX, YY)
                   ENDIF
                ELSE
                   XLO = MIN(XLO, XNEW)
