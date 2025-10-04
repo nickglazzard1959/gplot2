@@ -4937,7 +4937,10 @@ C---- POP: CHECK > 0, GET THINGS FROM STACK[ISTACK], DECREMENT ISTACK.
       IERR = 0
 C
 C---- SPLIT THE RPN STRING INTO TOKENS ON COMMAS.
+C---- WARNING - DO *NOT* UPCASE ON NOS.
+#ifdef PORTF77
       CALL UPCASE(COPS)
+#endif
       LCOPS = LNBC(COPS,1,1)
       IBEG = 1
  1    CONTINUE
@@ -7626,7 +7629,7 @@ C------------------------------------
 C GET LAST MODIFIED DATE.
 C------------------------------------
       CHARACTER*9 LASTMD
-      PARAMETER( LASTMD='02-OCT-25' )
+      PARAMETER( LASTMD='04-OCT-25' )
       GETMOD = LASTMD
       RETURN
       END

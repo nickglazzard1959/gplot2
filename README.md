@@ -3579,7 +3579,7 @@ LSYSTEM 5 $1 20
 ```
 
 A Minkowski island, after 4 iterations. L-systems can generate most
-(all?) fractal curves. Several suck curves follow.
+(all?) fractal curves. Several such curves follow.
 
 ![](lssm001.svg)
 
