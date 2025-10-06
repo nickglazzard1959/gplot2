@@ -15,6 +15,5 @@ for fname in flist:
     outstring = txt.format('../../temp/'+fname+'.eps', fname, fname)
     print(outstring)
     n += 1
-    if (n % 3) == 0:
+    if (n % 2) == 0:
         print('\\clearpage')
-    

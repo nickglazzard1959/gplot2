@@ -273,7 +273,7 @@ def main():
                 'del':  (1, 1, 'nosname', cmds.DEL, 'Delete a permanent file.'),
                 'bput': (2, 3, 'localname nosname [direct]', cmds.BPUT, 'Send a binary file to the server, indirect by default.'),
                 'mput': (2, 2, 'listname display|ascii', cmds.MPUT, 'Send a list of files to the server.'),
-                'mget': (3, 3, 'listname display|ascii extension', cmds.MGET, 'Get a list of files  the server.')}
+                'mget': (3, 3, 'listname display|ascii extension (no dot)', cmds.MGET, 'Get a list of files from the server.')}
 
     def parse_cmd( cmdline, commands ):
         """
