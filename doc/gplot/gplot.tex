@@ -107,6 +107,9 @@
 %% NG: Node diagrams
 \usepackage{pstricks,pst-node}
 
+%% NG: Landscape?
+\usepackage{lscape}
+
 %% NG: Source code listings
 \usepackage{listings,color}
 \lstloadlanguages{Python,bash}
@@ -224,24 +227,24 @@
 %%\clearpage
 
 \section{Introduction}
-\textbf{GPLOT} is an interactive graphics program primarily focussed on graph plotting from data files.
-It is based on U.L.C.C. \textbf{DIMFILM}, a substantial graphics library written and maintained
-by Dr. John Gilbert between 1973 and approximately 1993. The version of \textbf{DIMFILM} used is
+\newpara
+\textbf{GPLOT} is an interactive graphics program based on U.L.C.C. \textbf{DIMFILM}, a substantial graphics
+library written and maintained
+by Dr. John Gilbert between 1972 and approximately 1995. The version of \textbf{DIMFILM} used is
 from somewhere around 1984 and is the second major version, which moved away from CDC Fortran
 to portable, standard Fortran-77 (necessitated by U.L.C.C.'s move to Amdahl IBM compatible machines). 
 \newpara
-\textbf{GPLOT}, in contrast, is deliberately written for the CDC \texttt{FTN5} compiler under NOS 2.8 and
-is not intended to be portable. It uses seven letter identifiers, dynamic memory allocation (via
-the Common Memory Manager), and makes free use of NOS system calls.
+\textbf{GPLOT}, in contrast, was deliberately written for the CDC \texttt{FTN5} compiler under NOS 2.8 and
+was not intended to be portable. It uses seven letter identifiers, dynamic memory allocation (via
+the Common Memory Manager), and makes some use of NOS system calls.
 \newpara
 That said, it can be built and used on ``Unix-like'' systems (Debian Linux and macOS have been tested)
 where it behaves almost identically to the NOS version.
 \newpara
-In overall intent, \textbf{GPLOT} is like a stripped down Gnuplot. 
-\textbf{GPLOT} relies on character
-string parsing subroutines written by Dr. Adrian Clark circa 1985. Dr. Clark also wrote a \textbf{DIMFILM} device
-driver for Tektronix storage tube terminals on which the \textbf{GPLOT} Tektronix and, to some extent, \textbf{GTerm}, support
-is based.
+Originally, \textbf{GPLOT} was focussed on plotting graphs from tabulated data and could perhaps be thought of
+as a stripped down \textbf{Gnuplot}, though with far fewer capabilities.
+Recent versions have extended its capabilities in new directions so that it can be used for drawing block diagrams,
+tables and other technical drawings.
 \newpara
 The primary `interactive' output device for \textbf{GPLOT} is \textbf{GTerm} -- a simple terminal emulator with colour graphics
 capabilities written in Python (see the \textbf{GTerm} project repository for more information). \textbf{GPLOT} also 
@@ -252,48 +255,62 @@ Output in the form of graphics files which  can be included in other documents i
 Encapsulated PostScript files and SVG files. The latter is 
 used by the \textbf{PMDHTML} Markdown to HTML program and the \textbf{PLNOTES} short document maintenance scheme for NOS
 (which is not described further here) as well as for HTML documents in general. The former is useful for \LaTeX and other
-`print' style document systems.
-\newpara
-\textbf{GPLOT} is currently at version 0.6. The first usable version (0.1, late 2013) 
-could not output EPSF files as such, but used a
-limited character set format that could be trivially translated to EPSF. V0.2 (2022) improved Tektronix 401x support. V0.58
-(developed between late 2022 and early 2023) added significant -- if idiosyncratic -- facilities for function evaluation 
-and other programmability features, as well as SVG output. It also exposed a lot more of DIMFILM's capabilities and directly
-generated "true" EPS files. Most of what can be done with DIMFILM using a specially
-written Fortran program can now be done from \textbf{GPLOT}. V0.59 fixed some bugs in parameter substitution. V0.6 (July 2025)
-tidied up a few things and supported building on ``Unix-like'' systems as well as NOS. This version also uses the NOS MODIFY --
-Git inter-operability tools so that the source can be managed equally well on NOS or with Git, with changes made on one system
-being automatically reflected in the other. This version also automatically generates minor variations of the source code
-needed for building on COS and Unix, using a single, NOS compatible, code base.
+``print'' style document systems.
 \newpara
 A major goal for \textbf{GPLOT} is that it should be \textit{very easy to use} --- as easy as other graph plotting
-programs on modern operating systems (such an Gnuplot, matplotlib, etc.) --- although \textbf{GPLOT} will never rival
-the full capabilities of those systems.
+programs on modern operating systems (such an \textbf{Gnuplot}, matplotlib, etc.) --- although \textbf{GPLOT} is not
+directly comparable to those programs. In some aspects, it does much less than they do, but it also does
+things they do not do.
 \newpara
 To build and install \textbf{GPLOT} on an emulated CYBER mainframe (with DtCyber), or on a ``Unix-like'' system,
-please refer to the main \textbf{GPLOT} Github project \texttt{README.md}.
+please refer to the main \textbf{GPLOT} Github project \texttt{README.md}. This describes the build procedures in
+a step-by-step fashion and also explains how a single source code base can be used fairly easily on both NOS and
+``Unix-like'' systems.
+\newpara
+\textbf{GPLOT} (with \textbf{DIMFILM}) is almost entirely self-contained -- it has no dependencies beyond the operating
+system and language runtime libraries. By modern standards, it is very light weight. It should be possible to
+port it to other systems with working Fortran-77 compilers and runtimes, provided they do not insist on six character
+variable and function names (although it would not be very hard to work around that with a simple Python program
+to transform the source code). Many historic systems, as well as almost all modern systems, should be able to
+build and run it. That said, it will almost certainly not run on systems as small as PDP-11s.
+
 
 \section{Running \textbf{GPLOT}}
 \textbf{GPLOT} needs two files: \texttt{GPLOT} (the pre-loaded binary executable) 
 and \texttt{DADIMFO} (which contains
-the font data for \textbf{DIMFILM}). To run \textbf{GPLOT} use:
+the font data for \textbf{DIMFILM}). To run \textbf{GPLOT} on NOS, use:
 \begin{verbatim}
 /ATTACH,GPLOT.
 /GPLOT.
 \end{verbatim}
 \texttt{GPLOT} will \texttt{ATTACH} the font file (\texttt{DADIMFO}) itself.
+On NOS, options supplied on the ``command line'' should be comma separated, following
+the usual rules for CCL (Cyber Control Language). Note that arguments containing spaces
+need to be ``quoted'' by enclosing them in dollar signs (as per normal CCL practice).
+
 \newpara
-The following control card options are recognized.
+To run \textbf{GPLOT} on a ``Unix-like'' system, use:
+\begin{verbatim}
+$ ugplot
+\end{verbatim}
+On these systems, options should be space separated and arguments containing spaces
+should be enclosed in double quotation marks -- the usual rules for the shell being
+used should be followed. Note, though, that the \texttt{keyword=value} format is used, as
+it is on NOS. \texttt{ugplot} must be used here -- this is a shell script that establishes
+symbolic links as necessary to arrange that the font file is accessible, then runs \textbf{GPLOT}.
+
+\newpara
+The following options are recognized.
 \begin{itemize}
 \item \textttc{OBEY=FILE}\\
-   \textbf{GPLOT} will start reading commands from the specified \texttt{LOCAL} file with name \texttt{FILE}. 
-   The current version exits when the file
-   has been read, but this might change in future versions.
+   \textbf{GPLOT} will read commands from the specified \texttt{LOCAL} file with name \texttt{FILE}. 
+   The program exits when the file has been read.
 \item \textttc{PARM=STRING}\\
    Used with \texttt{OBEY=FILE}. \texttt{STRING} is passed as one or more parameters to the \texttt{OBEY} file.
     See \ref{obfile} for more details.
    Under NOS, if \texttt{STRING} needs to contain spaces (i.e. there is more than one parameter), it should be enclosed in
-   \$ signs. If any single parameter in \texttt{STRING} itself needs to contain spaces, that parameter should be enclosed in
+   \$ (or \texttt{``}) signs. If any single parameter in \texttt{STRING} itself needs to contain spaces,
+   that parameter should be enclosed in
    single quotes.
 \item \textttc{GET=YN}\\
    Turn on automatic \texttt{GET}s of indirect \texttt{PERMANENT} files before \texttt{READ} and \texttt{OBEY} 
@@ -303,14 +320,17 @@ The following control card options are recognized.
    run) in order to make the files to be used \texttt{LOCAL}. On the other hand, if changes have been made to a \texttt{LOCAL} version
    of a \texttt{PERMANENT} file, these will be lost when \textbf{GPLOT} \texttt{READs} or \texttt{OBEYs} 
    that file with `auto \texttt{GET}' in effect. So be 
-   careful!
+   careful! This option is not relevant on ``Unix-like'' systems.
+ \item \textttc{SAVE=YN}\\
+   Turn on automatic \texttt{SAVE} or \texttt{REPLACE} of graphics output files as indirect \texttt{PERMANENT} files.
+   This option is not relevant on ``Unix-like'' systems.
 \item \textttc{DEBUG=YN}\\
    Outputs debugging information (mostly to do with \texttt{OBEY} file arguments and parameter substitutions currently).
 \item \textttc{QUIET=YN}\\
    Displays the unabbreviated command and \texttt{OBEY} nesting level for every command executed. Note that this may
-   upset some output devices (it seems).
+   upset some output devices (especially the Tektronix 401x).
 \item \textttc{SLIDE=YN}\\
-	Tell DIMFILM to use a graph plotting layout suitable for slides. This is the default, as it seems better suited to most
+	Tell \textbf{DIMFILM} to use a graph plotting layout suitable for slides. This is the default, as it seems better suited to most
 	output devices. The alternative tends to have text and other features that look too small on the page or display. Some
 	people might like that, though. 
 \end{itemize}
@@ -319,15 +339,11 @@ An example of a \textbf{GPLOT} control statement is:
 GPLOT,OBEY=DOPLOT,PARM=$X Y 'A TITLE'$.
 \end{verbatim}
 
-\begin{quote}
-\begin{center}
-\textbf{Note}\\
-\end{center}
-\textbf{GPLOT} can be run as any other command on ``Unix-like'' systems, but the current directory
-must contain the fonts file \texttt{DADIMFO} when the command is issued otherwise \textbf{GPLOT} will
-immediately exit with an error message. To avoid this problem, run \textbf{GPLOT} via the script \texttt{ugplot}
-which arranges things so that this problem is avoided.
-\end{quote}
+\newpara
+On a ``Unix-like'' system, this would be:
+\begin{verbatim}
+ugplot obey=doplot parm="x y 'a title'"
+\end{verbatim}
 
 \section{Commands}
 All commands can be abbreviated so long as they uniquely identify a command.
@@ -349,9 +365,12 @@ This does not mean that lower case text cannot be plotted, though -- it can.
 
 \newpara
 On ``Unix-like'' systems, lower case input can be used freely. Command names are converted to upper case internally.
-Strings and file names preserve the case as entered. Also, EPS and SVG output files are given their usual extensions
-(extensions are alien to NOS and COS). However, RPN evaluator operator names must still be given in
-upper case.
+Strings preserve the case as entered. Also, EPS and SVG output files are given their usual extensions
+(extensions are alien to NOS and COS).
+
+\newpara
+In order to simplify usage on ``Unix-like'' systems, \textbf{GPLOT} converts all file names to lower case on those
+systems. This may (rarely) be undesirable, but is thought to be helpful in general.
 \end{quote}
 
 \newpara
@@ -361,15 +380,24 @@ convenience in describing them.
 \subsection{Basic Graphics Commands}
 These are the lowest level facilities on which graph plotting is built.
 \begin{itemize}
-\item \textttc{DEVICE NAME [OUTPUT-FILE]} --- Select the output device.\\
+\item \textttc{DEVICE NAME [OUTPUT-FILE [SIZES]]} --- Select the output device.\\
    The EPS and SVG devices need an output file name to write to. Note that this
    will be created as a \texttt{LOCAL} file and will need to be made permanent with
-   \texttt{SAVE} or \texttt{REPLACE} on NOS. See Section \ref{devinfolabel} for the available devices and their
+   \texttt{SAVE} or \texttt{REPLACE} on NOS unless the \texttt{SAVE=YES} option has been used.
+   For the EPS and SVG devices, an additional SIZES specification may be
+   given. See Section \ref{devinfolabel} for the available devices and their
    characteristics.
-\item \textttc{CLEAR} --- Clear the drawing area.\\
-   The device display will be set to its default background colour.
-   Any previously drawn material will be erased. This is also required to flush output to files
-   for the \texttt{EPSCOL} and \texttt{EPSBIN} devices.
+\item \textttc{CLEAR [NAME]} --- Clear the drawing area.\\
+  The device display will be set to its default background colour (white, except on
+  the Tektronix 401x, which is black).
+   Any previously drawn material will be erased. If
+   \texttt{EPSCOL} or \texttt{SVG} devices are being used, the \texttt{NAME}
+   argument can be used to set the name to be used by the \emph{next} output file(s).
+   Note that the name given must be 4 or fewer characters on NOS, or 72 characters
+   on ``Unix-like'' systems. See \ref{devinfolabel} for more information. Using
+   \texttt{CLEAR} with a file name before outputting anything is a good way to create a
+   specifically named output file. The file named in the \texttt{DEVICE} command will
+   simply be deleted if it is found to be empty when the \texttt{CLEAR} command is encountered.
 \item \textttc{BOUNDS XL XH YL YH} --- Set the plotting bounds.\\
    This establishes a user coordinate system with $x_l,y_l$ at the bottom left
    and $x_h,y_h$ at the top right. The \texttt{MOVE}, \texttt{DRAW}, 
@@ -382,16 +410,15 @@ These are the lowest level facilities on which graph plotting is built.
    multiple graphs side by side.
 \item \textttc{UNPANE} --- Stop using any pane.\\ 
    The full drawing area will be used after this.
-\item \textttc{PANEOUTLINE} --- Outline the pane area.\\
-   A rectangle is drawn that matches the pane area.
+ \item \textttc{OUTLINE object} --- Outline an area.\\
+   The area is determined by \texttt{object}, which may be: \texttt{PANE}, \texttt{BLANK},
+   \texttt{BOUNDS} or \texttt{DEVICE}.
 \item \textttc{BLANK XL XH YL YH} --- Set the blank area.\\
    No drawing with either the basic graphics or graph plotting routines will
    make a mark inside the specified area. This can be useful for reserving a
    space for a graph key, for example.
 \item \textttc{UNBLANK} --- Stop using any blank area.\\
    The previous blank area is no longer protected after this.
-\item \textttc{BLANKOUTLINE} --- Outline the blank area.\\
-   A rectangle is drawn that matches the blank area.
 \item \textttc{COLOUR R G B} --- Set the RGB colour to use for drawing.\\
    \textbf{DIMFILM} maintains a separate drawing colour and line width for three
    different classes of graphical objects: lines, including those on graph plots;
@@ -417,7 +444,8 @@ These are the lowest level facilities on which graph plotting is built.
 \item \textttc{STYLE STYLENAME} --- Set the line style.\\
    The following styles are defined: \texttt{SOLID}, \texttt{DASH},
    \texttt{DOT}, \texttt{DASHDOT}. These are
-   probably self explanatory!
+   probably self explanatory! Note that this is not constrained to to the current
+   colour/style group.
 \item \textttc{MOVE X Y} --- Move to position.
    The virtual pen is moved to $(x,y)$ in \texttt{BOUNDS} coordinates.
 \item \textttc{DRAW X Y} --- Draw to position.\\
@@ -450,7 +478,8 @@ Sequence & Purpose \\
 \texttt{*B} & Backspace over last character.\\
 \texttt{*1} or \texttt{*2} or \texttt{*3} & Select a font set.\\
 \texttt{*+  \ldots \$+ } & Start and end super-script. Maximum of 2 levels.\\
-\texttt{*\_ \ldots \$\_} & Start and end sub-script. Maximum of 2 levels.\\
+\texttt{*- \ldots \$-} & Start and end sub-script. Maximum of 2 levels.\\
+\texttt{*= \ldots \$=} & Start and end underlining.\\
 \texttt{*N} & Reset sub- or super- script level to zero.\\
 \texttt{*O }\ldots \$O & Make sub- or super- scripts fully below or above previous character (for summations).\\
 \texttt{*,} numerator \texttt{\$,} denominator \texttt{\$.} & Construct a fraction.\\
@@ -469,22 +498,23 @@ These add a small number of primitive shapes as well as more control over how te
 
 \begin{itemize}
 \item \textttc{CIRCLE X Y R} -- Draw a circle.\\
-	Centre at $(x,y)$ with radius $r$.
+  Centre at $(x,y)$ with radius $r$.
 \item \textttc{ARC X Y R A1 A2} -- Draw an arc of a circle.\\
-	Centre at $(x,y)$ and with radius $r$, starting at angle
-	$a_1$ and ending at angle $a_2$. The angles are measured in degrees counter-clockwise from the positive X axis.
+  Centre at $(x,y)$ and with radius $r$, starting at angle
+  $a_1$ and ending at angle $a_2$. The angles are measured in degrees counter-clockwise from the positive X axis.
 \item \textttc{RECT X Y W H} -- Draw a rectangle.\\
-	With bottom left at $(x,y)$, width $w$, height $h$.
+  With bottom left at $(x,y)$, width $w$, height $h$.
 \item \textttc{CRECT X Y W H} -- Draw a rectangle.\\
-	Centred on  $(x,y)$, width $w$, height $h$.
+  Centred on  $(x,y)$, width $w$, height $h$.
 \item \textttc{FONT FONTNAME} -- Set the current font.\\
-	The \texttt{FONTNAME} must be one of the alphabetic fonts listed by \texttt{LISTFONT}.
+  The \texttt{FONTNAME} must be one of the alphabetic fonts listed by \texttt{LISTFONT}.
 \item \textttc{SYMHT H} -- Set the height characters, symbols and markers.\\
-	The height is given in user bounds units.
+  The height is given in user bounds units.
 \item \textttc{SYMANG A} -- Set the angle at which text is drawn.\\
-	The angle is in degrees measured counter-clockwise from the positive X axis.
+  The angle is in degrees measured counter-clockwise from the positive X axis.
 \item \textttc{CTEXT W "TEXT"} -- Draw text centred at the current position.\\
-	The text is scaled so its width is $w$ in user bounds units.
+  The text is scaled so its width is $w$ in user bounds units.
+\item \textttc{MARKER NUMBER YES} -- Draw marker \texttt{NUMBER} at the current position.
 \end{itemize}
 
 \subsection{Graph Axis Commands}
@@ -553,7 +583,7 @@ data omitting the undesired items.
    The file \texttt{NAME} (which must be a \texttt{LOCAL} file -- possibly obtained inside \textbf{GPLOT} using
    the \texttt{GET} command) should contain numbers (in the standard character code), with at least one per line,
    separated by spaces or commas. There may be any number of spaces preceding or separating each number
-   (subject to line length limitations -- the limit may be 80). Blank lines are skipped and ignored.
+   (subject to line length limitations -- the limit is 80). Blank lines are skipped and ignored.
    Lines with the character \texttt{`C'} in column 1 are ignored (allowing comments). 
    The \texttt{numbers} may be integers
    or any real number format (exponential or not), optionally preceded by a \texttt{+} or \texttt{-} sign. 
@@ -619,11 +649,29 @@ data omitting the undesired items.
    As explained in \texttt{XYLINE}, either straight lines or smooth curves can join the points. 
    If \texttt{CUBIC} or \texttt{QUINTIC} is used, the
    number of intermediate (linear) segments drawn for the curve between each point is controlled by \texttt{N} (default: 10).
-\item \textttc{ASYMYERRORBARS MODE} --- Use asymmetric Y error bars if \texttt{MODE} is \texttt{ON}.\\
+\item \textttc{ASYMYERRORS MODE} --- Use asymmetric Y error bars if \texttt{MODE} is \texttt{ON}.\\
    If \texttt{OFF}, symmetric Y and X error bars are drawn. Error bars will only be drawn if error bar
    data has been \texttt{READ}, and both \texttt{YECOL} and \texttt{XECOL} must have been 
    specified to get asymmetric Y error bars or
    symmetric Y and X error bars.
+ \item \textttc{USEKEY} --- Prepare to create a key for a graph.\\
+   A separate panel will be created to the right of the graph plotting area containing a key or legend
+   to identify lines or sets of points on a graph.
+ \item \textttc{ADDKEY} --- Add a key entry for the data plotted by the previous \texttt{XYLINE} or \texttt{XYPOINT} command.
+ \item \textttc{KEYS} --- Create the accumulated key and draw it.
+ \item \textttc{GRAPHMODE STATE} --- Automatically set bounds so that graphs occupy as much area on a device as possible.\\
+   \texttt{STATE} must be either \texttt{ON} or \texttt{OFF}. The bounds default to 0 to 1 on both axes. All graph plotting takes place within the
+   current pane, which is identical to the bounds unless specifically set. However, the bounds area will be centered in the
+   output device drawable area in order to keep a unit step on both axes the same (so circles are circles and not ellipses
+   when drawn). To fully use the device drawable area, the bounds must have the same aspect ratio as the device.
+   GRAPHMODE ON arranges for this to happen internally.
+ \item \textttc{SUBFIGGRID NX NY IX IY [SHRINK]} --- Set up to draw a graph as part of a rectangular array of sub-figures.\\
+   This allows a pane to be automatically set up so that the next graph is plotted as one of an array
+   of \texttt{NX} by \texttt{NY} graphs at
+   the \texttt{IX,IY} coordinate of that grid. As always in \textbf{GPLOT},
+   grid coordinates start at 1 and range up to \texttt{NX} or \texttt{NY} inclusive.
+   The optional \texttt{SHRINK} argument is a floating
+   point number less than 1 which shrinks the pane about its center to control the separation of the graphs.
 \end{itemize}
 
 
@@ -690,7 +738,7 @@ something like plotting macros (with parameters) to be used.
    OBEY FRED "FIRST 'SECONDA SECONDB'"
    \end{verbatim}
    defines two actual parameters that will be substituted for the formal parameters \texttt{\$1} and \texttt{\$2} wherever
-   these occur as space separated words in the file FRED. \texttt{\$2} will, in fact, be substituted as:
+   these occur as space separated words in the file \texttt{FRED}. \texttt{\$2} will, in fact, be substituted as:
    \begin{verbatim}
    "SECONDA SECONDB"
    \end{verbatim}
@@ -716,7 +764,22 @@ something like plotting macros (with parameters) to be used.
    to add one.
 \item \textttc{LISTFONT} --- Lists the available fonts.\\
 	The names of all available fonts are shown, along with the type of font: \texttt{ALPHABETIC}, \texttt{SYMBOL} or 
-	\texttt{MARKER}. 
+	\texttt{MARKER}.
+\item \textttc{VERSION [N]} --- Print (if \texttt{N} is omitted) the current version of \textbf{GPLOT}.
+        If \texttt{N} is supplied, it should be the
+        number of the string register (1 to 9) in to which to put version information.
+\item \textttc{WAIT} --- Wait for input from the user if the device is interactive (\textbf{GTerm} or Tektronix 401x).
+  The user should respond with \texttt{Y (enter)} or just \texttt{(enter)} to continue.
+  If \texttt{N (enter)} is used, the request
+  for a response will be repeated. If \texttt{Q (enter)} is used, \textbf{GPLOT} will perform
+  an \texttt{EXIT} command and terminate.
+\item \texttt{RESET} --- Reset most of \textbf{GPLOT} state to the default values. This does not include any data that has been
+  \texttt{READ} or the selected device.
+\item \textttc{PREFIX PATH} --- Set a prefix string to be pre-pended to all input file names.\\
+  This is ignored on NOS. On ``Unix-like'' systems, it allows a directory to be set in which to look for all
+  input files. The format of this string is not examined by \textbf{GPLOT}, but currently a \texttt{/} character is added to the end
+  of it. This behaviour may change in future versions, as this may be inappropriate on other operating systems to which
+  \textbf{GPLOT} may be ported.
 \item \textttc{EXIT} --- Exit \textbf{GPLOT}.\\
    This closes any log file, flushes graphics commands to the output device, and shuts down \textbf{DIMFILM}. 
    Then it exits \textbf{GPLOT} --- surprise!
@@ -800,7 +863,7 @@ A very useful variant on EVAL is:
 \begin{itemize}
 \item \textttc{ITEVAL start end step RPN-string}
 \end{itemize}
-which will evaluate the RPN-string \texttt{max( int( (end - start + step) / step ), 0 ) } times, as per a FORTRAN DO-loop. The value of
+which will evaluate the RPN-string \texttt{max( int( (end - start + step) / step ), 0 ) } times, as per a Fortran DO-loop. The value of
 the loop counter can be accessed using the token \texttt{I} in the \texttt{RPN-string}. The \texttt{I} token has the value 1 if used in an
 \texttt{RPN-string} evaluated via \texttt{EVAL}.
 
@@ -892,14 +955,16 @@ These operators provide the essential stack operations needed by all RPN evaluat
 \hline
 Token & Actions & Description\\
 \hline
-SWAP & ( A1 A2 -- A2 A1 ) & SWAP OR EXCHANGE TOP 2 STACK ARRAYS.\\
-DUP & ( A1 -- A1 A1 ) & DUPLICATE TOP OF STACK\\
+SWAP or S & ( A1 A2 -- A2 A1 ) & SWAP OR EXCHANGE TOP 2 STACK ARRAYS.\\
+DUP or \& & ( A1 -- A1 A1 ) & DUPLICATE TOP OF STACK\\
 POP & ( A1 -- ) & POP TOP OF STACK\\
+G & (\ldots AN \ldots C1 -- AN ) & GET STACK LEVEL AT DEPTH C1 INTO TOP OF STACK\\
+CL & ( -- ) & CLEAR STACK\\
 SETX & ( A1 -- A1 ) & OVERWRITE RANGE / GRAPH X VALUES WITH STACK TOP VALUES: X = A1\\
 SETY & ( A1 -- A1 ) & OVERWRITE GRAPH Y VALUES WITH STACK TOP VALUES: Y = A1\\
 XLIN & ( C1 C2 C3 -- ) & X = C1 TO C2 IN C3 LINEAR STEPS\\
 XLOG & ( C1 C2 C3 C4 -- ) & X = C1**C2 TO C1**C3 IN C4 STEPS\\
-ELEM & ( A1 C2 -- A1 C2 ) & C2 = A1[C2]\\
+EL & ( A1 C2 -- A1 C2 ) & C2 = A1[C2]\\
 I0IJ & ( C1 C2 -- C1' C2' ) & C1'=MOD(C1,C2), C2'=(C1/C2) : 1D TO 2D INDICES, 0 BASED.\\
 I1IJ & ( C1 C2 -- C1' C2' ) & C1'=MOD(C1,C2)+1, C2'=(C1/C2)+1 : 1D TO 2D INDICES, 1 BASED.\\
 \hline
@@ -956,6 +1021,7 @@ LOG2 & ( A1 -- A1 ) & BASE 2 LOGARITHM: A1 = LOG2(A1) \\
 EXP & ( A1 -- A1 ) & A1 =  E ** A1  DOMAIN: -675.81 TO 741.66 \\
 RAND & ( A1 -- A1 ) & UNIFORMLY DISTRIBUTED RANDOMS [0:A1): A1 = A1 * RANDOM \\
 SEED & ( C1 -- ) & SET RANDOM NUMBER SEED TO A1[1] \\
+GCD & ( C1 C2 -- C1 ) & FIND GREATEST COMMON DIVISOR OF C1, C2\\
 \hline
 \end{tabular}
 }
@@ -1055,6 +1121,12 @@ TA & ( C1 -- ) & SET TEXT DRAWING ANGLE IN DEGREES CCW \\
 TSC & ( -- ) & START TEXT CONTINUATION \\
 TEC & ( -- ) & END TEXT CONTINUATION \\
 TLEN & ( C1 -- C1 ) & LENGTH IN BOUNDS UNITS AT HEIGHT=1 OF STRING IN REGISTER C1. \\
+ROT & ( A1 A2 C3 -- A1 A2 ) & ROTATE X=A1,Y=A2 BY C3 RADIANS. \\
+TRN & ( A1 A2 C3 C4 -- A1 A2 ) & TRANSLATE X=A1, Y=A2 BY C3,C4. \\
+SCL & ( A1 A2 C3 C4 -- A1 A2 ) & SCALE X=A1, Y=A2 BY C3,C4. \\
+R2D & ( C1 -- C1 ) & RADIANS TO DEGREES. \\
+D2R & ( C1 -- C1 ) & DEGREES TO RADIANS. \\
+LAB & ( C1 C2 C3 C4 C5 -- ) & LABEL AT (C1,C2), LEN C3, ANG C4, SR C5 \\
 \hline
 \end{tabular}
 }
@@ -1062,7 +1134,7 @@ TLEN & ( C1 -- C1 ) & LENGTH IN BOUNDS UNITS AT HEIGHT=1 OF STRING IN REGISTER C
 
 \subsubsection{Output and Memory Functions}
 As with a calculator, the RPN evaluator provides a small number of `memories' (9) to which values can be stored
-and then retrieved. The values are arrays, though, in this case.
+and then retrieved.
 \newpara
 These operators also give a way of examining arrays on the stack or the whole stack, which can be very useful for debugging. 
 \newpara
@@ -1072,8 +1144,8 @@ These operators also give a way of examining arrays on the stack or the whole st
 \hline
 Token & Actions & Description\\
 \hline
-STO & ( A1 C2 -- A1 ) & STORE A1[1] (A.K.A. C1) IN REGISTER C2 \\
-RCL & ( C1 -- C1 ) & RECALL CONST VALUE FROM REGISTER INT(C1) \\
+STO or = & ( A1 C2 -- A1 ) & STORE A1[1] (A.K.A. C1) IN REGISTER C2 \\
+RCL or \# & ( C1 -- C1 ) & RECALL CONST VALUE FROM REGISTER INT(C1) \\
 P & ( -- ) & PRINT TOS ARRAY FIRST AND LAST ELEMENTS \\
 PE & ( A1 C2 C3 -- A1 ) & PRINT ELEMENTS C2 TO C3 OF A1 IN FREE FORMAT \\
 PC & ( C1 -- C1 ) & PRINT C1 (TOS A[1]) IN FREE FORMAT. \\
@@ -1117,6 +1189,7 @@ The graphics state used when drawing an L-system string consists of the current 
 drawing angle along which a virtual pen can move. The symbols with a graphical interpretation are:
 \begin{itemize}
 \item \texttt{F} -- draw a unit length line segment at the current drawing angle.
+\item \texttt{D} -- as F but two different substitutable draw symbols are needed.
 \item \texttt{M} -- move by unit length at the current drawing angle.
 \item \texttt{+} -- turn counter-clockwise by the turning angle.
 \item \texttt{-} -- turn clockwise by the turning angle.
@@ -1151,12 +1224,17 @@ a straw-like plant.
    excellent 4014 emulator. The latter has much higher quality graphics than \texttt{xterm}
    and reproduces other features of the Tektronix
    DVST displays for a very realistic experience.
-\item \textttc{EPSCOL NAME} --- Output to a colour EPS file.\\
+\item \textttc{EPSCOL NAME [SIZE]} --- Output to a colour EPS file.\\
    Output goes to the \texttt{LOCAL} file \texttt{NAME}. As of V0.58,
    `real' EPS is generated directly in NOS, using 6/12 character encoding which supports all printable ASCII
-   characters.
-\item \textttc{SVG NAME} --- Output SVG (Scalable Vector Graphics) to a file. This can be included in HTML files, and
-	this format is used by the \texttt{PLNOTES} application on NOS to insert graphs and graphics into documents. 
+   characters. \texttt{SIZE} is of the form: \texttt{W,H+X+Y} where \texttt{W} is the width,
+   \texttt{H} the height and \texttt{X} and \texttt{Y} are offsets from the bottom left -- the
+   units are inches in all cases.
+\item \textttc{SVG NAME [SIZE]} --- Output SVG (Scalable Vector Graphics) to a file. This can be included in HTML files, and
+  this format is used by the \texttt{PLNOTES} application on NOS to insert graphs and graphics into documents.
+  \texttt{SIZE} is of the form: \texttt{W,H} which are
+  the width and height in ``pixels'' (although, this does not affect the ``resolution'', just
+  the size browsers and other software assign to it).
 \end{itemize}
 \newpara
 There is also an \textttc{EPSBIN} device, which supports only black and white (i.e. binary) output colours, but this
@@ -1174,16 +1252,17 @@ of the name is incremented after the output file has been written. So, if \textt
 output files may be generated on NOS and COS: \texttt{EPXA001, EPXA002 ...}
 \newpara
 On Unix systems, the name may be more descriptive, use mixed case and will also be automatically given the 
-appropriate extension. E.g. If \texttt{NAME} is \texttt{ExampleA}, the output files may be named
-\texttt{ExampleA001.eps, ExampleA002.eps ...}
+appropriate extension. However, the output file names will be translated to all
+lower case by \textbf{GPLOT}. E.g. If \texttt{NAME} is \texttt{ExampleA}, the output files may be named
+\texttt{examplea001.eps, examplea002.eps ...}.
 
-\section{Building and Maintaining \textbf{GPLOT} and DIMFILM}
+\section{Building and Maintaining \textbf{GPLOT} and \textbf{DIMFILM}}
 
 Please see the main \texttt{README.md} for the \textbf{GPLOT} project on Github
 for detailed information on how to build and install \textbf{GPLOT} on both NOS
 and ``Unix''.
 
-\section{GPLOT examples and tutorial}
+\section{\textbf{GPLOT} examples and tutorial}
 
 \subsection{The simplest graph}
 
@@ -1222,12 +1301,12 @@ Although very minimal, there are a few points worth noting.
 If you use lower case, it will work on both systems, but the results may be different. 
 NOS (in \texttt{NORMAL} mode) will internally convert lower case to upper case. 
 So ``A very simple graph'' will appear exactly as that on ``Unix'', but as ``A VERY SIMPLE GRAPH'' on NOS. 
-Using upper case and DIMFILM ``string markup'' is portable and handles subscripts, superscripts, 
-fractions and so on too. Note that GPLOT should \emph{not} be used in \texttt{ASCII} mode on NOS! 
-GPLOT does not attempt to deal with 6/12 Display Code, but will convert it (mostly!) to upper case. 
+Using upper case and \textbf{DIMFILM} ``string markup'' is portable and handles subscripts, superscripts, 
+fractions and so on too. Note that \textbf{GPLOT} should \emph{not} be used in \texttt{ASCII} mode on NOS! 
+\textbf{GPLOT} does not attempt to deal with 6/12 Display Code, but will convert it (mostly!) to upper case. 
 However, internal arrays are not sized for 6/12 representations, so there will be problems 
 (mainly strings being unexpectedly truncated rather than crahses, though).
-\item The \texttt{RESET} command re-establishes a default state. If multiple obey files are used in one GPLOT session
+\item The \texttt{RESET} command re-establishes a default state. If multiple obey files are used in one \textbf{GPLOT} session
 without using \texttt{RESET} at the top of each file, the results will be unpredictable (the state 
 at the end on one obey file will be inherited by the next).
 \item This script is device independent. It can be used ``as is'' with any of the supported devices.
@@ -1253,29 +1332,30 @@ When plotting graphs, it is often better to fill the output canvas.
 \newpara
 We will address these last two deficiencies in the next example.
 
-\subsection{Bounds, panes, devices and coordinate systems in DIMFILM}
+\subsection{Bounds, panes, devices and coordinate systems in \textbf{DIMFILM}}
 
 \newpara
 It is perhaps worth understanding why the graph appears in a centered square area on the device
 even at this stage. 
 
 \newpara
-DIMFILM lets the user define a ``world coordinate system'' or ``user coordinates''. These ``bounds''
+\textbf{DIMFILM} lets the user define a ``world coordinate system'' or ``user coordinates''.
+These ``bounds''
 are defined by four numbers,
 \texttt{xlo} to \texttt{xhi} defining a range of X coordinates, and
 \texttt{ylo} to \texttt{yhi} defining a range of Y coordinates. This
 coordinate system is intended to be ``square'' in that a unit step in X
 should have the same length when drawn by the output device as a unit
 step in Y. The output devices each have their own ranges of valid
-coordinates. In the case of the interactive devices (GTerm and the
-Tektronix 4014), these ranges are fixed (not strictly true for GTerm).
+coordinates. In the case of the interactive devices (\textbf{GTerm} and the
+Tektronix 4014), these ranges are fixed (not strictly true for \textbf{GTerm}).
 The valid range of coordinates can be set by the user for the ``file''
 devices, SVG and EPS, by defining the ``paper size'' when the device is
 opened. The coordinate systems of these devices are also defined to be
 ``square''.
 
 \newpara
-DIMFILM also has the concept of a ``pane'', which is initially identical
+\textbf{DIMFILM} also has the concept of a ``pane'', which is initially identical
 to the ``bounds''. The ``pane'' is a rectangular subregion of the
 bounds, specified by four numbers in bounds coordinates.
 
@@ -1285,7 +1365,7 @@ system, so that circles when drawn are circles and not ellipses.
 
 \newpara
 For plotting graphs of data, though, ``squareness'' is not usually
-important. DIMFILM determines the locations and sizes of the various
+important. \textbf{DIMFILM} determines the locations and sizes of the various
 elements of a graph in terms of fractions of the pane. The graph will be
 placed inside the pane, squashed and stretched as may be to fill it.
 
@@ -1328,7 +1408,7 @@ yhi - ylo     height_display
 
 \subsection{NOS, Unix-like systems and compatibility}\label{nos-unix-like-systems-and-compatibility}
 \newpara
-Before moving on, it may be worth discussing how GPLOT tries to maximise
+Before moving on, it may be worth discussing how \textbf{GPLOT} tries to maximise
 compatability between these two very different operating systems.
 
 \newpara
@@ -1356,7 +1436,7 @@ script's output. However, on NOS, the title and labels will appear in
 upper case.
 
 \newpara
-Using DIMFILM's ``string markup sequences'' (the \texttt{*L} here)
+Using \textbf{DIMFILM's} ``string markup sequences'' (the \texttt{*L} here)
 allows lower case to be plotted on NOS.
 
 \newpara
@@ -1365,7 +1445,7 @@ lower case and ``string markup'' and get the same result as using upper
 case on both systems.
 
 \newpara
-GPLOT also tries to use heuristics to make file name related matters
+\textbf{GPLOT} also tries to use heuristics to make file name related matters
 transparent, although there are limits to this considering each NOS
 account has a flat file system with maximum 7 letter/digit upper case
 only file names!
@@ -1394,9 +1474,9 @@ characters as a sort of ``extension'' -- e.g.~\texttt{OB} for obey files
 -- but this is just a personal convention which NOS knows nothing about.
 
 \newpara
-GPLOT converts all supplied file names (including any \texttt{PREFIX})
+\textbf{GPLOT} converts all supplied file names (including any \texttt{PREFIX})
 to lower case on ``Unix''. You cannot use upper or mixed case file names
-in GPLOT on ``Unix''. This applies to all input and output files. Very
+in \textbf{GPLOT} on ``Unix''. This applies to all input and output files. Very
 rarely, this will be undesirable, but it almost always simplifies
 matters. On NOS, all file names are upper case and all lower case is
 converted to upper case by NOS.
@@ -1454,7 +1534,7 @@ resets the bounds to 0 to 1 by 0 to 1 and if bounds are explicitly
 specified, they just supersede the ones set by \texttt{GRAPHMODE}.
 
 \newpara
-In GPLOT/DIMFILM there are 3 ``different classes of things'', namely:
+In \textbf{GPLOT/DIMFILM} there are 3 ``different classes of things'', namely:
 \begin{itemize}
 \item
   Text (\texttt{TEXT}): this refers to all types of ``strings''.
@@ -1668,7 +1748,7 @@ times and the first keeps the axis ranges automatically determined from
 the first data plotted.
 
 \newpara
-GPLOT also lets you specify data ``inline'' in a script file. Here is a
+\textbf{GPLOT} also lets you specify data ``inline'' in a script file. Here is a
 very simple example (Figure~\ref{fig:gr10001}) and the script that generated it.
 
 \begin{figure}
@@ -1741,7 +1821,7 @@ numbers'' and will almost always be \texttt{1\ 2} for inline data.
 
 \subsection{Multiple graphs and keys}\label{multiple-graphs-and-keys}
 \newpara
-GPLOT provides a straightforward (if inflexible) way of adding a key or
+\textbf{GPLOT} provides a straightforward (if inflexible) way of adding a key or
 legend to help identify the meaning of the lines (or points) on graphs.
 
 \newpara
@@ -1975,15 +2055,15 @@ OUTLINE DEV
 
 \subsection{Plotting data stored in a disk file}\label{plotting-data-stored-in-a-disk-file}
 \newpara
-So far, we have plotted data that has been generated by GPLOT or stored
+So far, we have plotted data that has been generated by \textbf{GPLOT} or stored
 as ``HERE'' data in the command stream. Very often, the data to be
 plotted will be in disk files, though.
 
 \newpara
-GPLOT provides a very simple, albeit basic, way of reading such data and
+\textbf{GPLOT} provides a very simple, albeit basic, way of reading such data and
 plotting it. Given a file containing the same number of numeric items on
 each line, with those items separated by spaces or a comma (and perhaps
-spaces), GPLOT can treat the n-th number on each line as an entry in a
+spaces), \textbf{GPLOT} can treat the n-th number on each line as an entry in a
 column of numbers. The columns are numbered 1, 2, 3, etc.
 
 \newpara
@@ -2305,7 +2385,7 @@ error and the 4th as symmetric X error.
 The supplied data can be interpolated for the purposes of plotting
 ``smooth'' curves through, rather than straight lines between, the
 supplied data. This is generally frowned upon in science, but
-GPLOT/DIMFILM can do it!
+\textbf{GPLOT/DIMFILM} can do it!
 
 \newpara
 In addition to \texttt{LINEAR} interpolation (which is usually
@@ -2557,10 +2637,10 @@ least, approximate it).
 
 \subsection{Histograms and multiple plots in one figure}\label{histograms-and-multiple-plots-in-one-figure}
 \newpara
-Histograms are another common type of plot and GPLOT can draw them in
+Histograms are another common type of plot and \textbf{GPLOT} can draw them in
 various styles. There are no facilities for binning raw data so that
 histograms can be drawn, however. Other software must prepare counts of
-data points that fall into bins of specified ranges. All GPLOT deals
+data points that fall into bins of specified ranges. All \textbf{GPLOT} deals
 with are the counts and bin numbers for each count.
 
 \newpara
@@ -2688,7 +2768,7 @@ The most obvious new feature, though, is that the four plots showing the
 different histogram drawing styles appear in a single ``figure''.
 
 \newpara
-This can be done easily with DIMFILM, as graphs are plotted inside any
+This can be done easily with \textbf{DIMFILM}, as graphs are plotted inside any
 specified ``pane'' (see above), so all you have to do is use
 \texttt{PANE} appropriately.
 
@@ -2696,7 +2776,7 @@ specified ``pane'' (see above), so all you have to do is use
 Actually, though, that needs some (trivial) manual calculation, but it
 may also need to account for the device aspect ratio if the output
 canvas is to be filled. To further simplify creating multiple plots in a
-single ``figure'', GPLOT has the \texttt{SUBFIGGRID} command (which can
+single ``figure'', \textbf{GPLOT} has the \texttt{SUBFIGGRID} command (which can
 be abbreviated, fortunately). This lets you specify a rectangular
 arrangement of ``sub-figures'' and the current sub-figure to be drawn
 (before any plotting commands) and calculates an appropriate pane for
@@ -2818,8 +2898,8 @@ OUTLINE DEV
 
 \newpara
 (Note that files will be stored on ``Unix-like'' systems with lower case
-file names but may be referred to in upper case in GPLOT -- all file
-names are converted internally to lower case by GPLOT on ``Unix'' before
+file names but may be referred to in upper case in \textbf{GPLOT} -- all file
+names are converted internally to lower case by \textbf{GPLOT} on ``Unix'' before
 being accessed. These names could appear in lower case -- as could all
 commands -- and it would work)
 
@@ -2843,7 +2923,7 @@ script files.
 \subsection{Using the RPN evaluator to plot simple functions}\label{using-the-rpn-evaluator-to-plot-simple-functions}
 
 \newpara
-GPLOT includes a feature for calculating function values rather than
+\textbf{GPLOT} includes a feature for calculating function values rather than
 reading them from files. This is the Reverse Polish Notation (RPN)
 evaluator, which provides features very similar to those you would find
 on classic HP calculators.
@@ -2863,7 +2943,7 @@ function plotting, and its main limitation is perhaps that the
 \newpara
 A complete description of the available operators can be found in the
 ``cheat sheet'' below (which uses a notation familar to FORTH users) and
-in the PDF format GPLOT manual. Here, we just give some examples as an
+in the PDF format \textbf{GPLOT} manual. Here, we just give some examples as an
 introduction.
 
 \newpara
@@ -2872,7 +2952,7 @@ Admittedly, the RPN evaluator may not be all that easy to use (the
 of possibilities.
 
 \newpara
-When dealing with data from files, GPLOT uses between 2 and 4 arrays to
+When dealing with data from files, \textbf{GPLOT} uses between 2 and 4 arrays to
 store the data to be plotted. Two are used to store X and Y coordinates.
 If symmetric error bars are to be plotted a third array is used to store
 that, and asymmetric Y error bars or Y and X error bars use a fourth
@@ -2983,7 +3063,7 @@ command, which looks for a named procedure in the file \texttt{GPLPROC}
 and loads it into a specified ``procedure register'' if it is found.
 
 \newpara
-Note that the GPLOT evaluator does not actually do a ``call and return''
+Note that the \textbf{GPLOT} evaluator does not actually do a ``call and return''
 when it sees \texttt{EVAL\ @1}, etc. Instead, it uses string
 substitution to replace \texttt{@1} with the string in procedure
 register 1. It does this repeatedly, if necessary, until there are no
@@ -3048,7 +3128,7 @@ period will be enormous.
 \subsection{General drawing - Part 1: Basic functions}\label{general-drawing---part-1-basic-functions}
 
 \newpara
-DIMFILM provides some basic drawing capabilities apart from its
+\textbf{DIMFILM} provides some basic drawing capabilities apart from its
 extensive graph plotting functionality. Graph plotting is based on these
 lower level capabilities, as you would expect.
 
@@ -3059,10 +3139,10 @@ system, the \texttt{PANE} command, which sets up a rectangle in bounds
 coordinates outside of which no drawing will occur (a ``clip to inside''
 region) and the \texttt{BLANK} command, which sets a rectangle inside of
 which no drawing will occur (a ``clip to outside'' region). These
-commands map directly to DIMFILM subroutines.
+commands map directly to \textbf{DIMFILM} subroutines.
 
 \newpara
-For convenience, GPLOT adds a \texttt{CANVAS} command, which just sets
+For convenience, \textbf{GPLOT} adds a \texttt{CANVAS} command, which just sets
 the bounds and the pane to the same coordinate ranges.
 
 \newpara
@@ -3085,17 +3165,17 @@ given radius at a given position, \texttt{ARC} which draws a segment of
 a circle, and \texttt{RECT} which draws a rectangle.
 
 \newpara
-Two GPLOT commands build slightly on this: \texttt{CRECT} draws a
+Two \textbf{GPLOT} commands build slightly on this: \texttt{CRECT} draws a
 rectangle centered on a given location and \texttt{PATH} uses the
-contents of the X and Y arrays to draw a polyline. GPLOT/DIMFILM does
+contents of the X and Y arrays to draw a polyline. \textbf{GPLOT/DIMFILM} does
 not support the drawing of any kinds of smooth curves for general
 drawing purposes (\texttt{INTERPOLATE} can interpolate smooth curves
 between data points for graph plotting, but this can't be used for
 general drawing).
 
 \newpara
-DIMFILM has very limited geometric transformation support and GPLOT does
-not provide access to this. GPLOT does provide a more comprehensive
+\textbf{DIMFILM} has very limited geometric transformation support and \textbf{GPLOT} does
+not provide access to this. \textbf{GPLOT} does provide a more comprehensive
 geometric transformation capability through its RPN evaluator, though.
 
 \newpara
@@ -3104,7 +3184,7 @@ comprehensive set of facilities for drawing text using vector fonts.
 These are accessed through the \texttt{TEXT} and \texttt{CTEXT}
 commands, with various properties set by the \texttt{SYMHT},
 \texttt{SYMANG} and \texttt{FONT} commands. The fonts are specific to
-DIMFILM (there is no way to use any ``system fonts''!) and are, in this
+\textbf{DIMFILM} (there is no way to use any ``system fonts''!) and are, in this
 implementation, some of the Hershey fonts. The available fonts can be
 listed with the \texttt{LISTFONT} command.
 
@@ -3118,7 +3198,7 @@ The text output facility allows ``markup'' to be included in the string
 to draw, and this extends to sub-scripts, super-scripts, and fractions,
 which can be nested to two levels. Mathematical notation can, to a
 useful degree, be accommodated by this. Although we have high quality
-font drawing everywhere now (and for the last few decades), when DIMFILM
+font drawing everywhere now (and for the last few decades), when \textbf{DIMFILM}
 was first released (1973), this was cutting edge. Mathematical notation
 is still not readily expressible everywhere it might be useful even
 today, in fact.
@@ -3134,168 +3214,1309 @@ is Figure~\ref{fig:gd01001}.
   \label{fig:gd01001}
 \end{figure}
 
-\clearpage
+\newpara
+The script for this is a little long, but may be worth presenting in
+full:
+
+\begin{lstlisting}
+RESET
+CANVAS 0 22 0 16
+#
+CSG TEXT
+COL 0 0 0
+CSG GEN
+COL 0 0 0
+#
+# DRAW CIRCLES
+CIRCLE 3 3 1
+STYLE DASH
+CIRCLE 19 3 1
+STYLE DOT
+COL 0 0 1
+CIRCLE 19 13 1
+STYLE DASHDOT
+COL 1 0 0
+CIRCLE 3 13 1
+STYLE SOLID
+COL 0 0 0
+#
+# DRAW ANGLE
+MOVE 7 9
+DRAW 10 9
+MOVE 7 9
+DRAW 9.5981 10.5
+ARC 7 9 2 0 30
+MOVE 9.45 9.5
+SYMHT 0.5
+TEXT "*:83=30"
+#
+# DRAW CENTER CROSS + MARKERS
+COL 1 0 0
+MOVE 2 8
+DRAW 20 8
+MOVE 11 2
+DRAW 11 14
+MOVE 11 8
+COL 0 0 0
+MARKER 9 Y
+MARKER 23 Y
+#
+# DRAW CIRCLE CROSSES AND MARKERS
+MOVE 1 13
+DRAW 5 13
+MOVE 3 11
+DRAW 3 15
+SYMHT 3
+MOVE 3 13
+MARKER 9 Y
+#
+MOVE 17 13
+DRAW 21 13
+MOVE 19 11
+DRAW 19 15
+MOVE 19 13
+MARKER 24 Y
+#
+MOVE 1 3
+DRAW 5 3
+MOVE 3 1
+DRAW 3 5
+MOVE 3 3
+MARKER 13 Y
+#
+MOVE 17 3
+DRAW 21 3
+MOVE 19 1
+DRAW 19 5
+MOVE 19 3
+MARKER 3 Y
+#
+# DRAW ROUND CORNER RECTANGLE
+WIDTH 3
+ARC 7 6 1 180 270
+ARC 15 6 1 270 360
+ARC 7 10 1 90 180
+ARC 15 10 1 0 90
+MOVE 6 6
+DRAW 6 10
+MOVE 16 6
+DRAW 16 10
+MOVE 7 5
+DRAW 15 5
+MOVE 15 11
+DRAW 7 11
+WIDTH 1
+#
+# ODDITIES
+MOVE 7 7
+DRAW 8 6
+DRAW 9 7
+DRAW 10 6
+#
+MOVE 12 9
+DRAW 13 10
+DRAW 14 9
+DRAW 15 10
+#
+READ HERE 1 2
+12 6
+14 6
+15 7
+12 7
+EOF
+PATH C
+#
+SYMHT 0.5
+MOVE 11 15
+CTEXT 0 "*=G*LENERAL DRAWING BASIC COMMANDS EXAMPLE$="
+MOVE 11 1
+CTEXT 12 "MOVE, DRAW, CIRCLE, ARC, MARKER, TEXT, CTEXT, PATH"
+#
+CSG GEN
+COL 0 0 1
+OUTLINE BOUNDS
+OUTLINE DEV
+\end{lstlisting}
+
+\newpara
+Most of this is likely to be self explanatory. The only points that may
+be unclear are:
+
+\begin{itemize}
+\item
+  The use of a ``special character'' from the symbol font (which is
+  loaded with \texttt{MATH.SMALL} by default) to draw the ``theta''
+  character. This is done by: \texttt{TEXT\ "*:83=30"} where the
+  ``theta'' is selected by character number (83) using string markup.
+  How do we know which character number to use? By looking at ``font
+  tables'' which can be generated with one of the supplied script files
+  (\texttt{obfont} for ``normal'' alphabets, \texttt{obsyms} for symbols
+  and \texttt{obmarks} for markers). This is explained further in a
+  later section (below).
+\item
+  The \texttt{MARKER} command, which will draw a specified marker (which
+  is determined by a number) at the current position \emph{if} a second
+  argument (\texttt{YES} - abbreviated, any case) is supplied. If only
+  one argument is supplied, the \texttt{MARKER} command sets the marker
+  number to use for points when plotting graphs.
+\item
+  Polyline paths can be drawn with the \texttt{PATH} command with
+  coordinates defined by a \texttt{HERE} file. This is quite a
+  convenient way of setting up a path, actually. The path may bew open
+  or closed depending on the argument to \texttt{PATH} which may be
+  \texttt{C} for closed or \texttt{O} for open.
+\end{itemize}
+
+\newpara
+While you can draw a lot with these basic drawing commands, it can get
+pretty tedious and long winded. Some of that is inevitable, but some
+things could be ``automated''. In this case, the end coordinate for the
+non-horizontal ``angle'' line has to be set by
+\texttt{DRAW\ 9.5981\ 10.5} where those numbers we found by hand with a
+calculator! This is the sort of thing a computer ought to be able to do
+for you!
+
+\newpara
+To help with this, in addition to simple evaluation of
+\texttt{y\ =\ f(x)} functions, the ``evaluator'' was added.
+
+
+\subsection{The RPN Evaluator for drawing 2D parametric functions}\label{the-rpn-evaluator-for-drawing-2d-parametric-functions}
+\newpara
+Bridging the graph plotting and general drawing worlds is drawing
+functions of a parameter, \texttt{t}, that trace out a path on the 2D
+plane. These are of the form:
+
+\begin{lstlisting}
+x = f(t)
+y = f(t)
+\end{lstlisting}
+
+\newpara
+Such functions can generate very pleasing patterns and often appear in
+``recreational mathematics''. Some of the most familiar examples are the
+curves generated by the ``Spirograph'' ``toy'' (see this
+\href{https://en.wikipedia.org/wiki/Spirograph}{Wikipedia article}),
+which we will come to shortly.
+
+\newpara
+As a simpler example (from the point of view of \textbf{GPLOT} only!) we start
+with the ``Farris mystery curve''. The ``mystery'' is that a five-fold
+symmetry appears from formula which contain even number and no obvious
+source of such a symmetry.
+
+\newpara
+While ``Spirograph'' uses two wheels, with one rotating in slip-free
+contact with the other, the Farris curves (many variations are possible)
+can be generated with three wheels in slip-free contact.
+
+\newpara
+Figure~\ref{fig:g1fm001} shows the ``original'' mystery curve.
+
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/g1fm001.eps}
-  \caption{g1fm001}
+  \caption{The Farris Mystery Curve}
   \label{fig:g1fm001}
 \end{figure}
+
+\begin{lstlisting}
+# FARRIS MYSTERY CURVE
+#
+RESET
+CANVAS -2 2 -2 2
+#
+MAXPOINTS 3000
+#
+EVAL 0,TWPI,2001,XLIN
+PROC 2 X,SIN,X,6,*,SIN,2,/,+,X,14,*,COS,3,/,+
+PROC 1 X,COS,X,6,*,COS,2,/,+,X,14,*,SIN,3,/,+
+EVAL @1,@2,PTHO
+#
+CSG ALL
+COL 0 0 0
+MOVE 0  -1.66
+CTEXT 1.3 "*LX = COS(T) + *,COS(6T)$,2$. + *,SIN(14T)$,3$." 
+MOVE 0  -1.9
+CTEXT 1.3 "*LY = SIN(T) + *,SIN(6T)$,2$. + *,COS(14T)$,3$." 
+MOVE 0, 1.9
+CTEXT 2 "*IF*LARRIS MYSTERY CURVE"
+#
+OUTLINE BOUNDS
+\end{lstlisting}
+
+\newpara
+The script that generates this is quite short and simple. The first
+\texttt{EVAL} fills the X array (stack level 0) with 0 to 2 pi in 2001
+linear steps. Two procedures are then defined (stored in procedure
+registers 1 and 2). \texttt{PROC\ 1} calculates X values and
+\texttt{PROC\ 2} finds Y values. The second \texttt{EVAL} evaluates
+these two procedures in the order that leaves the calculated coordinates
+on stack for use by the path drawing operator \texttt{PTHO}.
+
+\newpara
+It is easy to plot this curve as a graph (i.e.~with value labelled axes,
+etc.) simply by replacing \texttt{PTHO} with operators that set the
+calculated X and Y values into the X and Y arrays (stack levels 0 and 1)
+used by graph plotting commands (here \texttt{XYLINE}). This is
+shown in Figure~\ref{fig:g2fm001}.
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/g2fm001.eps}
-  \caption{g2fm001}
+  \caption{The Farris Mystery Curve graphed}
   \label{fig:g2fm001}
 \end{figure}
 
-\clearpage
+\begin{lstlisting}
+# FARRIS MYSTERY CURVE PLOTTED AS A GRAPH.
+#
+CANVAS -2 2 -2 2
+#
+MAXPOINTS 3000
+CSG TEXT
+COL 0 0 0
+CSG ANNOT
+COL 0 0 1
+CSG GEN
+COL 1 0 0
+#
+EVAL 0,TWPI,2001,XLIN
+PROC 2 X,SIN,X,6,*,SIN,2,/,+,X,14,*,COS,3,/,+
+PROC 1 X,COS,X,6,*,COS,2,/,+,X,14,*,SIN,3,/,+
+EVAL @1,@2,SETX,POP,SETY
+GRAPHMODE OFF
+TITLE "T*LHE *UF*LARRIS MYSTERY CURVE GRAPHED"
+XLABEL "*LX = COS(T) + *,COS(6T)$,2$. + *,SIN(14T)$,3$."
+YLABEL "*LY = SIN(T) + *,SIN(6T)$,2$. + *,COS(14T)$,3$."
+GRID BOTH
+XYLINE
+\end{lstlisting}
+
+\newpara
+The Spirograph is a toy invented by Denys Fisher in 1962-64 and fondly
+remembered by people of a certain age. It is a simple mechanism which
+can trace out hypotrochoid and epitrochoid curves based on two wheels
+(with gear teeth, so they can stay in contact without slipping). One
+wheel is fixed and the other rotates on the inside or outside of the
+fixed wheel. This second wheel has holes in which the tip of a pen can
+be placed to draw curves. If the moving wheel rotates inside the fixed
+wheel, a hypotrochoid curve is traced out, and if it is outside, an
+epitrochoid curve is drawn.
+
+\newpara
+Much less accessible mechanisms were developed in the 19th century to
+draw such curves for use in banknote engraving as they are visually
+attractive and are (or were) difficult to forge without specialised
+machinery.
+
+\newpara
+Drawing these curves with \textbf{GPLOT} is an interesting exercise. They can be
+defined with three integer parameters:
+
+\begin{itemize}
+\item
+  \texttt{R}, the radius of the fixed wheel.
+\item
+  \texttt{RL}, the radius of the smaller, moving, wheel.
+\item
+  \texttt{P}, the distance of the ``pen hole'' from the centre of the
+  moving wheel.
+\end{itemize}
+
+\newpara
+We want to be able to change these easily, so we want to define a script
+that we can call like this:
+
+\begin{lstlisting}
+OB OBSPIRO "65 25 30"
+\end{lstlisting}
+
+\newpara
+where we pass the values of \texttt{R}, \texttt{RL} and \texttt{P} to
+the script. This is a good opportunity to show how to pass parameters to
+scripts and to use ``nested scripts'' to reuse code in the way that
+subroutines and functions allow in more sophisticated programming
+environments.
+
+\newpara
+The script \texttt{OBSPIRO} uses these parameters to calculate how many
+times the moving wheel needs to circle the fixed wheel to complete a
+closed curve, as well as the degree of symmetry of the curve. Note that
+the parameters passed to the script are referred to as \texttt{\$1},
+\texttt{\$2}, etc. as they are in Unix scripting languages. Note also
+that it is possible to use parameters in the RPN strings used by
+\texttt{EVAL}. This can be very useful.
+
+\newpara
+One ``problem'' with the parametrised Spirograph simulation is that we
+don't know how big the pattern will be -- i.e.~what the range of
+coordinates will be -- so we can't easily set the \texttt{BOUNDS} for
+the drawing.
+
+\newpara
+The \texttt{OBSPIRO} script deals with this using the \texttt{BBSTART},
+\texttt{BBEND} and \texttt{BBSET} commands. Between \texttt{BBSTART} and
+\texttt{BBEND}, the \texttt{DRAW} command doesn't draw anything (all
+drawing ultimately comes down to \texttt{MOVE} and \texttt{DRAW}).
+Instead, the range of \texttt{X} and \texttt{Y} coordinates is
+accumulated. \texttt{BBSET} can then be used to set these accumulated
+ranges as the \texttt{BOUNDS}, optionally scaled about the center by a
+scale factor (here, \texttt{1.2}).
+
+\newpara
+The tracing out of the Spirograph is done by the script
+\texttt{OBSPIRC}, which \texttt{OBSPIRO} ``calls'' twice: once to find
+the pattern's bounds and once to draw the pattern.
+
+\newpara
+In general, parameters can be passed to obey scripts in two ways:
+\begin{itemize}
+\item
+  Using parameters as described above, where, for example,
+  \texttt{OB\ X\ "1\ 2\ 3"} results in \texttt{\$1}, \texttt{\$2} and
+  \texttt{\$3} in the script \texttt{X} being read as \texttt{1},
+  \texttt{2} and \texttt{3} as a result of \emph{text (string)
+  substitution}.
+\item
+  Numerical values and strings can be passed through registers. This is
+  necessary if values are calculated by \texttt{EVAL} to be used in a
+  ``nested'' script.
+\end{itemize}
+
+\newpara
+The \texttt{OBSPIRO} script demonstrates all these features.
+
+\begin{lstlisting}
+# SPIROGRAPH PATTERNS - OBSPIRO
+#
+# FOR MORE INFORMATION, SEE:
+#   HTTPS://LINUXGAZETTE.NET/133/LUANA.HTML
+#   HTTPS://APERIODICAL.COM/2021/12/THE-MATHEMATICS-OF-SPIROGRAPH/
+#
+RESET
+
+# THE CONTROL PARAMETERS SHOULD ALL BE INTEGERS.
+#
+# $1 = R = BIG CIRCLE RADIUS
+# $2 = RL = LITTLE CIRCLE RADIUS (MOVES AROUND BIG CIRCLE, IN CONTACT)
+# $3 = P = LITTLE CIRCLE PEN RADIUS (FROM CENTRE OF LITTLE CIRCLE)
+
+# THE DEGREE OF SYMMETRY OF THE PATTERN IS MAX(R/GCD(R,RL),RL/GCD(R,RL))
+
+# THE NUMBER OF REVOLUTIONS AROUND THE BIG CIRCLE NEEDED TO JOIN
+# UP TO THE START OF THE PATTERN IS:
+# NR = RL / GCD(R,RL) (GCD=GREATEST COMMON DIVISOR)
+
+# THE PARAMETER RANGE NEEDED TO DRAW THE THING IS THEN:
+# T = [0:2*PI*NR]
+#
+# AND:
+# X(T) = COS(T) * (R - RL) + COS(((R - RL) / RL) * T) * P
+# Y(T) = SIN(T) * (R - RL) - SIN(((R - RL) / RL) * T) * P
+
+# CALCULATE NR AND STORE IN REG 9. SAVE GCD(R,RL) IN REG 8.
+# NOTE THE DOUBLE QUOTES ARE NEEDED FOR PARAMETER SUBSTITUTION TO WORK
+EVAL "$2,$1,$2,GCD,8,=,/,9,="
+
+# FIND THE DEGREE OF SYMMETRY. STORE IN REG 8.
+EVAL "$1,8,#,/,$2,8,#,/,MAX,8,="
+
+# FIND THE BOUNDING BOX AND SET BOUNDS.
+BBSTART
+OB OBSPIRC "$1 $2 $3"
+BBEND
+BBSET 1.2
+
+# DRAW THE SPIROGRAPH
+CSG GENERAL
+COL 1 0 0
+WIDTH 2
+OB OBSPIRC "$1 $2 $3"
+
+# DRAW ANNOTATION (OR NOT)
+# CSG GENERAL
+# COL 0 0 1
+# WIDTH 2
+# CIRCLE 0 0 $1
+# EVAL "$1,$2,-,0,$2,C"
+# EVAL "$1,$2,-,$3,+,0,$3,20,/,C"
+# EVAL "$1,0,M,$1,$3,+,$2,-,$3,20,/,-,0,D"
+
+# ADD A PARAMETER DISPLAY
+CSG TEXT
+COL 0 0 0
+BOUNDS 0 1 0 1
+MOVE 0.05 0.05
+SYMHT 0.02
+TEXT "R=$1, *LR=$2, P=$3"
+STRING 9 "S*LYMMETRY="
+STRING 8 "(I2)"
+EVAL "0.05,0.1,M,9,T,TSC,8,#,8,TVI,TEC"
+FONT 2 SCRIPT.SIMPLEX
+MOVE 0.8 0.95
+SYMHT 0.07
+CTEXT 0 "*2S*LPIROGRAPH!"
+FONT 2 SERIF.COMPLEX
+
+CSG GEN
+COL 0 0 0
+OUTLINE BOUNDS
+\end{lstlisting}
+
+\newpara
+The \texttt{OBSPIRC} script does the actual work of calculating pattern
+coordinates and drawing the result.
+
+\begin{lstlisting} 
+# SPIROGRAPH PATTERN CORE - OBSPIRC
+
+# $1 = R = BIG CIRCLE RADIUS
+# $2 = RL = LITTLE CIRCLE RADIUS (MOVES AROUND BIG CIRCLE, IN CONTACT)
+# $3 = P = LITTLE CIRCLE PEN RADIUS (FROM CENTRE OF LITTLE CIRCLE)
+# REG 9 = NR = NUMBER OF REVOLUTIONS AROUND BIG CIRCLE
+#
+# T = [0:2*PI*NR]
+#
+# X(T) = COS(T) * (R - RL) + COS(((R - RL) / RL) * T) * P
+# Y(T) = SIN(T) * (R - RL) - SIN(((R - RL) / RL) * T) * P
+
+STO 1 $1
+STO 2 $2
+STO 3 $3
+MAXPOINTS 3000
+
+ERANGE 1 0 6.28 2001
+EVAL 0,TWPI,2001,XLIN,X,9,RCL,*,SETX
+EVAL 1,RCL,2,RCL,-,5,STO  ; [5] = R - RL
+EVAL 5,RCL,2,RCL,/,6,STO  ; [6] = (R - RL)  / RL
+PROC 1 X,COS,5,RCL,*,6,RCL,X,*,COS,3,RCL,*,+ ; X
+PROC 2 X,SIN,5,RCL,*,6,RCL,X,*,SIN,3,RCL,*,- ; Y
+EVAL @1,@2,PTHO
+\end{lstlisting}
+
+\newpara
+This is quite similar to the ``Farris Mystery Curve'' script in its
+approach. Note that it stores the parameters it receives in registers
+for use in the RPN, although direct substitution could be used. It first
+generates an angle parameter at 2001 points that ``goes around'' the
+required number of times to generate a closed pattern, then it finds the
+path coordinates based on the angle and draws the result with the open
+path operator, \texttt{PTHO}.
+
+\newpara
+Figures\ref{fig:g1sp001}, \ref{fig:g2sp001} and \ref{fig:g3sp001} are some examples
+of the output of \texttt{OBSPIRO} with different
+parameter sets.
+
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/g1sp001.eps}
-  \caption{g1sp001}
+  \caption{Spirograph Example 1}
   \label{fig:g1sp001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/g2sp001.eps}
-  \caption{g2sp001}
+  \caption{Spirograph Example 2}
   \label{fig:g2sp001}
 \end{figure}
 
-\clearpage
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/g3sp001.eps}
-  \caption{g3sp001}
+  \caption{Spirograph Example 3}
   \label{fig:g3sp001}
 \end{figure}
+
+\newpara
+Still sticking with procedurally generated patterns, but moving away
+from traditional continuous functions of a variable, there is a
+traditional form of Japanese Sashiko stitching called Hitomezashi,
+developed in the Edo period.
+
+\newpara
+These stitch patterns consist of short stitches of a single unit length,
+made either horizontally or vertically. If two random sequences of
+length \texttt{N} are generated, one for the horizontal direction and
+another for the vertical, and a stitch is made if the value of the
+sequence is odd (and not made if it is even) then a very attractive
+pattern results.
+
+\newpara
+I came across this thanks to this
+\href{https://www.youtube.com/watch?v=JbfhzlMk2eY}{Numberphile}, video
+on YouTube, which gives an excellent explanation of things.
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/gemz001.eps}
-  \caption{gemz001}
+  \caption{A Hitomezashi stitch pattern}
   \label{fig:gemz001}
 \end{figure}
 
-\clearpage
+\newpara
+The following obey script draws such patterns:
+
+\begin{lstlisting}
+# GENERATE HITOMEZASHI STITCH PATTERNS
+#
+RESET
+CANVAS 0 41 0 41
+BLANK 30.5 40.5 37.5 40.5
+
+ERANGE 1 0 40 41
+PROC 1 1,RAND,0.5,+,FLR,1,EL,X,+,ODD
+EVAL 333,SEED
+
+CSG GEN
+COL 0 0 1
+WIDTH 3
+ITEVAL 0 40 1 0,I,M,@1,HDSH
+ITEVAL 0 40 1 I,0,M,@1,VDSH
+
+CSG ANNOT
+COL 1 0 0
+WIDTH 5
+OUTLINE BLANK
+
+UNBLANK
+MOVE 35.5 39
+CSG TEXT
+COL 0 0 0
+WIDTH 1
+CTEXT 9 "H*LITOMEZASHI"
+
+OUTLINE DEV
+\end{lstlisting}
+
+\newpara
+This introduces a new version of \texttt{EVAL} -- iterated evaluation or
+\texttt{ITEVAL}. This repeatedly runs an RPN procedure with a ``loop
+variable'' that iterates from a start value to a stop value (inclusive --
+Fortran DO-loop rules apply) by a step value. The ``loop variable''
+value can be accessed inside the RPN using the \texttt{I} operator.
+
+\newpara
+This example also shows how to use \texttt{BLANK} and \texttt{UNBLANK}
+to temporarily protect a rectangular region so that it cannot be drawn
+in.
+
+
+\subsection{General drawing - Part 2: Evaluator assisted}\label{general-drawing---part-2-evaluator-assisted}
+
+\newpara
+It is possible to use the evaluator to assist with general drawing
+tasks. In many cases, it is necessary to calculate coordinates from a
+small set of supplied parameters in order to complete the drawing task.
+A good example of this was the ``labelled angle line pair'' shown in the
+manual general drawing section, where we used a calculator to find the
+coordinates of the label text literally by hand.
+
+\newpara
+Probably the most convenient way of using the evaluator for such tasks
+is to add procedures to the \emph{evaluator procedure library} which
+consists of the file \texttt{GPLPROC} (\texttt{gplproc} on Unix-like
+systems).
+
+\newpara
+The procedures in this library are, to some extent, a way to extend
+\textbf{GPLOT's} capabilities, or, at least, make some things much more
+convenient than they otherwise would be.
+
+\newpara
+The contents of \texttt{GPLPROC} include comments that document its
+procedures. Please read it for full information. To understand its
+features, here are a couple of examples.
+
+\newpara
+This \texttt{RELLIPSE} procedure draws an ellipse (which \textbf{GPLOT/DIMFILM}
+cannot do directly). It has five parameters, the center position
+\texttt{(XC,YC)}, the semi-major and semi-minor axis lengths and a
+rotation angle (a rotation of the ellipse axes).
+
+\begin{lstlisting}
+C A ROTATED ELLIPSE "XC YC A B ANGLE-DEGREES"
+RELLIPSE
+CL,0,TWPI,360,XLIN,X,&,COS,S,SIN,3,#,4,#,SCL,5,#,D2R,ROT,1,#,2,#,TRN,PTHC
+\end{lstlisting}
+
+\newpara
+To use this procedure to draw a rotated ellipse, two \textbf{GPLOT} commands are
+needed:
+
+\begin{lstlisting}
+LOAD 1 RELLIPSE
+EVAL @1 "5,1,0.5,0.9,33"
+\end{lstlisting}
+
+\newpara
+The first line loads the required procedure into a procedure register (1
+here), then the second executes it, passing it the required arguments.
+If a given procedure is to be ``called'' multiple times, it need only be
+loaded once, of course.
+
+\newpara
+The second example shows a useful feature unique to \texttt{GPLPROC}. A
+major limitation of the evaluator is that RPN strings are limited to 80
+characters. This is not enough for many ``real world'' applications.
+When a procedure is loaded from \texttt{GPLPROC}, it can span multiple
+lines. In such a case, the procedure is loaded into multiple successive
+procedure registers and \texttt{,@n} sequences are automatically added
+to line ends so that the when the procedure is called from an
+\texttt{EVAL} command, a single long procedure is assembled and
+executed. A side effect of this scheme is that lines can be no more than
+77 characters long if another line follows in the procedure definition.
+
+\begin{lstlisting}
+C GEAR "X Y R1 R2 N-TEETH ROT-DEGREES"
+GEAR 2
+CL,0,5,#,&,1,+,XLIN,3,#,4,#,X,2,/,ODD,SEL,X,TWPI,*,5,#,/,6,#,D2R,+,&
+COS,S,SIN,3,G,*,S,3,G,*,1,#,2,#,TRN,PTHO
+\end{lstlisting}
+
+\newpara
+Note that the number of lines in the full procedure (2 here) must be
+given after the procedure name. These procedures must be loaded into a
+procedure register number that leaves enough successive registers to
+hold the full thing. Here, for example, \texttt{LOAD\ 8\ GEAR} would
+work, but \texttt{LOAD\ 9\ GEAR} would not.
+
+\newpara
+The script \texttt{OBPRTST} calls every procedure currently defined in
+\texttt{GPLPROC} as shipped. The output of that is shown in
+Figure~\ref{fig:gdea001}.
+
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/gdea001.eps}
-  \caption{gdea001}
+  \caption{Examples of each procedure in \texttt{GPLPROC}}
   \label{fig:gdea001}
 \end{figure}
+
+\newpara
+It is intended that \textbf{GPLOT} users add their own procedures to
+\texttt{GPLPROC} to ``extend'' \textbf{GPLOT} to do things they want to do.
+
+\subsection{General drawing - Part 3: Higher level drawing}\label{general-drawing---part-3-higher-level-drawing}
+
+\newpara
+Although the evaluator can ``extend'' the capabilities of \textbf{GPLOT} to some
+extent, it has some pretty severe limitations and inconveniences. The
+main limitations are the maximum size of procedures and the complete
+lack of branching and looping features. In practice, you cannot ``draw
+anything'' with \textbf{GPLOT/DIMFILM} in the way that you can with PostScript,
+for example.
+
+\newpara
+There are some drawing operations beyond the (very) basic facilities
+described above which are sufficiently generally useful to ``build in''
+to \textbf{GPLOT}. This hopefully makes it relatively easy to draw things that
+are commonly useful (easier than using PostScript, for example), while
+acknowledging that there are still fundamental limitations to what can
+be drawn.
+
+\newpara
+To this end, \textbf{GPLOT} has three ``higher level'' drawing ``primitives'':
+
+\begin{itemize}
+\item
+  Decorated lines
+\item
+  Boxed text
+\item
+  Labels with pointing arrows.
+\end{itemize}
+
+\newpara
+These can be used for a broad range of diagrams, but especially block
+diagrams.
+
+\newpara
+A \textbf{decorated line} is a series of connected and directed line
+segments, the ends of which may have:
+
+\begin{itemize}
+\item
+  Arrow heads. These will automatically point in the correct direction
+  (hopefully).
+\item
+  ``Half skips''. These are (close to) quarter circles, and if a line
+  ends and begins with one of these, it can give the appearence of
+  skipping over another line, as was commonly seen in older circuit
+  diagrams.
+\item
+  No decorations or ``plain''.
+\end{itemize}
+
+\newpara
+Such a line is drawn by the \texttt{LINE} command which takes a string
+that defines the line segments and their decorations. Each coordinate or
+\emph{point description} defining a ``vertex'' in the ``polyline'' has
+the following components:
+
+\begin{lstlisting}
+<decoration>x,y[,<annotation_string>]
+
+<decoration> = P (plain) or A (arrow) or S (half skip)
+
+<annotation_string> is a short string (currently limited to 5 characters).
+It may contain \textbf{DIMFILM} string markup. It cannot contain spaces.
+\end{lstlisting}
+
+\newpara
+The annotation string, if supplied, will be drawn in a circle at the
+mid-point of the line segment ended by the point description that
+specifies it. This is intended to be a \emph{very short} label.
+
+\newpara
+The point descriptions are separated by \texttt{"\textgreater{}"}
+characters, which can be read in this context as ``to''.
+
+\newpara
+Here is an example that defines a two segment decorated line, starting
+with no decoration and ending in an arrow head with a label,
+\texttt{"Le"}, in the middle of the first of the two line segments:
+
+\begin{lstlisting}
+LINE P7,6>P7,21,L*LE>A16,21
+\end{lstlisting}
+
+\newpara
+Additional characteristics of decorated lines are specified by the
+\texttt{ARROWPARM} and \texttt{LINEPARM} commands. The latter sets scale
+factors for drawing skips and annotations, while the former sets the
+type, size and appearance of arrow heads. Note that the width and colour
+of decorated lines are set in the usual way (lines, arrows and skips are
+in \texttt{CSG\ GENERAL}, annotation text in \texttt{CSG\ TEXT}).
+
+\newpara
+\textbf{Boxed text} is intended to be a fairly flexible component for
+constructing block diagrams, tables and many other drawings. The element
+is basically text centered in a box of a specified size at a specified
+position (given either by centre or bottom left).
+
+\newpara
+A number of other features can be added, though.
+
+\begin{itemize}
+\item
+  The inside of the box can be ``filled'' with hatched lines.
+\item
+  A second box, inside the first and surrounding the text, can be drawn.
+  It is a \texttt{BLANK} region, and it can be outlined.
+\item
+  The text may have multiple lines (up to 5), separated by backslashes.
+\item
+  The text may be centered or left justified.
+\item
+  The text can contain \textbf{DIMFILM} string markup.
+\item
+  The position of the boxed text can be automatically ``stepped'' by
+  specified X and Y ``deltas'' after eah one is drawn. This makes it
+  much easier to use this for constructing tables and other things.
+\end{itemize}
+
+\newpara
+The main command for this element is \texttt{BOXTEXT}, which draws a
+given text string at a position given by either a supplied coordinate,
+or, if the coordinate is omitted, at the position of the last
+\texttt{BOXTEXT} incremented by previously specified deltas.
+
+\newpara
+A number of secondary commands set current characteristics of
+\texttt{BOXTEXT}. These are:
+
+\begin{itemize}
+\item
+  \texttt{BOXPSIZE} which sets the box size and how the position
+  coordinate is to be interpreted.
+\item
+  \texttt{BOXPHATCH} which sets the hatching parameters (or turns it
+  off).
+\item
+  \texttt{BOXPTEXT} which sets how text is drawn inside the box. There
+  are two distinct modes: \texttt{FIX} and \texttt{SCALE}. In
+  \texttt{FIX} mode, the \texttt{WIDTHSCALE} parameter sets how many
+  lines will fit in the box height, while in \texttt{SCALE} mode, it
+  sets the fraction of the box width the text should be scaled to fill.
+\item
+  \texttt{BOXPBOX} which controls whether the outer and inner boxes are
+  outlined.
+\item
+  \texttt{BOXPDELTAS} which sets the automatic position step after ecah
+  \texttt{BOXTEXT} is drawn.
+\end{itemize}
+
+\newpara
+\textbf{Labels} are the same graphical entities used to label points on
+a graph, but the coordinates of the thing they point at is in bounds
+rather than graph coordinates.
+
+\newpara
+Figure~\ref{fig:gh1b001} is a simple example of how
+these facilities can be used to draw a
+small block diagram.
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/gh1b001.eps}
-  \caption{gh1b001}
+  \caption{A simple block diagram}
   \label{fig:gh1b001}
 \end{figure}
 
-\clearpage
+\begin{lstlisting}
+RESET
+BOUNDS 0 42 0 26
+
+CSG TEXT
+COL 0 0 0
+CSG ANNOT
+COL 0 0 0
+WID 2
+
+BOXPSIZE 10 6 NO
+
+BOXT "B*LOX 1" 7 3
+BOXT "B*LOX 2" 21 3
+BOXT "C*LURIOUS\*UB*LOX 3" 35 3
+
+BOXT "B*LOX 4" 35 13
+
+BOXPHATCH 0.05 8 HORIZ
+BOXPBOX BOTH
+BOXT "B*LOX 5\*UA*LN ODDITY" 21 21
+
+CSG GEN
+COL 0 0 0
+ARROWPARM BARBED 0.8 2 0.3
+LINEPARM 0.5 1.5
+LINE P12,3>A16,3
+LINE P26,3>A30,3
+LINE P35,6>A35,10
+LINE A35,16>P35,21,R*LT>A26,21
+LINE P7,6>P7,21,L*LE>A16,21
+
+LINE P12.5,12.5>P13.2,12.5>A14.1,14.1
+ALABEL 13.2 12.5 2 300 "What is this thing?"
+
+OUTLINE DEVICE
+\end{lstlisting}
+
+\newpara
+It may look painful to create a diagram such as this by entering
+coordinates, and perhaps it is. However, it may be less painful than it
+seems at first. A key simplification is to use an integer coordinate
+system with the box size a useful multiple of the unit size (e.g.~so
+that middle of the box edges is easy to find). It is also helpful to
+have a grid printed out (!) with the coordinate system shown over a
+specified range (\texttt{BOUNDS}). As an aid to this, the script
+\texttt{OBGRID} can draw such a grid which can be used as the background
+of the diagram as it is developed (e.g.~using the \textbf{GTerm} device)
+or printed to help sketch out the diagram.
+An example of the use of a grid is shown in Figure~\ref{fig:ghbb001}.
+
+\newpara
+Surely it would be easier to just use, say, Inkscape? Perhaps. I have
+drawn many block diagrams with Inkscape and in some ways it is obviously
+easier. But it still takes longer than might be expected to get to a
+``final'' result. It is also very difficult (at least for me) to get
+lines and boxes to ``snap'' together precisely (I usually give up on
+perfecting this, to be honest). The \textbf{GPLOT} approach at least results in
+exact alignment of all elements! In summary, I'm not sure it is all that
+more time consuming to get to an acceptable result. Which approach you
+prefer (using a mouse and relying on hand/eye coordination or working
+out and typing in coordinates) is a matter of personal taste. Obviously,
+if you want to draw a portrait of your dog, Inkscape (or a similar
+program) is the only sane choice! For more exactly defined tasks, a
+``language based'' approach can make sense, as proved by the success of
+vector graphics description languages such as PGF/Tikz.
+
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/ghbb001.eps}
-  \caption{ghbb001}
+  \caption{Using a grid to assist with planning a block diagram}
   \label{fig:ghbb001}
 \end{figure}
 
-\begin{figure}
-  \centering
-  \includegraphics[width=\maxwidth]{../../temp/gh2b001.eps}
-  \caption{gh2b001}
-  \label{fig:gh2b001}
-\end{figure}
+\begin{lstlisting}
+#
+# DRAW A GRID WITH NUMBERED AXES. USEFUL FOR BLOCK DIAGRAMS.
+# CALL WITH BOUNDS AS PARAMETERS.
+#
+BOUNDS $1 $2 $3 $4
+CSG ALL
+COL 0.8 0.8 0.8
+STRING 9 "(I2)"
+ITEVAL $3 $4 1 "$1,I,M,$2,I,D"
+ITEVAL $1 $2 1 "I,$3,M,I,$4,D"
+ITEVAL $3 $4 1 "$4,$3,-,100,/,TH,$1,I,M,I,9,TVI"
+ITEVAL $1 $2 1 "$4,$3,-,100,/,TH,I,$3,0.5,+,M,I,9,TVI"
+\end{lstlisting}
 
-\clearpage
-\begin{figure}
-  \centering
-  \includegraphics[width=\maxwidth]{../../temp/lsys001.eps}
-  \caption{lsys001}
-  \label{fig:lsys001}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=\maxwidth]{../../temp/lsbr001.eps}
-  \caption{lsbr001}
-  \label{fig:lsbr001}
-\end{figure}
-
-\clearpage
-\begin{figure}
-  \centering
-  \includegraphics[width=\maxwidth]{../../temp/lssm001.eps}
-  \caption{lssm001}
-  \label{fig:lssm001}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=\maxwidth]{../../temp/lssp001.eps}
-  \caption{lssp001}
-  \label{fig:lssp001}
-\end{figure}
-
-\clearpage
-\begin{figure}
-  \centering
-  \includegraphics[width=\maxwidth]{../../temp/lsks001.eps}
-  \caption{lsks001}
-  \label{fig:lsks001}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=\maxwidth]{../../temp/lsgo001.eps}
-  \caption{lsgo001}
-  \label{fig:lsgo001}
-\end{figure}
-
-\clearpage
-\begin{figure}
-  \centering
-  \includegraphics[width=\maxwidth]{../../temp/fosm001.eps}
-  \caption{fosm001}
-  \label{fig:fosm001}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=\maxwidth]{../../temp/cht1001.eps}
-  \caption{cht1001}
-  \label{fig:cht1001}
-\end{figure}
-
-\clearpage
-\begin{figure}
-  \centering
-  \includegraphics[width=\maxwidth]{../../temp/cht2001.eps}
-  \caption{cht2001}
-  \label{fig:cht2001}
-\end{figure}
+\newpara
+For a more sophisticated example of a block diagram drawn with \textbf{GPLOT},
+look at the script \texttt{OBMODIO} which draws the block diagram at the
+top of the Github \texttt{README.md} document showing
+the component parts of the Git-MODIFY
+inter-operability scheme. This is shown in Figure~\ref{fig:iocd001}.
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/iocd001.eps}
-  \caption{iocd001}
+  \caption{Git-MODIFY Inter-operability scheme components diagram}
   \label{fig:iocd001}
 \end{figure}
+
+\newpara
+An example of using \textbf{GPLOT} (primarily \texttt{BOXTEXT}) to produce a
+drawing other than a block diagram is shown below. This documents the
+key bindings for the NOS 2 Full Screen Editor with a Macbook laptop
+keyboard.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/gh2b001.eps}
+  \caption{A diagram showing the key layout for FSE on a MacBook}
+  \label{fig:gh2b001}
+\end{figure}
+
+\newpara
+Further examples of how the ``higher level drawing'' features can be
+used can be seen in the \texttt{OBCHT1} and \texttt{OBCHT2} scripts
+which generate the \textbf{GPLOT} ``cheat sheet'' which can be found at the end
+of this document.
+
+\subsubsection{L-Systems}\label{l-systems}
+\newpara
+L-systems or Lindenmeyer systems are a type of formal grammar (as in
+mathematical logic) developed by Aristid Lindenmeyer, a theoretical
+biologist, in 1968 to model the processes of plant development. They can
+be used to generate a variety of attractive images, beyond plants and
+trees, including self-similar fractals. See this
+\href{https://en.wikipedia.org/wiki/L-system}{Wikipedia} article for
+more background information.
+
+\newpara
+Lindenmeyer systems generating 2D vector graphics are included in \textbf{GPLOT}.
+The implementation is based on Paul Bourke's description of a 1991
+commercial product (probably now long dead) which can be found
+\href{https://paulbourke.net/fractals/lsys/}{here}. As with many of Paul
+Bourke's web pages, this is very informative and inspirational.
+
+\newpara
+L-systems work by manipulating strings, the characters of which either
+represent graphical actions (such as moving forward, drawing a line, or
+turning through an angle) or are ``variables'' with no associated
+graphical meaning.
+
+\newpara
+An L-system is defined by an ``axiom string'' and a set of ``re-writing
+rules'', and, in our case, also a fixed ``turning angle''. The ``axiom
+string'' must be set in string register 1 and up to 8 ``re-writing
+rules'' can then appear in string registers 2 to 9 (used consecutively).
+The initial line angle is set by storing the angle (in degrees) in
+numeric register 3.
+
+\newpara
+The characters allowed (``vocabulary'') are:
+\texttt{F\ A\ B\ C\ D\ E\ M\ X\ Y\ +\ -\ {[}\ {]}} Seven of these are
+associated with specific actions. Any alphabetic character can be
+substituted with a string by a re-writing rule. The seven ``action
+characters'' are:
+
+\begin{itemize}
+\item
+  \texttt{F} - draw a unit length line segment at the current drawing
+  angle.
+\item
+  \texttt{D} - as \texttt{F}, but some systems need two substitutable
+  drawing characters.
+\item
+  \texttt{M} - move by a unit length at the cureent drawing angle.
+\item
+  \texttt{+} - turn counter-clockwise by the turning angle.
+\item
+  \texttt{-} - turn clockwise by the turning angle.
+\item
+  \texttt{{[}} - push the current position and drawing angle on a stack.
+\item
+  \texttt{{]}} - pop the current position and drawing angle off a stack.
+\end{itemize}
+
+\newpara
+This is all very abstract, of course! Paul Bourke's web page gives a
+simple example which is quite easy to follow, but more complex systems
+are not obvious (to me, anyway).
+
+\newpara
+Figure~\ref{fig:lsys001} is a classic example of a plant drawn with an L-system,
+drawn by the following script.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/lsys001.eps}
+  \caption{A Lindenmeyer plant also demonstrating other facilities}
+  \label{fig:lsys001}
+\end{figure}
+
+\begin{lstlisting}
+# PROCEDURE TO DRAW AN ALGORITHMICALLY DEFINED
+# PLANT USING A LINDENMAYER SYSTEM.
+# USAGE:
+#  OBEY OBPLANT <ITERATIONS>
+#   ITERATIONS BETWEEN 5 AND 8 SEEMS REASONABLE.
+
+# INITIALISE GPLOT STATE.
+RESET
+GRAPHMODE ON
+
+# SET THE COLOUR OF THE PLANT.
+CSG GENERAL
+COL 0.05 0.6 0.03
+
+# DEFINE THE LINDENMAYER SYSTEM FOR THE PLANT.
+STRING 1 X
+STRING 2 F:FF
+STRING 3 X:F-[[X]+X]+F[+FX]-X 
+STO 3 90
+
+# DRAW THE PLANT
+LSYSTEM 2 $1 22.5
+
+# SETUP TO ADD ANNOTATION
+GRAPHMODE OFF
+BOUNDS 0 1.33 0 1
+CSG TEXT
+COL 0 0 0
+
+# DEMONSTRATE CTEXT CENTRED TEXT.
+MOVE 0.3325 0.265
+CTEXT 0.532 "L*LINDENMAYER *UP*LLANT"
+MOVE 0.3325 0.185
+CTEXT 0.4655 "X, F:FF, X:F-[[X]+X]+F[+FX]-X, 22.5*L DEGREES, $1 ITERATIONS."
+
+# DEMONSTRATE ROTATED TEXT VIA THE RPN EVALUATOR.
+STRING 5 "GPLOT/DIMFILM D*LEMONSTRATION AND TEST SCRIPT"
+STRING 6 "  DIMFILM 1972-95, GPLOT 2013-"
+EVAL "1.31,0.05,M,90,TA,5,T,1.31,0.6,M,6,T"
+
+# ADD THE GPLOT VERSION INFO, DRAWING CENTRED TEXT
+# VIA A STORED PROCEDURE.
+VERSION 9
+LOADP 1 ECTEXT
+EVAL @1 "0.3325,0.125,0.45,9"
+
+OUTLINE DEV
+\end{lstlisting}
+
+\newpara
+Note that, in general, the complexity of the drawing explodes as the
+number of iterations increases. The \textbf{GPLOT} L-system implementation uses
+scratch files to avoid memory limitations on NOS, so large outputs are
+possible, but the compute times also explode! The maximum stack depth is
+set to 20, although this doesn't seem to be much of a limitation in
+practice.
+
+\newpara
+Here are some other examples.
+
+\newpara
+A complicated, bristly plant (Figure~\ref{fig:lsbr001}) is
+drawn by the following script.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/lsbr001.eps}
+  \caption{A bristly looking plant}
+  \label{fig:lsbr001}
+\end{figure}
+
+\begin{lstlisting}
+RESET
+
+# SET THE COLOUR OF THE PLANT.
+CSG GENERAL
+COL 0.05 0.6 0.03
+
+# DEFINE THE LINDENMAYER SYSTEM FOR THE PLANT.
+STRING 1 ABFFF
+STRING 2 A:[+++C][---C]YA
+STRING 3 C:+X[-C]B
+STRING 4 X:-C[+X]B
+STRING 5 Y:YB
+STRING 6 B:[-FFF][+FFF]F
+
+# INITIAL DRAWING ANGLE.
+STO 3 90
+
+# DRAW.
+LSYSTEM 5 $1 20
+\end{lstlisting}
+
+\newpara
+Figure~\ref{fig:lssm001} shows a Minkowski island, after 4 iterations.
+L-systems can generate most
+(all?) 2D fractal curves. Several such curves follow.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/lssm001.eps}
+  \caption{A Minkowski Island (4 iterations)}
+  \label{fig:lssm001}
+\end{figure}
+
+\begin{lstlisting}
+RESET
+
+STRING 1 F+F+F+F
+STRING 2 F:F+F-F-FF+F+F-F
+
+STO 3 0
+
+CSG GENERAL
+COL 0.9 0 0.1
+
+LSYSTEM 1 $1 90
+\end{lstlisting}
+
+\newpara
+Figure ~\ref{fig:lssp001} shows a 
+Sierpinski gasket after 6 iterations, drawn by this script.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/lssp001.eps}
+  \caption{A Sierpinski Gasket (6 iterations)}
+  \label{fig:lssp001}
+\end{figure}
+
+\begin{lstlisting}
+RESET
+
+STRING 1 F+F+F        ; AXIOM
+STRING 2 F:F-F+F+F-F  ; GENERATOR
+
+STO 3 0               ; INITIAL ANGLE
+
+CSG GENERAL
+COL 0.9 0 0.1
+
+# DRAW THE GASKET
+LSYSTEM 1 $1 120
+\end{lstlisting}
+
+\newpara
+Figure~\ref{fig:lsks001} shows a Koch ``snowflake'' drawn with rectangular elements
+is drawn by this script.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/lsks001.eps}
+  \caption{A Koch Snowflake (4 iterations)}
+  \label{fig:lsks001}
+\end{figure}
+
+\begin{lstlisting}
+RESET
+
+STRING 1 F+F+F+F
+STRING 2 F:FF+F-F+F+FF
+
+STO 3 0
+
+CSG GENERAL
+COL 0.9 0 0.1
+
+LSYSTEM 1 $1 90
+\end{lstlisting}
+
+\newpara
+Finally, Figure~\ref{fig:lsgo001} shows a Gosper curve or ``flowsnake''
+after 4 iterations, drawn by this script.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/lsgo001.eps}
+  \caption{A Gosper Flowsnake curve (4 iterations)}
+  \label{fig:lsgo001}
+\end{figure}
+
+\begin{lstlisting}
+RESET
+
+STRING 1 F
+STRING 2 F:F-D--D+F++FF+D-
+STRING 3 D:+F-DD--D-F++F+D
+
+STO 3 90
+
+CSG GENERAL
+COL 0.9 0 0.1
+
+LSYSTEM 2 $1 60
+\end{lstlisting}
+
+\section{Fonts}
+\newpara
+As previously noted, the fonts that can be used in \textbf{GPLOT} are taken
+from the Hershey vector fonts (originally published in 1967).
+Figure~\ref{fig:fosm001} is a ``font sampler'' giving a quick overview
+of what is available.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/fosm001.eps}
+  \caption{A font sampler}
+  \label{fig:fosm001}
+\end{figure}
+
+The pages that follow give full font tables for the
+alphabetic, symbol and marker fonts. These can be used to
+find the character numbers needed to insert special characters
+in text, as well as showing all the fonts in detail.
+
+\subsection{Alphabetic fonts}
+This script will draw an alphabetic font table.
+\begin{lstlisting}
+PROC 1 I,10,I0IJ,M,I,TC   ; DRAW CHARACTER I AT IJ
+PROC 2 I,0.5,-,1,STO,0.5,CHS,M,1,RCL,9.5,D
+PROC 3 0.5,CHS,I,0.5,-,1,STO,M,9.5,1,RCL,D
+PROC 4 I,10,I0IJ,0.4,-,SWAP,0.4,-,SWAP,M,I,1,TVI
+STRING 1 "(I2)"
+FONT 1 $1 
+CANVAS -1 10 -1 10
+CSG ALL
+COLOUR 0 0 0
+WIDTH 1
+SYMHT 0.3 
+ITEVAL 1 96 1 @1
+FONT 1 SANS.SIMPLEX 
+SYMHT 0.2 
+COLOUR 0.5 0.5 0.5
+ITEVAL 1 96 1 @4
+COLOUR 1 0 0
+ITEVAL 0 10 1 @2
+ITEVAL 0 10 1 @3
+MOVE 4.5 9.75
+SYMHT 0.4
+CTEXT 0 $1
+\end{lstlisting}
+The argument to this script is the font name.
 
 \clearpage
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f01t001.eps}
-  \caption{f01t001}
+  \caption{Sans Simplex}
   \label{fig:f01t001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f02t001.eps}
-  \caption{f02t001}
+  \caption{Sans Simplex Mono}
   \label{fig:f02t001}
 \end{figure}
 
@@ -3303,14 +4524,14 @@ is Figure~\ref{fig:gd01001}.
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f03t001.eps}
-  \caption{f03t001}
+  \caption{Sans Simplex Greek}
   \label{fig:f03t001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f04t001.eps}
-  \caption{f04t001}
+  \caption{Sans Duplex}
   \label{fig:f04t001}
 \end{figure}
 
@@ -3318,14 +4539,14 @@ is Figure~\ref{fig:gd01001}.
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f05t001.eps}
-  \caption{f05t001}
+  \caption{Serif Complex}
   \label{fig:f05t001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f06t001.eps}
-  \caption{f06t001}
+  \caption{Serif Complex Small}
   \label{fig:f06t001}
 \end{figure}
 
@@ -3333,14 +4554,14 @@ is Figure~\ref{fig:gd01001}.
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f07t001.eps}
-  \caption{f07t001}
+  \caption{Serif Complex Greek}
   \label{fig:f07t001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f08t001.eps}
-  \caption{f08t001}
+  \caption{Serif Complex Greek Small}
   \label{fig:f08t001}
 \end{figure}
 
@@ -3348,14 +4569,14 @@ is Figure~\ref{fig:gd01001}.
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f09t001.eps}
-  \caption{f09t001}
+  \caption{Serif Triplex}
   \label{fig:f09t001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f10t001.eps}
-  \caption{f10t001}
+  \caption{Serif Complex Italic}
   \label{fig:f10t001}
 \end{figure}
 
@@ -3363,14 +4584,14 @@ is Figure~\ref{fig:gd01001}.
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f11t001.eps}
-  \caption{f11t001}
+  \caption{Serif Complex Italic Small}
   \label{fig:f11t001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f12t001.eps}
-  \caption{f12t001}
+  \caption{Serif Triplex Italic}
   \label{fig:f12t001}
 \end{figure}
 
@@ -3378,14 +4599,14 @@ is Figure~\ref{fig:gd01001}.
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f13t001.eps}
-  \caption{f13t001}
+  \caption{Script Simplex}
   \label{fig:f13t001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f14t001.eps}
-  \caption{f14t001}
+  \caption{Script Complex}
   \label{fig:f14t001}
 \end{figure}
 
@@ -3393,14 +4614,14 @@ is Figure~\ref{fig:gd01001}.
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f15t001.eps}
-  \caption{f15t001}
+  \caption{Gothic Triplex}
   \label{fig:f15t001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f16t001.eps}
-  \caption{f16t001}
+  \caption{Gothic Triplex German}
   \label{fig:f16t001}
 \end{figure}
 
@@ -3408,29 +4629,60 @@ is Figure~\ref{fig:gd01001}.
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f17t001.eps}
-  \caption{f17t001}
+  \caption{Gothic Triplex Italian}
   \label{fig:f17t001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f18t001.eps}
-  \caption{f18t001}
+  \caption{Cyrillic Complex}
   \label{fig:f18t001}
 \end{figure}
 
+
 \clearpage
+\subsection{Symbol fonts}
+
+\newpara
+This script draws a symbol font table:
+\begin{lstlisting}
+PROC 1 I,10,I0IJ,M,I,TS   ; DRAW SYMBOL I AT IJ
+PROC 2 I,0.5,-,1,STO,0.5,CHS,M,1,RCL,9.5,D
+PROC 3 0.5,CHS,I,0.5,-,1,STO,M,9.5,1,RCL,D
+PROC 4 I,10,I0IJ,0.4,-,SWAP,0.4,-,SWAP,M,I,1,TVI
+STRING 1 "(I2)"
+FONT S $1 
+CANVAS -1 10 -1 10
+CSG ALL
+COLOUR 0 0 0
+WIDTH 1
+SYMHT 0.3 
+ITEVAL 1 96 1 @1
+FONT 1 SANS.SIMPLEX 
+SYMHT 0.2 
+COLOUR 0.5 0.5 0.5
+ITEVAL 1 96 1 @4
+COLOUR 1 0 0
+ITEVAL 0 10 1 @2
+ITEVAL 0 10 1 @3
+MOVE 4.5 9.75
+SYMHT 0.4
+CTEXT 0 $1
+\end{lstlisting}
+The argument is the font name.
+
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f01s001.eps}
-  \caption{f01s001}
+  \caption{Math symbols}
   \label{fig:f01s001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f02s001.eps}
-  \caption{f02s001}
+  \caption{Cartographic symbols}
   \label{fig:f02s001}
 \end{figure}
 
@@ -3438,14 +4690,14 @@ is Figure~\ref{fig:gd01001}.
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f03s001.eps}
-  \caption{f03s001}
+  \caption{Astronomical symbols}
   \label{fig:f03s001}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f04s001.eps}
-  \caption{f04s001}
+  \caption{Astrological symbols}
   \label{fig:f04s001}
 \end{figure}
 
@@ -3453,22 +4705,114 @@ is Figure~\ref{fig:gd01001}.
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f05s001.eps}
-  \caption{f05s001}
+  \caption{Musical symbols}
   \label{fig:f05s001}
 \end{figure}
+
+%% \clearpage
+\subsection{Marker font}
+
+\newpara
+This script draws a marker font table:
+\begin{lstlisting}
+PROC 1 I,10,I0IJ,M,I,TM   ; DRAW MARKER I AT IJ
+PROC 2 I,0.5,-,1,STO,0.5,CHS,M,1,RCL,9.5,D
+PROC 3 0.5,CHS,I,0.5,-,1,STO,M,9.5,1,RCL,D
+PROC 4 I,10,I0IJ,0.4,-,SWAP,0.4,-,SWAP,M,I,1,TVI
+STRING 1 "(I2)"
+FONT M $1 
+CANVAS -1 10 -1 10
+CSG ALL
+COLOUR 0 0 0
+WIDTH 1
+SYMHT 0.3 
+ITEVAL 1 96 1 @1
+FONT 1 SANS.SIMPLEX 
+SYMHT 0.2 
+COLOUR 0.5 0.5 0.5
+ITEVAL 1 96 1 @4
+COLOUR 1 0 0
+ITEVAL 0 10 1 @2
+ITEVAL 0 10 1 @3
+MOVE 4.5 9.75
+SYMHT 0.4
+CTEXT 0 $1
+\end{lstlisting}
+The argument is the font name.
 
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/f01m001.eps}
-  \caption{f01m001}
+  \caption{Principal marker font}
   \label{fig:f01m001}
 \end{figure}
+
+
+\section{Acknowledgements and history}
+\newpara
+\textbf{GPLOT} is entirely reliant on \textbf{DIMFILM}, written by Dr. John C. Gilbert at The University of London
+Computer Centre (U.L.C.C.) and maintained primarily by him between 1972 and the mid-1990's. One goal of \textbf{GPLOT} is to
+preserve \textbf{DIMFILM}. I can find almost no trace of this excellent software elsewhere.
+
+\newpara
+\textbf{GPLOT} uses character
+string parsing subroutines written by Dr. Adrian Clark circa 1985. Dr. Clark also wrote a \textbf{DIMFILM} device
+driver for Tektronix storage tube terminals on which the \textbf{GPLOT} Tektronix support
+is based.
+
+\newpara
+The version of \textbf{DIMFILM} used here came to me from Dr. Gilbert via Dr. Clark in 2005. Due to a malfunctioning hardware
+RAID controller, the U.L.C.C. production version was no longer available and the version we have here
+was assembled by Dr. Gilbert from various sources. Unfortunately, it did not include the original font data. I had a
+working version of \textbf{DIMFILM} using Hershey fonts by 2007 (it was very much a hobby project!). Not many changes were made.
+The original, unmodified, source is retained in the \texttt{historic} sub-tree of the source repository.
+
+\newpara
+The original (albeit ``interim'') \textbf{DIMFILM} manual was preserved in several formats, including a very early version
+of Microsoft Word and some mid-1980's version of WordStar. I have failed to find any software which can use these
+files. Fortunately, the manual was also kept in a RUNOFF style format (i.e. plain text with markup). I never found
+a RUNOFF style formatting program that could process these files either (the files have the extension \texttt{.sg} which
+doesn't seem to be known to the Internet for text processing purposes). However, it was possible to write a
+formatter in Python from scratch to get a PDF version of this essential manual.
+
+\newpara
+The first usable version of \textbf{GPLOT} (0.1, late 2013) 
+could not output EPSF files as such, but used a
+limited character set format that could be trivially translated to EPSF. V0.2 (2022) improved Tektronix 401x support. V0.58
+(developed between late 2022 and early 2023) added significant -- if idiosyncratic -- facilities for function evaluation 
+and other programmability features, as well as SVG output. It also exposed a lot more of \textbf{DIMFILM's} capabilities and directly
+generated "true" EPS files. Most of what can be done with \textbf{DIMFILM} using a specially
+written Fortran program can now be done from \textbf{GPLOT}. V0.59 fixed some bugs in parameter substitution. V0.6 (July 2025)
+tidied up a few things and supported building on ``Unix-like'' systems as well as NOS. This version also uses the NOS MODIFY --
+Git inter-operability tools so that the source can be managed equally well on NOS or with Git, with changes made on one system
+being automatically reflected in the other. This version also automatically generates minor variations of the source code
+needed for building on COS and Unix, using a single, NOS compatible, code base. Many further changes and additions were made
+between July and October 2025 -- many of them a direct result of trying to use it (e.g. to produce the figures
+in this manual). The additions include the ``higher level drawing'' functions.
+
+\newpara
+The current version (0.87) may be genuinely useful (I find it to be). 
+
+\clearpage
+\begin{figure}
+  \centering
+  \includegraphics[angle=90,scale=1.5]{../../temp/cht1001.eps}
+\end{figure}
+
+
+\clearpage
+\begin{figure}
+  \centering
+  \includegraphics[angle=90,scale=1.5]{../../temp/cht2001.eps}
+  \label{fig:cht2001}
+\end{figure}
+
 
 \clearpage
 \begin{figure}
   \centering
   \includegraphics[width=\maxwidth]{../../temp/fin001.eps}
-  \caption{fin001}
+  \caption{THE END}
   \label{fig:fin001}
 \end{figure}
 
