@@ -17,6 +17,7 @@ sudo cp export-modify.sh /usr/local/bin
 sudo cp modgitinit.sh /usr/local/bin
 sudo cp modgitedit.sh /usr/local/bin
 sudo cp epsview.sh /usr/local/bin
+sudo cp svgviewall.sh /usr/local/bin
 cd nostools
 pip install .
 cd ..

@@ -172,6 +172,9 @@
 \definecolor{OurGreen}{rgb}{0.1,0.5,0.1}
 \newcommand{\textbfg}[1]{\textbf{\textcolor{OurGreen}{#1}}}
 
+% Title page background colour.
+\definecolor{titlepagecolor}{cmyk}{1,.60,0,.40}
+
 % Alter some LaTeX defaults for better treatment of figures:
     % See p.105 of "TeX Unbound" for suggested values.
     % See pp. 199-200 of Lamport's "LaTeX" book for details.
@@ -200,7 +203,7 @@
 
     
 \usepackage[xetex,unicode,
-	pdftitle={GPLOT: A DIMFILM Based Graph Plotting Program for CDC NOS 2.8},
+	pdftitle={GPLOT: A DIMFILM Based Graph Plotting and Drawing Program for CDC NOS 2.8},
 	pdfauthor={Nick Glazzard},
 	colorlinks,linkcolor=blue,citecolor=blue,urlcolor=blue
 	]{hyperref}
@@ -210,21 +213,55 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
-\title{\textbf{GPLOT}: A \textbf{DIMFILM} Based Graph Plotting Program \\ for CDC NOS 2.8}
-\author{Nick Glazzard}
-%%\date{November 20, 2012}
-\maketitle
+%%\title{\textbf{GPLOT}: A \textbf{DIMFILM} Based Graph Plotting \\ and Drawing Program for CDC NOS 2.8}
+%%\author{Nick Glazzard}
+%%\maketitle
+
+\begin{titlepage}
+\pagecolor{titlepagecolor}
+
+\vspace*{25mm}
+{\color{white} \noindent \rule{\textwidth}{3mm}}
+\begin{center}
+\Huge
+\textcolor{white}{\textbf{GPLOT}: A \textbf{DIMFILM} Based Graph Plotting \\ and Drawing Program for CDC NOS 2.8}
+\end{center}
+\vspace*{2mm}
+{\color{white} \noindent \rule{\textwidth}{3mm}}
+
+\vspace*{6cm}
+
+\begin{center}
+\Large 
+\textcolor{white}{
+  Nick Glazzard
+}
+\end{center}
+
+\vspace*{2cm}
+
+\begin{center}
+\Large 
+\textcolor{white}{
+Version 0.87\\
+\today
+}
+\end{center}
+
+\end{titlepage}
+
+\pagecolor{white}
 
 
 %%\begin{abstract}
 %%Stuff
 %%\end{abstract}
 
-%%\clearpage
+\clearpage
 
-%%\tableofcontents
+\tableofcontents
 
-%%\clearpage
+\clearpage
 
 \section{Introduction}
 \newpara
@@ -268,12 +305,28 @@ a step-by-step fashion and also explains how a single source code base can be us
 ``Unix-like'' systems.
 \newpara
 \textbf{GPLOT} (with \textbf{DIMFILM}) is almost entirely self-contained -- it has no dependencies beyond the operating
-system and language runtime libraries. By modern standards, it is very light weight. It should be possible to
+system and language runtime libraries. By modern standards, it is very light weight -- the entire source of
+GPLOT, DIMFILM, output device code and utility functions is less than 40,000 lines, including comments. It should be possible to
 port it to other systems with working Fortran-77 compilers and runtimes, provided they do not insist on six character
 variable and function names (although it would not be very hard to work around that with a simple Python program
 to transform the source code). Many historic systems, as well as almost all modern systems, should be able to
 build and run it. That said, it will almost certainly not run on systems as small as PDP-11s.
 
+\subsection{About this document}
+This description of GPLOT is in three parts.
+
+\begin{itemize}
+\item \textbf{Part I} is a ``traditional manual'' for \textbf{GPLOT} that describes each of its commands in detail, but doesn't help
+  you decide which of them to use for a specific task.
+\item \textbf{Part II} is a tutorial (of sorts) that goes through various tasks that \textbf{GPLOT} can help with from plotting
+  simple graphs to creating quite complicated diagrams.
+\item \textbf{Part III} is a collection of information of various kinds on various topics that fill in details (e.g.
+  complete font tables) or describes tools that can be used with \textbf{GPLOT}.
+\end{itemize}
+
+\clearpage
+\part{\textbf{GPLOT} Manual}
+\clearpage
 
 \section{Running \textbf{GPLOT}}
 \textbf{GPLOT} needs two files: \texttt{GPLOT} (the pre-loaded binary executable) 
@@ -374,6 +427,11 @@ systems. This may (rarely) be undesirable, but is thought to be helpful in gener
 \end{quote}
 
 \newpara
+If a line starts with a hash character (\texttt{\#}) or the two characters ``\texttt{C }'' (upper case C only), the entire line
+will be treated as a comment. Anything after a semi-colon (\texttt{;}) is treated as an inline comment, unless the semi-colon is in
+a double quoted string.
+
+\newpara
 Commands are divided in to related groups below, but that is only for 
 convenience in describing them.
 
@@ -409,7 +467,9 @@ These are the lowest level facilities on which graph plotting is built.
    so that graphs will be scaled to fit this region. This is a way to plot
    multiple graphs side by side.
 \item \textttc{UNPANE} --- Stop using any pane.\\ 
-   The full drawing area will be used after this.
+  The full drawing area will be used after this.
+\item \textttc{CANVAS XL XH YL YH} --- A convenience function that sets \texttt{BOUNDS}
+  and \texttt{PANE} (to the same extents) in one command.
  \item \textttc{OUTLINE object} --- Outline an area.\\
    The area is determined by \texttt{object}, which may be: \texttt{PANE}, \texttt{BLANK},
    \texttt{BOUNDS} or \texttt{DEVICE}.
@@ -444,9 +504,9 @@ These are the lowest level facilities on which graph plotting is built.
 \item \textttc{STYLE STYLENAME} --- Set the line style.\\
    The following styles are defined: \texttt{SOLID}, \texttt{DASH},
    \texttt{DOT}, \texttt{DASHDOT}. These are
-   probably self explanatory! Note that this is not constrained to to the current
+   probably self explanatory! Note that this is not constrained to the current
    colour/style group.
-\item \textttc{MOVE X Y} --- Move to position.
+\item \textttc{MOVE X Y} --- Move to position.\\
    The virtual pen is moved to $(x,y)$ in \texttt{BOUNDS} coordinates.
 \item \textttc{DRAW X Y} --- Draw to position.\\
    The virtual pen is lowered and moved to $(x,y)$ in \texttt{BOUNDS} coordinates.
@@ -459,11 +519,11 @@ These are the lowest level facilities on which graph plotting is built.
    the \textbf{DIMFILM} manual, and a summary of most of them is given in Table~\ref{tab:textformats}.
    On systems other than NOS, lower case letters will be preserved.
 \item \textttc{FILL} --- Fill the drawing area with the current colour.\\
-   This clears the graphics area to the current colour, erasing it. It differs from
-   \texttt{CLEAR} in that \texttt{CLEAR} always fills with white and empties any buffered graphics commands
-   in the device (if relevant). \texttt{FILL} is only really useful after a \texttt{CLEAR} though, as it
-   destroys anything already drawn. This command is device dependent and isn't useful for all devices.
-   Only \textbf{GTerm} supports it currently.
+   This erases all drawn graphics, of course. It differs from
+   \texttt{CLEAR} in that \texttt{CLEAR} always fills with a fixed
+   device dependent colour and empties any buffered graphics commands
+   in the device (if any). \texttt{FILL} is only useful after a \texttt{CLEAR} and
+   only on \textbf{GTerm}.
 \end{itemize}
 
 \begin{table}
@@ -493,8 +553,9 @@ Sequence & Purpose \\
 \end{footnotesize}
 \end{table}
 
-\subsection{Further Plotting Commands}
+\subsection{Further Drawing Commands}
 These add a small number of primitive shapes as well as more control over how text is drawn.
+There is also a command that draws an arbitrary polyline.
 
 \begin{itemize}
 \item \textttc{CIRCLE X Y R} -- Draw a circle.\\
@@ -513,8 +574,12 @@ These add a small number of primitive shapes as well as more control over how te
 \item \textttc{SYMANG A} -- Set the angle at which text is drawn.\\
   The angle is in degrees measured counter-clockwise from the positive X axis.
 \item \textttc{CTEXT W "TEXT"} -- Draw text centred at the current position.\\
-  The text is scaled so its width is $w$ in user bounds units.
+  The text is scaled so its width is $w$ in user bounds units. If $w$ is 0, the text isn't scaled.
+  Instead, it is drawn at the size set with \texttt{SYMHT}.
 \item \textttc{MARKER NUMBER YES} -- Draw marker \texttt{NUMBER} at the current position.
+\item \textttc{PATH TYPE} --- Use the contents of the \texttt{X,Y} arrays (e.g. as set by \texttt{READ} or the
+  evaluator (see below) as the vertices of a polyline. If \texttt{TYPE} is \texttt{C} (closed), join the
+  last coordinate pair to the first. If \texttt{TYPE} is \texttt{O} (open) do not do that.
 \end{itemize}
 
 \subsection{Graph Axis Commands}
@@ -540,6 +605,10 @@ of the commands below \textit{need} to be used before plotting, but you may want
    This is the default.
 \item \textttc{XLOG} --- Use a logarithmic X axis.
 \item \textttc{YLOG} --- Use a logarithmic Y axis.
+\item \textttc{INTVALUES Which} --- Try to use integer values for an axis/axes.\\
+  \texttt{Which} may be: \texttt{NONE}, \texttt{X}, \texttt{Y}, or \texttt{BOTH}.
+  It is not always possible to do this, because of the range of the axis values. If
+  it is not possible, floating point values will be used with no error message given.
 \end{itemize}
 
 \subsection{Graph Plotting Commands}
@@ -601,8 +670,7 @@ data omitting the undesired items.
    for \texttt{XECOL}, then that data will be used as either a symmetric X error bar or as the upper part of an asymmetric
    Y error bar, depending on the setting made with the \texttt{ASYMYERRORBARS} command. The default is to interpret 
    \texttt{YECOL} and \texttt{XECOL} as the lower and upper extents of asymmetric Y error bars, as this may be more frequently
-   useful, There is currently no way to draw asymmetric X error bars --- although this could be added if the
-   storage of 6 numbers per point was acceptable (I'm not sure it is).\\
+   useful, There is currently no way to draw asymmetric X error bars.\\
    If \texttt{NAME} is \texttt{HERE} (i.e. the string \texttt{HERE}), 
    then no data file is opened. Instead, \texttt{READ} tries to read data from
    the command input stream itself (\texttt{INPUT} or an \texttt{OBEY} file -- see below). 
@@ -672,6 +740,8 @@ data omitting the undesired items.
    grid coordinates start at 1 and range up to \texttt{NX} or \texttt{NY} inclusive.
    The optional \texttt{SHRINK} argument is a floating
    point number less than 1 which shrinks the pane about its center to control the separation of the graphs.
+ \item \textttc{GRMOVE X Y} --- Move the ``pen'' to graph coordinates $(x,y)$, setting the ``current position''.
+ \item \textttc{GRDRAW X Y} --- Draw from the current position to $(x,y)$, adjusting the ``current position''.
 \end{itemize}
 
 
@@ -719,6 +789,9 @@ drawn if these are explicitly specified.
 	This is useful if \texttt{RIGHTANNOT ON} is used.
 \end{itemize}
 
+\newpara      
+See also \texttt{GLABEL} in Section~\ref{labels-sect}.
+
 \subsection{\textbf{GPLOT} System Commands}
 These commands don't draw anything, but they show the state of \textbf{GPLOT}, interact usefully with NOS, and allow
 something like plotting macros (with parameters) to be used.
@@ -744,12 +817,15 @@ something like plotting macros (with parameters) to be used.
    \end{verbatim}
    in order to preserve the embedded space(s). This is useful for passing \texttt{TITLE} strings to \texttt{OBEY} files,
    for example.
-\item \textttc{HELP} --- Outputs summary help information, including the supported output devices.
+ \item \textttc{HELP [TOPIC]} --- Output help information, including the supported output devices.\\
+   \texttt{HELP} alone outputs a list of \textbf{GPLOT} commands, alphabetically sorted. If \texttt{TOPIC} is the name
+   of a command, detailed information on that command is displayed. \texttt{HELP HELP} briefly described the \texttt{HELP} command
+   itself. If \texttt{TOPIC} is \texttt{DEVICES}, information on the available output devices is displayed.
 \item \textttc{STATUS} --- Displays various \textbf{GPLOT} state information.\\
    This includes the number of points available, whether anything has been read, the \texttt{BOUNDS}, whether
    any \texttt{PANE} or \texttt{BLANK} is in effect, etc.
 \item \textttc{LOGFILE NAME} --- Opens a command log file called \texttt{NAME}.\\
-   This is a \texttt{LOCAL} file to which any interactive input from you, the user, is written. Commands executed
+   This is a \texttt{LOCAL} file on NOS to which any interactive input from you, the user, is written. Commands executed
    from any \texttt{OBEY} files are not logged. This lets you log a session and repeat it (perhaps after editing)
    by executing the log file as an \texttt{OBEY} file. You will need to \texttt{SAVE} or \texttt{REPLACE} the file to make it
    \texttt{PERMANENT} if you want to keep it between jobs. When \texttt{LOGFILE} is executed, any previously open log file
@@ -773,7 +849,7 @@ something like plotting macros (with parameters) to be used.
   If \texttt{N (enter)} is used, the request
   for a response will be repeated. If \texttt{Q (enter)} is used, \textbf{GPLOT} will perform
   an \texttt{EXIT} command and terminate.
-\item \texttt{RESET} --- Reset most of \textbf{GPLOT} state to the default values. This does not include any data that has been
+\item \textttc{RESET} --- Reset most of \textbf{GPLOT} state to the default values. This does not include any data that has been
   \texttt{READ} or the selected device.
 \item \textttc{PREFIX PATH} --- Set a prefix string to be pre-pended to all input file names.\\
   This is ignored on NOS. On ``Unix-like'' systems, it allows a directory to be set in which to look for all
@@ -810,7 +886,8 @@ The stack entries are numbered 0, 1 \ldots \texttt{NSTACK-1}. Stack entry 0 is s
 \begin{itemize}
 \item It can only be written to by the \textttc{ERANGE} command or the \textttc{XLIN}, \textttc{XLOG} and \textttc{SETX} 
 RPN operators.
-\item Writing to it with \textttc{ERANGE}, \textttc{XLIN} or \textttc{XLOG} sets the evaluation range and the number of active elements in
+\item Writing to it with the \textttc{ERANGE} command, or the \textttc{XLIN} or \textttc{XLOG} operators,
+  sets the evaluation range and the number of active elements in
 the stack arrays -- i.e. the array length, \texttt{NELEM} for evaluation purposes\footnote{Also referred to as
 \texttt{NEVAL} internal to \texttt{GPLOT}.}.
 \item Its contents can be accessed by the \textttc{X} RPN operator.
@@ -823,16 +900,6 @@ operators must be used before any other RPN operators. The contents of stack lev
 Stack level 1 is also special in that it contains the Y values corresponding to the X values in the X range array when plotting graphs.
 This may be referred to as the \textbf{Y value array}. There is an RPN operator which explicitly sets this by copying the contents of
 the top-of-stack (TOS) array into it.
-\newpara
-There are RPN operators which directly produce graphical output. It is sometimes useful to know the bounds of that output before
-actually drawing anything, and three commands are provided to do that.
-\begin{itemize}
-\item \textttc{BBSTART} prevents RPN operators that would normally draw things from doing so, but instead has them accumulate bounding
-	box information.
-\item \textttc{BBEND} restores normal operation of the graphics drawing RPN operators.
-\item \textttc{BBSET} sets the bounds to the accumulated bounding box and is equivalent to issuing a BOUNDS command with the
-	appropriate arguments.
-\end{itemize}
 \newpara
 Three other groups of storage are also defined for use with function definition and evaluation:
 \begin{itemize}
@@ -853,19 +920,61 @@ A \texttt{TOKEN} is a numeric constant operand or an RPN operator. Unlike comman
 \newpara
 There are two commands which can cause an \texttt{RPN-string} to be evaluated. The main one is:
 \begin{itemize}
-\item \textttc{EVAL RPN-string}
+\item \textttc{EVAL RPN-string [``arguments'']}
 \end{itemize}
-The \texttt{RPN-string} for EVAL can `call` procedures stored in Procedure Registers (as \texttt{RPN-string}s) using the token
-\texttt{@n} where \texttt{n} is the Procedure Register number (1 to 9). This \texttt{@n}  token cannot be used in the \texttt{RPN-string}s)
-stored in Procedure Registers, as a proper call stack is not maintained.
+The \texttt{RPN-string} for \texttt{EVAL} can `call` procedures stored in Procedure Registers (as \texttt{RPN-string}s) using the token
+\texttt{@n} where \texttt{n} is the Procedure Register number (1 to 9). The `calling` of procedures in Procedure Registers is
+actually done by string substitution. There is no true call-return mechanism. If a stored procedure contains \texttt{@n}, it
+will also be substituted. The substitution continues until no \texttt{@n} sequences are found in the expanded procedure
+string.
+\newpara
+There is an optional second argument to \texttt{EVAL} which can be used to pass parameters to a procedure, in a sense. If present,
+it should be a comma separated list of up to 9 numeric values (or \texttt{\$n} for parameter substitution in scripts). These
+values are placed into successive Scalar Registers starting with register 1. Using these registers, along with String Registers,
+is how parameters can be given to RPN procedures. Inside those, the parameter values are accessed with the \texttt{RCL} operator.
 \newpara
 A very useful variant on EVAL is:
 \begin{itemize}
-\item \textttc{ITEVAL start end step RPN-string}
+\item \textttc{ITEVAL start end step RPN-string [``arguments'']}
 \end{itemize}
 which will evaluate the RPN-string \texttt{max( int( (end - start + step) / step ), 0 ) } times, as per a Fortran DO-loop. The value of
 the loop counter can be accessed using the token \texttt{I} in the \texttt{RPN-string}. The \texttt{I} token has the value 1 if used in an
 \texttt{RPN-string} evaluated via \texttt{EVAL}.
+\newpara
+There are RPN operators which directly produce graphical output. It is sometimes useful to know the bounds of that output before
+actually drawing anything, and three commands are provided to do that: \texttt{BBSTART}, \texttt{BBEND} and \texttt{BBSET}. See
+the next Section for details.
+
+\subsubsection{Evaluator Related Command Descriptions}
+A full list of the commands provided for the RPN evaluator follows.
+\begin{itemize}
+\item \textttc{ERANGE BASE START STOP NELEM} --- Set the contents of stack level 0 (or X) to a set of equally spaced values.\\
+  This also sets the effective array length to \texttt{NELEM}.
+  \texttt{BASE} is 1 for linearly spaced values or the base of the logarithm for logarithmically spaced values.
+  \texttt{START} is the starting value for the range.
+  For logarithmic ranges, the \texttt{BASE} is raised to \texttt{START} for the starting value.
+  \texttt{STOP} is the ending value for he range (the range is inclusive).
+  For logarithmic ranges, the \texttt{BASE} is raised to \texttt{END} for the ending value.
+  \texttt{NELEM} is the number of steps to make between START and STOP.\\
+  For example: \texttt{ERANGE 2 1 8 8} results in \texttt{2, 4, 8, 16, 32, 64, 128 and 256} appearing in X.
+\item \textttc{EVAL RPN-string [``arguments'']} --- See above.
+\item \textttc{ITEVAL start end step RPN-string [``arguments'']} --- See above.
+\item \textttc{PROC N RPN} --- Put an RPN string into Procedure Register N (1 to 9).
+\item \textttc{LOADPROC N NAME} --- Copy a named procedure from the \texttt{GPLPROC} procedure library file to Procedure Register \texttt{N}.
+  For more information on this, see Section~\ref{gplproc-sect}.
+\item \textttc{STRING N TEXT} --- Set the contents of String Register \texttt{N} to \texttt{TEXT}.
+  The only way to pass strings to the RPN evaluator is through String Registers.
+\item \textttc{STO N X} --- Put \texttt{X} into Scalar Register \texttt{N}. The only way to pass numeric parameters to the RPN evaluator is through
+  Scalar Registers. The optional ``arguments'' string to EVAL and ITEVAL is a conveneient way of setting a group of these
+  registers to pass parameters to a procedure.
+\item \textttc{RCL N} --- Display the contents of Scalar Register \texttt{N}.
+\item \textttc{ZEROVAL V} --- Set the value of divide-by-zero avoidance and some other tolerance tests. The default is $10^{-9}$.
+\item \textttc{BBSTART} prevents RPN operators that would normally draw things from doing so, but instead has them accumulate bounding
+	box information.
+\item \textttc{BBEND} restores normal operation of the graphics drawing RPN operators.
+\item \textttc{BBSET} sets the bounds to the accumulated bounding box and is equivalent to issuing a \texttt{BOUNDS} command with the
+	appropriate arguments.
+\end{itemize}
 
 \subsection{How the RPN evaluator works}
 The RPN evaluator's basic operation given an \texttt{RPN-string} is as follows:
@@ -898,6 +1007,19 @@ The RPN evaluator's basic operation given an \texttt{RPN-string} is as follows:
 	The tolerance for possible divide by zero conditions can be set with the \textttc{ZEROVAL} command before evaluation.
 \item Some operators cause graphics output as a `side effect` \ldots albeit a rather critical one!
 \end{enumerate}
+
+\newpara
+The RPN evaluator, while useful, has a number of fundamental limitations.
+\begin{itemize}
+\item There are no jumps, conditional branches or looping constructs. This makes it less powerful than the RPN in
+  programmable calculators. (There is conditional value selection operating on array elements, but that is a different
+  thing.) The only form of looping available is through \texttt{ITEVAL}, which is useful, but limited.
+\item The command line (and all other input lines in \textbf{GPLOT}) is limited to 80 characters. Any lines longer
+  than this are truncated at 80 characters. This means the length of an RPN string must be significantly less than this.
+  For many problems, the limited size of procedures this implies makes it impossible to use the RPN evaluator to solve them.
+  Using procedures stored in the GPLPROC procedure library is a useful way of working around this, as explained below. Using this,
+  the maximum size of a procedure is 696 characters, which is not huge, but enough for many tasks.
+\end{itemize}
 
 \subsection{Operands and Operators}
 In the following descriptions of the available operators, the symbol \texttt{A} is an array of \texttt{NELEM} values 
@@ -956,17 +1078,17 @@ These operators provide the essential stack operations needed by all RPN evaluat
 Token & Actions & Description\\
 \hline
 SWAP or S & ( A1 A2 -- A2 A1 ) & SWAP OR EXCHANGE TOP 2 STACK ARRAYS.\\
-DUP or \& & ( A1 -- A1 A1 ) & DUPLICATE TOP OF STACK\\
+DUP or \& & ( A1 -- A1 A1 ) & DUPLICATE TOP OF STACK (TOS)\\
 POP & ( A1 -- ) & POP TOP OF STACK\\
-G & (\ldots AN \ldots C1 -- AN ) & GET STACK LEVEL AT DEPTH C1 INTO TOP OF STACK\\
+G & (\ldots AN \ldots C1 -- AN ) & GET STACK LEVEL AT DEPTH C1 INTO TOS\\
 CL & ( -- ) & CLEAR STACK\\
-SETX & ( A1 -- A1 ) & OVERWRITE RANGE / GRAPH X VALUES WITH STACK TOP VALUES: X = A1\\
+SETX & ( A1 -- A1 ) & OVERWRITE RANGE / GRAPH X VALUES WITH TOS: X = A1\\
 SETY & ( A1 -- A1 ) & OVERWRITE GRAPH Y VALUES WITH STACK TOP VALUES: Y = A1\\
 XLIN & ( C1 C2 C3 -- ) & X = C1 TO C2 IN C3 LINEAR STEPS\\
 XLOG & ( C1 C2 C3 C4 -- ) & X = C1**C2 TO C1**C3 IN C4 STEPS\\
 EL & ( A1 C2 -- A1 C2 ) & C2 = A1[C2]\\
 I0IJ & ( C1 C2 -- C1' C2' ) & C1'=MOD(C1,C2), C2'=(C1/C2) : 1D TO 2D INDICES, 0 BASED.\\
-I1IJ & ( C1 C2 -- C1' C2' ) & C1'=MOD(C1,C2)+1, C2'=(C1/C2)+1 : 1D TO 2D INDICES, 1 BASED.\\
+I1IJ & ( C1 C2 -- C1' C2' ) & C1'=MOD(C1,C2)+1, C2'=(C1/C2)+1 : 1D TO 2D IDX, 1 BASED.\\
 \hline
 \end{tabular}
 }
@@ -1155,6 +1277,197 @@ DUMP & ( -- ) & PRINT ALL STACK LEVELS FIRST AND LAST ELEMENTS \\
 }
 \end{small}
 
+\subsection{The GPLPROC Procedure Library}\label{gplproc-sect}
+\newpara
+The file \texttt{GPLPROC} can be used to define named procedures for the RPN evaluator to use. This file is
+automatically made \texttt{LOCAL} on NOS whenever \texttt{LOADPROC} is used.
+
+\newpara
+The format of named procedure definitions in GPLPROC is very simple.
+\begin{lstlisting}
+  PROCNAME [nlines]
+  RPN-string
+  . . .
+  RPN-string
+\end{lstlisting}
+
+\newpara
+For example:
+\begin{lstlisting}
+C AN UNROTATED ELLIPSE,  "XC YC A B"
+ELLIPSE
+CL,0,TWPI,360,XLIN,X,&,COS,3,#,*,1,#,+,S,SIN,4,#,*,2,#,+,PTHC
+\end{lstlisting}
+defines a single line procedure called ELLIPSE, which can be loaded into a Procedure Register
+with:
+\begin{lstlisting}
+LOADPROC 1 ELLIPSE
+\end{lstlisting}
+would load ELLIPSE into Procedure Register 1, and
+\begin{lstlisting}
+EVAL @1 "1.0,2.0,2.0,0.5"
+\end{lstlisting}
+will then draw an ellipse.
+
+\newpara
+As with scripts (obey files), full line comments can be inserted by starting the line with
+``\texttt{\#}'' or ``\texttt{C }``.
+
+\newpara
+If the procedure name is followed by the optional \texttt{nlines} value (an integer in the range 2 to 9),
+procedures longer than (at the very most) 80 characters can be defined. This is implemented by putting
+consecutive lines into successive Procedure Registers. All lines except the last have \texttt{,@n} added to their
+ends automatically, where \texttt{n} is the procedure line number plus 1. This has three consequences:
+\begin{itemize}
+\item The procedure substitution mechanism will ``chain'' the Procedure Register contents together into one
+  RPN string.
+\item All lines (except the last) in such a procedure definition may have no more than 77 characters.
+\item The first \texttt{nlines} Procedure Register contents will be overwritten.
+\end{itemize}
+
+\newpara
+An example of a multi-line procedure definition is:
+\begin{lstlisting}
+C ANGLE PAIR "X Y LENGTH ROT1-DEGREES ROT2-DEGREES"
+ANGLEPAIR 4
+CL,0,1,2,XLIN,X,0,3,#,DUP,SCL,4,#,D2R,ROT,1,#,2,#,TRN,PTHO
+4,#,9,=,5,#,4,=
+CL,0,1,2,XLIN,X,0,3,#,DUP,SCL,4,#,D2R,ROT,1,#,2,#,TRN,PTHO
+9,#,4,=,CL,1,#,2,#,3,#,2,/,4,#,5,#,A
+\end{lstlisting}
+
+\newpara
+There is no specific limit to the number of procedures that can be defined in \texttt{GPLPROC},
+although every \texttt{LOADPROC} just searches the file sequentially from the start for the name,
+so it will get slow eventually. There is also no limit on the length of procedure names,
+except for the universal 80 character line length restriction.
+
+
+\section{Higher Level Drawing Commands}
+\newpara
+While \textbf{DIMFILM} provides a comprehensive set of graph plotting facilities (many -- but not all -- of which can
+be accessed via \textbf{GPLOT}), its general purpose drawing facilities are somewhat limited, at least by today's
+standards. To address this, \textbf{GPLOT} has added some ``higher level'' features, which ultimately use \textbf{DIMFILM}'s
+functionality, but may make some tasks much easier. Rather than try to provide very general extensions, such as a stack
+of transformation matrices as in \textbf{PostScript}, the \textbf{GPLOT} extensions are aimed at specific common tasks.
+
+\newpara
+These higher level drawing commands are based on three new components:
+\begin{itemize}
+\item \textbf{Boxed text}. These provide a simple way of creating a rectangle containing text (one or more
+  lines) with several options. Such things are the basic building blocks of block diagrams and similar things.
+  They can also be used to create tables.
+\item \textbf{Decorated lines}. These are polylines, the ends of which can be ``decorated'' with arrow heads or things
+  we call ``skips'' which can give the impression of one line ``jumping over'' another. Additionally, the
+  midpoint of a line segment can contain a very short textual label (typically one or two characters) which
+  will be drawn inside a circle.
+\item \textbf{Labels}. These are single lines of text, enclosed in a box, from which an arrow points to a specified
+  location. The length of the arrow, and the direction (given as an angle in degrees counter-clockwise
+  around the ``pointed at'' position from the positive X axis)
+  are also specified.
+\end{itemize}
+
+\subsection{Boxed text}
+\newpara
+These commands draw a boxed text and establish its parameters:
+\begin{itemize}
+\item \textttc{BOXTEXT [X Y]} --- This draws a boxed text object at the location $(x,y)$ (if supplied) or
+  at the last incremented boxed text position (see \texttt{BOXPDELTAS}). \texttt{TEXT} is the text to be placed in
+  the box. This may have up to 5 lines with lines separated by back-slash characters. All \textbf{DIMFILM} string
+  markup applies. The appearance of the text and various other options are controlled by the following \texttt{BOXP\ldots}
+  parameter setting commands.
+\item \textttc{BOXPSIZE WIDTH HEIGHT BOTLEFT} --- This sets the size of the (outer) box. All text will be drawn
+  within this box and it may, under some circumstances, be clipped against it. \texttt{WIDTH} and \texttt{HEIGHT} are the dimensions of the
+  box in \texttt{BOUNDS} units. If \texttt{BOTLEFT} is \texttt{YES}, the box coordinates will be used for the bottom left point. If \texttt{BOTLEFT}
+  is \texttt{NO}, they will be used as the centre point.
+\item \textttc{BOXPBOX WHICH} --- Controls which box outlines are drawn. \texttt{WHICH} may be:
+  \begin{itemize}
+  \item \texttt{NONE} --- No outlines are drawn.
+  \item \texttt{OUTER} --- The outer box, with dimensions specified with \texttt{BOXPSIZE}, will be drawn.
+  \item \texttt{INNER} --- The inner box, tightly surrounding the text, will be drawn. This area is protected from hatching (if any),
+    whether the outline is drawn or not.
+  \item \texttt{BOTH} --- Both box outlines are drawn.
+  \end{itemize}
+\item \textttc{BOXPTEXT WIDTHFRAC MODE FLUSHLEFT} --- Controls how the text is drawn. \texttt{MODE} may be:
+  \begin{itemize}
+  \item \texttt{FIX} --- In this case, the text is not scaled to fit the box directly. Instead, a \texttt{SYMHT} is calculated so that
+    \texttt{WIDTHFRAC} lines will fit inside the box. If any line is too long with this \texttt{SYMHT}, it will be clipped at the box
+    edges. All boxed text objects with the same height and \texttt{WIDTHFRAC} will have a consistent text size in a diagram.
+    \texttt{WIDTHFRAC} will typically be an integer, 1 or greater.
+  \item \texttt{SCALE} --- In this case, the text is scaled so that the longest line occupied \texttt{WIDTHFRAC} of the box width.
+    In this case, \texttt{WIDTHFRAC} will typically be a floating point number less than 1 and greater than 0.
+    There may be no consistency between text sizes in different boxed texts in a diagram with the \texttt{SCALE} option.
+  \end{itemize}
+  If \texttt{FLUSHLEFT} is \texttt{YES}, the text will be left justified in the inner box.
+  If \texttt{NO}, the text will be centred in the inner box.
+\item \textttc{BOXPHATCH SPACING IANGLE MODE} --- This controls how the boxed text is hatched (or not). \texttt{MODE} may be:
+  \begin{itemize}
+  \item \texttt{NONE} --- No hatching will be drawn.
+  \item \texttt{VERT} --- Hatch lines will be draw joining the bootom and top edges of the box.
+  \item \texttt{HORIZ} --- Hatch lines will be drawn joining the left and right edges of the box.
+  \item \texttt{BOTH} --- Both \texttt{HORIZ} and \texttt{VERT} hatching will be drawn.
+  \end{itemize}
+  \texttt{SPACING} is the distance between hatch lines along the edges in \texttt{BOUNDS} units. \texttt{IANGLE} is the number of spacings
+  on the opposite edge that the end point of a hatch line will be displaced, controlling the angle at which
+  it is drawn.
+\item \textttc{BOXPDELTAS DX DY} --- Set the auto-increment of boxed text positions after each boxed text is drawn. If a \texttt{BOXTEXT}
+  is specified without an explicit position, the result of adding these deltas to the last \texttt{BOXTEXT} position will be
+  used as the new position. This is very useful for constructing tables, which can easily be built from abutting boxed text objects.
+\end{itemize}
+
+\subsection{Decorated lines}
+These commands draw, or set the parameters of, a decorated polyline:
+\begin{itemize}
+\item \textttc{LINE LINESPEC} --- This defines and draws a decorated line. \texttt{LINESPEC} is a string
+  (not quoted, as it cannot contain spaces) which describes the line using a series of \texttt{POINTSPECs}
+  separated by \texttt{>} characters (which may be read as ``go to'' characters here). I.e.\\
+  \texttt{LINE POINTSPEC>POINTSPEC...POINTSPEC}\\
+  A \texttt{POINTSPEC} consists of a single character \texttt{TYPE}, then an \texttt{X} coordinate followed by a \texttt{Y}
+  coordinate, optionally followed by a very short \texttt{ANNOTATION} string. \texttt{X, Y and ANNOTATION} are separated
+  by commas. I.e.\\
+  \texttt{<TYPE>X,Y[,ANNOTATION]}\\
+  The possible values for \texttt{TYPE} are:
+  \begin{itemize}
+  \item \texttt{P} --- Plain. This point will be undecorated.
+  \item \texttt{A} --- Arrow. This point will be decorated with an arrow head. If this is the first
+    \texttt{POINTSPEC} in a \texttt{LINESPEC}, the arrow will point out from the start of the polyline
+    If it is the last \texttt{POINTSPEC}, it will point out from the end of the polyline.
+    If used on intermediate \texttt{POINTSPECs}, an arrow will be drawn at both the end of one line segment and the start of
+    the next, with the arrows pointing towards each other (which is rarely useful).
+  \item \texttt{S} --- Skip. This is (more or less) a quarter-circle. If this is the first
+    \texttt{POINTSPEC} in a \texttt{LINESPEC}, the quarter-circle will start at the top of a circle and fall down to
+    the line segment. If this is the last \texttt{POINTSPEC} in a \texttt{LINESPEC}, it will rise up from the line segment
+    to the top of the quarter-circle. Using \texttt{S} on intermediate \texttt{POINTSPECs} will cause a half-circle to be drawn.
+  \end{itemize}
+\item \textttc{ARROWPARM TYPE SIZE SHARPNESS BARBEDNESS} --- Sets how arrow heads are to be drawn. \texttt{TYPE} may be:
+  \begin{itemize}
+  \item \texttt{OPEN}
+  \item \texttt{CLOSED}
+  \item \texttt{BARBED}
+  \end{itemize}
+  These are probably self-explanatory. \texttt{SIZE} is the tip-to-base length in \texttt{BOUNDS} units.
+  \texttt{SHARPNESS} control how sharp the arrow head looks in the range 0.5 (very broad) to 5 (very sharp) with 2 being
+  a good default. The \texttt{BARBEDNESS} controls how deep the barb is, using a fraction of the tip-to-base distance. 0.3
+  is a good default. Note that these parameters also control the appearence of arrow heads in labels too.
+\item \textttc{LINEPARM SKIPSCALE ANNOTSCALE} --- Sets the size at which skips and mid-line annotations are drawn.
+  \texttt{SKIPSCALE} is half the length of a skip in \texttt{BOUNDS} units. That is, two abutting skips will cover this distance.
+  \texttt{ANNOTSCALE} is twice the diameter of the annotation enclosing circle in \texttt{BOUNDS} units.
+\end{itemize}
+
+\subsection{Labels}\label{labels-sect}
+These let you point at something with a short message. These commands draw labels:
+\begin{itemize}
+\item \textttc{ALABEL X Y LENGTH ANGLE TEXT} --- Add a label pointing at \texttt{BOUNDS} coordinates $(x,y)$.\\
+  \texttt{LENGTH} is the distance from the point $(x,y)$ to the centre of the box containing the label text in \texttt{BOUNDS} units.
+  \texttt{ANGLE} is the angle the arrow line makes with the +X axis in degrees.
+  \texttt{TEXT} is a (short) label string, enclosed in double quotes if it contains spaces. If it is entirely spaces, the arrow
+  is drawn without any box at its ``far'' end. All \textbf{DIMFILM} ``string markup'' can be used.
+\item \textttc{GLABEL GX GY LENGTH ANGLE TEXT} --- Add a label pointing at graph coordinates $(x,y)$.\\
+  This is useful for labelling points on graphs. Note that \texttt{LENGTH} is in \texttt{BOUNDS} units. It is not possible to use ``graph
+  lengths'' as the axis ranges may be wildly different or log axes may be in effect. The arguments are the same as
+  for \texttt{ALABEL} apart from the meaning of the coordinates.
+\end{itemize}
+
 \section{Defining and drawing L-systems}
 Leveraging the functionality added for general purpose function evaluation described above, a quite specialised but
 fun facility for defining and drawing L-systems is also available. Lindenmayer (L) systems were invented by the theoretical
@@ -1262,7 +1575,11 @@ Please see the main \texttt{README.md} for the \textbf{GPLOT} project on Github
 for detailed information on how to build and install \textbf{GPLOT} on both NOS
 and ``Unix''.
 
-\section{\textbf{GPLOT} examples and tutorial}
+\clearpage
+\part{GPLOT Tutorial and Examples}
+\clearpage
+
+\section{Plotting graphs}
 
 \subsection{The simplest graph}
 
@@ -1935,7 +2252,7 @@ to put that without obscuring part of the data (at least, I've often
 found that is the case over the decades). That approach could certainly
 be added, though.
 
-\subsubsection{Multiple curves with two different Y axis
+\subsection{Multiple curves with two different Y axis
 ranges}\label{multiple-curves-with-two-different-y-axis-ranges}
 \newpara
 Sometimes it is useful to plot two (or more) curves with the same X axis
@@ -2919,6 +3236,7 @@ sub-figure script would be inherited by the next. These must occur
 \emph{before} the \texttt{SUBFIG} command, so they cannot be left in the
 script files.
 
+\section{Beyond graph plotting}
 
 \subsection{Using the RPN evaluator to plot simple functions}\label{using-the-rpn-evaluator-to-plot-simple-functions}
 
@@ -4188,7 +4506,7 @@ used can be seen in the \texttt{OBCHT1} and \texttt{OBCHT2} scripts
 which generate the \textbf{GPLOT} ``cheat sheet'' which can be found at the end
 of this document.
 
-\subsubsection{L-Systems}\label{l-systems}
+\subsection{L-Systems}\label{l-systems}
 \newpara
 L-systems or Lindenmeyer systems are a type of formal grammar (as in
 mathematical logic) developed by Aristid Lindenmeyer, a theoretical
@@ -4458,6 +4776,10 @@ COL 0.9 0 0.1
 LSYSTEM 2 $1 60
 \end{lstlisting}
 
+\clearpage
+\part{Appendices}
+\clearpage
+
 \section{Fonts}
 \newpara
 As previously noted, the fonts that can be used in \textbf{GPLOT} are taken
@@ -4472,6 +4794,7 @@ of what is available.
   \label{fig:fosm001}
 \end{figure}
 
+\newpara
 The pages that follow give full font tables for the
 alphabetic, symbol and marker fonts. These can be used to
 find the character numbers needed to insert special characters
@@ -4748,6 +5071,521 @@ The argument is the font name.
 \end{figure}
 
 
+\section{Ancillary Tools and Notes}
+\newpara
+\textbf{GPLOT} comes with some tools which may be helpful when using it, and perhaps more generally.
+When using \textbf{GTerm}, but especially when using a Tektronix 401x emulated terminal, it is useful to
+set certain things on ``Unix-like'' systems to get the best results. Some notes on that can be found here.
+
+\newpara
+Installation instructions for the tools can be found in the Github \texttt{README.md} for the \textbf{GPLOT} project.
+
+\subsection{EPSView}
+\newpara
+The script \texttt{epsview.sh} can be used to display Encapsulated PostScript (EPS) files created by
+\textbf{GPLOT}. This is particularly
+useful on recent versions on macOS, where the ability to display EPS files simply by clicking on them has been removed
+by Apple in recent versions, but it also can be useful on Linux.
+
+\newpara
+The most basic usage is:
+\begin{lstlisting}
+$ epsview.sh epsfile
+\end{lstlisting}
+On macOS, this will open a new \texttt{Preview} window or tab displaying the contents of the given EPS file after
+it has been converted to PDF by Ghostscript. The supplied
+name need not be given the extension \texttt{.eps} -- this will be added if it isn't there.
+
+\newpara
+On Linux, \texttt{xdg-open} is used to open the EPS file (after conversion to PDF). This should find an
+appropriate application to display the converted PDF file.
+
+\newpara
+The following options are available:
+\begin{itemize}
+\item \textttc{-p} --- Also output a PNG image file version of the EPS file.
+  This will be named as the input file but with a \texttt{.png}
+  extension.
+\item \textttc{-c} --- Try to remove (crop) any ``margins'' from the EPS document.
+\item \textttc{-f} --- Apply ``fixup'' heuristics to EPS files generated on COS.
+  Unfortunately, these become upper case when transferred from COS to NOS. No transfer options
+  have been found that prevent this (so far), so try to correct for this. This is only relevant
+  to \textbf{DIMFILM} EPS output from COS.
+\end{itemize}
+
+\subsection{SVGView}
+\newpara
+The Python program \texttt{svgview} is an ``as minimal as can be'' SVG file viewer which can be used to
+have a quick look at SVG files created by \textbf{GPLOT/DIMFILM} (and most others, probably). This
+is based on PySDL2 and is comparatively lightweight (relative to a web browser or Inkscape,
+anyway!).
+
+\newpara
+To display an SVG file in a pop-up window:
+\begin{lstlisting}
+svgview afile.svg
+\end{lstlisting}
+(the extension need not be \texttt{.svg} or present at all). There is only one
+option: \textttc{-w n} which lets the width of the window (and also the resolution at which
+the SVG is rasterised) be set to \textttc{n} pixels. The default is 1280.
+
+\newpara
+A trivial Bash script uses this program to display every \texttt{.svg} file in the current working
+directory in turn. This can help with verifying correct operation of \textbf{GPLOT/DIMFILM} as
+explained below.
+
+\subsection{NOSFTP}
+\newpara
+If EPS and SVG graphics files are generated on NOS, it might be necessary to move them to other
+``mainstream'' systems for further use. NOS 2.8.7 has a very good FTP server and this is probably
+the most straightforward way of moving the files between NOS and ``Unix-like'' systems.
+
+\newpara
+It is possible to use any FTP client to communicate with the NOS FTP server, and this is
+fairly straightforward. However, the NOS file system has some very unusual features not seen
+on ``mainstream'' systems and extra information must be sent when accessing NOS files. This
+extra information is easy to forget. NOSFTP is a small Python program that adds the extra
+information ``behind the scenes'' so you don't have to remember it.
+
+\newpara
+To run NOSFTP:
+\begin{lstlisting}
+$ nosftp [options] username hostname
+\end{lstlisting}
+Here, \textttc{username} is the account name on NOS you want to access and \texttt{hostname} is the name of the host
+running DtCyber (or its IP address). Before logging in, you will be prompted to enter the password for the
+NOS account and the NOS FTP server will be contacted. After that, you will be prompted to enter
+commands. The following commands are available:
+\begin{itemize}
+\item \textttc{quit} or \textttc{exit} or \textttc{bye} --- Close the FTP server connection and exit NOSFTP.
+\item \textttc{get nosname localname ascii|display|binary} --- Get a file from the NOS FTP server. You should
+  use \texttt{ascii} if transferring EPS or SVG files so that lower case is correctly preserved.
+\item \textttc{put localname nosname [display]} --- Send a file to the NOS FTP server. This command
+  tries to be ``intelligent'' (which may have been a mistake). If NOSFTP ``thinks'' the file is binary data,
+  it will save it as a \emph{direct access} file on NOS, otherwise it will save it as an \emph{indirect access} file.
+  For non-binary files, it will send the file to be stored as ASCII unless
+  the optional \texttt{display} option is supplied,
+  in which case it will be stored as Display Code (with any lower case converted to upper case).
+  If sending \texttt{OBEY} files, you should use the \texttt{display} option.
+\item \textttc{bput localname nosname [direct]} --- Send a binary file (you determine it is binary rather than
+  NOSFTP guessing it is). By default, this is stored on NOS as an \emph{indirect access} file. To store it as a
+  \emph{direct access} file, add the direct option.
+\item \textttc{mget listname display|ascii extension} --- Given a list of files, one per line in a file called
+  \texttt{listname}, fetch each file in turn. All the files will be treated in the same way, so they must be
+  of the same ``kind''. The files must not be binary. The character set for every file can be \texttt{display}
+  (upper case only) or \texttt{ascii} (mixed case). On the receiving end, all the files will be given the
+  \texttt{extension} specified. The names given in the file \texttt{listname} must be valid NOS file names.
+  Files with invalid NOS names are skipped, but the rest of the transfers will take place.
+\item \textttc{mput listname display|ascii} ---  Given a list of files, one per line in a file called
+  \texttt{listname}, send each file in turn. The file names in \texttt{listname} must be valid NOS file names.
+  No name transformations are made, so the files to be sent must have the same names on the ``Unix-like''
+  system with no extensions. The files must not be binary. If lower case is to be preserved, the \texttt{ascii}
+  option should be used. For \texttt{OBEY} files, use the \texttt{display} option.
+\item \textttc{dir} --- Show a compact list of all permanent files stored on the NOS account.
+\item \textttc{info nosname} --- List full information on a single NOS permanent file.
+\item \textttc{del nosname} --- Delete a NOS permanent file.
+\item \textttc{lpwd} --- Print the local working directory name.
+\item \textttc{lcd localdir} --- Change the local working directory.
+\item \textttc{ls [string]} --- List the local working directory, optionally restricting output
+  to file names containing string.
+\end{itemize}
+
+\newpara
+The following command line options are available:
+\begin{itemize}
+\item \textttc{-e ``NOSFTP command''} --- Execute the supplied command, then exit.
+\item \textttc{-p password} --- Use the plain text password to login to the NOS FTP server. Terrible
+  for ``security'' but may be practically useful.
+\item \textttc{-d 0|1|2} --- Set the debug level to help diagose problems. Should not be necessary!
+\end{itemize}
+
+\subsection{SGFormat}
+\newpara
+\textbf{SGFormat} is a RUNOFF style document formatter. It  was written to
+try to format the original DIMFILM manual
+by working from the \texttt{.SG} version of the documentation.
+
+\newpara
+The DIMFILM manual was held in three different formats. Two of these were binary: one for an early
+version of Microsoft Word (.msw extension) and one for some version of Wordstar (.ws2). The files date from the
+mid-1980's and I have not been able to find any software which can read them. Perhaps the appropriate
+versions of Word and WordStar still exist somewhere and could be run under something like DOSBox but
+there is no clear way of using these files today. This is (another) lesson in the fragility of
+digital data, even when significant trouble is taken to preserve it (e.g. through use of multiple
+different data formats).
+
+\newpara
+However, the third format was of the ``text with mark-up'' type and was definitely related to RUNOFF.
+Again, though, I have not been able to locate any software which can process this specific version
+of RUNOFF-like mark-up. The file extension (.SG) doesn't seem to be known in relation to any
+kind of document processing software. Some 40 years ago, though, it must have been.
+
+\newpara
+As a readable text based format, it was the obvious choice from which to try to recreate the DIMFILM
+manual. A first attempt to do this in 2008 with a C program gave results which were marginally useful but not
+really acceptable. This showed that a pretty complete implementation of a document formatter was needed
+to get decent results. Fortunately, that is much easier using Python in 2025 than it was using C 17
+years earlier.
+
+\newpara
+Although SGFormat exists solely because the DIMFILM manual needed to be recreated, it
+could be used to create new documents in the unlikely event anyone wants to do that. The output is
+plain text and PDF (via PostScript).
+
+\newpara
+Mark-up in this riff on RUNOFF consists of two types:
+\begin{itemize}
+\item Full line commands, beginning with a dot or period: \texttt{.} We'll call these ``body commands''
+  below.
+\item Commands embedded in lines of text. These are single letters following a dollar sign: \texttt{\$}. We'll
+  call these ``line commands'' below.
+\end{itemize}
+Characters which need to be escaped are preceeded by two tildes: \texttt{\textasciitilde\textasciitilde}
+
+\newpara
+It should be said that, since there is no information available on the \texttt{.SG} format anywhere
+(that I have found), it isn't certain what the commands should really do! However, what we
+have chosen to do for them seems to give a reasonable result for the \textbf{DIMFILM} manual. Also,
+although there are many options that can be set (see below), and these work as intended at their
+defaults, no real tests have been done on what happens when these are set to other values.
+
+\subsubsection{Body commands}
+The following body commands are implemented. The commands maybe be in lower or upper case.
+\begin{itemize}
+\item \textttc{.} --- Output a blank line if a single dot is the only thing on an input line.
+\item \textttc{.justify} --- Turn on justification for smooth (not ragged) right edge.
+\item \textttc{.part} --- Begin a new Part of the document.
+\item \textttc{.chapter} --- Start of a new Chapter within a Part.
+\item \textttc{.section} --- Start of a new Section within a Chapter.
+\item \textttc{.subsection} --- Start of a new Sub-section within a Section.
+\item \textttc{.appendix} --- Start of a new Appendix. As per Chapter, but keep counts separate.
+\item \textttc{.foot} --- Start of Footer text definition.
+\item \textttc{.endf} --- End of Footer text definition.
+\item \textttc{.head} --- Start of Header text definition.
+\item \textttc{.endh} --- End of Header text definition.
+\item \textttc{.tabset [n,n,...n]} --- Define a new set of tab stops or revert to default if no stops given.
+\item \textttc{.display} --- Start of a literal section for ASCII art or code that should not
+  be split across pages. The text in such a section is centered horizontally, based on
+  the maximum length of a line in the section. Tab commands
+  should not appear in lines in such sections.
+\item \textttc{.endd} --- End a \texttt{.display} section.
+\item \textttc{.copy} --- Start a literal section, as per \texttt{.display}, but do not centre the contents
+  horizonatlly and process tab stops if present.
+\item \textttc{.endc} --- End a \texttt{.copy} section.
+\item \textttc{.page n} --- Set the page number to integer \texttt{n}.
+\item \textttc{.newpage} --- Start a new page.
+\item \textttc{.blank [n]} --- Output n blank lines, or 1 if \texttt{n} omitted.
+\item \textttc{.contents} --- Insert table of contents in the output here.
+\end{itemize}
+
+\newpara
+The following body commands may appear, but are (intelligently) ignored: \texttt{.macro},
+\texttt{.endm}, \texttt{.nl}, \texttt{.fill},
+\texttt{.contig}, \texttt{.ee}, \texttt{.tt}, \texttt{.space}, \texttt{.footlength}, \texttt{.headlength},
+\texttt{.set}, \texttt{.parspace}, \texttt{.table}, \texttt{.endtable}.
+
+\subsubsection{Line commands}
+These appear within ``normal'' (i.e. not body command) lines of input text.
+\begin{itemize}
+\item \textttc{(space)} as first character on line --- Paragraph break.
+\item \textttc{\$T} --- Go to next tab stop in a \texttt{.copy} section.
+\item \textttc{\$T} --- If first thing on an input line outise a \texttt{.copy} section,
+  indent by body tab size (see below).
+\item \textttc{\$I} --- Indent by body indent size if not in a \texttt{.copy} section (see below).
+\item \textttc{\$C} --- Centre the following text to the end of the line or \$E. Do not use in a \texttt{.copy} section.
+\item \textttc{\$E} --- Right justify the following text to the end of the line.
+\item \textttc{\#} --- Insert a non-removeable space.
+\item \textttc{\textasciitilde\textasciitilde\#} --- Insert a hash character.
+\item \textttc{\textasciitilde\textasciitilde\_} --- Insert an underscore. Unescaped underscores are deleted.
+\item \textttc{\textasciitilde\textasciitilde\$} --- Insert a dollar sign.
+\item \textttc{\textasciitilde\textasciitilde\textasciitilde} --- Insert a tilde.
+  To avoid inadvertantly escaping a following \texttt{\$},
+  add a space between the \texttt{\textasciitilde\textasciitilde\textasciitilde} and \texttt{\$}.
+\item \textttc{\textasciitilde\%date} --- Insert a specifed date (see below) or today's date if not explicitly set.
+\item \textttc{\textasciitilde\%page }--- Insert the current output page number.
+  Negative page numbers are output as Roman
+  numerals.
+\end{itemize}
+
+\newpara
+Note that \texttt{\$C} and \texttt{\$E} can be used on a single line to split it into 3 sections: left justified,
+centered and right justified. This is useful when defining a footer. For example:
+\begin{lstlisting}
+ .foot
+
+ DIMFILM$c~%page $eDRAFT DOCUMENT
+ Preliminary User Guide $e~%date
+ .endf
+\end{lstlisting}
+This will put \texttt{DIMFILM} at the left (left justified), the page number in the centre,
+and \texttt{DRAFT DOCUMENT}
+right justified (and on a second line, \texttt{Preliminary User Guide} left justified and a date
+right justified) at the foot of every output page.
+
+\subsubsection{Control file}
+A document is described by a JSON format control file. This defines the source files that
+make up the document and all processing options to be applied to it.
+
+\newpara
+The following keys must be present in a control file.
+\begin{itemize}
+\item \textttc{source\_files} --- The value for this must be a list naming the input files.
+\item \textttc{source\_dir} --- The value for this is a string naming the directory where the source files can be found.
+  This is pre-pended to each source file name before trying to open it.
+\item \textttc{output\_stem} --- Set the name of the output file, omitting any extension. A plain text file with the
+  extension \texttt{.txt} and a PDF file with extension \texttt{.pdf} will be created based on this.
+\item \textttc{output\_dir} --- The value for this is a string naming the directory in which to write output files.
+\end{itemize}
+
+\newpara
+There are many more optional keys.
+\begin{itemize}
+\item \textttc{page\_lines} --- The value should be a string representing a decimal integer, giving the number of
+  lines on a page, not including header and footer lines. Default is 58.
+\item \textttc{line\_width} --- The value should be a string representing a decimal integer, giving the number of
+  characters in a line across the page. Default is 80.
+\item \textttc{body\_tab\_size} --- Set the tab size for \texttt{\$T} outside \texttt{.copy} regions.
+  Default is 6.
+\item \textttc{body\_indent\_size} --- Set the indent size for \texttt{\$I}. Default is 3.
+\item \textttc{min\_justify\_words} --- Set the minimum number of words on an output line above which
+  right flush justification will be done. If this is done with too few words, very large unsightly gaps
+  appear between the (few) words present. Default is 8.
+\item \textttc{ps\_page\_height\_points} --- Set the PostScript/PDF page height in points. Default is 842 (A4).
+\item \textttc{ps\_page\_width\_points} --- Set the PostScript/PDF page width in points. Default is 595 (A4).
+\item \textttc{ps\_top\_margin\_points} --- Set top margin height for PostScript/PDF in points. Default is 54 (0.75 inch).
+\item \textttc{ps\_left\_margin\_points} --- Set left margin width for PostScript/PDF in points. Default is 54 (0.75 inch).
+\item \textttc{ps\_text\_size\_points} --- Set the character height for PostScript/PDF in points. Default is 10.
+\item \textttc{ps\_leading} --- Set the spacing between lines for PostScript/PDF in points. Default is 3.
+\item \textttc{ps\_font\_name} --- Set the name of the font to be used for PostScript/PDF. Default is Courier.
+  This should be a monospaced font and allowed values will be operating system dependent.
+\item \textttc{ps\_paper} --- Set the paper size by name for PostScript/PDF output.
+  Known values are \texttt{a4}, \texttt{letter} and \texttt{legal}. Setting this overrides any previously
+  specified \texttt{ps\_page\_height\_points} and \texttt{ps\_page\_width\_points} values.
+\item \textttc{specific\_date\_string} --- Set a specific date to be output when \texttt{\textasciitilde\%date}
+  is used. The format is \texttt{YYYY,MM,DD}. If this option is not used, today's date will be output.
+\item \textttc{default\_tabset} --- The value should be a string containing comma separated integers in ascending
+  order. For example: ``\texttt{10,15,20,35}''. These tab stops will be used throughout the document unless
+  the \textttc{.tabset} body command is used.
+\end{itemize}
+
+\newpara
+As a concrete example, this is the control file for the \textbf{DIMFILM} manual.
+\begin{lstlisting}
+{
+    "source_files" : [
+        "DIMFORM.SG",
+        "DIMINTRO.SG",
+        "DIMPART1.SG",
+        "DIMPART2.SG",
+        "DIMPART3.SG",
+        "DIMPART4.SG",
+        "DIMAPP1.SG",
+        "DIMAPP2.SG",
+        "DIMAPP3.SG",
+        "DIMAPP4.SG"
+    ],
+
+    "source_dir" : "../../historic/DIMFILM/DOCS",
+
+    "specific_date_string" : "1984,06,23",
+
+    "output_stem" : "dimfilm-manual",
+
+    "output_dir" : "."
+}
+\end{lstlisting}
+
+\subsubsection{Running SGFormat}
+To run this tool (after it has been installed) use:
+\begin{lstlisting}
+sgformat [-h] [-d] ctrlname
+\end{lstlisting}
+where \texttt{ctrlname} in the name of the JSON format control file for the document.
+
+\newpara
+The \texttt{-d} option turns on debugging mode and should not normally be used.
+
+\subsection{Terminal configuration on ``Unix-like'' systems}
+\newpara
+By default, ``terminals'' on ``Unix-like'' systems are assumed to have certain characteristics defined by
+the terminal type \texttt{xterm-256color}. This is based on the DEC VT-100 escape sequences with many extensions.
+Users very rarely need to know about their ``terminal type'' these days, but neither \textbf{GTerm} nor Tektronix 401x
+conform to the \texttt{xterm-256color} ``standard'' (to say the least). \textbf{GTerm} largely just ignores extraneous
+escape sequences it receives, but Tektronix 401x terminals (with some emulators) may be more sensitive. In both cases,
+things work better if the terminal is explicitly configured.
+
+\newpara
+Although there are many alternative approaches, using Bash rather than zsh and setting the prompt to something
+minimal is recommended. For example:
+\begin{lstlisting}
+$ bash
+$ export PS1='$ '
+\end{lstlisting}
+
+\subsubsection{Tektronix 401x}
+\begin{lstlisting}
+$ export TERM=tek4014
+$ tset -e ^H
+\end{lstlisting}
+
+\subsubsection{GTerm}
+\begin{lstlisting}
+$ export TERM=dumb
+$ tset
+\end{lstlisting}
+
+\subsection{A stripped down telnetd for ``Unix-like'' systems}
+\newpara
+The \textbf{DtCyber} simulator provides terminal access through a built-in telnet server. Most other historic computer system simulators
+do the same for terminals. However, \textbf{GPLOT} can run on ``Unix-like'' systems and it is often useful to run it with
+\textbf{GTerm} (or, maybe, a Tektronix 401x emulator). In the past, that hasn't been a problem, because ``Unix-like'' systems
+came with a telnet server (of course). However, there are now two issues:
+\begin{itemize}
+\item Some systems (e.g. macOS) no longer ship with telnet servers at all, for ``security'' reasons.
+\item Telnet servers have been disfavoured for over a decade now, since ssh is a much better choice for most purposes --- but
+  not for all. Maintaining them has been low priority, and this has shown in terms of bugs that come and go from release to
+  release. The standard \texttt{telnetd} is also quite complex --- much more so than it needs to be for most likely applications
+  these days.
+\end{itemize}
+
+\newpara
+To get around these issues, we maintain a fork of \textbf{mini-telnetd} which can be built on today's versions of macOS and Linux.
+This is a very barebones telnet server which nonetheless does everything needed for using \textbf{GTerm} on macOS and Linux.
+
+\newpara
+On macOS, \textbf{mini-telnetd} can be run as follows (note \texttt{sudo} is not required):
+\begin{lstlisting}
+$ mini-telnetd -p 2323 -l /usr/bin/login
+\end{lstlisting}
+
+\newpara
+On Linux, \textbf{mini-telnetd} must be run as \texttt{sudo}. However, the login program binary location need not be specified,
+as the default \texttt{/bin/login} is correct there.
+\begin{lstlisting}
+$ sudo mini-telnetd -p 22323 
+\end{lstlisting}
+
+\subsection{Verifying GPLOT/DIMFILM is working correctly}
+
+The "test suite" for \textbf{GPLOT} (and, indirectly, \textbf{DIMFILM}) consists of the obey files that
+create the figures in this document. These aren't exhaustive tests, of course, but
+if the full set of Figures can be correctly generated on a system for all four
+supported devices, it is likely that (almost?) everything is working correctly.
+
+\newpara
+To aid with verification, there are two obey files which generate all the figures
+in EPS or SVG format. These are \texttt{OBALEPS} and \texttt{OBALSVG},
+which both rely on \texttt{OBALTST}.
+
+\newpara
+To run these on NOS, use:
+\begin{lstlisting}
+ATTACH,GPLOT.
+GPLOT,GET=YES,SAVE=YES,OBEY=OBALEPS.
+GPLOT,GET=YES,SAVE=YES,OBEY=OBALSVG.
+\end{lstlisting}
+
+\newpara
+You may want to fetch the result files to some system on which they can be
+viewed after each step, as the \texttt{OBALSVG} stage will overwrite the EPS files
+generated by \texttt{OBALEPS} (the output files have the same names -- NOS file names
+have no extensions and are too short to add anything meaningful to distinguish 
+EPS from SVG).
+
+\newpara
+These tests will take some time to run and consume a lot of resources, so
+it is recommended to use:
+\begin{lstlisting}
+SETTL,*.
+SETJSL,*.
+\end{lstlisting}
+to prevent running into time and resource limits.
+
+\newpara
+To fetch the output files from NOS to a "Unix-like" system, you can use NOSFTP
+with a fetch list. This list is in a file \texttt{fetch-list} which can be recreated
+with \texttt{get-images-list.sh} if \texttt{OBALTST} is modified (it scans that obey file for
+output image information). For example, to get all SVG files generated by the above
+on NOS into a directory called \texttt{temp2}:
+\begin{lstlisting}
+$ mkdir temp2
+$ cd temp2
+$ nosftp tester nuc1
+Password for NOS account: 
+Contacting NOS FTP server on host: nuc1
+230 USER LOGGED IN, PROCEED.
+220 SERVICE READY FOR NEW USER.
+Local cwd now: /Volumes/qemu-main/gitprojects/gplot2/temp2
+NOS FTP> mget ../obey-files/fetch-list ascii svg
+... getting: gr1001 ( 1 )
+... retrieving file: gr1001
+226 CLOSING DATA CONNECTION.
+...
+...
+... getting: fin001 ( 73 )
+... retrieving file: fin001
+226 CLOSING DATA CONNECTION.
+Got 73 of 73 files OK
+
+NOS FTP> bye
+
+Exiting normally.
+221 SERVICE CLOSING CONTROL CONNECTION. LOGGED OUT.
+
+$ ls
+cht1001.svg f02t001.svg f05t001.svg f11t001.svg f17t001.svg	
+g2fm001.svg gh1b001.svg gr12001.svg gr18001.svg gr21001.svg	
+gr30001.svg iocd001.svg lsys001.svg cht2001.svg f03s001.svg	
+f06t001.svg f12t001.svg f18t001.svg g2sp001.svg gh2b001.svg	
+gr13001.svg gr1a001.svg gr22001.svg gr3001.svg  lsbr001.svg
+f01m001.svg f03t001.svg f07t001.svg f13t001.svg fin001.svg	
+g3sp001.svg ghbb001.svg gr14001.svg gr1i001.svg gr27001.svg	
+gr4001.svg  lsgo001.svg f01s001.svg f04s001.svg f08t001.svg	
+f14t001.svg fosm001.svg gd01001.svg gr10001.svg gr15001.svg	
+gr1x001.svg gr28001.svg gr5001.svg  lsks001.svg f01t001.svg	
+f04t001.svg f09t001.svg f15t001.svg g1fm001.svg gdea001.svg	
+gr1001.svg  gr16001.svg gr20001.svg gr29001.svg gr7001.svg	
+lssm001.svg f02s001.svg f05s001.svg f10t001.svg f16t001.svg	
+g1sp001.svg gemz001.svg gr11001.svg gr17001.svg gr2001.svg	
+gr2a001.svg gr8001.svg  lssp001.svg
+\end{lstlisting}
+
+\newpara
+There is a script which will run the \textbf{SVGView} tool on all SVG
+files in a directory to make the output easy to examine:
+\begin{lstlisting}
+svgviewall.sh
+\end{lstlisting}
+This is installed when the other tools described above are
+installed.
+
+\newpara
+To verify correct operation on the two interactive devices,
+use \textbf{GPLOT} interactively, choose the device
+(\texttt{GTERM} or \texttt{TEK4K}) then use:
+\begin{lstlisting}
+OBEY OBALTST
+\end{lstlisting}
+and inspect the output visually. The obey script pauses
+after each output "frame" for the user to type \texttt{(return)}
+(or \texttt{Q (return)} to stop the script). On "Unix-like"
+systems, you may need to use \texttt{PREFIX} to specify where obey
+files are to be found first.
+
+\newpara
+To run the EPS and SVG format verification tests on
+"Unix-like" systems, use:
+\begin{lstlisting}
+ugplot obey=obaleps
+ugplot obey=obalsvg
+\end{lstlisting}
+
+\newpara
+The output files will have \texttt{.svg} or \texttt{.eps} extensions in 
+this case, of course.
+
+
+
 \section{Acknowledgements and history}
 \newpara
 \textbf{GPLOT} is entirely reliant on \textbf{DIMFILM}, written by Dr. John C. Gilbert at The University of London
@@ -4768,7 +5606,8 @@ working version of \textbf{DIMFILM} using Hershey fonts by 2007 (it was very muc
 The original, unmodified, source is retained in the \texttt{historic} sub-tree of the source repository.
 
 \newpara
-The original (albeit ``interim'') \textbf{DIMFILM} manual was preserved in several formats, including a very early version
+As noted above,
+the original (albeit ``interim'') \textbf{DIMFILM} manual was preserved in several formats, including a very early version
 of Microsoft Word and some mid-1980's version of WordStar. I have failed to find any software which can use these
 files. Fortunately, the manual was also kept in a RUNOFF style format (i.e. plain text with markup). I never found
 a RUNOFF style formatting program that could process these files either (the files have the extension \texttt{.sg} which
@@ -4786,12 +5625,18 @@ written Fortran program can now be done from \textbf{GPLOT}. V0.59 fixed some bu
 tidied up a few things and supported building on ``Unix-like'' systems as well as NOS. This version also uses the NOS MODIFY --
 Git inter-operability tools so that the source can be managed equally well on NOS or with Git, with changes made on one system
 being automatically reflected in the other. This version also automatically generates minor variations of the source code
-needed for building on COS and Unix, using a single, NOS compatible, code base. Many further changes and additions were made
+needed for building on COS (\textbf{DIMFILM} library only) and Unix, using a single, NOS compatible,
+code base. Many further changes and additions were made
 between July and October 2025 -- many of them a direct result of trying to use it (e.g. to produce the figures
 in this manual). The additions include the ``higher level drawing'' functions.
 
 \newpara
-The current version (0.87) may be genuinely useful (I find it to be). 
+The current version (0.87) may be genuinely useful (I find it to be).
+
+\section{Cheat sheet or Reference card}
+Very often, a reminder of \textbf{GPLOT} commands and operators is all that is needed when
+using it. Such a cheat sheet (or, more formally, reference card) follows. This is
+also available as a separate PDF file for easy printing.
 
 \clearpage
 \begin{figure}

@@ -12,11 +12,11 @@ keywords = ["NOS","git","MODIFY","retrocomputing"]
 license = {file = "LICENSE"}
 
 authors = [
-{name = "Nick Glazzard", email = "nick@hccc.org.uk"}
+{name = "Nick Glazzard", email = "nick.nos28@gmail.com"}
 ]
 
 maintainers = [
-{name = "Nick Glazzard", email = "nick@hccc.org.uk"}
+{name = "Nick Glazzard", email = "nick.nos28@gmail.com"}
 ]
 
 classifiers = ["Development Status :: 4 - Beta",
@@ -30,7 +30,9 @@ classifiers = ["Development Status :: 4 - Beta",
               ]
 
 dependencies = [
-               ]
+             "pysdl2",
+             "pysdl2-dll"
+             ]
 
 [project.scripts]
 nosftp = "nostools.nosftp:main"
@@ -39,6 +41,7 @@ modjoin = "nostools.modjoin:main"
 asciify = "nostools.asciify:main"
 trimcends = "nostools.trimcends:main"
 sgformat = "nostools.sgformat:main"
+svgview = "nostools.svgview:main"
 
 [tool.setuptools]
 packages = ["nostools"]

@@ -589,6 +589,17 @@ def sgformat(control_file, debug=False):
             specific_date_string = control_dict['specific_date_string']
         if 'ps_paper' in control_dict.keys():
             ps_paper = control_dict['ps_paper']
+            if ps_paper == 'a4':
+                ps_page_height_points = 842
+                ps_page_width_points = 595
+            elif ps_paper == 'letter':
+                ps_page_height_points = 791
+                ps_page_width_points = 612
+            elif ps_paper == 'legal':
+                ps_page_height_points = 1009
+                ps_page_width_points = 612
+            else:
+                print('... unknown paper type:', ps_paper, 'Leaving at A4.')
         if 'default_tabset' in control_dict.keys():
             default_tabset = [int(x) for x in control_dict['default_tabset']]
     except Exception as e:
