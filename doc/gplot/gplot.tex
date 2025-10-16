@@ -5113,6 +5113,30 @@ The following options are available:
   to \textbf{DIMFILM} EPS output from COS.
 \end{itemize}
 
+\subsubsection{Making ImageMagick work for PDF files on Linux}
+\newpara
+It is possible that the \texttt{-p} option will not work on Linux systems because \textbf{ImageMagick} believes PDF output
+from \textbf{Ghostscript} is a ``security'' problem. This will not be the case with conversions of \textbf{GPLOT} output
+to PDF (honest!). If you get a ``security policy'' message using this option, a configuration file can be
+edited to make things work.
+
+\begin{lstlisting}
+sudo nano /etc/ImageMagick-6/policy.xml
+\end{lstlisting}
+Find this string:
+\begin{lstlisting}
+<policy domain="coder" rights="none" pattern="PDF" />
+\end{lstlisting}
+and change it to:
+\begin{lstlisting}
+<policy domain="coder" rights="read|write" pattern="PDF" />
+\end{lstlisting}
+
+\newpara
+Whether you run into this is probably dependent on the exact versions of \textbf{Ghostscript}
+and \textbf{Imagemagick} that are
+installed on your system. And possibly on the phase of the moon too.
+
 \subsection{SVGView}
 \newpara
 The Python program \texttt{svgview} is an ``as minimal as can be'' SVG file viewer which can be used to
