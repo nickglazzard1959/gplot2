@@ -5465,6 +5465,18 @@ as the default \texttt{/bin/login} is correct there.
 $ sudo mini-telnetd -p 22323 
 \end{lstlisting}
 
+\subsection{Building documentation on a ``Unix-like'' system}
+\newpara
+The \textbf{DIMFILM} and \textbf{GPLOT} PDF manuals are stored ``pre-built'' in the Git repository. If you want to rebuild them,
+the directories \texttt{doc/dimfilm} and \texttt{doc/gplot} contain \texttt{build.sh} scripts that will build them from source. For
+the \textbf{DIMFILM} manual, the \textbf{GPLOT} tools must have been installed and
+the Python \texttt{venv} used for that installation must be active
+(see \texttt{README.md}).
+
+\newpara
+For the \textbf{GPLOT} manual, in addition to the \textbf{DIMFILM} requirements, a complete TeX/LaTeX environment
+must have been installed. This is done by installing \textbf{TexLive} on Linux or \textbf{MacTex} on macOS.
+
 \subsection{Verifying GPLOT/DIMFILM is working correctly}
 
 The "test suite" for \textbf{GPLOT} (and, indirectly, \textbf{DIMFILM}) consists of the obey files that
