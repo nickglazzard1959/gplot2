@@ -1622,7 +1622,7 @@ Using upper case and \textbf{DIMFILM} ``string markup'' is portable and handles 
 fractions and so on too. Note that \textbf{GPLOT} should \emph{not} be used in \texttt{ASCII} mode on NOS! 
 \textbf{GPLOT} does not attempt to deal with 6/12 Display Code, but will convert it (mostly!) to upper case. 
 However, internal arrays are not sized for 6/12 representations, so there will be problems 
-(mainly strings being unexpectedly truncated rather than crahses, though).
+(mainly strings being unexpectedly truncated rather than crashes, though).
 \item The \texttt{RESET} command re-establishes a default state. If multiple obey files are used in one \textbf{GPLOT} session
 without using \texttt{RESET} at the top of each file, the results will be unpredictable (the state 
 at the end on one obey file will be inherited by the next).
@@ -1870,7 +1870,7 @@ is selected with the \texttt{CSGROUP} command. Following this,
 \texttt{COLOUR} and \texttt{WIDTH} commands set the colour (as
 normalised RGB) and line width for that \texttt{CSGROUP} only. Perhaps
 oddly, the line style (solid, dashed, etc.) is \emph{not} set
-independently for different groups. The current line style applies to
+independently for different groups in \textbf{DIMFILM}. The current line style applies to
 all groups.
 
 \newpara
@@ -2799,7 +2799,7 @@ of this is shown in Figure~\ref{fig:gr20001}.
 
 \newpara
 Well, if we were hoping for a straight line with log Y for this
-function, we are going to be disappointed! Here is the script fot this:
+function, we are going to be disappointed! Here is the script for this:
 
 \begin{lstlisting}
 # LOG Y AXIS
@@ -3249,7 +3249,7 @@ on classic HP calculators.
 \newpara
 One difference is that the RPN evaluator often operates on \emph{arrays}
 rather than scalar values, in a way that might be familiar to people who
-have used NumPy or an APL-like language, perhaps. But with RPN thrown in
+have used \textbf{NumPy} or an APL-like language, perhaps. But with RPN thrown in
 for extra confusion!
 
 \newpara
@@ -3260,7 +3260,7 @@ function plotting, and its main limitation is perhaps that the
 
 \newpara
 A complete description of the available operators can be found in the
-``cheat sheet'' below (which uses a notation familar to FORTH users) and
+``cheat sheet'' below (which uses a notation familar to \textbf{FORTH} users) and
 in the PDF format \textbf{GPLOT} manual. Here, we just give some examples as an
 introduction.
 
@@ -3303,8 +3303,8 @@ diagrammatically.
 \newpara
 As a first, very simple, example, let's compute ``y=x\^{}2''. In
 previous examples the data has been precomputed and read from a file
-(often a ``HERE'' file). This script generates the y values for a
-defined range of x values and plots the result (left hand subfigure,
+(often a ``HERE'' file). This script generates the Y values for a
+defined range of X values and plots the result (left hand subfigure,
 Figure~\ref{fig:gr30001}).
 
 \begin{lstlisting}
@@ -3338,10 +3338,10 @@ OUTLINE DEV
 \newpara
 The two commands that generate the data to be plotted are
 \texttt{ERANGE} and \texttt{EVAL}. The \texttt{ERANGE} command defines a
-range of x values for which the function is the be evaluated. In the
-case given here, it is similar to the NumPy ``linspace'' function. The
+range of X values for which the function is the be evaluated. In the
+case given here, it is similar to the \textbf{NumPy} ``linspace'' function. The
 first argument is the logarithm base, which, if 1, indicates we want to
-sample a linear range. The next two values are the start and end x
+sample a linear range. The next two values are the start and end X
 values, and the final argument is the number of steps to take between
 start and end. \texttt{ERANGE} puts its output in the X array, which is
 also stack level 0.
@@ -3355,7 +3355,7 @@ contents on the stack. The X array can be written to by the
 \newpara
 The \texttt{EVAL} operator needs one argument (a second is optional)
 which is an ``RPN string'' containing operators and operands for the
-evaluator to, er, evaluate. It may be enclosed in double quotation
+evaluator to \ldots er \ldots evaluate. It may be enclosed in double quotation
 marks.
 
 \newpara
@@ -3366,7 +3366,7 @@ graphing commands.
 \newpara
 To make the evaluator more useful, there are 9 ``procedure registers''
 which can contain ``RPN strings''. These can be executed by the
-evalautor using the notation:
+evaluator using the notation:
 
 \begin{lstlisting}
 EVAL @1
@@ -3680,7 +3680,7 @@ be unclear are:
 \item
   Polyline paths can be drawn with the \texttt{PATH} command with
   coordinates defined by a \texttt{HERE} file. This is quite a
-  convenient way of setting up a path, actually. The path may bew open
+  convenient way of setting up a path, actually. The path may be open
   or closed depending on the argument to \texttt{PATH} which may be
   \texttt{C} for closed or \texttt{O} for open.
 \end{itemize}
@@ -3690,7 +3690,7 @@ While you can draw a lot with these basic drawing commands, it can get
 pretty tedious and long winded. Some of that is inevitable, but some
 things could be ``automated''. In this case, the end coordinate for the
 non-horizontal ``angle'' line has to be set by
-\texttt{DRAW\ 9.5981\ 10.5} where those numbers we found by hand with a
+\texttt{DRAW\ 9.5981\ 10.5} where those numbers were found by hand with a
 calculator! This is the sort of thing a computer ought to be able to do
 for you!
 
@@ -3707,7 +3707,7 @@ plane. These are of the form:
 
 \begin{lstlisting}
 x = f(t)
-y = f(t)
+y = g(t)
 \end{lstlisting}
 
 \newpara
@@ -3720,7 +3720,7 @@ which we will come to shortly.
 \newpara
 As a simpler example (from the point of view of \textbf{GPLOT} only!) we start
 with the ``Farris mystery curve''. The ``mystery'' is that a five-fold
-symmetry appears from formula which contain even number and no obvious
+symmetry appears from formulae which contain mostly even numbers and no obvious
 source of such a symmetry.
 
 \newpara
@@ -4136,7 +4136,7 @@ coordinates of the label text literally by hand.
 Probably the most convenient way of using the evaluator for such tasks
 is to add procedures to the \emph{evaluator procedure library} which
 consists of the file \texttt{GPLPROC} (\texttt{gplproc} on Unix-like
-systems).
+systems, with any specified \texttt{PREFIX} prepended).
 
 \newpara
 The procedures in this library are, to some extent, a way to extend
@@ -4363,7 +4363,7 @@ A number of secondary commands set current characteristics of
   \texttt{BOXPBOX} which controls whether the outer and inner boxes are
   outlined.
 \item
-  \texttt{BOXPDELTAS} which sets the automatic position step after ecah
+  \texttt{BOXPDELTAS} which sets the automatic position step after each
   \texttt{BOXTEXT} is drawn.
 \end{itemize}
 
@@ -4535,7 +4535,8 @@ rules'', and, in our case, also a fixed ``turning angle''. The ``axiom
 string'' must be set in string register 1 and up to 8 ``re-writing
 rules'' can then appear in string registers 2 to 9 (used consecutively).
 The initial line angle is set by storing the angle (in degrees) in
-numeric register 3.
+numeric register 3, with the $(x,y)$ coordinates
+of the origin of the system in registers 1 and 2.
 
 \newpara
 The characters allowed (``vocabulary'') are:
@@ -5466,7 +5467,7 @@ do the same for terminals. However, \textbf{GPLOT} can run on ``Unix-like'' syst
 came with a telnet server (of course). However, there are now two issues:
 \begin{itemize}
 \item Some systems (e.g. macOS) no longer ship with telnet servers at all, for ``security'' reasons.
-\item Telnet servers have been disfavoured for over a decade now, since ssh is a much better choice for most purposes --- but
+\item Telnet servers have been disfavoured for over a decade now, since \textbf{ssh} is a much better choice for most purposes --- but
   not for all. Maintaining them has been low priority, and this has shown in terms of bugs that come and go from release to
   release. The standard \texttt{telnetd} is also quite complex --- much more so than it needs to be for most likely applications
   these days.
@@ -5623,6 +5624,9 @@ To run the EPS and SVG format verification tests on
 ugplot obey=obaleps
 ugplot obey=obalsvg
 \end{lstlisting}
+from the \texttt{obey-files} directory (the generated
+files can be tidied
+up afterwards, as desired).
 
 \newpara
 The output files will have \texttt{.svg} or \texttt{.eps} extensions in 

@@ -643,9 +643,9 @@ on NOS than IEEE 32 bit floating point range). The string substitutions
 are defined in `.json` files.
 
 At present, the "Unix" version of GPLOT is intended to behave *identically*
-to the NOS version. This includes limitations to 7 character file names
-and all input being converted to upper case! Note that files to be read
-will generally have to have UPPER CASE names.
+to the NOS version. These systems are very different, of course, especially
+where files are concerned, and various rules and heuristics are used to
+try to hide these differences as much as possible, as explained below.
 
 The build procedure is very similar to that on NOS.
 
@@ -686,7 +686,7 @@ source directory `dimfm-source`, then compiles the contents with
 `gfortran`, creating the library `lib/dimfm.a`
 
 This library has identical functionality to the NOS version.
-FORTRAN-77 (and maybe later version of Fortran?) programs can
+FORTRAN-77 (and maybe later versions of Fortran?) programs can
 be compiled with `gfortran` and linked with it (and the other
 libraries noted above) to produce graphical output.
 
@@ -700,7 +700,7 @@ This compiles the support library code (from `support.f` and
 using DIMFILM will have to link with this library in addition to
 the others mentioned above.
 
-### Build the GPLOT program and copy the font definition file
+### Build the GPLOT program
 
 ```
 ./make-gplot.sh
@@ -709,13 +709,25 @@ This pre-processes the source in `gplot-library` to a newly created
 source directory `gplot-source`, then compiles the contents with
 `gfortran`, creating a relocateable object file which is then
 linked with all the above libraries to create the `gplot` program.
-The DIMFILM font file, found in `gplot-library/dadimfo.src` is also
-copied to `ports/unix/DADIMFO`. After this:
+
+Before GPLOT can be used, an install script must be run:
 ```
-./gplot
+./install.sh
+```
+This copies the `gplot` binary and a script file, `ugplot` to 
+`/usr/local/bin`. It also creates `/usr/local/share/dimfilm` and
+copies the DIMFILM font file, found in `gplot-library/dadimfo.src`,
+to it. After this:
+```
+./ugplot
 ```
 will start GPLOT, which should function identically to the NOS
-version.
+version. A script file is needed to arrange that `DADIMFO` is
+available no matter where `gplot` is run from. For cross-platform
+compatibility, it isn't possible to put a Unix style path
+in the source code and conditional compilation for this was
+less straightforward than usual. The script manages symbolic
+links so that the NOS code that opens `DADIMFO` works on "Unix" too.
 
 Note that command line arguments are as described for NOS in the
 GPLOT documentation, except that arguments are separated by spaces
@@ -752,7 +764,7 @@ A script called `epsview.sh` is included in the `tools` directory
 and installed along with the other tools by `install.sh` in that
 location. This uses programs in the `ghostscript` package to
 convert EPS to PDF and then open the PDF version. This displays
-output in macOS `Preview`. It can also produces a `.png` image version 
+output in macOS `Preview`. It can also produce a `.png` image version 
 using Imagemagick tools if the `-p` option is supplied. 
 This script takes steps to ensure that
 EPS files output by DIMFILM can be opened correctly and displayed
@@ -1182,7 +1194,7 @@ Using upper case and DIMFILM "string markup" is portable and handles subscripts,
 fractions and so on too. Note that GPLOT should *not* be used in `ASCII` mode on NOS! 
 GPLOT does not attempt to deal with 6/12 Display Code, but will convert it (mostly!) to upper case. 
 However, internal arrays are not sized for 6/12 representations, so there will be problems 
-(mainly strings being unexpectedly truncated rather than crahses, though).
+(mainly strings being unexpectedly truncated rather than crashes, though).
 - The `RESET` command re-establishes a default state. If multiple obey files are used in one GPLOT session
 without using `RESET` at the top of each file, the results will be unpredictable (the state 
 at the end on one obey file will be inherited by the next).
@@ -1215,7 +1227,7 @@ even at this stage.
 
 DIMFILM lets the user define a "world coordinate system" or "user coordinates". These "bounds"
 are defined by four numbers, `xlo` to `xhi` defining a range of X coordinates, and
-`ylo` to `yhi` defining a range of Y coordinates. This coordinate system is intended to be "square"
+`ylo` to `yhi` defining a range of Y coordinates. This coordinate system is intended to be "square",
 in that a unit step in X should have the same length when drawn by the output device
 as a unit step in Y. The output devices each have their own ranges of valid coordinates. In the 
 case of the interactive devices (GTerm and the Tektronix 4014), these ranges are fixed (not strictly
@@ -1304,7 +1316,9 @@ not be added to the file names you type in or put in scripts.
 
 To help identify what files contain on NOS, I use the first two characters as
 a sort of "extension" -- e.g. `OB` for obey files -- but this is just a personal
-convention which NOS knows nothing about.
+convention which NOS knows nothing about. Unfortunately, reserving three characters
+for a frame number on output files leaves only four characters for the name, and using
+two of those to distinguish EPS from SVG isn't a good idea.
 
 GPLOT converts all supplied file names (including any `PREFIX`) to lower case
 on "Unix". You cannot use upper or mixed case file names in GPLOT on "Unix".
@@ -1365,7 +1379,7 @@ All of them are members of the class `ALL`.
 These 3 classes are called "colour/style groups" and the current class is selected with the
     `CSGROUP` command. Following this, `COLOUR` and `WIDTH` commands set the colour (as normalised RGB)
 and line width for that `CSGROUP` only. Perhaps oddly, the line style (solid, dashed, etc.) is *not* set
-independently for different groups. The current line style applies to all groups.
+independently for different groups in DIMFILM. The current line style applies to all groups.
 
 Note that any command can be abbreviated -- so long as the abbreviation remains unique, it will work.
 (Note that this is *not* true of evaluator operators, as we will see).
@@ -2129,7 +2143,7 @@ example of this is:
 ![](gr20001.svg)
 
 Well, if we were hoping for a straight line with log Y for this function,
-we are going to be disappointed! Here is the script fot this:
+we are going to be disappointed! Here is the script for this:
 
 ```
 # LOG Y AXIS
@@ -2479,7 +2493,7 @@ but may be referred to in upper case in GPLOT -- all file names are converted
 internally to lower case by GPLOT on "Unix" before being accessed. These names
 could appear in lower case -- as could all commands -- and it would work)
 
-Please example the "called" scripts for more information.
+Please examine the "called" scripts for more information.
 
 When generating a multi-plot "figure", you must keep the grid size constant
 in the `SUBFIG` command (e.g. `SUBFIG 2 2`) for every sub-figure. This is probably
@@ -2521,7 +2535,7 @@ If `READ` is used, their contents will be overwritten by the read data and the
 array length seen by the evaluator will be the number of points read. 
 
 To provide "room" for any but the simplest calculations, another 4 stack levels
-(arrays) are provided "above" to four used for data from `READ`. (This can be
+(arrays) are provided "above" the four used for data from `READ`. (This can be
 configured with the `NSTACK` command).
 
 It is possible to use the first two X and Y levels of the stack as inputs
@@ -2535,7 +2549,7 @@ diagrammatically.
 
 As a first, very simple, example, let's compute "y=x^2". In previous examples
 the data has been precomputed and read from a file (often a "HERE" file). This
-script generates the y values for a defined range of x values and plots the result
+script generates the Y values for a defined range of X values and plots the result
 (left hand subfigure, below).
 ```
 RESET
@@ -2561,11 +2575,11 @@ OUTLINE DEV
 ![](gr30001.svg)
 
 The two commands that generate the data to be plotted are `ERANGE` and
-`EVAL`. The `ERANGE` command defines a range of x values for which the
+`EVAL`. The `ERANGE` command defines a range of X values for which the
 function is the be evaluated. In the case given here, it is similar to the
 NumPy "linspace" function. The first argument is the logarithm base, which, 
 if 1, indicates we want to sample a linear range. The next two values are
-the start and end x values, and the final argument is the number of steps
+the start and end X values, and the final argument is the number of steps
 to take between start and end. `ERANGE` puts its output in the X array,
 which is also stack level 0.
 
@@ -2575,7 +2589,7 @@ stack. The X array can be written to by the `SETX` operator. Otherwise,
 it is not accessed.
 
 The `EVAL` operator needs one argument (a second is optional) which is an
-"RPN string" containing operators and operands for the evaluator to, er,
+"RPN string" containing operators and operands for the evaluator to ... er ...
 evaluate. It may be enclosed in double quotation marks. 
 
 Whatever the evaluator leaves in the stack level 1 or Y array can be
@@ -2583,7 +2597,7 @@ plotted against the X array contents using `XYLINE` or the other graphing
 commands.
 
 To make the evaluator more useful, there are 9 "procedure registers"
-which can contain "RPN strings". These can be executed by the evalautor
+which can contain "RPN strings". These can be executed by the evaluator
 using the notation:
 ```
 EVAL @1
@@ -2849,13 +2863,13 @@ the `MARKER` command sets the marker number to use for points when plotting
 graphs.
 - Polyline paths can be drawn with the `PATH` command with coordinates
 defined by a `HERE` file. This is quite a convenient way of setting up a
-path, actually. The path may bew open or closed depending on the argument to
+path, actually. The path may be open or closed depending on the argument to
 `PATH` which may be `C` for closed or `O` for open.
 
 While you can draw a lot with these basic drawing commands, it can get pretty
 tedious and long winded. Some of that is inevitable, but some things could
 be "automated". In this case, the end coordinate for the non-horizontal 
-"angle" line has to be set by `DRAW 9.5981 10.5` where those numbers we
+"angle" line has to be set by `DRAW 9.5981 10.5` where those numbers were
 found by hand with a calculator! This is the sort of thing a computer
 ought to be able to do for you!
 
@@ -2870,7 +2884,7 @@ functions of a parameter, `t`, that trace out a path on the 2D plane.
 These are of the form:
 ```
 x = f(t)
-y = f(t)
+y = g(t)
 ```
 
 Such functions can generate very pleasing patterns and often appear in
@@ -2881,7 +2895,7 @@ will come to shortly.
 
 As a simpler example (from the point of view of GPLOT only!) we start with
 the "Farris mystery curve". The "mystery" is that a five-fold symmetry
-appears from formula which contain even number and no obvious source of
+appears from formulae which contain mostly even numbers and no obvious source of
 such a symmetry.
 
 While "Spirograph" uses two wheels, with one rotating in slip-free contact
@@ -3203,7 +3217,7 @@ coordinates of the label text literally by hand.
 
 Probably the most convenient way of using the evaluator for such tasks is to add procedures
 to the *evaluator procedure library* which consists of the file `GPLPROC` (`gplproc` on Unix-like
-systems).
+systems, with any specified `PREFIX` prepended).
 
 The procedures in this library are, to some extent, a way to extend GPLOT's capabilities, or, at
 least, make some things much more convenient than they otherwise would be.
@@ -3359,7 +3373,7 @@ A number of secondary commands set current characteristics of
   parameter sets how many lines will fit in the box height, while in `SCALE`
   mode, it sets the fraction of the box width the text should be scaled to fill.
 - `BOXPBOX` which controls whether the outer and inner boxes are outlined.
-- `BOXPDELTAS` which sets the automatic position step after ecah `BOXTEXT`
+- `BOXPDELTAS` which sets the automatic position step after each `BOXTEXT`
   is drawn.
   
 **Labels** are the same graphical entities used to label points on a graph,
@@ -3483,7 +3497,8 @@ associated graphical meaning.
 An L-system is defined by an "axiom string" and a set of "re-writing rules", and, in our case,
 also a fixed "turning angle". The "axiom string" must be set in string register 1 and up to
 8 "re-writing rules" can then appear in string registers 2 to 9 (used consecutively). The initial
-line angle is set by storing the angle (in degrees) in numeric register 3.
+line angle is set by storing the angle (in degrees) in numeric register 3, with the X,Y coordinates
+of the origin of the system in registers 1 and 2.
 
 The characters allowed ("vocabulary") are: `F A B C D E M X Y + - [ ]` Seven of these are associated
 with specific actions. Any alphabetic character can be substituted with a string by a re-writing
@@ -3853,6 +3868,8 @@ To run the EPS and SVG format verification tests on
 ugplot obey=obaleps
 ugplot obey=obalsvg
 ```
+from the `obey-files` directory (the generated
+files can be tidied up afterwards, as desired).
 
 The output files will have `.svg` or `.eps` extensions in 
 this case, of course.
