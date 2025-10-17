@@ -286,7 +286,7 @@ tables and other technical drawings.
 The primary `interactive' output device for \textbf{GPLOT} is \textbf{GTerm} -- a simple terminal emulator with colour graphics
 capabilities written in Python (see the \textbf{GTerm} project repository for more information). \textbf{GPLOT} also 
 supports Tektronix 401x terminals (which \texttt{xterm} emulates, although Ren\'{e} Richarz's
-excellent 4014 emulator is preferred).
+excellent 4014 emulator is preferred: \url{https://github.com/rricharz/Tek4010}).
 \newpara
 Output in the form of graphics files which  can be included in other documents is available in two formats:
 Encapsulated PostScript files and SVG files. The latter is 
@@ -5473,8 +5473,16 @@ came with a telnet server (of course). However, there are now two issues:
 \end{itemize}
 
 \newpara
-To get around these issues, we maintain a fork of \textbf{mini-telnetd} which can be built on today's versions of macOS and Linux.
+To get around these issues, we can use a patched version
+of \textbf{mini-telnetd} which can be built on today's versions of macOS and Linux.
 This is a very barebones telnet server which nonetheless does everything needed for using \textbf{GTerm} on macOS and Linux.
+The \textbf{mini-telnetd} Github repository can be found here: \url{https://github.com/Troll338cz/mini_telnetd}.
+
+\newpara
+After cloning this, use the file: \texttt{tools/mini\_telnetd.patch} to patch the source and build it with \texttt{make}.
+\begin{lstlisting}
+git apply mini_telnetd.patch
+\end{lstlisting}
 
 \newpara
 On macOS, \textbf{mini-telnetd} can be run as follows (note \texttt{sudo} is not required):

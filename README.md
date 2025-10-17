@@ -10,11 +10,13 @@ on CDC NOS 2.8.7, but it will also run on "Unix-like" systems.
 In addition to plotting graphs of
 data (stored in files), the current version of GPLOT has some features
 which can be useful for general drawing, especially of things such as
-block diagrams.
+block diagrams. All the graphics in this document were created with GPLOT,
+for example.
 
 GPLOT is based on the DIMFILM library (Descriptive Instructions for MicroFILM)
-which was written by Dr. John Gilbert at ULCC between 1972 and the mid 1990s.
-The version of DIMFILM used is the second major version, from around 1983.
+which was written by Dr. John Gilbert at ULCC between 1972 (first released
+in 1973) and the mid 1990s.
+The version of DIMFILM used is the second major version, from around 1984.
 The first version was CDC specific, while the second was much more easily 
 ported and ran on IBM MVS, Cray COS and UNICOS as well as Convex machines.
 
@@ -436,8 +438,9 @@ This creates a CCL procedure library called `USERLIB` and sets it up in the
 library search list (a bit like changing `$PATH` on "Unix" systems, but not
 really). It also sets `PRLOGIN` to be the "script" run on login. This sets
 up `USERLIB` on login so it is available and also lets the user pick from 
-a list of terminals for the interactive session (so that the Full Screen Editor
-- FSE - "just works"). You may want to modify this part, depending on which
+a list of terminals for the interactive session (so that the 
+Full Screen Editor - FSE - "just works"). You may want to modify this part,
+depending on which
 terminal emulator you use. 
 
 ### Build the utilities library from PLUTILS
@@ -3853,3 +3856,43 @@ ugplot obey=obalsvg
 
 The output files will have `.svg` or `.eps` extensions in 
 this case, of course.
+
+
+Other software to use with GPLOT
+--------------------------------
+
+For historical accuracy -- if you want to experience what online
+graphics was like in the 1970's and the first half of the 1980's --
+using Rene Richarz's superb Tektronix 401x terminal emulator with
+GPLOT is the best way to go. This gets very close to the real thing
+and behaves very like the Tek 4006 I used in 1980-83. 
+It can be found on Github [here](https://github.com/rricharz/Tek4010)
+
+For less historical accuracy, but more utility, my 
+[GTerm project](https://github.com/nickglazzard1959/gterm)
+is a colour graphics terminal for use with GPLOT (and NOS APL).
+It is idiosyncratic and has some issues, but it is quite useful
+with GPLOT.
+
+Because Telnet servers are unpopular on modern operating systems for
+security reasons, it may be difficult to use GPLOT on "Unix-like"
+systems with online graphics terminals. 
+The GTerm project includes a minimal but sufficient Telnet
+client (`ctelnet`) for use with, for example, a Tektronix 401x terminal
+emulator, but it needs to talk to a Telnet server, and that is no
+longer available on macOS, for one. Various Telnet servers can be
+installed, of course, but they are far more complicated than needed
+to just access GPLOT running on "Unix". One alternative is
+[mini_telnetd](https://github.com/Troll338cz/mini_telnetd), available
+on Github. Unfortunately, this will not build "out of the box" on
+modern systems, but it isn't hard to fix that. It is very minimal,
+but quite sufficient for using GPLOT online on "Unix".
+
+To patch `mini_telnetd` after cloning its repository, use the
+file: `tools/mini_telnetd.patch` as follows:
+```
+git apply mini_telnetd.patch 
+```
+then rebuild it with `make`. More information on
+running `mini_telnetd` is found in the GPLOT PDF manual (it
+is trivial, with no "installation" needed).
