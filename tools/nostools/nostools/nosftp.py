@@ -280,12 +280,12 @@ def main():
         Recognize commands in cmdline. Return cmdline split into
         space separated words and command enum: (cmd_enum, args_list)
         """
-        cmdline = cmdline.lower().strip()
+        cmdline = cmdline.strip()
         if len(cmdline) == 0:
             return (cmds.NONE, [])
         else:
             cmdwords = cmdline.split()
-            cmd = cmdwords[0]
+            cmd = cmdwords[0].lower()
             if cmd == 'help':
                 sorted_keys = sorted(commands.keys())
                 for key in sorted_keys:
@@ -331,18 +331,18 @@ def main():
 
             elif cmdcode == cmds.GET:
                 nostypes_list = ['ascii','display','binary']
-                if not argslist[2] in nostypes_list:
+                if not argslist[2].lower() in nostypes_list:
                     print('File type must be one of:', nostypes_list)
                 else:
                     if not valid_nos_name(argslist[0]):
                         print('NOS file name is invalid.')
                     else:
-                        if not get_file(ftp, argslist[0], argslist[1], argslist[2]):
+                        if not get_file(ftp, argslist[0], argslist[1], argslist[2].lower()):
                             print('Failed.')
 
             elif cmdcode == cmds.MGET:
                 nostypes_list = ['ascii','display','binary']
-                if not argslist[1] in nostypes_list:
+                if not argslist[1].lower() in nostypes_list:
                     print('File type must be one of:', nostypes_list)
                 else:                
                     try:
@@ -368,7 +368,7 @@ def main():
                                 print('... ... NOS file name is invalid. Skipping ...')
                             else:
                                 outname = inname + '.' + argslist[2]
-                                if not get_file(ftp, inname, outname, argslist[1]):
+                                if not get_file(ftp, inname, outname, argslist[1].lower()):
                                     print('... ... Failed to send file. Skipping ...')
                                 else:
                                     ngot += 1
@@ -379,7 +379,7 @@ def main():
                 if not valid_nos_name(argslist[1]):
                     print('NOS file name is invalid.')
                 else:
-                    if (len(argslist) == 3) and (argslist[2] == 'display'):
+                    if (len(argslist) == 3) and (argslist[2].lower() == 'display'):
                         cs_string = 'DIS'
                     else:
                         cs_string = 'ASCII'
@@ -398,7 +398,7 @@ def main():
                     else:
                         continue
 
-                cs_string = 'DIS' if (argslist[1] == 'display') else 'ASCII'
+                cs_string = 'DIS' if (argslist[1].lower() == 'display') else 'ASCII'
 
                 nsent = nfiles = 0
                 for inname in inlist:
@@ -459,7 +459,7 @@ def main():
                     if len(argslist) == 1:
                         newfilelist = []
                         for filename in filelist:
-                            if filename.lower().find(argslist[0]) != -1:
+                            if filename.lower().find(argslist[0].lower()) != -1:
                                 newfilelist.append(filename)
                         if len(newfilelist) == 0:
                             print('No matching files found.')
