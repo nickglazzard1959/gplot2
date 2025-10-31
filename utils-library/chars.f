@@ -5,7 +5,6 @@ C MANY WRITTEN BY DR. ADRIAN CLARK SOMETIME IN THE EARLY-MID 1980'S.
 C MODIFIED FOR CDC NOS COMPATIBILITY AND ADDITIONS BY NICK GLAZZARD.
 C================================================================
 C
-#ifndef PORTF77
       INTEGER FUNCTION IACHAR(C)
 C----------------------------------------------------(CHARS)-----------
 C RETURN THE ASCII CODE FOR C REGARDLESS OF THE LOCAL CHARACTER SET.
@@ -15,9 +14,15 @@ C DEALT WITH (NO LOWER CASE IS POSSIBLE IN 1 CHARACTER).
 C----------------------------------------------------------------------
       CHARACTER*1 C
 C----
+#ifndef PORTF77
+C ON NOS, OFFSET BY 32, AS ICHAR OF SPACE IS 0.
       IACHAR = ICHAR(C) + 32
+#else
+      IACHAR = ICHAR(C)
+#endif
       RETURN
       END
+#ifndef PORTF77
           IDENT IDCHAR
           ENTRY IDCHAR
 *
@@ -345,6 +350,7 @@ C
       NUMRIC = .TRUE.
       DO 1 I = 1, LEN(S)
          J = IACHAR( S(I:I) )
+C         PRINT *,'CH=',S(I:I),' J=',J
          IF( J .GT. 47 .AND. J .LT. 58 )GOTO 1
          NUMRIC = .FALSE.
          GOTO 2
