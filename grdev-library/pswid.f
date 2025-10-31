@@ -8,7 +8,11 @@ C
       INCLUDE 'dfxpsn.cmn'
 C
       WIDTH = W
+#ifdef NOSVE
+      WRITE(LUN,100)W, CHAR(119)
+ 100  FORMAT(F12.6,1X,A)
+#else
       WRITE(LUN,100)W
-C
  100  FORMAT(F12.6,' ^W')
+#endif
       END

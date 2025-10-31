@@ -38,10 +38,18 @@ C
 C --- BRANCH ACCORDING TO THE BEAM BRIGHTNESS.
 C
       IF( ON ) THEN
+#ifdef NOSVE
+         WRITE(LUN, 100) XPS, YPS, XPOS, YPOS, CHAR(108)
+#else
          WRITE(LUN, 100) XPS, YPS, XPOS, YPOS
+#endif
          EMPTYF = .FALSE.
       ELSE
+#ifdef NOSVE
+         WRITE(LUN, 200) XPS, YPS, CHAR(109)
+#else
          WRITE(LUN, 200) XPS, YPS
+#endif
       END IF
 C
       XPOS = XPS
@@ -56,8 +64,13 @@ C
          IF( YPS .GT. YMAX ) YMAX = YPS
       END IF
 C
-  100 FORMAT(F12.6, 1X, F12.6, 1X, F12.6, 1X, F12.6, ' ^L')
-  200 FORMAT(F12.6, 1X, F12.6, ' ^M')
+#ifdef NOSVE
+ 100  FORMAT(F12.6, 1X, F12.6, 1X, F12.6, 1X, F12.6, 1X, A)
+ 200  FORMAT(F12.6, 1X, F12.6, A)
+#else
+ 100  FORMAT(F12.6, 1X, F12.6, 1X, F12.6, 1X, F12.6, ' ^L')
+ 200  FORMAT(F12.6, 1X, F12.6, ' ^M')
+#endif
       END
 C
       SUBROUTINE PSBORD

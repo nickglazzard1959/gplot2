@@ -88,10 +88,12 @@ C
 C---- WRITE THE TRAILER.
 C
             IF( INGROUP )THEN
-               WRITE(LUN,9)'</^G>'
+               WRITE(CFMT,9)'</^G>'
+               CALL SQSPACE(CFMT,ALINE,LUN)
                INGROUP = .FALSE.
             ENDIF
-            WRITE(LUN,9)'</^S^V^G>'
+            WRITE(CFMT,9)'</^S^V^G>'
+            CALL SQSPACE(CFMT,ALINE,LUN)
  9          FORMAT(A)
 C
 C---- CLOSE THE OUTPUT FILE, KEEPING IT.
@@ -112,16 +114,24 @@ C
 C
 C---- CREATE A FILE NAME FOR THE NEW FRAME.
 C---- ON "UNIX", ADD AN EXTENSION AND FORCE THE RESULT TO LOWER CASE.
+C---- ON NOS/VE, ALSO ADD AN EXTENSION, WITH UNDERSCORE NOT DOT.
 C
       FRNO = FRNO + 1
+#ifndef PORTF77
+      WRITE(FNO,100)SVGN(1:SVGNL), FRNO
+ 100  FORMAT(A,I3.3)
+#endif      
 #ifdef UNIX
       WRITE(FNO,100)SVGN(1:SVGNL), FRNO, '.^S^V^G'
  100  FORMAT(A,I3.3,A)
       CALL LOCASE(FNO(1:LNBC(FNO,1,1)))
-#else
-      WRITE(FNO,100)SVGN(1:SVGNL), FRNO
- 100  FORMAT(A,I3.3)
 #endif
+#ifdef NOSVE
+      WRITE(CFMT,9)'_^S^V^G'
+      CALL CNV612(CFMT)
+      WRITE(FNO,100)SVGN(1:SVGNL), FRNO, CFMT
+ 100  FORMAT(A,I3.3,A)
+#endif      
 C
 C---- CREATE THE NEW FILE. OVERWRITE EXISTING.
 C
@@ -136,8 +146,10 @@ C
 C
 C---- WRITE OUT THE SVG HEADER TO THE OUTPUT FILE.
 C
-      WRITE(LUN,9)'<^S^V^G '
-      WRITE(LUN,9)TID
+      WRITE(CFMT,9)'<^S^V^G '
+      CALL SQSPACE(CFMT,ALINE,LUN)
+      WRITE(CFMT,9)TID
+      CALL SQSPACE(CFMT,ALINE,LUN)
 C
 C---- COMPLETE THE SVG HEADER WITH THE VIEWBOX.
 C---- NOTE: A PREVIOUS VERSION OF THIS CODE ACCUMULATED BOUNDS TO WRITE
@@ -176,11 +188,14 @@ C----------------------------------------------------------------------
       REAL WIDTH
 C----
       INCLUDE 'svgcmn.cmn'
+      CHARACTER*80 CFMT, ALINE
+C
       WPEN = 2.0 * WIDTH
 C
 C---- END GROUP SO THE NEXT LINE WILL CREATE NEW GROUP WITH THIS WIDTH.
       IF( INGROUP )THEN
-         WRITE(LUN,9)'</^G>'
+         WRITE(CFMT,9)'</^G>'
+         CALL SQSPACE(CFMT,ALINE,LUN)
  9       FORMAT(A)
          INGROUP = .FALSE.
       ENDIF
@@ -196,13 +211,16 @@ C----------------------------------------------------------------------
       REAL R, G, B
 C----
       INCLUDE 'svgcmn.cmn'
+      CHARACTER*80 CFMT, ALINE
+C
       CPEN(1) = R
       CPEN(2) = G
       CPEN(3) = B
 C
 C---- END GROUP SO THE NEXT LINE WILL CREATE NEW GROUP WITH THIS COLOUR.
       IF( INGROUP )THEN
-         WRITE(LUN,9)'</^G>'
+         WRITE(CFMT,9)'</^G>'
+         CALL SQSPACE(CFMT,ALINE,LUN)
  9       FORMAT(A)
          INGROUP = .FALSE.
       ENDIF
@@ -314,6 +332,9 @@ C
          ENDIF
  3    CONTINUE
 C
+#ifdef NOSVE
+      CALL CNV612(COUT(1:IOUT))
+#endif
       WRITE(LUN,101)COUT(1:IOUT)
  101  FORMAT(A)
 C
@@ -353,7 +374,8 @@ C---- NOTE THAT R, G, B VALUES MUST BE SEPARATED WITH COMMAS NOT SPACES.
                IPEN(I) = INT(255.9*CPEN(I))
  1          CONTINUE
  9          FORMAT('<^G ',A)
-            WRITE(LUN,9)MATRIX
+            WRITE(CFMT,9)MATRIX
+            CALL SQSPACE(CFMT,COUT,LUN)
             WRITE(CFMT,102)STYLE,IPEN(1),IPEN(2),IPEN(3)
  102        FORMAT(A,I3,',',I3,',',I3,');')
             CALL SQSPACE(CFMT,COUT,LUN)

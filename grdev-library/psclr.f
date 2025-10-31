@@ -33,6 +33,9 @@ C
       CHARACTER*15 CMTLR
       CHARACTER*24 CMTBE
       CHARACTER*7  EPEXT
+#if NOSVE
+      LOGICAL FIRST
+#endif
       DATA CMTID/'%%!PS-A^D^O^B^E-3.0 EPSF-3.0'/
       DATA CMTIT/'%%T^I^T^L^E: D^I^M^F^I^L^M ^P^L^O^T ^F^I^L^E.'/
       DATA CMTBB/'%%B^O^U^N^D^I^N^GB^O^X: (^A^T^E^N^D)'/
@@ -48,7 +51,38 @@ C
       DATA SHOPG/'^S^H^O^W^P^A^G^E'/
       DATA CMTLR/'%%T^R^A^I^L^E^R'/
       DATA CMTBE/'%%B^O^U^N^D^I^N^GB^O^X: '/
+#if NOSVE
+      DATA EPEXT/'_^E^P^S'/
+      DATA FIRST/.TRUE./
+#else
       DATA EPEXT/'.^E^P^S'/
+#endif
+      SAVE
+#ifdef NOSVE
+C
+C --- ON NOS/VE, CONVERT 6/12 STRINGS TO LOWER CASE ASCII.
+C --- ON UNIX, THIS IS DONE BY ASCIIFY.PY, BUT WE CANNOT DO THAT ON VE.
+C
+      IF( FIRST )THEN
+         CALL CNV612( CMTID )
+         CALL CNV612( CMTIT )
+         CALL CNV612( CMTBB )
+         CALL CNV612( CMTEC )
+         CALL CNV612( DEFL1 )
+         CALL CNV612( DEFL2 )
+         CALL CNV612( DEFL3 )
+         CALL CNV612( DEFM  )
+         CALL CNV612( DEFC  )
+         CALL CNV612( DEFW  )
+         CALL CNV612( CMTEP )
+         CALL CNV612( SETWD )
+         CALL CNV612( SHOPG )
+         CALL CNV612( CMTLR )
+         CALL CNV612( CMTBE )
+         CALL CNV612( EPEXT )         
+         FIRST = .FALSE.
+      ENDIF
+#endif
 C
 C --- CLOSE ANY EXISTING FILLED FILE, AFTER WRITING THE TRAILER.
 C
@@ -94,13 +128,15 @@ C
       IF( .NOT. OPENED .OR. EVERY )THEN
          FRNO = FRNO + 1
          IF( EVERY )THEN
-#ifdef UNIX
-            WRITE( FNO, 200 )EPFN(1:EPFNL),FRNO,EPEXT
- 200        FORMAT( A,I3.3,A )
-            CALL LOCASE(FNO(1:LNBC(FNO,1,1)))
-#else
+#ifndef PORTF77
             WRITE( FNO, 200 )EPFN(1:EPFNL),FRNO
  200        FORMAT( A,I3.3 )
+#else
+            WRITE( FNO, 200 )EPFN(1:EPFNL),FRNO,EPEXT
+ 200        FORMAT( A,I3.3,A )
+#endif
+#ifdef UNIX
+            CALL LOCASE(FNO(1:LNBC(FNO,1,1)))
 #endif            
             OPEN( UNIT=LUN, FILE=FNO(1:LNBC(FNO,1,1)),
      &       STATUS='UNKNOWN', FORM='FORMATTED',

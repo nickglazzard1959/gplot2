@@ -922,3 +922,61 @@ C
  9    CONTINUE
       RETURN
       END
+C
+      SUBROUTINE CNV612( STRING )
+C------------------------------------------------------(CHARS)---------
+C CONVERT STRING FROM 6/12 ASCII TO TRUE ASCII IN PLACE.
+C THIS MUST ONLY BE CALLED ON PLATFORMS WITH 8 BIT CHARACTERS.
+C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      CHARACTER*(*) STRING
+C
+      INTEGER I, J, SLEN, IC
+      CHARACTER*1 C
+C
+      SLEN = LEN(STRING)
+      J = 0
+      I = 1
+ 1    CONTINUE
+      IF( I .GT. SLEN )GOTO 2
+      IF( STRING(I:I) .EQ. '^' )THEN
+         I = I + 1
+         IF( I .GT. SLEN )GOTO 2
+         J = J + 1
+         IC = IACHAR( STRING(I:I) )
+         IF( IC .GE. 48 .AND. IC .LE. 51 )THEN
+            STRING(J:J) = CHAR(123+IC-48)
+         ELSE
+            IF( IC .GE. 65 .AND. IC .LE. 90 )THEN
+               STRING(J:J) = CHAR(IC+32)
+            ELSE
+               STRING(J:J) = CHAR(IC)
+            ENDIF
+         ENDIF
+      ELSE IF( STRING(I:I) .EQ. '@' )THEN
+         I = I + 1
+         IF( I .GT. SLEN )GOTO 2
+         J = J + 1
+         IC = IACHAR( STRING(I:I) )
+         IF( IC .EQ. 65 )THEN
+            STRING(J:J) = CHAR(64)
+         ELSE IF( IC .EQ. 66 )THEN
+            STRING(J:J) = CHAR(94)
+         ELSE IF( IC .EQ. 71 )THEN
+            STRING(J:J) = CHAR(96)
+         ELSE IF( IC .EQ. 68 )THEN
+            STRING(J:J) = CHAR(58)
+         ELSE
+            STRING(J:J) = CHAR(IC)
+         ENDIF
+      ELSE
+         J = J + 1
+         STRING(J:J) = STRING(I:I)
+      ENDIF
+      I = I + 1
+      GOTO 1
+ 2    CONTINUE
+      STRING(J+1:SLEN) = ' '
+      RETURN
+      END
+      

@@ -10,7 +10,11 @@ C
       RED = R
       GREEN = G
       BLUE = B
+#ifdef NOSVE
+      WRITE(LUN,100)R,G,B, CHAR(99)
+ 100  FORMAT(F12.6,1X,F12.6,1X,F12.6,1X,A)
+#else
       WRITE(LUN,100)R,G,B
-C
  100  FORMAT(F12.6,1X,F12.6,1X,F12.6,' ^C')
+#endif
       END
