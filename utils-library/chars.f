@@ -933,6 +933,7 @@ C----------------------------------------------------------------------
 C
       INTEGER I, J, SLEN, IC
       CHARACTER*1 C
+      INTEGER IACHAR
 C
       SLEN = LEN(STRING)
       J = 0

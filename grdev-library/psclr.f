@@ -33,9 +33,10 @@ C
       CHARACTER*15 CMTLR
       CHARACTER*24 CMTBE
       CHARACTER*7  EPEXT
-#if NOSVE
+#ifdef NOSVE
       LOGICAL FIRST
 #endif
+      SAVE
       DATA CMTID/'%%!PS-A^D^O^B^E-3.0 EPSF-3.0'/
       DATA CMTIT/'%%T^I^T^L^E: D^I^M^F^I^L^M ^P^L^O^T ^F^I^L^E.'/
       DATA CMTBB/'%%B^O^U^N^D^I^N^GB^O^X: (^A^T^E^N^D)'/
@@ -51,13 +52,12 @@ C
       DATA SHOPG/'^S^H^O^W^P^A^G^E'/
       DATA CMTLR/'%%T^R^A^I^L^E^R'/
       DATA CMTBE/'%%B^O^U^N^D^I^N^GB^O^X: '/
-#if NOSVE
+#ifdef NOSVE
       DATA EPEXT/'_^E^P^S'/
       DATA FIRST/.TRUE./
 #else
       DATA EPEXT/'.^E^P^S'/
 #endif
-      SAVE
 #ifdef NOSVE
 C
 C --- ON NOS/VE, CONVERT 6/12 STRINGS TO LOWER CASE ASCII.

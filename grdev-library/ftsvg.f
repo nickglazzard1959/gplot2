@@ -3,13 +3,14 @@ C---------------------------------------------------------------------
 C SET THE SVG OUTPUT FILE NAME STEM TO SFNAME.
 C 4 CHARS MAX ON NOS. ALLOWS FOR 3 DIGIT FRNO.
 C 72 CHARS MAX ON "UNIX". ALLOWS FOR 4 CHAR EXT AND 3 DIGIT FRNO.
+C 72 CHARS MAX ON NOS/VE.
 C RESET FRAME NUMBER. SFNAME SHOULD BE 79 OR MORE CHARACTERS.
 C---------------------------------------------------------------------
       IMPLICIT LOGICAL (A-Z)
       CHARACTER*(*) SFNAME
 C----
       INCLUDE 'svgcmn.cmn'
-#ifdef UNIX
+#ifdef UNIXNVE
       SVGNL = MIN(72,LEN(SFNAME))
 #else
       SVGNL = MIN(4,LEN(SFNAME))
@@ -129,7 +130,7 @@ C
 #ifdef NOSVE
       WRITE(CFMT,9)'_^S^V^G'
       CALL CNV612(CFMT)
-      WRITE(FNO,100)SVGN(1:SVGNL), FRNO, CFMT
+      WRITE(FNO,100)SVGN(1:SVGNL), FRNO, CFMT(1:LNBC(CFMT,1,1))
  100  FORMAT(A,I3.3,A)
 #endif      
 C
@@ -333,6 +334,9 @@ C
  3    CONTINUE
 C
 #ifdef NOSVE
+C---- CONVERT 6/12 CARAT CASE ASCII TO TRUE ASCII IN PLACE
+C---- ON NOS/VE. ON UNIX, THIS IS DONE BY SOURCE CODE MANIPULATION
+C---- WITH ASCIIFY.PY, BUT MUST DO IT DYNAMICALLY ON NOS/VE.
       CALL CNV612(COUT(1:IOUT))
 #endif
       WRITE(LUN,101)COUT(1:IOUT)
@@ -359,7 +363,7 @@ C----
       REAL X, Y
       DATA STYLE /'^S^T^Y^L^E="^S^T^R^O^K^E:^R^G^B('/
       DATA STYWID /'^S^T^R^O^K^E-^W^I^D^T^H:'/
-      DATA MATRIX /'^T^R^A^N^S^F^O^R^M="^M^A^T^R^I^X(1 0 0 1 0 0)"'/
+      DATA MATRIX /'^T^R^A^N^S^F^O^R^M="^M^A^T^R^I^X(1*0*0*1*0*0)"'/
       DATA LB /'<^L^I^N^E*^X1="'/
 C
       X = MIN(DVXMAX, MAX(0.0, XU))
@@ -373,7 +377,7 @@ C---- NOTE THAT R, G, B VALUES MUST BE SEPARATED WITH COMMAS NOT SPACES.
             DO 1 I=1,3
                IPEN(I) = INT(255.9*CPEN(I))
  1          CONTINUE
- 9          FORMAT('<^G ',A)
+ 9          FORMAT('<^G*',A)
             WRITE(CFMT,9)MATRIX
             CALL SQSPACE(CFMT,COUT,LUN)
             WRITE(CFMT,102)STYLE,IPEN(1),IPEN(2),IPEN(3)

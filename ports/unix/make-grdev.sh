@@ -12,7 +12,7 @@ function get_file() {
 
 function compile() {
     echo "... compiling $1"
-    gfortran -g -c -O${OPT} -Wall -std=legacy -cpp -DPORTF77 -DUNIX $1
+    gfortran -g -c -O${OPT} -Wall -std=legacy -cpp -DPORTF77 -DUNIX -DUNIXNVE $1
     return 0
 }
 
