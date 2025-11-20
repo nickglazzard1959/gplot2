@@ -28,7 +28,7 @@ C SEND AN 8 BIT VALUE, VAL8, TO THE "8-IN-12" OUTPUT
 C STREAM.
 C--------------------------------------------------
       INCLUDE 'a12cmn.cmn'
-#ifdef PORTF77
+#ifdef UNIX
       INTEGER VAL8
 C--- JUST INSERT IN TO THE BUFFER (WHICH IS BYTE SIZED).
       BUF(IWP) = INT(IAND(VAL8,255),1)
@@ -36,8 +36,19 @@ C--- JUST INSERT IN TO THE BUFFER (WHICH IS BYTE SIZED).
 C--- FLUSH THE BUFFER TO OUTPUT WHEN ALL BYTES USED.
       IF( IWP .GT. NA12WD )THEN
          CALL A12FLS
-      ENDIF      
-#else
+      ENDIF
+#endif
+#ifdef VMS
+      BYTE VAL8
+C--- JUST INSERT IN TO THE BUFFER (WHICH IS BYTE SIZED).
+      BUF(IWP) = VAL8
+      IWP = IWP + 1
+C--- FLUSH THE BUFFER TO OUTPUT WHEN ALL BYTES USED.
+      IF( IWP .GT. NA12WD )THEN
+         CALL A12FLS
+      ENDIF
+#endif
+#ifndef PORTF77
       BOOLEAN VAL8
       BOOLEAN VAL12
 C--- THE 12 BITS MUST BEGIN WITH 0100 IN TOP 4 BITS
@@ -58,7 +69,7 @@ C--- FLUSH THE BUFFER TO OUTPUT WHEN ALL WORDS USED.
       RETURN
       END
 C
-#ifdef PORTF77
+#ifdef UNIX
       SUBROUTINE A12OUTB( VAL8 )
 C--------------------------------------------------
 C SEND AN 8 BIT VALUE, VAL8, TO THE "8-IN-12" OUTPUT
@@ -85,7 +96,11 @@ C---------------------------------------------------
       BOOLEAN VAL8S(NVAL8)
 C
       DO 1 I=1,NVAL8
+#ifdef VMS
+         CALL A12OUT(VAL8S(I))
+#else
          CALL A12OUT(INT(VAL8S(I)))
+#endif
   1   CONTINUE
       RETURN
       END

@@ -11,7 +11,11 @@ C----
       INCLUDE 'svgcmn.cmn'
 #ifdef UNIX
       SVGNL = MIN(72,LEN(SFNAME))
-#else
+#endif
+#ifdef VMS
+      SVGNL = MIN(72,LEN(SFNAME))
+#endif
+#ifndef PORTF77
       SVGNL = MIN(4,LEN(SFNAME))
 #endif
       SVGN(1:SVGNL) = SFNAME(1:SVGNL)
@@ -58,12 +62,12 @@ C
  1    CONTINUE
       WRITE(6,101)
  101  FORMAT(1X,'NOSPFRT - ERROR REMOVING LOCAL FILE')
+      RETURN
 #else
       WRITE(6,102)NAME
  102  FORMAT(1X,'ERROR, FILE NAME = ',A)
       STOP 'NOSPFRT MUST ONLY BE CALLED WHEN OS IS NOS.'
 #endif
-      RETURN
       END
 C
       SUBROUTINE SVGCLR
@@ -118,7 +122,12 @@ C
       WRITE(FNO,100)SVGN(1:SVGNL), FRNO, '.^S^V^G'
  100  FORMAT(A,I3.3,A)
       CALL LOCASE(FNO(1:LNBC(FNO,1,1)))
-#else
+#endif
+#ifdef VMS
+      WRITE(FNO,100)SVGN(1:SVGNL), FRNO, '.^S^V^G'
+ 100  FORMAT(A,I3.3,A)
+#endif
+#ifndef PORTF77
       WRITE(FNO,100)SVGN(1:SVGNL), FRNO
  100  FORMAT(A,I3.3)
 #endif

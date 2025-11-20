@@ -42,6 +42,7 @@ asciify = "nostools.asciify:main"
 trimcends = "nostools.trimcends:main"
 sgformat = "nostools.sgformat:main"
 svgview = "nostools.svgview:main"
+vmsftp = "nostools.vmsftp:main"
 
 [tool.setuptools]
 packages = ["nostools"]

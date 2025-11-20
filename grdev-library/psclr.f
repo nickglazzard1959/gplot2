@@ -32,7 +32,9 @@ C
       CHARACTER*16 SHOPG
       CHARACTER*15 CMTLR
       CHARACTER*24 CMTBE
+#ifdef PORTF77
       CHARACTER*7  EPEXT
+#endif
       DATA CMTID/'%%!PS-A^D^O^B^E-3.0 EPSF-3.0'/
       DATA CMTIT/'%%T^I^T^L^E: D^I^M^F^I^L^M ^P^L^O^T ^F^I^L^E.'/
       DATA CMTBB/'%%B^O^U^N^D^I^N^GB^O^X: (^A^T^E^N^D)'/
@@ -48,7 +50,9 @@ C
       DATA SHOPG/'^S^H^O^W^P^A^G^E'/
       DATA CMTLR/'%%T^R^A^I^L^E^R'/
       DATA CMTBE/'%%B^O^U^N^D^I^N^GB^O^X: '/
+#ifdef PORTF77
       DATA EPEXT/'.^E^P^S'/
+#endif
 C
 C --- CLOSE ANY EXISTING FILLED FILE, AFTER WRITING THE TRAILER.
 C
@@ -98,7 +102,12 @@ C
             WRITE( FNO, 200 )EPFN(1:EPFNL),FRNO,EPEXT
  200        FORMAT( A,I3.3,A )
             CALL LOCASE(FNO(1:LNBC(FNO,1,1)))
-#else
+#endif
+#ifdef VMS
+            WRITE( FNO, 200 )EPFN(1:EPFNL),FRNO,EPEXT
+ 200        FORMAT( A,I3.3,A )
+#endif
+#ifndef PORTF77
             WRITE( FNO, 200 )EPFN(1:EPFNL),FRNO
  200        FORMAT( A,I3.3 )
 #endif            

@@ -43,7 +43,8 @@ C    RGB MODEL - CHECK VALID RANGE - ALSO USED ON EXIT BY ALL MODELS
            RRR = ZZ01(RR)
            GGG = ZZ01(GG)
            BBB = ZZ01(BB)
-           IF ((RRR.NE.RR).OR.(GGG.NE.GG).OR.(BBB.NE.BB)) THEN
+           IF ((ABS(RRR-RR).GT.1E-6).OR.(ABS(GGG-GG).GT.1E-6).OR.
+     1          (ABS(BBB-BB).GT.1E-6)) THEN
                      IF ((ICHECK.GT.0).AND.(N.NE.0)) WRITE(ERRREC,100)
      1                                ROUTIN,RR,GG,BB,RRR,GGG,BBB
       CALL DFX130(0)

@@ -1,31 +1,35 @@
 #!/bin/bash
 #
-# Process PLDIMFM source in dimfm-library to create gfortran
-# compatible code, then compile that code and build a static
-# library, dimfm.a
+# Process PLDIMFM source in dimfm-library to create VMS FORTRAN
+# compatible code, then transfer that code to VMS.
 #
 function get_file() {
     echo "... getting $1"
-    asciify ../../dimfm-library/$1 dimfm-source/$1
+    asciify -c vmsdefs.json ../../dimfm-library/$1 dimfm-source/$1
     return 0
 }
 
-function compile() {
-    echo "... compiling $1"
-    gfortran -g -c -O${OPT} ${FPE} -Wall -Wno-unused-dummy-argument -Wno-unused-label -std=legacy -cpp -DPORTF77 -DUNIX $1
-    return 0
-}
-
-echo "Build DIMFM library."
+echo "Prepare DIMFM library."
 #
-FPE=
-#FPE="-ffpe-trap=invalid,zero,overflow"
-if [ -z "${OPT}" ]; then
-    OPT=0
+if [ -z "${VMSUSER}" ]; then
+    echo "Environment variable VMSUSER must be defined."
 fi
-if [ ! -d lib ]; then
-    mkdir lib
+if [ -z "${VMSPASSWORD}" ]; then
+    echo "Environment variable VMSPASSWORD must be defined."
 fi
+if [ -z "${VMSHOST}" ]; then
+    echo "Environment variable VMSHOST must be defined."
+fi
+if [ -z "${VMSDEBUG}" ]; then
+    echo "*** Building for RELEASE ***"
+    FOPT=
+    LOPT=
+else
+    echo "*** Building for DEBUG ***"
+    FOPT="/DEBUG/NOOPT"
+    LOPT="/DEBUG"
+fi
+#
 rm -rf dimfm-source
 mkdir dimfm-source
 #
@@ -41,7 +45,6 @@ autot.f
 autox.f
 autoxy.f
 autoy.f
-
 axcut.f
 axtik.f
 blank.f
@@ -584,21 +587,38 @@ dfxk05.cmn
 params.cmn
 )
 #
+rm -f dimfm-source/dimfm-files
+touch dimfm-source/dimfm-files
+#
 for i in "${!F_LIST[@]}"; do
     get_file "${F_LIST[$i]}"
+    echo "${F_LIST[$i]}" >> dimfm-source/dimfm-files
 done
 #
 for i in "${!C_LIST[@]}"; do
     get_file "${C_LIST[$i]}"
+    echo "${C_LIST[$i]}" >> dimfm-source/dimfm-files
 done
+#
+rm -f dimfm-source/dimfm-build.com
+touch dimfm-source/dimfm-build.com
+echo "\$ PURGE" >> dimfm-source/dimfm-build.com
+for i in "${!F_LIST[@]}"; do
+    echo "\$ FORT${FOPT} ${F_LIST[$i]%.*}" >> dimfm-source/dimfm-build.com
+done
+echo "\$ LIB/OBJ/CREATE DIMFM *.OBJ" >> dimfm-source/dimfm-build.com
+echo "\$ PURGE" >> dimfm-source/dimfm-build.com
 #
 cd dimfm-source
-for i in "${!F_LIST[@]}"; do
-    compile "${F_LIST[$i]}"
-done
-#
-echo "... creating static library dimfm.a"
-ar rcs ../lib/dimfm.a *.o
+vmsftp -p ${VMSPASSWORD} -m ../vmsexts.json ${VMSUSER} ${VMSHOST} << EOF
+cred gplot
+cd gplot
+cred dimfm-source
+cd dimfm-source
+mput dimfm-files
+put dimfm-build.com
+bye
+EOF
 cd ..
 #
 echo "... done."
