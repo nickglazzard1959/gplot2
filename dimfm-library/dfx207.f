@@ -134,8 +134,12 @@ C                   IF BLANKS PERMITTED SKIP THEM
       ENDIF
       GO TO 1
    99 ILIM = IPT
-  998 IF (.NOT.FIRST) THEN
-       IF((IT.EQ.3).AND.(K.EQ.2)) RES(1)=RES(1)*(10.**(RES(2)*SIGN(2)))
+ 998  IF (.NOT.FIRST) THEN
+#ifdef NOSVE
+        IF((IT.EQ.3).AND.(K.EQ.2)) RES(1)=RES(1)*(E10VE(RES(2)*SIGN(2)))
+#else
+        IF((IT.EQ.3).AND.(K.EQ.2)) RES(1)=RES(1)*(10.**(RES(2)*SIGN(2)))
+#endif
        IF (IT.GE.2) RRES = RES(1)*SIGN(1)
                       ELSE
        ILIM = -10 - IPT

@@ -17,12 +17,20 @@ C    FUNCTION DESCRIBED IN DFX309
    31 FPN1 = ZL
       IF (FPN1.EQ.0.0) GO TO 1
       A1 = DFX302(ALOG10(ABS(FPN1)))
+#ifdef NOSVE
+      B = E10VE(A1)
+#else
       B = 10.**A1
+#endif
       FPN1 = FPN1/B
     1 FPN2 = ZR
       IF (FPN2.EQ.0.0) GO TO 2
       A2 = DFX302(ALOG10(ABS(FPN2)))
+#ifdef NOSVE
+      B = E10VE(A2)
+#else
       B = 10.**A2
+#endif
       FPN2 = FPN2/B
     2 IROOM = 0
       GO TO (11,12),I

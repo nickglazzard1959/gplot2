@@ -21,7 +21,7 @@ cp ../../utils-library/cmchars.cmn utils-source/cmchars.cmn
 #
 cd utils-source
 echo "... compiling chars.f"
-gfortran -g -c -O${OPT} -Wall -std=legacy -cpp -DPORTF77 chars.f
+gfortran -g -c -O${OPT} -Wall -Wno-intrinsic-shadow -std=legacy -cpp -DPORTF77 -DUNIX chars.f
 #
 echo "... creating static library utils.a"
 ar rcs ../lib/utils.a chars.o

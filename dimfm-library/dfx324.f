@@ -72,8 +72,13 @@ C    HERE FOR LOGARITHMIC
       K = INT(BB)
       IF (BB.LT.0.0) K = K - 1
       C = AZL - FLOAT(K)
+#ifdef NOSVE
+      J = INT(E10VE(C))
+      S1 = FLOAT(J)*(E10VE(FLOAT(K)))
+#else
       J = INT(10.**C)
       S1 = FLOAT(J)*(10.**FLOAT(K))
+#endif
       IF (J.GE.10) J = 1
 C    THIS CORRECTS CASE WITH ZERO MANTISSA AND NEGATIVE CHARACTERISTIC
       S1 = ALOG10(S1)
@@ -158,11 +163,19 @@ C    DIFF LIMITED TO SENSIBLE VALUES
    30 DIST = ABS(AZR-AZL)
       A = ALOG10(DIST)
       J = INT(DFX302(A))
+#ifdef NOSVE
+      BB = E10VE(ABS(A-FLOAT(J)))
+#else
       BB = 10.**(ABS(A-FLOAT(J)))
+#endif
       D = .2
       IF (BB.GE.3.) D = .5
       IF (BB.GE.7.) D = 1.
+#ifdef NOSVE
+      DIFF = D*E10VE(FLOAT(J))
+#else
       DIFF = D*10.**J
+#endif
     2 J = INT(AZL/DIFF)
       S1 = FLOAT(J)*DIFF
       DIFF01 = TD01*(AZR-AZL)
@@ -193,7 +206,11 @@ C    IF VALUES ALL OF FORM N.YZ (WITH COMMON FACTOR) I.E. C1 = 0,
 C    AND DIFF IS NOT SIGNIFICANT TO SAME FACTOR (E.G. IT IS .00D)
 C    THEN FACTOR IS ADJUSTED TO PLOT VALUES AS NY.Z (WHEN DIFFERENCE
 C    BECOMES .0D)
-   81 FACTOR = 10.**V1
+#ifdef NOSVE
+ 81   FACTOR = E10VE(V1)
+#else
+ 81   FACTOR = 10.**V1
+#endif
       FACT1 = 1./FACTOR
       FACT = .TRUE.
       IF (IQ.EQ.-1) FACT = .FALSE.

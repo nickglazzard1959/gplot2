@@ -14,6 +14,15 @@ C    CURRENT REFERENCES FROM DFX309 AND DFX324
       LOGICAL FACT
       CS1(I) = (FLOAT(I)-1.)*(C1MONO+C1SEP) + C1MONO
 C    SEE DEFINITION IN DFX309
+C      PRINT *,'---DFX308---'
+C      PRINT *,'FACT=',FACT
+C      PRINT *,'FACTOR=',FACTOR
+C      PRINT *,'SH=',SH
+C      PRINT *,'S1=',S1
+C      PRINT *,'X1=',X1
+C      PRINT *,'Y1=',Y1
+C      PRINT *,'I1=',I1
+C      PRINT *,'------------'
       DX = 0.0
       I = I1
 C    STANDARD CALL HAS I = -1  -  PARTIAL LOG CYCLE VALUES
@@ -60,7 +69,11 @@ C    THIS SUBROUTINE.
       RETURN
     1 IF (FPN.EQ.0.0) GO TO 2
       A = DFX302(ALOG10(ABS(FPN)))
+#ifdef NOSVE
+      B = E10VE(A)
+#else
       B = 10.**A
+#endif
       FPN = FPN/B
       IF (IZVAL) GO TO 21
       IF (IADJ.NE.1.OR.A.NE.0.0) GO TO 60
