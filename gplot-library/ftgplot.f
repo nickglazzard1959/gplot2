@@ -7770,9 +7770,18 @@ C------------------------------------
 C
       INTEGER LFILE, LPATH, LFULL, LUSED
       INTEGER LNBC
+#ifdef UNIXNVE
+      CHARACTER*1 SEPCH
+#endif
 C
       FULLNAM = ' '
 #ifdef UNIX
+      SEPCH = '/'
+#endif
+#ifdef NOSVE
+      SEPCH = '.'
+#endif
+#ifdef UNIXNVE
       LFILE = LNBC(FILENAM,1,1)
       LPATH = LNBC(PATHNAM,1,0)
       LFULL = LEN(FULLNAM)
@@ -7788,11 +7797,12 @@ C
       ELSE
          FULLNAM(1:LPATH) = PATHNAM(1:LPATH)
          LPATH = LPATH + 1
-         FULLNAM(LPATH:LPATH) = '/'
+         FULLNAM(LPATH:LPATH) = SEPCH
          LPATH = LPATH + 1
          FULLNAM(LPATH:LUSED) = FILENAM(1:LFILE)
       ENDIF
-#else
+#endif
+#ifndef PORTF77
       FULLNAM = FILENAM
 #endif
       IFNE = MIN(LNBC(FULLNAM,1,1), MAXFNL)
