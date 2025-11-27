@@ -74,11 +74,19 @@ C    DIFFERENCE LIMITED TO SENSIBLE VALUES - SEE ALSO DFX309
     5 DIST = ABS(AZR-AZL)
       A = ALOG10(DIST)
       J = INT(DFX302(A))
+#ifdef NOSVE
+      BB = E10VE(ABS(A - FLOAT(J)))
+#else
       BB = 10.**(ABS(A - FLOAT(J)))
+#endif
       D = .2
       IF (BB.GE.3.) D = .5
       IF (BB.GE.7.) D = 1.
+#ifdef NOSVE
+      DIFF = D*E10VE(FLOAT(J))
+#else
       DIFF = D*10.**J
+#endif
       IF (ITYPE.EQ.-2.OR..NOT.IZVAL) GO TO 8
 C    HERE FOR INTEGER LINEAR AXIS VALUES
       DIFF = AINT(DIFF)
@@ -126,8 +134,13 @@ C    HERE FOR FULL LOGARITHMIC CYCLING
       K = INT(BB)
       IF (BB.LT.0.0) K = K - 1
       C = BB - FLOAT(K)
+#ifdef NOSVE
+      J = INT(E10VE(C))
+      S1 = FLOAT(J)*(E10VE(FLOAT(K)))
+#else
       J = INT(10.**C)
       S1 = FLOAT(J)*(10.**FLOAT(K))
+#endif
       IF (J.GE.10) J = 1
 C    THIS CORRECTS CASE WITH ZERO MANTISSA AND NEGATIVE CHARACTERISTIC
       S1 = ALOG10(S1)

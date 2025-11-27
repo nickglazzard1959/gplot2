@@ -20,7 +20,7 @@ asciify -d -m gplot-map.json ../../gplot-library/ftgplot.f gplot-source/ftgplot.
 #
 cd gplot-source
 echo "... compiling ftgplot.f"
-gfortran -g -c -O${OPT} ${FPE} -Wall -Wno-unused-dummy-argument -std=legacy -cpp -DPORTF77 -DUNIX ftgplot.f
+gfortran -g -c -O${OPT} ${FPE} -Wall -Wno-unused-dummy-argument -std=legacy -cpp -DPORTF77 -DUNIX -DOPROMPT -DUNIXNVE ftgplot.f
 #
 echo "... linking gplot"
 gfortran -g -o ../gplot ftgplot.o ../lib/dimfm.a ../lib/grdev.a ../lib/support.a ../lib/utils.a

@@ -137,6 +137,9 @@ C --- 60 BIT INTEGER MACHINES: PARAMETER(NBPW=6)
 #ifdef UNIX
       PARAMETER(NBPW=4)
 #endif      
+#ifdef NOSVE
+      PARAMETER(NBPW=4)
+#endif      
 #ifdef VMS
       PARAMETER(NBPW=2)
 #endif      

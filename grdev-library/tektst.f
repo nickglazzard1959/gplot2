@@ -8,7 +8,7 @@ C-------------------------------------------------
       INCLUDE 'a12cmn.cmn'
       INTEGER I
       A12UNT = UNIT
-C--- SET ALL BUFFER 60 BIT WORDS TO 0.
+C--- SET ALL BUFFER 60 BIT WORDS (OR BYTES) TO 0.
       DO 1 I=1,NA12WD
          BUF(I) = 0
  1    CONTINUE
@@ -31,6 +31,7 @@ C--------------------------------------------------
 #ifdef UNIX
       INTEGER VAL8
 C--- JUST INSERT IN TO THE BUFFER (WHICH IS BYTE SIZED).
+C--- NOTE: INT(V,N) IS GFORTRAN SPECIFIC. N IS A BYTES IN RESULT TYPE.
       BUF(IWP) = INT(IAND(VAL8,255),1)
       IWP = IWP + 1
 C--- FLUSH THE BUFFER TO OUTPUT WHEN ALL BYTES USED.
@@ -46,6 +47,24 @@ C--- JUST INSERT IN TO THE BUFFER (WHICH IS BYTE SIZED).
 C--- FLUSH THE BUFFER TO OUTPUT WHEN ALL BYTES USED.
       IF( IWP .GT. NA12WD )THEN
          CALL A12FLS
+      ENDIF
+#endif
+#ifdef NOSVE
+      BOOLEAN VAL8
+C--- NOS/VE FORTRAN DOES NOT HAVE A BYTE DATA TYPE.
+C--- TRY USING BUFFER OUT ON NOS/VE TOO.
+C--- IN THIS CASE, WORDS ARE 64 BIT AND NO SPECIAL
+C--- BIT PATTERNS ARE NEEDED IN THE DATA (?).
+C--- PACK BYTES INTO WORDS HERE.
+      BUF(IWP) = OR(BUF(IWP),SHIFT(VAL8,(8-ICP)*8))
+      ICP = ICP + 1
+      IF( ICP .GT. 8 )THEN
+         ICP = 1
+         IWP = IWP + 1
+C--- FLUSH THE BUFFER TO OUTPUT WHEN ALL WORDS USED.
+         IF( IWP .GT. NA12WD )THEN
+            CALL A12FLS
+         ENDIF
       ENDIF
 #endif
 #ifndef PORTF77
@@ -111,18 +130,44 @@ C FLUSH THE "8-IN-12" OUTPUT STREAM.
 C---------------------------------------------------
       INCLUDE 'a12cmn.cmn'
 C--- IF THERE IS ANY DATA IN THE BUFFER, SEND IT.
-#ifdef PORTF77
+#ifdef UNIX
       IF(IWP.GT.1)THEN
          ITOP = MIN(IWP,NA12WD)
          CALL SNDBYT(BUF,ITOP)
-C         BUFFER OUT (A12UNT,1) (BUF(1),BUF(ITOP))
       ENDIF
 C--- RE-INITIALIZE THE BUFFER.
       IWP = 1
       DO 1 I=1,NA12WD
          BUF(I) = 0
   1   CONTINUE      
-#else
+#endif
+#ifdef VMS
+      IF(IWP.GT.1)THEN
+         ITOP = MIN(IWP,NA12WD)
+         CALL SNDBYT(BUF,ITOP)
+      ENDIF
+C--- RE-INITIALIZE THE BUFFER.
+      IWP = 1
+      DO 1 I=1,NA12WD
+         BUF(I) = 0
+  1   CONTINUE      
+#endif
+#ifdef NOSVE
+      IF((IWP.EQ.1 .AND. ICP.GT.1).OR.IWP.GT.1)THEN
+         ITOP = MIN(IWP,NA12WD)
+         BUFFER OUT (A12UNT,1) (BUF(1),BUF(ITOP))
+         IF( UNIT(A12UNT) .GE. 0 )THEN
+            PRINT *,'BUFFER OUT FAILED.'
+         ENDIF
+      ENDIF
+C--- RE-INITIALIZE THE BUFFER.
+      ICP = 1
+      IWP = 1
+      DO 1 I=1,NA12WD
+         BUF(I) = 0
+  1   CONTINUE
+#endif      
+#ifndef PORTF77
       IF((IWP.EQ.1 .AND. ICP.GT.1).OR.IWP.GT.1)THEN
          ITOP = MIN(IWP,NA12WD)
          BUFFER OUT (A12UNT,1) (BUF(1),BUF(ITOP))

@@ -5,19 +5,25 @@ C MANY WRITTEN BY DR. ADRIAN CLARK SOMETIME IN THE EARLY-MID 1980'S.
 C MODIFIED FOR CDC NOS COMPATIBILITY AND ADDITIONS BY NICK GLAZZARD.
 C================================================================
 C
-#ifndef PORTF77
       INTEGER FUNCTION IACHAR(C)
 C----------------------------------------------------(CHARS)-----------
 C RETURN THE ASCII CODE FOR C REGARDLESS OF THE LOCAL CHARACTER SET.
-C THIS VERSION IS FOR CDC NOS. C IS DISPLAY CODE AND THE RESULT
-C WILL BE IN THE RANGE 32 TO 95 INCLUSIVE. 6/12 CODE IS NOT EXPLICITLY
+C ON CDC NOS, C IS DISPLAY CODE AND THE RESULT
+C WILL BE IN THE RANGE 32 TO 95 INCLUSIVE. 6/12 CODE IS NOT
 C DEALT WITH (NO LOWER CASE IS POSSIBLE IN 1 CHARACTER).
+C NOTE: IACHAR IS AN INTRINSIC ON UNIX/GFORTRAN AND THIS IS NOT CALLED.
 C----------------------------------------------------------------------
       CHARACTER*1 C
 C----
+#ifndef PORTF77
+C ON NOS, OFFSET BY 32, AS ICHAR OF SPACE IS 0.
       IACHAR = ICHAR(C) + 32
+#else
+      IACHAR = ICHAR(C)
+#endif
       RETURN
       END
+#ifndef PORTF77
           IDENT IDCHAR
           ENTRY IDCHAR
 *
@@ -345,6 +351,7 @@ C
       NUMRIC = .TRUE.
       DO 1 I = 1, LEN(S)
          J = IACHAR( S(I:I) )
+C         PRINT *,'CH=',S(I:I),' J=',J
          IF( J .GT. 47 .AND. J .LT. 58 )GOTO 1
          NUMRIC = .FALSE.
          GOTO 2
@@ -916,3 +923,61 @@ C
  9    CONTINUE
       RETURN
       END
+C
+      SUBROUTINE CNV612( STRING )
+C------------------------------------------------------(CHARS)---------
+C CONVERT STRING FROM 6/12 ASCII TO TRUE ASCII IN PLACE.
+C THIS MUST ONLY BE CALLED ON PLATFORMS WITH 8 BIT CHARACTERS.
+C----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      CHARACTER*(*) STRING
+C
+      INTEGER I, J, SLEN, IC
+      INTEGER IACHAR
+C
+      SLEN = LEN(STRING)
+      J = 0
+      I = 1
+ 1    CONTINUE
+      IF( I .GT. SLEN )GOTO 2
+      IF( STRING(I:I) .EQ. '^' )THEN
+         I = I + 1
+         IF( I .GT. SLEN )GOTO 2
+         J = J + 1
+         IC = IACHAR( STRING(I:I) )
+         IF( IC .GE. 48 .AND. IC .LE. 51 )THEN
+            STRING(J:J) = CHAR(123+IC-48)
+         ELSE
+            IF( IC .GE. 65 .AND. IC .LE. 90 )THEN
+               STRING(J:J) = CHAR(IC+32)
+            ELSE
+               STRING(J:J) = CHAR(IC)
+            ENDIF
+         ENDIF
+      ELSE IF( STRING(I:I) .EQ. '@' )THEN
+         I = I + 1
+         IF( I .GT. SLEN )GOTO 2
+         J = J + 1
+         IC = IACHAR( STRING(I:I) )
+         IF( IC .EQ. 65 )THEN
+            STRING(J:J) = CHAR(64)
+         ELSE IF( IC .EQ. 66 )THEN
+            STRING(J:J) = CHAR(94)
+         ELSE IF( IC .EQ. 71 )THEN
+            STRING(J:J) = CHAR(96)
+         ELSE IF( IC .EQ. 68 )THEN
+            STRING(J:J) = CHAR(58)
+         ELSE
+            STRING(J:J) = CHAR(IC)
+         ENDIF
+      ELSE
+         J = J + 1
+         STRING(J:J) = STRING(I:I)
+      ENDIF
+      I = I + 1
+      GOTO 1
+ 2    CONTINUE
+      STRING(J+1:SLEN) = ' '
+      RETURN
+      END
+      

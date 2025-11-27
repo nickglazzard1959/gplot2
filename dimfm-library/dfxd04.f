@@ -499,7 +499,11 @@ C   * OPEN DEVICE (I.E. ACTIVATE LINK/OPEN FILES ETC) *
 C   ***************************************************
 C
  1001 CONTINUE
+#ifdef NOSVE
+      CALL CONNEC(2, 2)
+#else
       CALL CONNEC(2)
+#endif
       CALL TEKINI(2)
       CALL TEKGRAF
       CALL TEKCLR

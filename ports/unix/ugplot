@@ -13,6 +13,7 @@ if [ -f ./DADIMFO ]; then
 else
     ln -s /usr/local/share/dimfilm/DADIMFO ./DADIMFO
 fi
+#valgrind --tool=memcheck --track-origins=yes gplot "${@}"
 gplot "${@}"
 if [ -L ./DADIMFO ]; then
     unlink ./DADIMFO
