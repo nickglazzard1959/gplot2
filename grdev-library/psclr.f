@@ -57,7 +57,11 @@ C
 #ifdef NOSVE
       DATA EPEXT/'_^E^P^S'/
       DATA FIRST/.TRUE./
-#else
+#endif
+#ifdef UNIX
+      DATA EPEXT/'.^E^P^S'/
+#endif
+#ifdef VMS
       DATA EPEXT/'.^E^P^S'/
 #endif
 #ifdef NOSVE
@@ -85,7 +89,6 @@ C
          FIRST = .FALSE.
       ENDIF
 #endif
->>>>>>> nosve
 C
 C --- CLOSE ANY EXISTING FILLED FILE, AFTER WRITING THE TRAILER.
 C
