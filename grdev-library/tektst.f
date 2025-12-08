@@ -357,20 +357,38 @@ C WHICH IS ALWAYS ASSOCIATED WITH LUN 5.
 C----------------------------------------------------
       INCLUDE 'gtcmn.cmn'
       CHARACTER*1 C
-      BOOLEAN PROMPT(5)
+      INTEGER NPROMPT
+#ifdef NOSVE
+      PARAMETER( NPROMPT=8 )
+      BOOLEAN PROMPT(NPROMPT)
+      DATA PROMPT /13,10,32,71,111,63,62,7/
+#else
+      PARAMETER( NPROMPT=5 )
+      BOOLEAN PROMPT(NPROMPT)
       DATA PROMPT /71,111,63,62,7/
+#endif
       CALL GTFLUSH
-      CALL A12SEQ( PROMPT, 5 )
+      CALL A12SEQ( PROMPT, NPROMPT )
       CALL A12FLS
  8    CONTINUE
 #ifndef PORTF77
       READ(7,101,END=9,ERR=9)C
-#else
+#endif
+#ifdef UNIX
       READ(5,101,END=9,ERR=9)C
+#endif
+#ifdef NOSVE
+      READ(*,101,END=9,ERR=9)C
+#endif
+#ifdef VMS
+      READ(*,101,END=9,ERR=9)C
 #endif
  101  FORMAT(A1)
       IF( C(1:1) .EQ. 'N' )GOTO 8
       IF( C(1:1) .EQ. 'Q' )THEN
+#ifdef NOSVE
+         PRINT *,'EXIT REQUESTED'
+#endif
          STOP 'EXIT REQUESTED'
       ENDIF
  9    CONTINUE
@@ -492,24 +510,42 @@ C WHICH IS ALWAYS ASSOCIATED WITH LUN 5.
 C----------------------------------------------------
       INCLUDE 'tekcmn.cmn'
       CHARACTER*1 C
-      BOOLEAN PROMPT(5)
+      INTEGER NPROMPT
+#ifdef NOSVE
+      PARAMETER( NPROMPT=8 )
+      BOOLEAN PROMPT(NPROMPT)
+      DATA PROMPT /13,10,32,71,111,63,62,7/
+#else
+      PARAMETER( NPROMPT=5 )
+      BOOLEAN PROMPT(NPROMPT)
       DATA PROMPT /71,111,63,62,7/
+#endif
       IF( INGRAF .EQ. 0 )CALL TEKGRAF
       CALL TEKDRAW( 3, 747, 0 )
       CALL TEKTEXT
-      CALL A12SEQ( PROMPT, 5 )
+      CALL A12SEQ( PROMPT, NPROMPT )
       CALL A12FLS
  8    CONTINUE
 #ifndef PORTF77
       READ(7,101,END=9,ERR=9)C
-#else
+#endif
+#ifdef UNIX
       READ(5,101,END=9,ERR=9)C
-#endif      
+#endif
+#ifdef NOSVE
+      READ(*,101,END=9,ERR=9)C
+#endif
+#ifdef VMS
+      READ(*,101,END=9,ERR=9)C
+#endif
  101  FORMAT(A1)
       IF( C(1:1) .EQ. 'N' )GOTO 8
       IF( C(1:1) .EQ. 'Q' )THEN
+#ifdef NOSVE
+         PRINT *,'EXIT REQUESTED'
+#endif
          STOP 'EXIT REQUESTED'
-      ENDIF      
+      ENDIF
  9    CONTINUE
 #ifndef PORTF77
 C--- ON NOS, AN EMPTY LINE WILL BE TREATED AS EOF. IF INTERACTIVE

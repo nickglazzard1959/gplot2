@@ -18,8 +18,8 @@ function compile() {
 
 echo "Build DIMFM library."
 #
-FPE=
-#FPE="-ffpe-trap=invalid,zero,overflow"
+#FPE=
+FPE="-ffpe-trap=invalid,zero,overflow -fbacktrace"
 if [ -z "${OPT}" ]; then
     OPT=0
 fi

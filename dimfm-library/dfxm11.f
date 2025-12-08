@@ -112,11 +112,12 @@ C
       CHARACTER*16 HEX
       CHARACTER*72 LINE
       INTEGER HEADER(9), MAXCH, NREC, NCHAR, NCH, FLEN
-      INTEGER IOS, I, J, K, L, M, P, W, NBYTES, CBYTES
+      INTEGER IOS, I, J, K, L, M, P, W, NBYTES, CBYTES, LFFN
       INTEGER SW, EW, CW, SB, PCW
       INTEGER GETBYT
       INTEGER PBASE(MAXBET+2)
       LOGICAL FSTLN
+      CHARACTER*128 FFNAME
 C
       INTEGER FLUN
       PARAMETER( FLUN=16 )
@@ -228,8 +229,9 @@ C      IF( IOS .NE. 0 )THEN
 C         IERR = -1
 C         RETURN
 C     ENDIF
+      CALL GETFFN( FFNAME, LFFN )
       IE = 0
-      OPEN( UNIT=FLUN, FILE='DADIMFO',
+      OPEN( UNIT=FLUN, FILE=FFNAME(1:LFFN),
      1      STATUS='OLD', FORM='FORMATTED',
      1     ACCESS='SEQUENTIAL', IOSTAT=IE )
       IF( IE .NE. 0 ) CALL DFXMSA( IE )
@@ -514,4 +516,30 @@ C
 C
       RETURN
 C
+      END
+C
+      SUBROUTINE GETFFN( FFNAME, LFFN )
+C --- -----------------------------------------------------------------
+C RETURN AN OS DEPENDENT FONT FILE NAME.
+C --- -----------------------------------------------------------------
+      CHARACTER*(*) FFNAME
+      INTEGER LFFN
+C
+#ifndef PORTF77
+      FFNAME = 'DADIMFO'
+      LFFN = 7
+#endif
+#ifdef UNIX
+      FFNAME = '/^U^S^R/^L^O^C^A^L/^S^H^A^R^E/^D^I^M^F^I^L^M/DADIMFO'
+      LFFN = 32
+#endif
+#ifdef VMS
+      FFNAME = 'DIMFONTS_LOGICAL'
+      LFFN = 16
+#endif
+#ifdef NOSVE
+      FFNAME = '$USER.DADIMFO'
+      FFFN = 13
+#endif
+      RETURN
       END
