@@ -539,7 +539,7 @@ C
 #endif
 #ifdef NOSVE
       FFNAME = '$USER.DADIMFO'
-      FFFN = 13
+      LFFN = 13
 #endif
       RETURN
       END

@@ -1,6 +1,6 @@
 export MODGITPROJECT="GPLOT and DIMFILM"
-export NOSUSER=tester
-export NOSPW=tester
-export NOSHOST=nuc1
+export NOSUSER=guest
+export NOSPW=guest
+export NOSHOST=localhost
 export RJEHOME=~/rje-station
 export RJESPOOL=${RJEHOME}/spool

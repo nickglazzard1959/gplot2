@@ -93,14 +93,19 @@ jobs on NOS. This will create the MODIFY program libraries
 `PLUTILS`, `PLGRDEV`, `PLDIMFM` and `PLGPLOT` from the previously transferred MODIFY
 format source code in `SRUTILS`, `SRGRDEV`, `SRDIMFM` and `SRGPLOT`.
 ```
+get,bautils.
 submit,bautils,no.
+get,bagrdev.
 submit,bagrdev,no.
+get,badimfm.
 submit,badimfm,no.
+get,bagplot.
 submit,bagplot,no.
 ```
 
 These jobs will produce no output listings, but you can observe their progress on the
-NOS console. You should see `MODIFICATION COMPLETE` and no errors in each case.
+NOS console. You should see `MODIFICATION COMPLETE` and no errors in each case. Note that
+these jobs delete `SRUTILS`, `SRGRDEV`, `SRDIMFM` and `SRGPLOT` when they are run.
 
 
 Building on NOS/VE
