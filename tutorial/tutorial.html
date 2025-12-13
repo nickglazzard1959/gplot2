@@ -1,0 +1,3023 @@
+<!docype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+@font-face {
+  font-family: octicons-link;
+  src: url(data:font/woff;charset=utf-8;base64,d09GRgABAAAAAAZwABAAAAAACFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABEU0lHAAAGaAAAAAgAAAAIAAAAAUdTVUIAAAZcAAAACgAAAAoAAQAAT1MvMgAAAyQAAABJAAAAYFYEU3RjbWFwAAADcAAAAEUAAACAAJThvmN2dCAAAATkAAAABAAAAAQAAAAAZnBnbQAAA7gAAACyAAABCUM+8IhnYXNwAAAGTAAAABAAAAAQABoAI2dseWYAAAFsAAABPAAAAZwcEq9taGVhZAAAAsgAAAA0AAAANgh4a91oaGVhAAADCAAAABoAAAAkCA8DRGhtdHgAAAL8AAAADAAAAAwGAACfbG9jYQAAAsAAAAAIAAAACABiATBtYXhwAAACqAAAABgAAAAgAA8ASm5hbWUAAAToAAABQgAAAlXu73sOcG9zdAAABiwAAAAeAAAAME3QpOBwcmVwAAAEbAAAAHYAAAB/aFGpk3jaTY6xa8JAGMW/O62BDi0tJLYQincXEypYIiGJjSgHniQ6umTsUEyLm5BV6NDBP8Tpts6F0v+k/0an2i+itHDw3v2+9+DBKTzsJNnWJNTgHEy4BgG3EMI9DCEDOGEXzDADU5hBKMIgNPZqoD3SilVaXZCER3/I7AtxEJLtzzuZfI+VVkprxTlXShWKb3TBecG11rwoNlmmn1P2WYcJczl32etSpKnziC7lQyWe1smVPy/Lt7Kc+0vWY/gAgIIEqAN9we0pwKXreiMasxvabDQMM4riO+qxM2ogwDGOZTXxwxDiycQIcoYFBLj5K3EIaSctAq2kTYiw+ymhce7vwM9jSqO8JyVd5RH9gyTt2+J/yUmYlIR0s04n6+7Vm1ozezUeLEaUjhaDSuXHwVRgvLJn1tQ7xiuVv/ocTRF42mNgZGBgYGbwZOBiAAFGJBIMAAizAFoAAABiAGIAznjaY2BkYGAA4in8zwXi+W2+MjCzMIDApSwvXzC97Z4Ig8N/BxYGZgcgl52BCSQKAA3jCV8CAABfAAAAAAQAAEB42mNgZGBg4f3vACQZQABIMjKgAmYAKEgBXgAAeNpjYGY6wTiBgZWBg2kmUxoDA4MPhGZMYzBi1AHygVLYQUCaawqDA4PChxhmh/8ODDEsvAwHgMKMIDnGL0x7gJQCAwMAJd4MFwAAAHjaY2BgYGaA4DAGRgYQkAHyGMF8NgYrIM3JIAGVYYDT+AEjAwuDFpBmA9KMDEwMCh9i/v8H8sH0/4dQc1iAmAkALaUKLgAAAHjaTY9LDsIgEIbtgqHUPpDi3gPoBVyRTmTddOmqTXThEXqrob2gQ1FjwpDvfwCBdmdXC5AVKFu3e5MfNFJ29KTQT48Ob9/lqYwOGZxeUelN2U2R6+cArgtCJpauW7UQBqnFkUsjAY/kOU1cP+DAgvxwn1chZDwUbd6CFimGXwzwF6tPbFIcjEl+vvmM/byA48e6tWrKArm4ZJlCbdsrxksL1AwWn/yBSJKpYbq8AXaaTb8AAHja28jAwOC00ZrBeQNDQOWO//sdBBgYGRiYWYAEELEwMTE4uzo5Zzo5b2BxdnFOcALxNjA6b2ByTswC8jYwg0VlNuoCTWAMqNzMzsoK1rEhNqByEyerg5PMJlYuVueETKcd/89uBpnpvIEVomeHLoMsAAe1Id4AAAAAAAB42oWQT07CQBTGv0JBhagk7HQzKxca2sJCE1hDt4QF+9JOS0nbaaYDCQfwCJ7Au3AHj+LO13FMmm6cl7785vven0kBjHCBhfpYuNa5Ph1c0e2Xu3jEvWG7UdPDLZ4N92nOm+EBXuAbHmIMSRMs+4aUEd4Nd3CHD8NdvOLTsA2GL8M9PODbcL+hD7C1xoaHeLJSEao0FEW14ckxC+TU8TxvsY6X0eLPmRhry2WVioLpkrbp84LLQPGI7c6sOiUzpWIWS5GzlSgUzzLBSikOPFTOXqly7rqx0Z1Q5BAIoZBSFihQYQOOBEdkCOgXTOHA07HAGjGWiIjaPZNW13/+lm6S9FT7rLHFJ6fQbkATOG1j2OFMucKJJsxIVfQORl+9Jyda6Sl1dUYhSCm1dyClfoeDve4qMYdLEbfqHf3O/AdDumsjAAB42mNgYoAAZQYjBmyAGYQZmdhL8zLdDEydARfoAqIAAAABAAMABwAKABMAB///AA8AAQAAAAAAAAAAAAAAAAABAAAAAA==) format('woff');
+}
+
+.markdown-body {
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  line-height: 1.5;
+  color: #24292e;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 16px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.markdown-body .pl-c {
+  color: #6a737d;
+}
+
+.markdown-body .pl-c1,
+.markdown-body .pl-s .pl-v {
+  color: #005cc5;
+}
+
+.markdown-body .pl-e,
+.markdown-body .pl-en {
+  color: #6f42c1;
+}
+
+.markdown-body .pl-smi,
+.markdown-body .pl-s .pl-s1 {
+  color: #24292e;
+}
+
+.markdown-body .pl-ent {
+  color: #22863a;
+}
+
+.markdown-body .pl-k {
+  color: #d73a49;
+}
+
+.markdown-body .pl-s,
+.markdown-body .pl-pds,
+.markdown-body .pl-s .pl-pse .pl-s1,
+.markdown-body .pl-sr,
+.markdown-body .pl-sr .pl-cce,
+.markdown-body .pl-sr .pl-sre,
+.markdown-body .pl-sr .pl-sra {
+  color: #032f62;
+}
+
+.markdown-body .pl-v,
+.markdown-body .pl-smw {
+  color: #e36209;
+}
+
+.markdown-body .pl-bu {
+  color: #b31d28;
+}
+
+.markdown-body .pl-ii {
+  color: #fafbfc;
+  background-color: #b31d28;
+}
+
+.markdown-body .pl-c2 {
+  color: #fafbfc;
+  background-color: #d73a49;
+}
+
+.markdown-body .pl-c2::before {
+  content: "^M";
+}
+
+.markdown-body .pl-sr .pl-cce {
+  font-weight: bold;
+  color: #22863a;
+}
+
+.markdown-body .pl-ml {
+  color: #735c0f;
+}
+
+.markdown-body .pl-mh,
+.markdown-body .pl-mh .pl-en,
+.markdown-body .pl-ms {
+  font-weight: bold;
+  color: #005cc5;
+}
+
+.markdown-body .pl-mi {
+  font-style: italic;
+  color: #24292e;
+}
+
+.markdown-body .pl-mb {
+  font-weight: bold;
+  color: #24292e;
+}
+
+.markdown-body .pl-md {
+  color: #b31d28;
+  background-color: #ffeef0;
+}
+
+.markdown-body .pl-mi1 {
+  color: #22863a;
+  background-color: #f0fff4;
+}
+
+.markdown-body .pl-mc {
+  color: #e36209;
+  background-color: #ffebda;
+}
+
+.markdown-body .pl-mi2 {
+  color: #f6f8fa;
+  background-color: #005cc5;
+}
+
+.markdown-body .pl-mdr {
+  font-weight: bold;
+  color: #6f42c1;
+}
+
+.markdown-body .pl-ba {
+  color: #586069;
+}
+
+.markdown-body .pl-sg {
+  color: #959da5;
+}
+
+.markdown-body .pl-corl {
+  text-decoration: underline;
+  color: #032f62;
+}
+
+.markdown-body .octicon {
+  display: inline-block;
+  vertical-align: text-top;
+  fill: currentColor;
+}
+
+.markdown-body a {
+  background-color: transparent;
+}
+
+.markdown-body a:active,
+.markdown-body a:hover {
+  outline-width: 0;
+}
+
+.markdown-body strong {
+  font-weight: inherit;
+}
+
+.markdown-body strong {
+  font-weight: bolder;
+}
+
+.markdown-body h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+.markdown-body img {
+  border-style: none;
+}
+
+.markdown-body code,
+.markdown-body kbd,
+.markdown-body pre {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+
+.markdown-body hr {
+  box-sizing: content-box;
+  height: 0;
+  overflow: visible;
+}
+
+.markdown-body input {
+  font: inherit;
+  margin: 0;
+}
+
+.markdown-body input {
+  overflow: visible;
+}
+
+.markdown-body [type="checkbox"] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.markdown-body * {
+  box-sizing: border-box;
+}
+
+.markdown-body input {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.markdown-body a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+.markdown-body strong {
+  font-weight: 600;
+}
+
+.markdown-body hr {
+  height: 0;
+  margin: 15px 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #dfe2e5;
+}
+
+.markdown-body hr::before {
+  display: table;
+  content: "";
+}
+
+.markdown-body hr::after {
+  display: table;
+  clear: both;
+  content: "";
+}
+
+.markdown-body table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+.markdown-body td,
+.markdown-body th {
+  padding: 0;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body h1 {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.markdown-body h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.markdown-body h3 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.markdown-body h4 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.markdown-body h5 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.markdown-body h6 {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.markdown-body p {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.markdown-body blockquote {
+  margin: 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body ol ol,
+.markdown-body ul ol {
+  list-style-type: lower-roman;
+}
+
+.markdown-body ul ul ol,
+.markdown-body ul ol ol,
+.markdown-body ol ul ol,
+.markdown-body ol ol ol {
+  list-style-type: lower-alpha;
+}
+
+.markdown-body dd {
+  margin-left: 0;
+}
+
+.markdown-body code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 12px;
+}
+
+.markdown-body pre {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 12px;
+}
+
+.markdown-body .octicon {
+  vertical-align: text-bottom;
+}
+
+.markdown-body .pl-0 {
+  padding-left: 0 !important;
+}
+
+.markdown-body .pl-1 {
+  padding-left: 4px !important;
+}
+
+.markdown-body .pl-2 {
+  padding-left: 8px !important;
+}
+
+.markdown-body .pl-3 {
+  padding-left: 16px !important;
+}
+
+.markdown-body .pl-4 {
+  padding-left: 24px !important;
+}
+
+.markdown-body .pl-5 {
+  padding-left: 32px !important;
+}
+
+.markdown-body .pl-6 {
+  padding-left: 40px !important;
+}
+
+.markdown-body::before {
+  display: table;
+  content: "";
+}
+
+.markdown-body::after {
+  display: table;
+  clear: both;
+  content: "";
+}
+
+.markdown-body>*:first-child {
+  margin-top: 0 !important;
+}
+
+.markdown-body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+.markdown-body a:not([href]) {
+  color: inherit;
+  text-decoration: none;
+}
+
+.markdown-body .anchor {
+  float: left;
+  padding-right: 4px;
+  margin-left: -20px;
+  line-height: 1;
+}
+
+.markdown-body .anchor:focus {
+  outline: none;
+}
+
+.markdown-body p,
+.markdown-body blockquote,
+.markdown-body ul,
+.markdown-body ol,
+.markdown-body dl,
+.markdown-body table,
+.markdown-body pre {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.markdown-body hr {
+  height: 0.25em;
+  padding: 0;
+  margin: 24px 0;
+  background-color: #e1e4e8;
+  border: 0;
+}
+
+.markdown-body blockquote {
+  padding: 0 1em;
+  color: #6a737d;
+  border-left: 0.25em solid #dfe2e5;
+}
+
+.markdown-body blockquote>:first-child {
+  margin-top: 0;
+}
+
+.markdown-body blockquote>:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font-size: 11px;
+  line-height: 10px;
+  color: #444d56;
+  vertical-align: middle;
+  background-color: #fafbfc;
+  border: solid 1px #c6cbd1;
+  border-bottom-color: #959da5;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #959da5;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.markdown-body h1 .octicon-link,
+.markdown-body h2 .octicon-link,
+.markdown-body h3 .octicon-link,
+.markdown-body h4 .octicon-link,
+.markdown-body h5 .octicon-link,
+.markdown-body h6 .octicon-link {
+  color: #1b1f23;
+  vertical-align: middle;
+  visibility: hidden;
+}
+
+.markdown-body h1:hover .anchor,
+.markdown-body h2:hover .anchor,
+.markdown-body h3:hover .anchor,
+.markdown-body h4:hover .anchor,
+.markdown-body h5:hover .anchor,
+.markdown-body h6:hover .anchor {
+  text-decoration: none;
+}
+
+.markdown-body h1:hover .anchor .octicon-link,
+.markdown-body h2:hover .anchor .octicon-link,
+.markdown-body h3:hover .anchor .octicon-link,
+.markdown-body h4:hover .anchor .octicon-link,
+.markdown-body h5:hover .anchor .octicon-link,
+.markdown-body h6:hover .anchor .octicon-link {
+  visibility: visible;
+}
+
+.markdown-body h1 {
+  padding-bottom: 0.3em;
+  font-size: 2em;
+  border-bottom: 1px solid #eaecef;
+}
+
+.markdown-body h2 {
+  padding-bottom: 0.3em;
+  font-size: 1.5em;
+  border-bottom: 1px solid #eaecef;
+}
+
+.markdown-body h3 {
+  font-size: 1.25em;
+}
+
+.markdown-body h4 {
+  font-size: 1em;
+}
+
+.markdown-body h5 {
+  font-size: 0.875em;
+}
+
+.markdown-body h6 {
+  font-size: 0.85em;
+  color: #6a737d;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 2em;
+}
+
+.markdown-body ul ul,
+.markdown-body ul ol,
+.markdown-body ol ol,
+.markdown-body ol ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown-body li {
+  word-wrap: break-all;
+}
+
+.markdown-body li>p {
+  margin-top: 16px;
+}
+
+.markdown-body li+li {
+  margin-top: 0.25em;
+}
+
+.markdown-body dl {
+  padding: 0;
+}
+
+.markdown-body dl dt {
+  padding: 0;
+  margin-top: 16px;
+  font-size: 1em;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.markdown-body dl dd {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.markdown-body table {
+  display: block;
+  width: 100%;
+  overflow: auto;
+}
+
+.markdown-body table th {
+  font-weight: 600;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+
+.markdown-body table tr {
+  background-color: #fff;
+  border-top: 1px solid #c6cbd1;
+}
+
+.markdown-body table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  box-sizing: content-box;
+  background-color: #fff;
+}
+
+.markdown-body img[align=right] {
+  padding-left: 20px;
+}
+
+.markdown-body img[align=left] {
+  padding-right: 20px;
+}
+
+.markdown-body code {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(27,31,35,0.05);
+  border-radius: 3px;
+}
+
+.markdown-body pre {
+  word-wrap: normal;
+}
+
+.markdown-body pre>code {
+  padding: 0;
+  margin: 0;
+  font-size: 100%;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+
+.markdown-body .highlight {
+  margin-bottom: 16px;
+}
+
+.markdown-body .highlight pre {
+  margin-bottom: 0;
+  word-break: normal;
+}
+
+.markdown-body .highlight pre,
+.markdown-body pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f6f8fa;
+  border-radius: 3px;
+}
+
+.markdown-body pre code {
+  display: inline;
+  max-width: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  line-height: inherit;
+  word-wrap: normal;
+  background-color: transparent;
+  border: 0;
+}
+
+.markdown-body .full-commit .btn-outline:not(:disabled):hover {
+  color: #005cc5;
+  border-color: #005cc5;
+}
+
+.markdown-body kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  font: 11px "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  line-height: 10px;
+  color: #444d56;
+  vertical-align: middle;
+  background-color: #fafbfc;
+  border: solid 1px #d1d5da;
+  border-bottom-color: #c6cbd1;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #c6cbd1;
+}
+
+.markdown-body :checked+.radio-label {
+  position: relative;
+  z-index: 1;
+  border-color: #0366d6;
+}
+
+.markdown-body .task-list-item {
+  list-style-type: none;
+}
+
+.markdown-body .task-list-item+.task-list-item {
+  margin-top: 3px;
+}
+
+.markdown-body .task-list-item input {
+  margin: 0 0.2em 0.25em -1.6em;
+  vertical-align: middle;
+}
+
+.markdown-body hr {
+  border-bottom-color: #eee;
+}
+
+/*
+
+github.com style (c) Vasily Polovnyov <vast@whiteants.net>
+
+*/
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #333;
+  background: #f8f8f8;
+  -webkit-text-size-adjust: none;
+}
+
+.hljs-comment,
+.diff .hljs-header {
+  color: #998;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.css .rule .hljs-keyword,
+.hljs-winutils,
+.nginx .hljs-title,
+.hljs-subst,
+.hljs-request,
+.hljs-status {
+  color: #333;
+  font-weight: bold;
+}
+
+.hljs-number,
+.hljs-hexcolor,
+.ruby .hljs-constant {
+  color: #008080;
+}
+
+.hljs-string,
+.hljs-tag .hljs-value,
+.hljs-doctag,
+.tex .hljs-formula {
+  color: #d14;
+}
+
+.hljs-title,
+.hljs-id,
+.scss .hljs-preprocessor {
+  color: #900;
+  font-weight: bold;
+}
+
+.hljs-list .hljs-keyword,
+.hljs-subst {
+  font-weight: normal;
+}
+
+.hljs-class .hljs-title,
+.hljs-type,
+.vhdl .hljs-literal,
+.tex .hljs-command {
+  color: #458;
+  font-weight: bold;
+}
+
+.hljs-tag,
+.hljs-tag .hljs-title,
+.hljs-rule .hljs-property,
+.django .hljs-tag .hljs-keyword {
+  color: #000080;
+  font-weight: normal;
+}
+
+.hljs-attribute,
+.hljs-variable,
+.lisp .hljs-body,
+.hljs-name {
+  color: #008080;
+}
+
+.hljs-regexp {
+  color: #009926;
+}
+
+.hljs-symbol,
+.ruby .hljs-symbol .hljs-string,
+.lisp .hljs-keyword,
+.clojure .hljs-keyword,
+.scheme .hljs-keyword,
+.tex .hljs-special,
+.hljs-prompt {
+  color: #990073;
+}
+
+.hljs-built_in {
+  color: #0086b3;
+}
+
+.hljs-preprocessor,
+.hljs-pragma,
+.hljs-pi,
+.hljs-doctype,
+.hljs-shebang,
+.hljs-cdata {
+  color: #999;
+  font-weight: bold;
+}
+
+.hljs-deletion {
+  background: #fdd;
+}
+
+.hljs-addition {
+  background: #dfd;
+}
+
+.diff .hljs-change {
+  background: #0086b3;
+}
+
+.hljs-chunk {
+  color: #aaa;
+}
+
+</style>
+</head>
+<body style="min-width: 200px; max-width: 790px; margin: 0 auto; padding: 30px; overflow: auto;"class="markdown-body">
+<h1 id="gplot-examples-and-tutorial">GPLOT examples and tutorial</h1>
+<p>Although both DIMFILM and GPLOT have &quot;formal&quot; manuals that are fairly complete,
+they don&#39;t really tell you how to do any specific task.</p>
+<p>This document is an attempt at &quot;task oriented&quot; documentation that might be seen
+as a tutorial or at least a set of examples. These cover most of what GPLOT can do
+(DIMFILM can do some more things that aren&#39;t accessible from GPLOT).</p>
+<p>The scripts that create the examples shown here also serve as a &quot;test suite&quot; (of sorts)
+for GPLOT and DIMFILM.</p>
+<p>Here are links to each of the examples:</p>
+<ul>
+<li><a href="#the-simplest-graph">The simplest graph</a></li>
+<li><a href="#bounds-panes-devices-and-coordinate-systems-in-dimfilm">Bounds Panes Devices and Coordinate systems in DIMFILM</a></li>
+<li><a href="#nos-and-unix-like-systems-and-compatibility">NOS and Unix-like systems and compatibility</a></li>
+<li><a href="#using-different-colours-and-filling-the-canvas">Using different colours and filling the canvas</a></li>
+<li><a href="#adding-a-grid-or-graticule">Adding a grid or graticule</a></li>
+<li><a href="#changing-the-width-of-lines">Changing the width of lines</a></li>
+<li><a href="#different-graph-styles">Different graph styles</a></li>
+<li><a href="#multiple-graphs-on-the-same-axes-and-here-data">Multiple graphs on the same axes and HERE data</a></li>
+<li><a href="#multiple-graphs-and-keys">Multiple graphs and keys</a></li>
+<li><a href="#multiple-curves-with-two-different-y-axis-ranges">Multiple curves with two different Y axis ranges</a></li>
+<li><a href="#plotting-data-stored-in-a-disk-file">Plotting data stored in a disk file</a></li>
+<li><a href="#labelling-points-on-a-graph">Labelling points on a graph</a></li>
+<li><a href="#data-with-uncertainties-in-y">Data with uncertainties in Y</a></li>
+<li><a href="#data-with-asymmetric-uncertainties-in-y">Data with asymmetric uncertainties in Y</a></li>
+<li><a href="#data-with-symmetric-uncertainties-in-y-and-x">Data with symmetric uncertainties in Y and X</a></li>
+<li><a href="#interpolating-the-data-points">Interpolating the data points</a></li>
+<li><a href="#log-linear-plots">Log Linear Plots</a></li>
+<li><a href="#log-log-plots">Log Log Plots</a></li>
+<li><a href="#histograms-and-multiple-plots-in-one-figure">Histograms and multiple plots in one figure</a></li>
+<li><a href="#multiple-plots-with-keys-in-one-figure">Multiple plots with keys in one figure</a></li>
+<li><a href="#using-the-rpn-evaluator-to-plot-simple-functions">Using the RPN evaluator to plot simple functions</a></li>
+<li><a href="#general-drawing-part-1-basic-functions">General drawing Part 1 Basic functions</a></li>
+<li><a href="#the-rpn-evaluator-for-drawing-2d-parametric-functions">The RPN Evaluator for drawing 2D parametric functions</a></li>
+<li><a href="#general-drawing-part-2-evaluator-assisted">General drawing Part 2 Evaluator assisted</a></li>
+<li><a href="#general-drawing-part-3-higher-level-drawing">General drawing Part 3 Higher level drawing</a></li>
+<li><a href="#l-systems">L-Systems</a></li>
+<li><a href="#alphabetic-font-tables">Alphabetic font tables</a></li>
+<li><a href="#symbol-font-tables">Symbol font tables</a></li>
+<li><a href="#marker-font-tables">Marker font tables</a></li>
+</ul>
+<h2 id="the-simplest-graph">The simplest graph</h2>
+<p>Let&#39;s start by plotting a very simple graph. Normally, data to be
+plotted exists in disk files, but, in this first example, the data
+will be internally generated by the <code>MEMTEST</code> command, which dynamically
+allocates data arrays on NOS (static arrays are used on &quot;Unix-like&quot; systems)
+and fills X,Y values with a sine wave.</p>
+<p><img src="gr1001.svg" alt=""></p>
+<p>The script file (obey file) to generate this contains:</p>
+<pre><code><span class="hljs-preprocessor"># SIMPLEST GRAPH</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+MEMTEST
+TITLE <span class="hljs-string">"A*L VERY SIMPLE GRAPH"</span>
+XLABEL <span class="hljs-string">"X*L AXIS"</span>
+YLABEL <span class="hljs-string">"Y*L AXIS"</span>
+XYLINE
+</code></pre><p>Although very minimal, there are a few points worth noting.</p>
+<ul>
+<li>For maximum NOS / &quot;Unix&quot; compatibility, it is best to use only UPPER CASE in obey files.
+If you use lower case, it will work on both systems, but the results may be different. 
+NOS (in <code>NORMAL</code> mode) will internally convert lower case to upper case. 
+So &quot;A very simple graph&quot; will appear exactly as that on &quot;Unix&quot;, but as &quot;A VERY SIMPLE GRAPH&quot; on NOS. 
+Using upper case and DIMFILM &quot;string markup&quot; is portable and handles subscripts, superscripts, 
+fractions and so on too. Note that GPLOT should <em>not</em> be used in <code>ASCII</code> mode on NOS! 
+GPLOT does not attempt to deal with 6/12 Display Code, but will convert it (mostly!) to upper case. 
+However, internal arrays are not sized for 6/12 representations, so there will be problems 
+(mainly strings being unexpectedly truncated rather than crashes, though).</li>
+<li>The <code>RESET</code> command re-establishes a default state. If multiple obey files are used in one GPLOT session
+without using <code>RESET</code> at the top of each file, the results will be unpredictable (the state 
+at the end on one obey file will be inherited by the next).</li>
+<li><p>This script is device independent. It can be used &quot;as is&quot; with any of the supported devices. 
+To generate SVG from it, we can use:</p>
+<pre><code>/ GPLOT <span class="hljs-built_in">or</span> $ UGPLOT
+? dev svg sveg <span class="hljs-number">1200</span>,<span class="hljs-number">800</span>
+? prefix obey-<span class="hljs-keyword">files</span>
+? obey obgraf1
+? <span class="hljs-keyword">ex</span>
+</code></pre><p>which will create an SVG file called <code>sveg001</code> (<code>sveg001.svg</code> on &quot;Unix&quot;) using a 
+&quot;resolution&quot; of 1200 by 800 pixels (with SVG, this is
+really a &quot;size&quot; rather than a resolution, as the vector data can be scaled without losing detail). </p>
+</li>
+<li><p>The various annotations associated with a graph (title, axis labels, etc.) should appear before the command which plots the data
+(<code>XYLINE</code> here).</p>
+</li>
+<li>The ranges of the X and Y axes are automatically determined from the supplied data.</li>
+<li>The graph is drawn in a square area in the center of the output device &quot;canvas&quot;. 
+When plotting graphs, it is often better to fill the output canvas.</li>
+<li>Everything is drawn in a single colour (red).</li>
+</ul>
+<p>We will address these last two deficiencies in the next example.</p>
+<h2 id="bounds-panes-devices-and-coordinate-systems-in-dimfilm">Bounds Panes Devices and Coordinate systems in DIMFILM</h2>
+<p>It is perhaps worth understanding why the graph appears in a centered square area on the device
+even at this stage.</p>
+<p>DIMFILM lets the user define a &quot;world coordinate system&quot; or &quot;user coordinates&quot;. These &quot;bounds&quot;
+are defined by four numbers, <code>xlo</code> to <code>xhi</code> defining a range of X coordinates, and
+<code>ylo</code> to <code>yhi</code> defining a range of Y coordinates. This coordinate system is intended to be &quot;square&quot;,
+in that a unit step in X should have the same length when drawn by the output device
+as a unit step in Y. The output devices each have their own ranges of valid coordinates. In the 
+case of the interactive devices (GTerm and the Tektronix 4014), these ranges are fixed (not strictly
+true for GTerm). The valid range of coordinates can be set by the user for the &quot;file&quot; devices, 
+SVG and EPS, by defining the &quot;paper size&quot; when the device is opened. The coordinate systems of these
+devices are also defined to be &quot;square&quot;.</p>
+<p>DIMFILM also has the concept of a &quot;pane&quot;, which is initially identical to the &quot;bounds&quot;. The &quot;pane&quot;
+is a rectangular subregion of the bounds, specified by four numbers in bounds coordinates.</p>
+<p>For general purpose drawing, you want to have a &quot;square&quot; coordinate system, so that circles 
+when drawn are circles and not ellipses.</p>
+<p>For plotting graphs of data, though, &quot;squareness&quot; is not usually important. DIMFILM determines the
+locations and sizes of the various elements of a graph in terms of fractions of the pane. The graph
+will be placed inside the pane, squashed and stretched as may be to fill it.</p>
+<p>The default initial bounds (and pane) are set to 0 to 1 by 0 to 1, which is a square region. To maintain
+&quot;squareness&quot; while maximising the use of the display area, the bounds region must cover either the
+height or the width of the display (or both).</p>
+<p>To make the situation clearer, we can draw the limits of the device (which we have set to a 1200 by
+800 &quot;pixel&quot; region when we opened the SVG device) and the outline of the bounds (and pane) region by adding
+these commands:</p>
+<pre><code><span class="hljs-attribute">OUTLINE</span> DEVICE
+<span class="hljs-attribute">OUTLINE</span> BOUNDS
+</code></pre><p><img src="gr1a001.svg" alt=""></p>
+<p>The only way to use the full area of the display is for the bounds to have the same <em>aspect ratio</em> as
+the display. That is:</p>
+<pre><code><span class="hljs-comment">xhi</span> <span class="hljs-literal">-</span> <span class="hljs-comment">xlo</span>     <span class="hljs-comment">width_display</span>
+<span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span>  <span class="hljs-comment">=</span>  <span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-literal">-</span>
+<span class="hljs-comment">yhi</span> <span class="hljs-literal">-</span> <span class="hljs-comment">ylo</span>     <span class="hljs-comment">height_display</span>
+</code></pre><h2 id="nos-and-unix-like-systems-and-compatibility">NOS and Unix-like systems and compatibility</h2>
+<p>Before moving on, it may be worth discussing how GPLOT tries to maximise compatability between
+these two very different operating systems. </p>
+<p>Perhaps the most obvious thing when glancing at the first example is that the script is
+entirely UPPER CASE. This need not be so, and the following will work on both &quot;Unix-like&quot;
+systems and NOS (although after transfer to NOS without using 6/12 coding - which should
+not be used - it will appear in upper case there).</p>
+<pre><code><span class="hljs-preprocessor"># Simplest graph.</span>
+<span class="hljs-preprocessor">#</span>
+reset
+memtest
+title <span class="hljs-string">"A very simple graph"</span>
+xlabel <span class="hljs-string">"X axis"</span>
+ylabel <span class="hljs-string">"Y axis"</span>
+xyline
+outline dev
+</code></pre><p>On &quot;Unix-like&quot; systems, the output will be identical to the first script&#39;s output.
+However, on NOS, the title and labels will appear in upper case.</p>
+<p>Using DIMFILM&#39;s &quot;string markup sequences&quot; (the <code>*L</code> here) allows lower case to
+be plotted on NOS. </p>
+<p>If you really don&#39;t like using upper case for some reason, you can use lower case
+and &quot;string markup&quot; and get the same result as using upper case on both systems.</p>
+<p>GPLOT also tries to use heuristics to make file name related matters transparent,
+although there are limits to this considering each NOS account has a flat file
+system with maximum 7 letter/digit upper case only file names!</p>
+<p>For NOS / &quot;Unix&quot; compatibilty, you will have to stick to 7 character file names.
+However, you can specify a path for &quot;Unix&quot; that is prefixed to each file name using
+the <code>PREFIX</code> command. This prefix is not used for device output files, though, so they
+will be created in the current working directory.</p>
+<p>If you don&#39;t care about NOS compatibility, you can use long file names, so long as
+the entire path name does not exceed 72 characters.</p>
+<p>Note that NOS does not have file name extensions. In contrast, &quot;Unix-like&quot; 
+systems pretty much rely on having file name extensions.  EPS output files
+will be given <code>.eps</code> extensions on &quot;Unix&quot; and SVG files <code>.svg</code>. These should
+not be added to the file names you type in or put in scripts.</p>
+<p>To help identify what files contain on NOS, I use the first two characters as
+a sort of &quot;extension&quot; -- e.g. <code>OB</code> for obey files -- but this is just a personal
+convention which NOS knows nothing about. Unfortunately, reserving three characters
+for a frame number on output files leaves only four characters for the name, and using
+two of those to distinguish EPS from SVG isn&#39;t a good idea.</p>
+<p>GPLOT converts all supplied file names (including any <code>PREFIX</code>) to lower case
+on &quot;Unix&quot;. You cannot use upper or mixed case file names in GPLOT on &quot;Unix&quot;.
+This applies to all input and output files.
+Very rarely, this will be undesirable, but it almost always simplifies matters.
+On NOS, all file names are upper case and all lower case is converted to upper
+case by NOS.</p>
+<h2 id="using-different-colours-and-filling-the-canvas">Using different colours and filling the canvas</h2>
+<p>Here is the same graph as above, but with different classes of things in different
+colours and filling the output canvas.</p>
+<p><img src="gr2001.svg" alt=""></p>
+<p>The code for this is:</p>
+<pre><code><span class="hljs-preprocessor"># USING COLOUR/STYLE GROUPS</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+MEMTEST
+CSGROUP GENERAL
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">1</span>
+TITLE <span class="hljs-string">"A*L SIMPLE GRAPH WITH BETTER COLOURS"</span>
+XLABEL <span class="hljs-string">"X*L AXIS"</span>
+YLABEL <span class="hljs-string">"Y*L AXIS"</span>
+XYLINE
+OUTLINE DEV
+</code></pre><p>To use the full area of the device, the command:</p>
+<pre><code><span class="hljs-keyword">GRAPHMODE</span> <span class="hljs-literal">ON</span>
+</code></pre><p>was added. This just sets the bounds to have the same aspect ratio
+as the display device internally. In this case, to match the aspect ratio
+of 1200 by 800 (3:2), the bounds will be set to 0 to 1.5 by 0 to 1.</p>
+<p>Note that</p>
+<pre><code><span class="hljs-keyword">GRAPHMODE</span> <span class="hljs-literal">OFF</span>
+</code></pre><p>resets the bounds to 0 to 1 by 0 to 1 and if bounds are explicitly specified,
+they just supersede the ones set by <code>GRAPHMODE</code>.</p>
+<p>In GPLOT/DIMFILM there are 3 &quot;different classes of things&quot;, namely:</p>
+<ul>
+<li>Text (<code>TEXT</code>): this refers to all types of &quot;strings&quot;.</li>
+<li>Annotation (<code>ANNOT</code>): this refers to the various things that annotate graphs specifically.</li>
+<li>Other (<code>GENERAL</code>): All elements not in the above classes. This includes all lines and points.</li>
+</ul>
+<p>All of them are members of the class <code>ALL</code>.</p>
+<p>These 3 classes are called &quot;colour/style groups&quot; and the current class is selected with the
+    <code>CSGROUP</code> command. Following this, <code>COLOUR</code> and <code>WIDTH</code> commands set the colour (as normalised RGB)
+and line width for that <code>CSGROUP</code> only. Perhaps oddly, the line style (solid, dashed, etc.) is <em>not</em> set
+independently for different groups in DIMFILM. The current line style applies to all groups.</p>
+<p>Note that any command can be abbreviated -- so long as the abbreviation remains unique, it will work.
+(Note that this is <em>not</em> true of evaluator operators, as we will see).</p>
+<h2 id="adding-a-grid-or-graticule">Adding a grid or graticule</h2>
+<p>In order to better see the values on plotted graphs, it is often useful to have a grid
+or graticule over which the graphs are plotted (as with traditional graph paper). This is
+easily added with the <code>GRID</code> command:</p>
+<pre><code><span class="hljs-preprocessor"># ADD A GRID</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+MEMTEST
+CSGROUP GENERAL
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">1</span>
+TITLE <span class="hljs-string">"A*L SIMPLE GRAPH WITH A GRID"</span>
+XLABEL <span class="hljs-string">"X*L AXIS"</span>
+YLABEL <span class="hljs-string">"Y*L AXIS"</span>
+GRID BOTH
+XYLINE
+OUTLINE DEV
+</code></pre><p>resulting in:</p>
+<p><img src="gr3001.svg" alt=""></p>
+<h2 id="changing-the-width-of-lines">Changing the width of lines</h2>
+<p>As with colour, the width of lines can easily be set independently for each colour/style
+group with the <code>WIDTH</code> command.</p>
+<p><img src="gr4001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># GRAPH PLOT WITH WIDER LINE</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+MEMTEST
+GRAPHMODE ON
+CSGROUP GENERAL
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+WIDTH <span class="hljs-number">3</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">1</span>
+TITLE <span class="hljs-string">"A*L SIMPLE GRAPH WITH A WIDER LINE"</span>
+XLABEL <span class="hljs-string">"X*L AXIS"</span>
+YLABEL <span class="hljs-string">"Y*L AXIS"</span>
+GRID BOTH
+XYLINE
+OUTLINE DEV
+</code></pre><h2 id="different-graph-styles">Different graph styles</h2>
+<p>The graphs above are all drawn with the default &quot;framed&quot; graph style. An alternative
+is the &quot;open&quot; style:</p>
+<p><img src="gr5001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># OPEN STYLE GRAPH</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+MEMTEST
+GRAPHMODE ON
+CSGROUP GENERAL
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+WIDTH <span class="hljs-number">3</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">1</span>
+GSTYLE OPEN
+TITLE <span class="hljs-string">"A*LN OPEN STYLE SIMPLE GRAPH"</span>
+XLABEL <span class="hljs-string">"X*L AXIS"</span>
+YLABEL <span class="hljs-string">"Y*L AXIS"</span>
+XYLINE
+OUTLINE DEV
+</code></pre><p>Another alternative is the &quot;axes&quot; style:</p>
+<p><img src="gr7001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># AXES STYLE GRAPH</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+MEMTEST
+CSGROUP GENERAL
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+WIDTH <span class="hljs-number">3</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">1</span>
+AXCUT <span class="hljs-number">0.02</span> <span class="hljs-number">0</span>
+GSTYLE AXES
+TITLE <span class="hljs-string">"A*LN AXES STYLE SIMPLE GRAPH"</span>
+XLABEL <span class="hljs-string">"X*L AXIS"</span>
+YLABEL <span class="hljs-string">"Y*L AXIS"</span>
+XYLINE
+OUTLINE DEV
+</code></pre><p>To which a grid can be added in the obvious way:</p>
+<p><img src="gr8001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># AXES STYLE GRAPH WITH GRID</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+MEMTEST
+CSGROUP GENERAL
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+WIDTH <span class="hljs-number">3</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">1</span>
+AXCUT <span class="hljs-number">0.02</span> <span class="hljs-number">0</span>
+GSTYLE AXES
+GRID BOTH
+TITLE <span class="hljs-string">"A*LN AXES STYLE SIMPLE GRAPH WITH GRID"</span>
+XLABEL <span class="hljs-string">"X*L AXIS"</span>
+YLABEL <span class="hljs-string">"Y*L AXIS"</span>
+XYLINE
+OUTLINE DEV
+</code></pre><h2 id="multiple-graphs-on-the-same-axes-and-here-data">Multiple graphs on the same axes and &quot;HERE&quot; data</h2>
+<p>To plot more than one graph on the same axes is quite straightforward.
+First, note that we haven&#39;t explicitly specified the ranges of the axes
+in any of the graphs so far. Instead, the system has looked at the data
+and automatically found reasonable ranges for the axes. This is very
+often the best approach. </p>
+<p>To plot more than one graph and keep automatically determining the axis ranges
+can be done with the with two commands: <code>XYSAME</code> and <code>ANNOT OFF</code>. The second
+prevents annotation being drawn multiple times and the first keeps the axis
+ranges automatically determined from the first data plotted.</p>
+<p>GPLOT also lets you specify data &quot;inline&quot; in a script file. Here is a
+very simple example and the script that generated it.</p>
+<p><img src="gr10001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># <span class="hljs-number">2</span> CURVE GRAPH WITH INLINE DATA</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+<span class="hljs-preprocessor">#</span>
+GRAPHMODE ON
+GSTYLE BOXED
+<span class="hljs-preprocessor">#</span>
+CSGROUP GENERAL
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+WIDTH <span class="hljs-number">1</span>
+STYLE SOLID
+<span class="hljs-preprocessor">#</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+STYLE SOLID
+<span class="hljs-preprocessor">#</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">1</span>
+STYLE SOLID
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor">#--- DEFINE SOME DATA INLINE </span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-number">1</span> <span class="hljs-number">1</span>
+<span class="hljs-number">2</span> <span class="hljs-number">0</span>
+EOF
+<span class="hljs-preprocessor">#--- DRAW THAT WITH AUTO DETERMINED AXIS RANGES</span>
+GRID BOTH
+TITLE <span class="hljs-string">"T*LWO CURVES, SAME AXES, INLINE DATA"</span>
+XLABEL <span class="hljs-string">"X*L AXIS"</span>
+YLABEL <span class="hljs-string">"Y*L AXIS"</span>
+XYLINE
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor">#--- TURN OFF ANNOTATION AND KEEP AUTO DET RANGES FOR NEXT CURVE</span>
+ANNOT OFF 
+XYSAME
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor">#--- DEFINE SOME MORE DATA INLINE</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0</span> <span class="hljs-number">1</span>
+<span class="hljs-number">1</span> <span class="hljs-number">0.1333</span>
+<span class="hljs-number">2</span> <span class="hljs-number">1</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor">#--- DRAW THAT IN A DIFFERENT COLOUR AND WIDTH.</span>
+CSG GEN
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+WIDTH <span class="hljs-number">3</span>
+STYLE DASHDOT
+XYLINE
+OUTLINE DEVICE
+</code></pre><p>Note the <code>READ</code> command. This is described further in the section on plotting
+data in files. For inline data, the keyword <code>HERE</code> is used with it, and the data
+follows immediately. That data is terminated by <code>EOF</code>. The numeric arguments
+to <code>READ</code> are &quot;column numbers&quot; and will almost always be <code>1 2</code> for inline data.</p>
+<h2 id="multiple-graphs-and-keys">Multiple graphs and keys</h2>
+<p>GPLOT provides a straightforward (if inflexible) way of adding a key or legend to
+help identify the meaning of the lines (or points) on graphs.</p>
+<p>Here is an example of three curves with a key and the generating script. The
+data is again defined by &quot;HERE&quot; data.</p>
+<p><img src="gr11001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># <span class="hljs-number">3</span> CURVE GRAPH WITH INLINE DATA AND KEYS</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+<span class="hljs-preprocessor">#</span>
+GSTYLE BOXED
+<span class="hljs-preprocessor">#</span>
+CSGROUP GENERAL
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+WIDTH <span class="hljs-number">1</span>
+STYLE SOLID
+<span class="hljs-preprocessor">#</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+STYLE SOLID
+<span class="hljs-preprocessor">#</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">1</span>
+STYLE SOLID
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DEFINE SOME DATA INLINE </span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-number">1</span> <span class="hljs-number">1</span>
+<span class="hljs-number">2</span> <span class="hljs-number">0</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- WE WILL ADD KEYS.</span>
+USEKEY
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DRAW THAT WITH AUTO DETERMINED AXIS RANGES</span>
+GRID BOTH
+TITLE <span class="hljs-string">"T*LHREE CURVES WITH KEYS"</span>
+XLABEL <span class="hljs-string">"X*L AXIS"</span>
+YLABEL <span class="hljs-string">"Y*L AXIS"</span>
+XYLINE
+ADDKEY <span class="hljs-string">"F*LIRST"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- TURN OFF ANNOTATION AND KEEP AUTO DET RANGES FOR NEXT CURVE</span>
+ANNOT OFF 
+XYSAME
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DEFINE SOME MORE DATA INLINE</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0</span> <span class="hljs-number">1</span>
+<span class="hljs-number">1</span> <span class="hljs-number">0.1333</span>
+<span class="hljs-number">2</span> <span class="hljs-number">1</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DRAW THAT IN A DIFFERENT COLOUR AND WIDTH.</span>
+CSG GEN
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+WIDTH <span class="hljs-number">3</span>
+STYLE DASHDOT
+XYLINE
+ADDKEY <span class="hljs-string">"S*LECOND"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DEFINE YET MORE DATA INLINE</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0</span> <span class="hljs-number">1</span>
+<span class="hljs-number">0.2</span> <span class="hljs-number">0.2</span>
+<span class="hljs-number">0.4</span> <span class="hljs-number">0.8</span>
+<span class="hljs-number">0.6</span> <span class="hljs-number">0.4</span>
+<span class="hljs-number">0.8</span> <span class="hljs-number">0.6</span>
+<span class="hljs-number">1.0</span> <span class="hljs-number">0.5</span>
+<span class="hljs-number">1.2</span> <span class="hljs-number">0.6</span>
+<span class="hljs-number">1.4</span> <span class="hljs-number">0.4</span>
+<span class="hljs-number">1.6</span> <span class="hljs-number">0.8</span>
+<span class="hljs-number">1.8</span> <span class="hljs-number">0.2</span>
+<span class="hljs-number">2</span> <span class="hljs-number">1</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DRAW THAT IN A DIFFERENT COLOUR AND WIDTH.</span>
+CSG GEN
+COL <span class="hljs-number">0.1</span> <span class="hljs-number">0.7</span> <span class="hljs-number">0.1</span>
+WIDTH <span class="hljs-number">2</span>
+STYLE SOLID
+XYLINE
+ADDKEY <span class="hljs-string">"T*LHIRD"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DRAW THE LEGEND.</span>
+KEYS
+OUTLINE DEV
+</code></pre><p>This allows adding keys for up to 20 curves (I find 10 curves on one graph is as
+much as I can cope with). The maximum length of the key text is also quite limited
+at a maximum of 15 characters (including any markup sequences).</p>
+<p>The layout currently cannot be changed. The key/legend area is always positioned to
+the right of the graph. This may be better than trying to put the key on top of the
+graph, as it can be impossible to find a place to put that without obscuring part
+of the data (at least, I&#39;ve often found that is the case over the decades).  That
+approach could certainly be added, though.</p>
+<h2 id="multiple-curves-with-two-different-y-axis-ranges">Multiple curves with two different Y axis ranges</h2>
+<p>Sometimes it is useful to plot two (or more) curves with the same X axis but, because
+they have significantly different Y ranges, two distinct Y axes. This can be done by
+having one Y axis on the left of a graph and another on the right.</p>
+<p>A simple example is:</p>
+<p><img src="gr12001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># TWO CURVES, DIFFERENT AXIS RANGES</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- GENERATE A SINE WAVE.</span>
+EVAL <span class="hljs-number">0.1</span>,TWPI,<span class="hljs-number">2</span>,*,<span class="hljs-number">0.1</span>,+,<span class="hljs-number">201</span>,XLIN,X,SIN
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- PLOT IT WITH AUTO AXIS RANGES.</span>
+XLAB <span class="hljs-string">"X"</span>
+YLABEL <span class="hljs-string">"S*LINE VALUE"</span>
+TITLE <span class="hljs-string">"T*LWO CURVES, DIFFERENT Y AXIS RANGES"</span>
+XYL
+ANNOT OFF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DEFINE A TRIANGLE WAVE SHAPE.</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-number">5</span> <span class="hljs-number">100</span>
+<span class="hljs-number">10</span> <span class="hljs-number">0</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- PLOT THAT WITH AUTO AXIS, PUT VALUES ON RIGHT</span>
+CSG ALL
+COLOUR <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+RIGHTANNOT ON
+RYLABEL <span class="hljs-string">"R*LIGHT EDGE (TRIANGLE VALUES)"</span>
+XYL
+OUTLINE DEV
+</code></pre><p>This example includes the first use of the evaluator so far (to create the
+sine wave curve). It is not essential to this example, though.</p>
+<p>Note that the axis ranges are still automatically determined (<code>XYSAME</code> is
+not used for obvious reasons). The <code>ANNOT OFF</code> command is need though,
+before the <code>RIGHTANNOT</code> command is used.</p>
+<p>It is possible to create a key for such a graph too:</p>
+<p><img src="gr13001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># TWO CURVES, DIFFERENT AXIS RANGES, KEY</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- GENERATE A SINE WAVE.</span>
+EVAL <span class="hljs-number">0.1</span>,TWPI,<span class="hljs-number">2</span>,*,<span class="hljs-number">0.1</span>,+,<span class="hljs-number">201</span>,XLIN,X,SIN
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- WE WILL USE KEYS.</span>
+USEKEY
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- PLOT IT WITH AUTO AXIS RANGES.</span>
+XLAB <span class="hljs-string">"X"</span>
+YLABEL <span class="hljs-string">"S*LINE VALUE"</span>
+TITLE <span class="hljs-string">"T*LWO CURVES, DIFFERENT Y AXIS RANGES"</span>
+XYL
+ADDKEY <span class="hljs-string">"S*LINE"</span>
+ANNOT OFF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DEFINE A TRIANGLE WAVE SHAPE.</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-number">5</span> <span class="hljs-number">100</span>
+<span class="hljs-number">10</span> <span class="hljs-number">0</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- PLOT THAT WITH AUTO AXIS, PUT VALUES ON RIGHT</span>
+CSG ALL
+COLOUR <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+RIGHTANNOT ON
+RYLABEL <span class="hljs-string">"R*LIGHT EDGE (TRIANGLE VALUES)"</span>
+XYL
+ADDKEY <span class="hljs-string">"T*LRIANGLE"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DRAW LEGEND.</span>
+KEYS
+OUTLINE DEV
+</code></pre><h2 id="plotting-data-stored-in-a-disk-file">Plotting data stored in a disk file</h2>
+<p>So far, we have plotted data that has been generated by GPLOT or stored as
+&quot;HERE&quot; data in the command stream. Very often, the data to be plotted will be
+in disk files, though.</p>
+<p>GPLOT provides a very simple, albeit basic, way of reading such data and plotting
+it. Given a file containing the same number of numeric items on each line,
+with those items separated by spaces or a comma (and perhaps spaces), GPLOT
+can treat the n-th number on each line as an entry in a column of numbers.
+The columns are numbered 1, 2, 3, etc.</p>
+<p>Any line that begins with <code>#</code> or <code>C</code> (upper case C, not lower case) will be
+skipped as a comment. Any entirely blank lines will also be skipped.</p>
+<p>The <code>READ</code> command is followed by the name of the data file to be read
+then the column numbers for the X and Y coordinates.</p>
+<p>Here is an example of some real measured data stored in a file (<code>DAEG1</code>)
+and plotted:</p>
+<p><img src="gr14001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># READ AN X,Y DATA FILE AND PLOT THE CONTENTS</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- READ THE DATA FILE, FIRST <span class="hljs-number">2</span> COLUMNS, SPACE OR COMMA SEP.</span>
+GET DAEG1
+READ DAEG1 <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DRAW THE GRAPH</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+TITLE <span class="hljs-string">"M*LAINS VOLTAGE ON 7-*UAUG*L-2025"</span>
+XLABEL <span class="hljs-string">"H*LOURS W.R.T MIDNIGHT 6/7 *UA*LUGUST"</span>
+YLABEL <span class="hljs-string">"V*LOLTS (*URMS - 220V *LNOMINAL)"</span>
+XYLINE
+<span class="hljs-preprocessor">#</span>
+OUTLINE DEV
+</code></pre><p>The data file will usually have at least two columns. However, a single
+column of data can be plotted. That data will become the Y values and the
+X values will be the line number (starting at 0). Use a 0 column number
+to do this. For example:</p>
+<pre><code>READ DAEG1 <span class="hljs-number">0</span> <span class="hljs-number">2</span>
+</code></pre><h2 id="labelling-points-on-a-graph">Labelling points on a graph</h2>
+<p>It is sometimes useful to point out something on a graph. Here is
+an example:</p>
+<p><img src="gr15001.svg" alt=""></p>
+<p>This is quite easy to do, in this case by adding the following commands between
+<code>XYLINE</code> and <code>OUTLINE</code>:</p>
+<pre><code><span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- ADD A LABEL OR TWO</span>
+CSG ALL
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+GLABEL <span class="hljs-number">9.8</span> <span class="hljs-number">192.0</span> <span class="hljs-number">0.1</span> <span class="hljs-number">165</span> <span class="hljs-string">"W*LHAT HAPPENED?"</span>
+CSG TEXT
+COL <span class="hljs-number">0.7</span> <span class="hljs-number">0.384</span> <span class="hljs-number">0.025</span>
+GLABEL <span class="hljs-number">14</span> <span class="hljs-number">191.5</span> <span class="hljs-number">0.05</span> <span class="hljs-number">165</span> <span class="hljs-string">"E*LEK"</span>
+</code></pre><p>The <code>GLABEL</code> command&#39;s first two arguments are the graph coordinates
+to which the label&#39;s arrow should point. The third argument is the
+length of the arrow in <em>bounds coordinates</em> (which will be 0 to 1 by
+0 to 1 by default, or 0 to (device aspect ratio) by 0 to 1 if
+<code>GRAPHMODE ON</code> is in effect). The fourth argument is the angle
+of the arrow around the location it is pointing at, counter-clockwise
+from <code>+X</code> in degrees. The final argument is the text for the label,
+which will be drawn in a box at the blunt end of the arrow.</p>
+<h2 id="data-with-uncertainties-in-y">Data with uncertainties in Y</h2>
+<p>If your data has an uncertainty measure associated with it, that can
+be plotted as an error bar on the graph. The meaning of this value is
+entirely up to you, of course. For common meanings see this
+<a href="https://en.wikipedia.org/wiki/Error_bar">Wikipedia article</a>.</p>
+<p>Using a concocted data file (<code>DAEG2</code>) which looks like this:</p>
+<pre><code><span class="hljs-number">0.0</span>,<span class="hljs-number">0.0</span>,<span class="hljs-number">0.0</span>
+<span class="hljs-number">0.1</span>,<span class="hljs-number">0.01</span>,<span class="hljs-number">0.004</span>
+<span class="hljs-number">0.2</span>,<span class="hljs-number">0.04</span>,<span class="hljs-number">0.01</span>
+<span class="hljs-number">0.3</span>,<span class="hljs-number">0.09</span>,<span class="hljs-number">0.041</span>
+<span class="hljs-number">0.4</span>,<span class="hljs-number">0.16</span>,<span class="hljs-number">0.083</span>
+<span class="hljs-number">0.5</span>,<span class="hljs-number">0.25</span>,<span class="hljs-number">0.013</span>
+<span class="hljs-number">0.6</span>,<span class="hljs-number">0.36</span>,<span class="hljs-number">0.022</span>
+<span class="hljs-number">0.7</span>,<span class="hljs-number">0.49</span>,<span class="hljs-number">0.033</span>
+<span class="hljs-number">0.8</span>,<span class="hljs-number">0.64</span>,<span class="hljs-number">0.054</span>
+<span class="hljs-number">0.9</span>,<span class="hljs-number">0.81</span>,<span class="hljs-number">0.065</span>
+<span class="hljs-number">1.0</span>,<span class="hljs-number">1.0</span>,<span class="hljs-number">0.1</span>
+</code></pre><p>(note the use of comma separated instead of blank separated values here),
+the following script will plot a graph with error bar data taken from
+column 3:</p>
+<pre><code><span class="hljs-preprocessor"># READ AN X,Y,E DATA FILE AND PLOT THE CONTENTS</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- READ THE DATA FILE, FIRST <span class="hljs-number">3</span> COLUMNS. THIS ONE USES COMMAS.</span>
+GET DAEG2
+READ DAEG2 <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DRAW THE GRAPH</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG GEN
+COL <span class="hljs-number">0.8</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span>
+TITLE <span class="hljs-string">"L*LOOKS LIKE X*+2$+ WITH SYMMETRICAL ERRORS"</span>
+XLABEL <span class="hljs-string">"X"</span>
+YLABEL <span class="hljs-string">"Y"</span>
+XYLINE
+OUTLINE DEV
+</code></pre><p><img src="gr16001.svg" alt=""></p>
+<p>The column given as the third argument to <code>READ</code> supplies the delta from the
+values taken from the column given as the second argument to <code>READ</code> at which
+error bar limits will be drawn above and below the value.</p>
+<h2 id="data-with-asymmetric-uncertainties-in-y">Data with asymmetric uncertainties in Y</h2>
+<p>It is possible that your data has potential deviations that are larger
+in the negative direction than in the positive direction, perhaps because
+the underlying data distribution is not normal, but skewed, or perhaps the
+device making measurements has errors that are proportional to the magnitude
+of the measured values. To visualise this, you need asymmetric error bars in Y.</p>
+<p>To illustrate this, we have concocted another data file (<code>DAEG3</code>):</p>
+<pre><code><span class="hljs-number">0.0</span>,<span class="hljs-number">0.0</span>,<span class="hljs-number">0.0</span>,<span class="hljs-number">0.0</span>,<span class="hljs-number">0.0</span>
+<span class="hljs-number">0.1</span>,<span class="hljs-number">0.01</span>,<span class="hljs-number">0.004</span>,<span class="hljs-number">0.006</span>,<span class="hljs-number">0.002</span>
+<span class="hljs-number">0.2</span>,<span class="hljs-number">0.04</span>,<span class="hljs-number">0.01</span>,<span class="hljs-number">0.12</span>,<span class="hljs-number">0.033</span>
+<span class="hljs-number">0.3</span>,<span class="hljs-number">0.09</span>,<span class="hljs-number">0.041</span>,<span class="hljs-number">0.032</span>,<span class="hljs-number">0.092</span>
+<span class="hljs-number">0.4</span>,<span class="hljs-number">0.16</span>,<span class="hljs-number">0.083</span>,<span class="hljs-number">0.043</span>,<span class="hljs-number">0.161</span>
+<span class="hljs-number">0.5</span>,<span class="hljs-number">0.25</span>,<span class="hljs-number">0.013</span>,<span class="hljs-number">0.09</span>,<span class="hljs-number">0.251</span>
+<span class="hljs-number">0.6</span>,<span class="hljs-number">0.36</span>,<span class="hljs-number">0.022</span>,<span class="hljs-number">0.022</span>,<span class="hljs-number">0.3617</span>
+<span class="hljs-number">0.7</span>,<span class="hljs-number">0.49</span>,<span class="hljs-number">0.033</span>,<span class="hljs-number">0.021</span>,<span class="hljs-number">0.5</span>
+<span class="hljs-number">0.8</span>,<span class="hljs-number">0.64</span>,<span class="hljs-number">0.054</span>,<span class="hljs-number">0.066</span>,<span class="hljs-number">0.666</span>
+<span class="hljs-number">0.9</span>,<span class="hljs-number">0.81</span>,<span class="hljs-number">0.065</span>,<span class="hljs-number">0.032</span>,<span class="hljs-number">0.814</span>
+<span class="hljs-number">1.0</span>,<span class="hljs-number">1.0</span>,<span class="hljs-number">0.1</span>,<span class="hljs-number">0.05</span>,<span class="hljs-number">0.997</span>
+</code></pre><p>Note this has 5 columns but here we will use the first four.</p>
+<p>To plot this with asymmetrical error bars only requires a
+change to <code>READ</code>. The <code>XYLINE</code> (or <code>XYPOINT</code>) command will plot
+whatever the last <code>READ</code> has read.</p>
+<p>Note the command: <code>ASYMYERRORS YES</code> which explicitly turns on this
+behaviour. This is not needed, however, as it is the default.</p>
+<pre><code><span class="hljs-preprocessor"># READ AN X,Y,EU,EL DATA FILE AND PLOT THE CONTENTS</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- READ THE DATA FILE, FIRST <span class="hljs-number">4</span> COLUMNS. THIS ONE USES COMMAS.</span>
+ASYMYERRORS YES
+GET DAEG3
+READ DAEG3 <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DRAW THE GRAPH</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG GEN
+COL <span class="hljs-number">0.8</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span>
+TITLE <span class="hljs-string">"L*LOOKS LIKE X*+2$+ WITH ASYMMETRICAL ERRORS"</span>
+XLABEL <span class="hljs-string">"X"</span>
+YLABEL <span class="hljs-string">"Y"</span>
+XYLINE
+OUTLINE DEV
+</code></pre><p>This results in:</p>
+<p><img src="gr17001.svg" alt=""></p>
+<p>Note that the column specified as the 3rd argument to <code>READ</code> is the
+delta from the 2nd argument column value to the <em>upper</em> limit of the 
+error bar, and the column specified as the 4th argument is the (negative)
+delta to the <em>lower</em> limit of the error bar.</p>
+<p>It is easy to plot points on top of this. This might be useful when the
+points are derived from real measurements and a curve has been fitted
+to these measurements. As an example of this, we take the point Y
+coordinates from the 5th column of <code>DAEG3</code> using this script:</p>
+<pre><code><span class="hljs-preprocessor"># READ AN X,Y,EU,EL DATA FILE AND PLOT THE CONTENTS</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- READ THE DATA FILE, FIRST <span class="hljs-number">3</span> COLUMNS. THIS ONE USES COMMAS.</span>
+ASYMYERRORS YES
+GET DAEG3
+READ DAEG3 <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DRAW THE GRAPH</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG GEN
+COL <span class="hljs-number">0.8</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span>
+TITLE <span class="hljs-string">"*LX*+2$+ WITH ASYMMETRICAL ERRORS AND POINTS"</span>
+XLABEL <span class="hljs-string">"X"</span>
+YLABEL <span class="hljs-string">"Y"</span>
+XYLINE
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- PLOT POINTS</span>
+XYSAME
+ANNOT OFF
+CSG GEN
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+SYMHT <span class="hljs-number">0.04</span>
+READ DAEG3 <span class="hljs-number">1</span> <span class="hljs-number">5</span>
+XYPOINT
+<span class="hljs-preprocessor">#</span>
+OUTLINE DEV
+</code></pre><p><img src="gr18001.svg" alt=""></p>
+<h2 id="data-with-symmetric-uncertainties-in-y-and-x">Data with symmetric uncertainties in Y and X</h2>
+<p>It is also easy to plot data with uncertainty estimates in both axes.
+This requires the same 4 data columns as used above, but with the
+command:</p>
+<pre><code>ASYMYERRORS <span class="hljs-keyword">NO</span>
+</code></pre><p>Note that this <em>must</em> appear <em>before</em> the <code>READ</code> command, as it causes data to
+be rearranged internally immediately after it is read. In this case, the 3rd
+column is interpreted as symmetric Y error and the 4th as symmetric X error.</p>
+<p><img src="gr1x001.svg" alt=""></p>
+<h2 id="interpolating-the-data-points">Interpolating the data points</h2>
+<p>The supplied data can be interpolated for the purposes of plotting &quot;smooth&quot; curves
+through, rather than straight lines between, the supplied data. This is generally
+frowned upon in science, but GPLOT/DIMFILM can do it!</p>
+<p>In addition to <code>LINEAR</code> interpolation (which is usually pointless, as the appearance
+of the graph does not change), a cubic (3rd order) or quintic (5th order) polynomial
+can be drawn through the data points. At least 3 points must be supplied for cubic,
+and 5 for quintic, interpolation. The data must be sorted in X. The number of points 
+to be found between each supplied point must be specified. If the data is not
+reasonably &quot;well behaved&quot;, there can be numerical issues.</p>
+<p>To demonstrate this capability, here is a very simple example:</p>
+<p><img src="gr1i001.svg" alt=""></p>
+<p>This is created by the following script:</p>
+<pre><code><span class="hljs-preprocessor"># INTERPOLATION</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- SOME DATA - VERY UNDERSAMPLED SIN(X)</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0.00000</span>  <span class="hljs-number">0.00000</span>
+<span class="hljs-number">0.78540</span>  <span class="hljs-number">0.70711</span>
+<span class="hljs-number">1.57080</span>  <span class="hljs-number">1.00000</span>
+<span class="hljs-number">2.35619</span>  <span class="hljs-number">0.70711</span>
+<span class="hljs-number">3.14159</span>  <span class="hljs-number">0.00000</span>
+<span class="hljs-number">3.92699</span> -<span class="hljs-number">0.70711</span>
+<span class="hljs-number">4.71239</span> -<span class="hljs-number">1.00000</span>
+<span class="hljs-number">5.49779</span> -<span class="hljs-number">0.70711</span>
+<span class="hljs-number">6.28319</span>  <span class="hljs-number">0.00000</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- SETUP THE GRAPH</span>
+USEKEY
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG GEN
+COL <span class="hljs-number">0.8</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span>
+YRANGE -<span class="hljs-number">1.2</span> <span class="hljs-number">1.2</span>
+TITLE <span class="hljs-string">"I*LNTERPOLATIONS"</span>
+XLABEL <span class="hljs-string">"X"</span>
+YLABEL <span class="hljs-string">"Y"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- LINEAR INTERPOLATION, <span class="hljs-number">9</span> INTERMEDIATES.</span>
+INTERPOLATE LINEAR <span class="hljs-number">9</span>
+XYLINE
+ADDKEY <span class="hljs-string">"L*LINEAR"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- POINTS BEING INTERPOLATED.</span>
+XYSAME
+MARKER <span class="hljs-number">20</span>
+XYPOINT
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- CUBIC</span>
+COL <span class="hljs-number">0.1</span> <span class="hljs-number">0.8</span> <span class="hljs-number">0.1</span>
+INTERPOLATE CUBIC <span class="hljs-number">9</span>
+XYLINE
+ADDKEY <span class="hljs-string">"C*LUBIC"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- QUINTIC</span>
+COL <span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.8</span>
+INTERPOLATE QUINTIC <span class="hljs-number">9</span>
+XYLINE
+ADDKEY <span class="hljs-string">"Q*LUINTIC"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- FINISH THE GRAPH</span>
+KEYS
+</code></pre><h2 id="log-linear-plots">Log Linear Plots</h2>
+<p>It is possible to use a logarithmic Y axis and linear X axis. An
+example of this is:</p>
+<p><img src="gr20001.svg" alt=""></p>
+<p>Well, if we were hoping for a straight line with log Y for this function,
+we are going to be disappointed! Here is the script for this:</p>
+<pre><code><span class="hljs-preprocessor"># LOG Y AXIS</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- SQUARES OF SOME NUMBERS.</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">1</span> <span class="hljs-number">1</span>
+<span class="hljs-number">2</span> <span class="hljs-number">4</span>
+<span class="hljs-number">3</span> <span class="hljs-number">9</span>
+<span class="hljs-number">4</span> <span class="hljs-number">16</span>
+<span class="hljs-number">5</span> <span class="hljs-number">25</span>
+<span class="hljs-number">6</span> <span class="hljs-number">36</span>
+<span class="hljs-number">7</span> <span class="hljs-number">49</span>
+<span class="hljs-number">8</span> <span class="hljs-number">64</span>
+<span class="hljs-number">9</span> <span class="hljs-number">81</span>
+<span class="hljs-number">10</span> <span class="hljs-number">100</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- WE WILL USE KEYS.</span>
+USEKEY
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- PLOT IT WITH LOG Y AXIS</span>
+XLAB <span class="hljs-string">"*LX"</span>
+YLABEL <span class="hljs-string">"*LLOG(Y)"</span>
+TITLE <span class="hljs-string">"*LY=X*+2$+ WITH LOG Y AXIS"</span>
+GRID BOTH
+YLOG
+XYLINE
+ADDKEY <span class="hljs-string">"L*LOG"</span>
+ANNOT OFF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- PLOT IT WITH LINEAR Y AXIS, VALUES ON RIGHT</span>
+CSG ALL
+COLOUR <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+RIGHTANNOT ON
+RYLABEL <span class="hljs-string">"Y (L*LINEAR)"</span>
+YLIN
+XYL
+ADDKEY <span class="hljs-string">"L*LINEAR"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DRAW LEGEND.</span>
+KEYS
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># OUTLINE DEV</span>
+</code></pre><p>Let&#39;s try a power function instead:</p>
+<p><img src="gr2a001.svg" alt=""></p>
+<p>Ah hah! This time we are in luck -- a straight line using a log-linear plot!</p>
+<h2 id="log-log-plots">Log Log Plots</h2>
+<p>It is also easy to plot data with both log Y and log X axes. This script
+will do that with the same data as shown in the first log-linear plot (but
+with the values scaled up to see what happens):</p>
+<pre><code><span class="hljs-preprocessor"># LOG X AND Y AXIS</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+<span class="hljs-preprocessor">#</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- SQUARES OF SOME NUMBERS.</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">1.0E7</span> <span class="hljs-number">1</span>
+<span class="hljs-number">2.0E7</span> <span class="hljs-number">4</span>
+<span class="hljs-number">3.0E7</span> <span class="hljs-number">9</span>
+<span class="hljs-number">4.0E7</span> <span class="hljs-number">16</span>
+<span class="hljs-number">5.0E7</span> <span class="hljs-number">25</span>
+<span class="hljs-number">6.0E7</span> <span class="hljs-number">36</span>
+<span class="hljs-number">7.0E7</span> <span class="hljs-number">49</span>
+<span class="hljs-number">8.0E7</span> <span class="hljs-number">64</span>
+<span class="hljs-number">9.0E7</span> <span class="hljs-number">81</span>
+<span class="hljs-number">1.0E8</span> <span class="hljs-number">100</span>
+<span class="hljs-number">2.0E8</span> <span class="hljs-number">400</span>
+<span class="hljs-number">3.0E8</span> <span class="hljs-number">900</span>
+<span class="hljs-number">4.0E8</span> <span class="hljs-number">1600</span>
+<span class="hljs-number">5.0E8</span> <span class="hljs-number">2500</span>
+<span class="hljs-number">6.0E8</span> <span class="hljs-number">3600</span>
+<span class="hljs-number">7.0E8</span> <span class="hljs-number">4900</span>
+<span class="hljs-number">8.0E8</span> <span class="hljs-number">6400</span>
+<span class="hljs-number">9.0E8</span> <span class="hljs-number">8100</span>
+<span class="hljs-number">1.0E9</span> <span class="hljs-number">10000</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- WE WILL USE KEYS.</span>
+USEKEY
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- PLOT IT WITH LOG X AND Y AXES</span>
+XLAB <span class="hljs-string">"*LLOG(X)"</span>
+YLABEL <span class="hljs-string">"*LLOG(Y)"</span>
+TITLE <span class="hljs-string">"*LY=(*,X$,10*+7$+$.)*O*+2$+$* WITH LOG X AND Y AXES"</span>
+GRID BOTH
+XLOG
+YLOG
+XYLINE
+ADDKEY <span class="hljs-string">"L*LOG"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- PLOT IT WITH LINEAR Y AXIS, VALUES ON RIGHT</span>
+ANNOT OFF
+CSG ALL
+COLOUR <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+RIGHTANNOT ON
+RYLABEL <span class="hljs-string">"Y (L*LINEAR)"</span>
+YLIN
+XYL
+ADDKEY <span class="hljs-string">"L*LINEAR"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- DRAW LEGEND.</span>
+KEYS
+</code></pre><p><img src="gr21001.svg" alt=""></p>
+<p>And we now have a straight line on the log-log plot for this function.</p>
+<p>Note that one of the main reasons people plot experimental data with
+log-linear or log-log axes is in the hope of seeing something like a 
+straight line when they do so, which gives them a clue to the form of
+a mathematical model which might &quot;explain&quot; the experimental data (or,
+at least, approximate it).</p>
+<h2 id="histograms-and-multiple-plots-in-one-figure">Histograms and multiple plots in one figure</h2>
+<p>Histograms are another common type of plot and GPLOT can draw them in
+various styles. There are no facilities for binning raw data so that
+histograms can be drawn, however. Other software must prepare counts
+of data points that fall into bins of specified ranges. All GPLOT
+deals with are the counts and bin numbers for each count. </p>
+<p>As a minimal example, here is a single column of counts that can be
+represented by a histogram (file <code>DAEG4</code>):</p>
+<pre><code><span class="hljs-number">100</span>
+<span class="hljs-number">123</span>
+<span class="hljs-number">90</span>
+<span class="hljs-number">20</span>
+<span class="hljs-number">10</span>
+<span class="hljs-number">1</span>
+<span class="hljs-number">200</span>
+<span class="hljs-number">233</span>
+<span class="hljs-number">129</span>
+<span class="hljs-number">43</span>
+<span class="hljs-number">77</span>
+<span class="hljs-number">6</span>
+<span class="hljs-number">2</span>
+<span class="hljs-number">9</span>
+<span class="hljs-number">64</span>
+<span class="hljs-number">99</span>
+<span class="hljs-number">12</span>
+<span class="hljs-number">18</span>
+<span class="hljs-number">111</span>
+<span class="hljs-number">87</span>
+</code></pre><p>The following script draws histogram plots of this data in four
+different styles:</p>
+<pre><code><span class="hljs-preprocessor"># READ A COUNTS ONLY DATA FILE AND MAKE HISTOGRAMS.</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- READ THE DATA FILE, FIRST COLUMN ONLY.</span>
+GET DAEG4
+READ DAEG4 <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- SET COLOURS</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG GEN
+COL <span class="hljs-number">0.8</span> <span class="hljs-number">0.1</span> <span class="hljs-number">0.1</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- SET THE AXIS RANGES AND USE INT LABELS.</span>
+XRANGE -<span class="hljs-number">1</span> <span class="hljs-number">20</span>
+YRANGE <span class="hljs-number">0</span> <span class="hljs-number">240</span>
+AXCUT NO
+INTVALUES BOTH
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- SET AXIS LABELS.</span>
+XLABEL <span class="hljs-string">"C*LLASS NUMBER"</span>
+YLABEL <span class="hljs-string">"C*LOUNT"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- ABUT STYLE IN BOTTOM LEFT.</span>
+PANE <span class="hljs-number">0</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0</span> <span class="hljs-number">0.5</span>
+HISTSTYLE ABUT
+TITLE <span class="hljs-string">"C*LOUNTS HISTOGRAM (ABUTTING BARS)"</span>
+XYHIST
+OUTLINE PANE
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- SHADED ABUT STYLE IN BOTTOM RIGHT.</span>
+PANE <span class="hljs-number">0.5</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0.5</span>
+HISTSTYLE ABUT+SHADE
+TITLE <span class="hljs-string">"C*LOUNTS HISTOGRAM (ABUTTING SHADED BARS)"</span>
+XYHIST
+OUTLINE PANE
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- SPECIFIED WIDTH BARS IN TOP LEFT.</span>
+PANE <span class="hljs-number">0</span> <span class="hljs-number">0.5</span> <span class="hljs-number">0.5</span> <span class="hljs-number">1</span>
+HISTSTYLE WIDE <span class="hljs-number">0.25</span>
+TITLE <span class="hljs-string">"C*LOUNTS HISTOGRAM (SPECIFIED WIDTH BARS)"</span>
+XYHIST
+OUTLINE PANE
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- THIN LINES IN TOP RIGHT.</span>
+PANE <span class="hljs-number">0.5</span> <span class="hljs-number">1</span> <span class="hljs-number">0.5</span> <span class="hljs-number">1</span>
+HISTSTYLE LINES
+TITLE <span class="hljs-string">"C*LOUNTS HISTOGRAM (IMPULSES)"</span>
+XYHIST
+OUTLINE PANE
+<span class="hljs-preprocessor">#</span>
+OUTLINE DEV
+</code></pre><p><img src="gr22001.svg" alt=""></p>
+<p>In addition to showing how to draw histogram plots, this example shows
+a number of other new features.</p>
+<ul>
+<li>We explicitly specify X and Y axis ranges rather than letting the software choose. This
+is done with the <code>XRANGE</code> and <code>YRANGE</code> commands.</li>
+<li>We prevent lines being drawn for the axes -- vertical and horizontal lines that pass through
+(0,0) (or another point specified with <code>AXCUT</code>) -- by using: <code>AXCUT NO</code></li>
+<li>We try to use integers for the axis values instead of floating point numbers using
+<code>INTVALUES BOTH</code>. This option can be requested for X, Y, both or neither axis. It may
+not always be honoured, as it will be impossible for many axis ranges. But in this case,
+it is a reasonable request and it works.</li>
+</ul>
+<p>The most obvious new feature, though, is that the four plots showing the different histogram
+drawing styles appear in a single &quot;figure&quot;.</p>
+<p>This can be done easily with DIMFILM, as graphs are plotted inside any specified &quot;pane&quot;
+(see above), so all you have to do is use <code>PANE</code> appropriately.</p>
+<p>Actually, though, that needs some (trivial) manual calculation, but it may also need to account
+for the device aspect ratio if the output canvas is to be filled. To further simplify creating
+multiple plots in a single &quot;figure&quot;, GPLOT has the <code>SUBFIGGRID</code> command (which can be abbreviated,
+fortunately). This lets you specify a rectangular arrangement of &quot;sub-figures&quot; and the current
+sub-figure to be drawn (before any plotting commands) and calculates an appropriate pane for
+you, accounting for the device&#39;s aspect ratio (if <code>GRAPHMODE ON</code> has been used). 
+It also lets you &quot;shrink&quot; the figure, so there is some white space between it and its neighbours.</p>
+<p>An example of using this is:</p>
+<p><img src="gr29001.svg" alt=""></p>
+<p>The script for that is very similar to the one above, but with these changes:</p>
+<pre><code><span class="hljs-preprocessor"># READ A COUNTS ONLY DATA FILE AND MAKE HISTOGRAMS.</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+GRAPHMODE ON
+...
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- ABUT STYLE IN BOTTOM LEFT.</span>
+SUBFIG <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">0.95</span>
+HISTSTYLE ABUT
+...
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- SHADED ABUT STYLE IN BOTTOM RIGHT.</span>
+SUBFIG <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span> <span class="hljs-number">0.95</span>
+HISTSTYLE ABUT+SHADE
+...
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- SPECIFIED WIDTH BARS IN TOP LEFT.</span>
+SUBFIG <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">0.95</span>
+HISTSTYLE WIDE <span class="hljs-number">0.25</span>
+...
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># --- THIN LINES IN TOP RIGHT.</span>
+SUBFIG <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">0.95</span>
+HISTSTYLE LINES
+...
+<span class="hljs-preprocessor">#</span>
+OUTLINE DEV
+</code></pre><h2 id="multiple-plots-with-keys-in-one-figure">Multiple plots with keys in one figure</h2>
+<p>The &quot;sub-figures&quot; feature also works with graphs with keys (some juggling of
+panes is involved internally). An example of this is:</p>
+<p><img src="gr27001.svg" alt=""></p>
+<p>This redraws four of the example plots shown above. Some minor changes to the
+scripts that drew them were made (any <code>RESET</code>, <code>GRAPHMODE</code> or other commands
+that changed the bounds or pane were removed). These modified versions are
+stored in the script files <code>OBGF28A</code>, <code>OBGF28B</code>, <code>OBGF28C</code> and <code>OBGF28D</code>. These
+are then &quot;called&quot; from a &quot;master&quot; script file <code>OBGF28M</code> (obey files can be
+nested up to 5 levels deep):</p>
+<pre><code><span class="hljs-preprocessor"># FOUR DISPARATE PLOTS, ONE FIGURE.</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor">#===========================</span>
+RESET
+GRAPHMODE ON
+<span class="hljs-preprocessor"># --- BOTTOM LEFT OF <span class="hljs-number">4</span></span>
+SUBFIG <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">0.98</span>
+<span class="hljs-preprocessor">#</span>
+OBEY OBGF28A
+<span class="hljs-preprocessor">#===========================</span>
+RESET
+GRAPHMODE ON
+<span class="hljs-preprocessor"># --- TOP RIGHT OF <span class="hljs-number">4</span></span>
+SUBFIG <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">0.98</span>
+<span class="hljs-preprocessor">#</span>
+OBEY OBGF28B
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># ========================</span>
+RESET
+GRAPHMODE ON
+<span class="hljs-preprocessor"># --- TOP LEFT OF <span class="hljs-number">4</span></span>
+SUBFIG <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">0.98</span>
+<span class="hljs-preprocessor">#</span>
+OBEY OBGF28C
+<span class="hljs-preprocessor"># ========================</span>
+<span class="hljs-preprocessor"># --- BOTTOM RIGHT OF <span class="hljs-number">4</span></span>
+RESET
+GRAPHMODE ON
+SUBFIG <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">2</span> <span class="hljs-number">1</span> <span class="hljs-number">0.98</span>
+<span class="hljs-preprocessor">#</span>
+OBEY OBGF28D
+OUTLINE PANE
+<span class="hljs-preprocessor">#</span>
+OUTLINE DEV
+</code></pre><p>(Note that files will be stored on &quot;Unix-like&quot; systems with lower case file names
+but may be referred to in upper case in GPLOT -- all file names are converted
+internally to lower case by GPLOT on &quot;Unix&quot; before being accessed. These names
+could appear in lower case -- as could all commands -- and it would work)</p>
+<p>Please examine the &quot;called&quot; scripts for more information.</p>
+<p>When generating a multi-plot &quot;figure&quot;, you must keep the grid size constant
+in the <code>SUBFIG</code> command (e.g. <code>SUBFIG 2 2</code>) for every sub-figure. This is probably
+obvious, but nothing can check for this.</p>
+<p>Note the repetition of <code>RESET</code> and <code>GRAPHMODE ON</code> for each sub-figure. Without this,
+the various colours and styles set in one sub-figure script would be inherited by the
+next. These must occur <em>before</em> the <code>SUBFIG</code> command, so they cannot be left in the
+script files.</p>
+<h2 id="using-the-rpn-evaluator-to-plot-simple-functions">Using the RPN evaluator to plot simple functions</h2>
+<p>GPLOT includes a feature for calculating function values rather than reading
+them from files. This is the Reverse Polish Notation (RPN) evaluator, which provides
+features very similar to those you would find on classic HP calculators.</p>
+<p>One difference is that the RPN evaluator often operates on <em>arrays</em> rather than
+scalar values, in a way that might be familiar to people who have used NumPy or
+an APL-like language, perhaps. But with RPN thrown in for extra confusion!</p>
+<p>The evaluator has quite a few features beyond those needed for simple function
+plotting, and its main limitation is perhaps that the &quot;program&quot; length is
+limited by the 80 character input line limit (beyond which all input is truncated).</p>
+<p>A complete description of the available operators can be found in the &quot;cheat sheet&quot;
+below (which uses a notation familar to FORTH users) and in the PDF format GPLOT manual.
+Here, we just give some examples as an introduction.</p>
+<p>Admittedly, the RPN evaluator may not be all that easy to use (the <code>DUMP</code> operator is
+helpful when debugging), but it opens up a lot of possibilities.</p>
+<p>When dealing with data from files, GPLOT uses between 2 and 4 arrays to store the
+data to be plotted. Two are used to store X and Y coordinates. If symmetric error
+bars are to be plotted a third array is used to store that, and asymmetric Y error
+bars or Y and X error bars use a fourth array.</p>
+<p>The RPN evaluator treats these four arrays as the first four levels of a stack.
+If <code>READ</code> is used, their contents will be overwritten by the read data and the
+array length seen by the evaluator will be the number of points read. </p>
+<p>To provide &quot;room&quot; for any but the simplest calculations, another 4 stack levels
+(arrays) are provided &quot;above&quot; the four used for data from <code>READ</code>. (This can be
+configured with the <code>NSTACK</code> command).</p>
+<p>It is possible to use the first two X and Y levels of the stack as inputs
+to the evaluator. More often, though, the contents of the X array are set
+to cover some range of values by the <code>ERANGE</code> command or certain evaluator
+operators, and the evaluator sets the Y values in the Y array. This is
+how it can fairly straightforwardly plot mathematical functions.</p>
+<p>The evaluator &quot;cheat sheet&quot; below tries to show this stack of arrays
+diagrammatically.</p>
+<p>As a first, very simple, example, let&#39;s compute &quot;y=x^2&quot;. In previous examples
+the data has been precomputed and read from a file (often a &quot;HERE&quot; file). This
+script generates the Y values for a defined range of X values and plots the result
+(left hand subfigure, below).</p>
+<pre><code>RESET
+GRAPHMODE ON
+<span class="hljs-preprocessor">#</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-preprocessor">#</span>
+ERANGE <span class="hljs-number">1</span> <span class="hljs-number">1</span> <span class="hljs-number">100</span> <span class="hljs-number">100</span>
+EVAL X,<span class="hljs-number">2</span>,**
+<span class="hljs-preprocessor">#</span>
+XLABEL <span class="hljs-string">"X"</span>
+YLABEL <span class="hljs-string">"Y"</span>
+TITLE <span class="hljs-string">"X*+2"</span>
+GRID BOTH
+XYLINE
+<span class="hljs-preprocessor">#</span>
+OUTLINE DEV
+</code></pre><p><img src="gr30001.svg" alt=""></p>
+<p>The two commands that generate the data to be plotted are <code>ERANGE</code> and
+<code>EVAL</code>. The <code>ERANGE</code> command defines a range of X values for which the
+function is the be evaluated. In the case given here, it is similar to the
+NumPy &quot;linspace&quot; function. The first argument is the logarithm base, which, 
+if 1, indicates we want to sample a linear range. The next two values are
+the start and end X values, and the final argument is the number of steps
+to take between start and end. <code>ERANGE</code> puts its output in the X array,
+which is also stack level 0.</p>
+<p>The RPN evaluator does not use the X array as a &quot;normal&quot; part of the stack.
+It can be read via the <code>X</code> operator, which pushes its contents on the 
+stack. The X array can be written to by the <code>SETX</code> operator. Otherwise,
+it is not accessed.</p>
+<p>The <code>EVAL</code> operator needs one argument (a second is optional) which is an
+&quot;RPN string&quot; containing operators and operands for the evaluator to ... er ...
+evaluate. It may be enclosed in double quotation marks. </p>
+<p>Whatever the evaluator leaves in the stack level 1 or Y array can be
+plotted against the X array contents using <code>XYLINE</code> or the other graphing
+commands.</p>
+<p>To make the evaluator more useful, there are 9 &quot;procedure registers&quot;
+which can contain &quot;RPN strings&quot;. These can be executed by the evaluator
+using the notation:</p>
+<pre><code><span class="hljs-built_in">EVAL</span> <span class="hljs-constant">@1</span>
+<span class="hljs-built_in">EVAL</span> <span class="hljs-constant">@1</span>,<span class="hljs-constant">@3</span>
+</code></pre><p>which &quot;calls&quot; one or more procedure register contents (sequentially). The
+contents of a &quot;procedure register&quot; can be set with the <code>PROC</code> command.
+They can also be set with the <code>LOADPROC</code> command, which looks for a
+named procedure in the file <code>GPLPROC</code> and loads it into a specified
+&quot;procedure register&quot; if it is found.</p>
+<p>Note that the GPLOT evaluator does not actually do a &quot;call and return&quot; when
+it sees <code>EVAL @1</code>, etc. Instead, it uses string substitution to replace <code>@1</code>
+with the string in procedure register 1. It does this repeatedly, if necessary,
+until there are no remaining <code>@n</code> sequences in the substituted string.</p>
+<p>There are also 9 <em>scalar</em> &quot;memory&quot; registers, which can be set with the
+<code>STO</code> command and recalled with <code>RCL</code>. Often, parameters for procedures
+are put into these registers with <code>STO</code> then accessed in the RPN with
+the <code>RCL</code> or (as an abbreviation) <code>#</code>.</p>
+<p>To make evaluating procedures with parameters more straightforward,
+the optional second argument to <code>EVAL</code> is a comma separated list
+of numeric values to <code>STO</code> into consecutive scalar registers (starting 
+with the 1st) before running the RPN string. For example,</p>
+<pre><code><span class="hljs-built_in">EVAL</span> <span class="hljs-constant">@1</span> <span class="hljs-string">"1,2,3,4"</span>
+</code></pre><p>would put 1 in scalar register 1, 2 in register 2, and so on, then &quot;call&quot; 
+the procedure in &quot;procedure register&quot; 1.</p>
+<p>Finally, there are 9 &quot;string registers&quot; which can be set with arbitrary
+strings (maximum 80 characters) using the <code>STRING</code> command. These can then
+be used in an RPN procedure for plotting text.</p>
+<p>Returning to plotting simple functions, this script graphs a slightly
+more complex function:</p>
+<pre><code>CSG ALL
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+WIDTH <span class="hljs-number">1</span>
+CSG GENERAL
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+WIDTH <span class="hljs-number">2</span>
+<span class="hljs-preprocessor">#</span>
+ERANGE <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">13</span> <span class="hljs-number">801</span>
+EVAL X,TWPI,*,SIN,X,PI,<span class="hljs-number">2</span>,SQRT,*,*,SIN,+
+<span class="hljs-preprocessor">#</span>
+XLABEL <span class="hljs-string">"*LX (ARGUMENT)"</span>
+YLABEL <span class="hljs-string">"*LY (NEVER REPEATS)"</span>
+TITLE <span class="hljs-string">"*LY=SIN(2 PI X) + SIN(2*+*,1$,2$.$+ PI X)"</span>
+XYL
+</code></pre><p>This is plotted in the righthand sub-figure above.
+This function is mathematically interesting, as it never
+repeats (i.e. its period is infinite). This will not
+be the case when it is plotted on a digital computer, though, as all 
+numbers on such machines are rational, but the period will be
+enormous.</p>
+<h2 id="general-drawing-part-1-basic-functions">General drawing Part 1 Basic functions</h2>
+<p>DIMFILM provides some basic drawing capabilities apart from its extensive
+graph plotting functionality. Graph plotting is based on these lower
+level capabilities, as you would expect.</p>
+<p>There is a simple but sound foundation for general drawing with the 
+<code>BOUNDS</code> command, which establishes a user defined coordinate system,
+the <code>PANE</code> command, which sets up a rectangle in bounds coordinates
+outside of which no drawing will occur (a &quot;clip to inside&quot; region) and
+the <code>BLANK</code> command, which sets a rectangle inside 
+of which no drawing will occur (a &quot;clip to
+outside&quot; region). These commands map directly to DIMFILM subroutines.</p>
+<p>For convenience, GPLOT adds a <code>CANVAS</code> command, which just sets the
+bounds and the pane to the same coordinate ranges. </p>
+<p>All general purpose drawing uses the coordinates established by
+<code>BOUNDS</code>. If no explicit <code>BOUNDS</code> command is given, this defaults
+to 0 to 1 by 0 to 1, which will be a square region, centered in the
+output device drawable rectangle. As noted above, to use the full area
+of the output device, the aspect ratio of the bounds must match the
+aspect ratio of the device. This can be done automatically for
+graph plotting applications using <code>GRAPHMODE ON</code>, but you will generally
+want to choose your own coordinate ranges for general drawing, often
+bearing the device aspect ratio in mind when doing do.</p>
+<p>The low level drawing operations available are <code>MOVE</code> to move the
+&quot;current position&quot; to a specified coordinate, <code>DRAW</code> to draw from
+the current postion to a new position (which becomes the current position)
+in a straight line, <code>CIRCLE</code> which draw a circle of a given radius at
+a given position, <code>ARC</code> which draws a segment of a circle, and <code>RECT</code> which
+draws a rectangle.</p>
+<p>Two GPLOT commands build slightly on this: <code>CRECT</code> draws a rectangle centered
+on a given location and <code>PATH</code> uses the contents of the X and Y arrays
+to draw a polyline. GPLOT/DIMFILM does not support the drawing of any
+kinds of smooth curves for general drawing purposes (<code>INTERPOLATE</code> can
+interpolate smooth curves between data points for graph plotting, but this
+can&#39;t be used for general drawing).</p>
+<p>DIMFILM has very limited geometric transformation support and GPLOT does
+not provide access to this. GPLOT does provide a more comprehensive
+geometric transformation capability through its RPN evaluator, though.</p>
+<p>While these graphics facilities are fairly basic, there is also a rather
+comprehensive set of facilities for drawing text using vector fonts. These
+are accessed through the <code>TEXT</code> and <code>CTEXT</code> commands, with various properties
+set by the <code>SYMHT</code>, <code>SYMANG</code> and <code>FONT</code> commands. The fonts are specific to
+DIMFILM (there is no way to use any &quot;system fonts&quot;!) and are, in this
+implementation, some of the Hershey fonts. The available fonts
+can be listed with the <code>LISTFONT</code> command.</p>
+<p>Special &quot;marker&quot; characters can also be drawn using the <code>MARKER</code> command
+with the optional 2nd argument set to <code>YES</code>.</p>
+<p>The text output facility allows
+&quot;markup&quot; to be included in the string to draw, and this extends to sub-scripts,
+super-scripts, and fractions, which can be nested to two levels. Mathematical
+notation can, to a useful degree, be accommodated by this. Although we have
+high quality font drawing everywhere now (and for the last few decades), when
+DIMFILM was first released (1973), this was cutting edge. Mathematical notation 
+is still not readily expressible everywhere it might be useful even today, in fact.</p>
+<p>An example which shows most of the basic drawing operations in action is:</p>
+<p><img src="gd01001.svg" alt=""></p>
+<p>The script for this is a little long, but may be worth presenting in full:</p>
+<pre><code>RESET
+CANVAS <span class="hljs-number">0</span> <span class="hljs-number">22</span> <span class="hljs-number">0</span> <span class="hljs-number">16</span>
+<span class="hljs-preprocessor">#</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG GEN
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># DRAW CIRCLES</span>
+CIRCLE <span class="hljs-number">3</span> <span class="hljs-number">3</span> <span class="hljs-number">1</span>
+STYLE DASH
+CIRCLE <span class="hljs-number">19</span> <span class="hljs-number">3</span> <span class="hljs-number">1</span>
+STYLE DOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+CIRCLE <span class="hljs-number">19</span> <span class="hljs-number">13</span> <span class="hljs-number">1</span>
+STYLE DASHDOT
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CIRCLE <span class="hljs-number">3</span> <span class="hljs-number">13</span> <span class="hljs-number">1</span>
+STYLE SOLID
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># DRAW ANGLE</span>
+MOVE <span class="hljs-number">7</span> <span class="hljs-number">9</span>
+DRAW <span class="hljs-number">10</span> <span class="hljs-number">9</span>
+MOVE <span class="hljs-number">7</span> <span class="hljs-number">9</span>
+DRAW <span class="hljs-number">9.5981</span> <span class="hljs-number">10.5</span>
+ARC <span class="hljs-number">7</span> <span class="hljs-number">9</span> <span class="hljs-number">2</span> <span class="hljs-number">0</span> <span class="hljs-number">30</span>
+MOVE <span class="hljs-number">9.45</span> <span class="hljs-number">9.5</span>
+SYMHT <span class="hljs-number">0.5</span>
+TEXT <span class="hljs-string">"*:83=30"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># DRAW CENTER CROSS + MARKERS</span>
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+MOVE <span class="hljs-number">2</span> <span class="hljs-number">8</span>
+DRAW <span class="hljs-number">20</span> <span class="hljs-number">8</span>
+MOVE <span class="hljs-number">11</span> <span class="hljs-number">2</span>
+DRAW <span class="hljs-number">11</span> <span class="hljs-number">14</span>
+MOVE <span class="hljs-number">11</span> <span class="hljs-number">8</span>
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+MARKER <span class="hljs-number">9</span> Y
+MARKER <span class="hljs-number">23</span> Y
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># DRAW CIRCLE CROSSES AND MARKERS</span>
+MOVE <span class="hljs-number">1</span> <span class="hljs-number">13</span>
+DRAW <span class="hljs-number">5</span> <span class="hljs-number">13</span>
+MOVE <span class="hljs-number">3</span> <span class="hljs-number">11</span>
+DRAW <span class="hljs-number">3</span> <span class="hljs-number">15</span>
+SYMHT <span class="hljs-number">3</span>
+MOVE <span class="hljs-number">3</span> <span class="hljs-number">13</span>
+MARKER <span class="hljs-number">9</span> Y
+<span class="hljs-preprocessor">#</span>
+MOVE <span class="hljs-number">17</span> <span class="hljs-number">13</span>
+DRAW <span class="hljs-number">21</span> <span class="hljs-number">13</span>
+MOVE <span class="hljs-number">19</span> <span class="hljs-number">11</span>
+DRAW <span class="hljs-number">19</span> <span class="hljs-number">15</span>
+MOVE <span class="hljs-number">19</span> <span class="hljs-number">13</span>
+MARKER <span class="hljs-number">24</span> Y
+<span class="hljs-preprocessor">#</span>
+MOVE <span class="hljs-number">1</span> <span class="hljs-number">3</span>
+DRAW <span class="hljs-number">5</span> <span class="hljs-number">3</span>
+MOVE <span class="hljs-number">3</span> <span class="hljs-number">1</span>
+DRAW <span class="hljs-number">3</span> <span class="hljs-number">5</span>
+MOVE <span class="hljs-number">3</span> <span class="hljs-number">3</span>
+MARKER <span class="hljs-number">13</span> Y
+<span class="hljs-preprocessor">#</span>
+MOVE <span class="hljs-number">17</span> <span class="hljs-number">3</span>
+DRAW <span class="hljs-number">21</span> <span class="hljs-number">3</span>
+MOVE <span class="hljs-number">19</span> <span class="hljs-number">1</span>
+DRAW <span class="hljs-number">19</span> <span class="hljs-number">5</span>
+MOVE <span class="hljs-number">19</span> <span class="hljs-number">3</span>
+MARKER <span class="hljs-number">3</span> Y
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># DRAW ROUND CORNER RECTANGLE</span>
+WIDTH <span class="hljs-number">3</span>
+ARC <span class="hljs-number">7</span> <span class="hljs-number">6</span> <span class="hljs-number">1</span> <span class="hljs-number">180</span> <span class="hljs-number">270</span>
+ARC <span class="hljs-number">15</span> <span class="hljs-number">6</span> <span class="hljs-number">1</span> <span class="hljs-number">270</span> <span class="hljs-number">360</span>
+ARC <span class="hljs-number">7</span> <span class="hljs-number">10</span> <span class="hljs-number">1</span> <span class="hljs-number">90</span> <span class="hljs-number">180</span>
+ARC <span class="hljs-number">15</span> <span class="hljs-number">10</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">90</span>
+MOVE <span class="hljs-number">6</span> <span class="hljs-number">6</span>
+DRAW <span class="hljs-number">6</span> <span class="hljs-number">10</span>
+MOVE <span class="hljs-number">16</span> <span class="hljs-number">6</span>
+DRAW <span class="hljs-number">16</span> <span class="hljs-number">10</span>
+MOVE <span class="hljs-number">7</span> <span class="hljs-number">5</span>
+DRAW <span class="hljs-number">15</span> <span class="hljs-number">5</span>
+MOVE <span class="hljs-number">15</span> <span class="hljs-number">11</span>
+DRAW <span class="hljs-number">7</span> <span class="hljs-number">11</span>
+WIDTH <span class="hljs-number">1</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># ODDITIES</span>
+MOVE <span class="hljs-number">7</span> <span class="hljs-number">7</span>
+DRAW <span class="hljs-number">8</span> <span class="hljs-number">6</span>
+DRAW <span class="hljs-number">9</span> <span class="hljs-number">7</span>
+DRAW <span class="hljs-number">10</span> <span class="hljs-number">6</span>
+<span class="hljs-preprocessor">#</span>
+MOVE <span class="hljs-number">12</span> <span class="hljs-number">9</span>
+DRAW <span class="hljs-number">13</span> <span class="hljs-number">10</span>
+DRAW <span class="hljs-number">14</span> <span class="hljs-number">9</span>
+DRAW <span class="hljs-number">15</span> <span class="hljs-number">10</span>
+<span class="hljs-preprocessor">#</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">12</span> <span class="hljs-number">6</span>
+<span class="hljs-number">14</span> <span class="hljs-number">6</span>
+<span class="hljs-number">15</span> <span class="hljs-number">7</span>
+<span class="hljs-number">12</span> <span class="hljs-number">7</span>
+EOF
+PATH C
+<span class="hljs-preprocessor">#</span>
+SYMHT <span class="hljs-number">0.5</span>
+MOVE <span class="hljs-number">11</span> <span class="hljs-number">15</span>
+CTEXT <span class="hljs-number">0</span> <span class="hljs-string">"*=G*LENERAL DRAWING BASIC COMMANDS EXAMPLE$="</span>
+MOVE <span class="hljs-number">11</span> <span class="hljs-number">1</span>
+CTEXT <span class="hljs-number">12</span> <span class="hljs-string">"MOVE, DRAW, CIRCLE, ARC, MARKER, TEXT, CTEXT, PATH"</span>
+<span class="hljs-preprocessor">#</span>
+CSG GEN
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+OUTLINE BOUNDS
+OUTLINE DEV
+</code></pre><p>Most of this is likely to be self explanatory. The only points that
+may be unclear are:</p>
+<ul>
+<li>The use of a &quot;special character&quot; from the symbol font (which is loaded
+with <code>MATH.SMALL</code> by default) to draw the &quot;theta&quot; character. This is done by:
+<code>TEXT &quot;*:83=30&quot;</code> where the &quot;theta&quot; is selected by character number (83) using
+string markup. How do we know which character number to use? By looking at 
+&quot;font tables&quot; which can be generated with one of the supplied script files
+(<code>obfont</code> for &quot;normal&quot; alphabets, <code>obsyms</code> for symbols and <code>obmarks</code> for
+markers). This is explained further in a later section (below).</li>
+<li>The <code>MARKER</code> command, which will draw a specified marker (which is 
+determined by a number) at the current position <em>if</em> a second argument
+(<code>YES</code> - abbreviated, any case) is supplied. If only one argument is supplied,
+the <code>MARKER</code> command sets the marker number to use for points when plotting
+graphs.</li>
+<li>Polyline paths can be drawn with the <code>PATH</code> command with coordinates
+defined by a <code>HERE</code> file. This is quite a convenient way of setting up a
+path, actually. The path may be open or closed depending on the argument to
+<code>PATH</code> which may be <code>C</code> for closed or <code>O</code> for open.</li>
+</ul>
+<p>While you can draw a lot with these basic drawing commands, it can get pretty
+tedious and long winded. Some of that is inevitable, but some things could
+be &quot;automated&quot;. In this case, the end coordinate for the non-horizontal 
+&quot;angle&quot; line has to be set by <code>DRAW 9.5981 10.5</code> where those numbers were
+found by hand with a calculator! This is the sort of thing a computer
+ought to be able to do for you!</p>
+<p>To help with this, in addition to simple evaluation of <code>y = f(x)</code> functions,
+the &quot;evaluator&quot; was added.</p>
+<h2 id="the-rpn-evaluator-for-drawing-2d-parametric-functions">The RPN Evaluator for drawing 2D parametric functions</h2>
+<p>Bridging the graph plotting and general drawing worlds is drawing
+functions of a parameter, <code>t</code>, that trace out a path on the 2D plane.
+These are of the form:</p>
+<pre><code>x = <span class="hljs-function"><span class="hljs-title">f</span><span class="hljs-params">(t)</span></span>
+y = <span class="hljs-function"><span class="hljs-title">g</span><span class="hljs-params">(t)</span></span>
+</code></pre><p>Such functions can generate very pleasing patterns and often appear in
+&quot;recreational mathematics&quot;. Some of the most familiar examples are the
+curves generated by the &quot;Spirograph&quot; &quot;toy&quot; (see this
+<a href="https://en.wikipedia.org/wiki/Spirograph">Wikipedia article</a>), which we
+will come to shortly.</p>
+<p>As a simpler example (from the point of view of GPLOT only!) we start with
+the &quot;Farris mystery curve&quot;. The &quot;mystery&quot; is that a five-fold symmetry
+appears from formulae which contain mostly even numbers and no obvious source of
+such a symmetry.</p>
+<p>While &quot;Spirograph&quot; uses two wheels, with one rotating in slip-free contact
+with the other, the Farris curves (many variations are possible) can be
+generated with three wheels in slip-free contact.</p>
+<p>Here is the &quot;original&quot; mystery curve:</p>
+<p><img src="g1fm001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># FARRIS MYSTERY CURVE</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+CANVAS -<span class="hljs-number">2</span> <span class="hljs-number">2</span> -<span class="hljs-number">2</span> <span class="hljs-number">2</span>
+<span class="hljs-preprocessor">#</span>
+MAXPOINTS <span class="hljs-number">3000</span>
+<span class="hljs-preprocessor">#</span>
+EVAL <span class="hljs-number">0</span>,TWPI,<span class="hljs-number">2001</span>,XLIN
+PROC <span class="hljs-number">2</span> X,SIN,X,<span class="hljs-number">6</span>,*,SIN,<span class="hljs-number">2</span>,/,+,X,<span class="hljs-number">14</span>,*,COS,<span class="hljs-number">3</span>,/,+
+PROC <span class="hljs-number">1</span> X,COS,X,<span class="hljs-number">6</span>,*,COS,<span class="hljs-number">2</span>,/,+,X,<span class="hljs-number">14</span>,*,SIN,<span class="hljs-number">3</span>,/,+
+EVAL @<span class="hljs-number">1</span>,@<span class="hljs-number">2</span>,PTHO
+<span class="hljs-preprocessor">#</span>
+CSG ALL
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+MOVE <span class="hljs-number">0</span>  -<span class="hljs-number">1.66</span>
+CTEXT <span class="hljs-number">1.3</span> <span class="hljs-string">"*LX = COS(T) + *,COS(6T)$,2$. + *,SIN(14T)$,3$."</span> 
+MOVE <span class="hljs-number">0</span>  -<span class="hljs-number">1.9</span>
+CTEXT <span class="hljs-number">1.3</span> <span class="hljs-string">"*LY = SIN(T) + *,SIN(6T)$,2$. + *,COS(14T)$,3$."</span> 
+MOVE <span class="hljs-number">0</span>, <span class="hljs-number">1.9</span>
+CTEXT <span class="hljs-number">2</span> <span class="hljs-string">"*IF*LARRIS MYSTERY CURVE"</span>
+<span class="hljs-preprocessor">#</span>
+OUTLINE BOUNDS
+</code></pre><p>The script that generates this is quite short and simple. The first <code>EVAL</code> fills the X
+array (stack level 0) with 0 to 2 pi in 2001 linear steps. Two procedures are then defined
+(stored in procedure registers 1 and 2). <code>PROC 1</code> calculates X values and <code>PROC 2</code> finds
+Y values. The second <code>EVAL</code> evaluates these two procedures in the order that leaves the
+calculated coordinates on stack for use by the path drawing operator <code>PTHO</code>.</p>
+<p>It is easy to plot this curve as a graph (i.e. with value labelled axes, etc.) simply
+by replacing <code>PTHO</code> with operators that set the calculated X and Y values into the 
+X and Y arrays (stack levels 0 and 1) used by graph plotting commands (here <code>XYLINE</code>).</p>
+<p><img src="g2fm001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># FARRIS MYSTERY CURVE PLOTTED AS A GRAPH.</span>
+<span class="hljs-preprocessor">#</span>
+CANVAS -<span class="hljs-number">2</span> <span class="hljs-number">2</span> -<span class="hljs-number">2</span> <span class="hljs-number">2</span>
+<span class="hljs-preprocessor">#</span>
+MAXPOINTS <span class="hljs-number">3000</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+CSG GEN
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-preprocessor">#</span>
+EVAL <span class="hljs-number">0</span>,TWPI,<span class="hljs-number">2001</span>,XLIN
+PROC <span class="hljs-number">2</span> X,SIN,X,<span class="hljs-number">6</span>,*,SIN,<span class="hljs-number">2</span>,/,+,X,<span class="hljs-number">14</span>,*,COS,<span class="hljs-number">3</span>,/,+
+PROC <span class="hljs-number">1</span> X,COS,X,<span class="hljs-number">6</span>,*,COS,<span class="hljs-number">2</span>,/,+,X,<span class="hljs-number">14</span>,*,SIN,<span class="hljs-number">3</span>,/,+
+EVAL @<span class="hljs-number">1</span>,@<span class="hljs-number">2</span>,SETX,POP,SETY
+GRAPHMODE OFF
+TITLE <span class="hljs-string">"T*LHE *UF*LARRIS MYSTERY CURVE GRAPHED"</span>
+XLABEL <span class="hljs-string">"*LX = COS(T) + *,COS(6T)$,2$. + *,SIN(14T)$,3$."</span>
+YLABEL <span class="hljs-string">"*LY = SIN(T) + *,SIN(6T)$,2$. + *,COS(14T)$,3$."</span>
+GRID BOTH
+XYLINE
+</code></pre><p>The Spirograph is a toy invented by Denys Fisher in 1962-64 and fondly remembered
+by people of a certain age. It is a simple mechanism which can trace out hypotrochoid
+and epitrochoid curves based on two wheels (with gear teeth, so they can stay
+in contact without slipping). One wheel is fixed and the other rotates on the inside 
+or outside of the fixed wheel. This second wheel has holes in which the tip
+of a pen can be placed to draw curves. If the moving wheel rotates inside the fixed wheel,
+a hypotrochoid curve is traced out, and if it is outside, an epitrochoid curve is drawn.</p>
+<p>Much less accessible mechanisms were
+developed in the 19th century to draw such curves for use in banknote engraving
+as they are visually attractive and are (or were) difficult to forge without
+specialised machinery.</p>
+<p>Drawing these curves with GPLOT is an interesting exercise. They can be defined
+with three integer parameters: </p>
+<ul>
+<li><code>R</code>, the radius of the fixed wheel.</li>
+<li><code>RL</code>, the radius of the smaller, moving, wheel.</li>
+<li><code>P</code>, the distance of the &quot;pen hole&quot; from the centre of the moving wheel.</li>
+</ul>
+<p>We want to be able to change these easily, so we want to define a script that
+we can call like this:</p>
+<pre><code><span class="hljs-title">OB</span> OBSPIRO <span class="hljs-string">"65 25 30"</span>
+</code></pre><p>where we pass the values of <code>R</code>, <code>RL</code> and <code>P</code> to the script. This is a good 
+opportunity to show how to pass parameters to scripts and to use &quot;nested scripts&quot;
+to reuse code in the way that subroutines and functions allow in more sophisticated
+programming environments.</p>
+<p>The script <code>OBSPIRO</code> uses these parameters to calculate how many times the moving wheel
+needs to circle the fixed wheel to complete a closed curve, as well as the degree of
+symmetry of the curve. Note that the parameters passed to the script are referred to
+as <code>$1</code>, <code>$2</code>, etc. as they are in Unix scripting languages. Note also that it is possible
+to use parameters in the RPN strings used by <code>EVAL</code>. This can be very useful.</p>
+<p>One &quot;problem&quot; with the parametrised Spirograph simulation is that we don&#39;t know how
+big the pattern will be -- i.e. what the range of coordinates will be -- so we can&#39;t
+easily set the <code>BOUNDS</code> for the drawing.</p>
+<p>The <code>OBSPIRO</code> script deals with this using the <code>BBSTART</code>, <code>BBEND</code> and <code>BBSET</code> commands.
+Between <code>BBSTART</code> and <code>BBEND</code>, the <code>DRAW</code> command doesn&#39;t draw anything (all drawing
+ultimately comes down to <code>MOVE</code> and <code>DRAW</code>). Instead, the range of <code>X</code> and <code>Y</code> coordinates
+is accumulated. <code>BBSET</code> can then be used to set these accumulated ranges as the <code>BOUNDS</code>,
+optionally scaled about the center by a scale factor (here, <code>1.2</code>).</p>
+<p>The tracing out of the Spirograph is done by the script <code>OBSPIRC</code>, which <code>OBSPIRO</code>
+&quot;calls&quot; twice: once to find the pattern&#39;s bounds and once to draw the pattern.</p>
+<p>In general, parameters can be passed to obey scripts in two ways:</p>
+<ul>
+<li>Using parameters as described above, where, for example, <code>OB X &quot;1 2 3&quot;</code>
+results in <code>$1</code>, <code>$2</code> and <code>$3</code> in the script <code>X</code> being read as <code>1</code>, <code>2</code> and
+<code>3</code> as a result of <em>text (string) substitution</em>.</li>
+<li>Numerical values and strings can be passed through registers. This is necessary
+if values are calculated by <code>EVAL</code> to be used in a &quot;nested&quot; script.</li>
+</ul>
+<p>The <code>OBSPIRO</code> script demonstrates all these features.</p>
+<pre><code><span class="hljs-preprocessor"># SPIROGRAPH PATTERNS - OBSPIRO</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># FOR MORE INFORMATION, SEE:</span>
+<span class="hljs-preprocessor">#   HTTPS:<span class="hljs-comment">//LINUXGAZETTE.NET/133/LUANA.HTML</span></span>
+<span class="hljs-preprocessor">#   HTTPS:<span class="hljs-comment">//APERIODICAL.COM/2021/12/THE-MATHEMATICS-OF-SPIROGRAPH/</span></span>
+<span class="hljs-preprocessor">#</span>
+RESET
+
+<span class="hljs-preprocessor"># THE CONTROL PARAMETERS SHOULD ALL BE INTEGERS.</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># $<span class="hljs-number">1</span> = R = BIG CIRCLE RADIUS</span>
+<span class="hljs-preprocessor"># $<span class="hljs-number">2</span> = RL = LITTLE CIRCLE RADIUS (MOVES AROUND BIG CIRCLE, IN CONTACT)</span>
+<span class="hljs-preprocessor"># $<span class="hljs-number">3</span> = P = LITTLE CIRCLE PEN RADIUS (FROM CENTRE OF LITTLE CIRCLE)</span>
+
+<span class="hljs-preprocessor"># THE DEGREE OF SYMMETRY OF THE PATTERN IS MAX(R/GCD(R,RL),RL/GCD(R,RL))</span>
+
+<span class="hljs-preprocessor"># THE NUMBER OF REVOLUTIONS AROUND THE BIG CIRCLE NEEDED TO JOIN</span>
+<span class="hljs-preprocessor"># UP TO THE START OF THE PATTERN IS:</span>
+<span class="hljs-preprocessor"># NR = RL / GCD(R,RL) (GCD=GREATEST COMMON DIVISOR)</span>
+
+<span class="hljs-preprocessor"># THE PARAMETER RANGE NEEDED TO DRAW THE THING IS THEN:</span>
+<span class="hljs-preprocessor"># T = [<span class="hljs-number">0</span>:<span class="hljs-number">2</span>*PI*NR]</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># AND:</span>
+<span class="hljs-preprocessor"># X(T) = COS(T) * (R - RL) + COS(((R - RL) / RL) * T) * P</span>
+<span class="hljs-preprocessor"># Y(T) = SIN(T) * (R - RL) - SIN(((R - RL) / RL) * T) * P</span>
+
+<span class="hljs-preprocessor"># CALCULATE NR AND STORE IN REG <span class="hljs-number">9.</span> SAVE GCD(R,RL) IN REG <span class="hljs-number">8.</span></span>
+<span class="hljs-preprocessor"># NOTE THE DOUBLE QUOTES ARE NEEDED FOR PARAMETER SUBSTITUTION TO WORK</span>
+EVAL <span class="hljs-string">"$2,$1,$2,GCD,8,=,/,9,="</span>
+
+<span class="hljs-preprocessor"># FIND THE DEGREE OF SYMMETRY. STORE IN REG <span class="hljs-number">8.</span></span>
+EVAL <span class="hljs-string">"$1,8,#,/,$2,8,#,/,MAX,8,="</span>
+
+<span class="hljs-preprocessor"># FIND THE BOUNDING BOX AND SET BOUNDS.</span>
+BBSTART
+OB OBSPIRC <span class="hljs-string">"$1 $2 $3"</span>
+BBEND
+BBSET <span class="hljs-number">1.2</span>
+
+<span class="hljs-preprocessor"># DRAW THE SPIROGRAPH</span>
+CSG GENERAL
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+WIDTH <span class="hljs-number">2</span>
+OB OBSPIRC <span class="hljs-string">"$1 $2 $3"</span>
+
+<span class="hljs-preprocessor"># DRAW ANNOTATION (OR NOT)</span>
+<span class="hljs-preprocessor"># CSG GENERAL</span>
+<span class="hljs-preprocessor"># COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span></span>
+<span class="hljs-preprocessor"># WIDTH <span class="hljs-number">2</span></span>
+<span class="hljs-preprocessor"># CIRCLE <span class="hljs-number">0</span> <span class="hljs-number">0</span> $<span class="hljs-number">1</span></span>
+<span class="hljs-preprocessor"># EVAL <span class="hljs-string">"$1,$2,-,0,$2,C"</span></span>
+<span class="hljs-preprocessor"># EVAL <span class="hljs-string">"$1,$2,-,$3,+,0,$3,20,/,C"</span></span>
+<span class="hljs-preprocessor"># EVAL <span class="hljs-string">"$1,0,M,$1,$3,+,$2,-,$3,20,/,-,0,D"</span></span>
+
+<span class="hljs-preprocessor"># ADD A PARAMETER DISPLAY</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+BOUNDS <span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+MOVE <span class="hljs-number">0.05</span> <span class="hljs-number">0.05</span>
+SYMHT <span class="hljs-number">0.02</span>
+TEXT <span class="hljs-string">"R=$1, *LR=$2, P=$3"</span>
+STRING <span class="hljs-number">9</span> <span class="hljs-string">"S*LYMMETRY="</span>
+STRING <span class="hljs-number">8</span> <span class="hljs-string">"(I2)"</span>
+EVAL <span class="hljs-string">"0.05,0.1,M,9,T,TSC,8,#,8,TVI,TEC"</span>
+FONT <span class="hljs-number">2</span> SCRIPT.SIMPLEX
+MOVE <span class="hljs-number">0.8</span> <span class="hljs-number">0.95</span>
+SYMHT <span class="hljs-number">0.07</span>
+CTEXT <span class="hljs-number">0</span> <span class="hljs-string">"*2S*LPIROGRAPH!"</span>
+FONT <span class="hljs-number">2</span> SERIF.COMPLEX
+
+CSG GEN
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+OUTLINE BOUNDS
+</code></pre><p>The <code>OBSPIRC</code> script does the actual work of calculating pattern coordinates
+and drawing the result.</p>
+<pre><code><span class="hljs-preprocessor"># SPIROGRAPH PATTERN CORE - OBSPIRC</span>
+
+<span class="hljs-preprocessor"># $<span class="hljs-number">1</span> = R = BIG CIRCLE RADIUS</span>
+<span class="hljs-preprocessor"># $<span class="hljs-number">2</span> = RL = LITTLE CIRCLE RADIUS (MOVES AROUND BIG CIRCLE, IN CONTACT)</span>
+<span class="hljs-preprocessor"># $<span class="hljs-number">3</span> = P = LITTLE CIRCLE PEN RADIUS (FROM CENTRE OF LITTLE CIRCLE)</span>
+<span class="hljs-preprocessor"># REG <span class="hljs-number">9</span> = NR = NUMBER OF REVOLUTIONS AROUND BIG CIRCLE</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># T = [<span class="hljs-number">0</span>:<span class="hljs-number">2</span>*PI*NR]</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># X(T) = COS(T) * (R - RL) + COS(((R - RL) / RL) * T) * P</span>
+<span class="hljs-preprocessor"># Y(T) = SIN(T) * (R - RL) - SIN(((R - RL) / RL) * T) * P</span>
+
+STO <span class="hljs-number">1</span> $<span class="hljs-number">1</span>
+STO <span class="hljs-number">2</span> $<span class="hljs-number">2</span>
+STO <span class="hljs-number">3</span> $<span class="hljs-number">3</span>
+MAXPOINTS <span class="hljs-number">3000</span>
+
+ERANGE <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">6.28</span> <span class="hljs-number">2001</span>
+EVAL <span class="hljs-number">0</span>,TWPI,<span class="hljs-number">2001</span>,XLIN,X,<span class="hljs-number">9</span>,RCL,*,SETX
+EVAL <span class="hljs-number">1</span>,RCL,<span class="hljs-number">2</span>,RCL,-,<span class="hljs-number">5</span>,STO  ; [<span class="hljs-number">5</span>] = R - RL
+EVAL <span class="hljs-number">5</span>,RCL,<span class="hljs-number">2</span>,RCL,/,<span class="hljs-number">6</span>,STO  ; [<span class="hljs-number">6</span>] = (R - RL)  / RL
+PROC <span class="hljs-number">1</span> X,COS,<span class="hljs-number">5</span>,RCL,*,<span class="hljs-number">6</span>,RCL,X,*,COS,<span class="hljs-number">3</span>,RCL,*,+ ; X
+PROC <span class="hljs-number">2</span> X,SIN,<span class="hljs-number">5</span>,RCL,*,<span class="hljs-number">6</span>,RCL,X,*,SIN,<span class="hljs-number">3</span>,RCL,*,- ; Y
+EVAL @<span class="hljs-number">1</span>,@<span class="hljs-number">2</span>,PTHO
+</code></pre><p>This is quite similar to the &quot;Farris Mystery Curve&quot; script in its approach. Note that
+it stores the parameters it receives in registers for use in the RPN, although direct
+substitution could be used. It first generates an angle parameter at 2001 points that
+&quot;goes around&quot; the required number of times to generate a closed pattern, then it finds
+the path coordinates based on the angle and draws the result with the open path operator,
+<code>PTHO</code>.</p>
+<p>Here are some examples of the output of <code>OBSPIRO</code> with different parameter sets.</p>
+<p><img src="g1sp001.svg" alt=""></p>
+<p><img src="g2sp001.svg" alt=""></p>
+<p><img src="g3sp001.svg" alt=""></p>
+<p>Still sticking with procedurally generated patterns, but moving away from traditional
+continuous functions of a variable, there is a traditional form of Japanese Sashiko
+stitching called Hitomezashi, developed in the Edo period.</p>
+<p>These stitch patterns consist of short stitches of a single unit length, made either horizontally
+or vertically. If two random sequences of length <code>N</code> are generated, one for the horizontal 
+direction and another for the vertical, and a stitch is made if the value of the sequence is 
+odd (and not made if it is even) then a very attractive pattern results.</p>
+<p>I came across this thanks to this <a href="https://www.youtube.com/watch?v=JbfhzlMk2eY">Numberphile</a>, 
+video on YouTube, which gives an excellent explanation of things.</p>
+<p><img src="gemz001.svg" alt=""></p>
+<p>The following obey script draws such patterns:</p>
+<pre><code><span class="hljs-preprocessor"># GENERATE HITOMEZASHI STITCH PATTERNS</span>
+<span class="hljs-preprocessor">#</span>
+RESET
+CANVAS <span class="hljs-number">0</span> <span class="hljs-number">41</span> <span class="hljs-number">0</span> <span class="hljs-number">41</span>
+BLANK <span class="hljs-number">30.5</span> <span class="hljs-number">40.5</span> <span class="hljs-number">37.5</span> <span class="hljs-number">40.5</span>
+
+ERANGE <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">40</span> <span class="hljs-number">41</span>
+PROC <span class="hljs-number">1</span> <span class="hljs-number">1</span>,RAND,<span class="hljs-number">0.5</span>,+,FLR,<span class="hljs-number">1</span>,EL,X,+,ODD
+EVAL <span class="hljs-number">333</span>,SEED
+
+CSG GEN
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+WIDTH <span class="hljs-number">3</span>
+ITEVAL <span class="hljs-number">0</span> <span class="hljs-number">40</span> <span class="hljs-number">1</span> <span class="hljs-number">0</span>,I,M,@<span class="hljs-number">1</span>,HDSH
+ITEVAL <span class="hljs-number">0</span> <span class="hljs-number">40</span> <span class="hljs-number">1</span> I,<span class="hljs-number">0</span>,M,@<span class="hljs-number">1</span>,VDSH
+
+CSG ANNOT
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+WIDTH <span class="hljs-number">5</span>
+OUTLINE BLANK
+
+UNBLANK
+MOVE <span class="hljs-number">35.5</span> <span class="hljs-number">39</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+WIDTH <span class="hljs-number">1</span>
+CTEXT <span class="hljs-number">9</span> <span class="hljs-string">"H*LITOMEZASHI"</span>
+
+OUTLINE DEV
+</code></pre><p>This introduces a new version of <code>EVAL</code> -- iterated evaluation or <code>ITEVAL</code>. This repeatedly
+runs an RPN procedure with a &quot;loop variable&quot; that iterates from a start value to a stop value
+(inclusive - FORTRAN DO-loop rules apply) by a step value. The &quot;loop variable&quot; value can be
+accessed inside the RPN using the <code>I</code> operator.</p>
+<p>This example also shows how to use <code>BLANK</code> and <code>UNBLANK</code> to temporarily protect a rectangular
+region so that it cannot be drawn in.</p>
+<h2 id="general-drawing-part-2-evaluator-assisted">General drawing Part 2 Evaluator assisted</h2>
+<p>It is possible to use the evaluator to assist with general drawing tasks. In many cases,
+it is necessary to calculate coordinates from a small set of supplied parameters in
+order to complete the drawing task. A good example of this was the &quot;labelled angle line pair&quot;
+shown in the manual general drawing section, where we used a calculator to find the
+coordinates of the label text literally by hand.</p>
+<p>Probably the most convenient way of using the evaluator for such tasks is to add procedures
+to the <em>evaluator procedure library</em> which consists of the file <code>GPLPROC</code> (<code>gplproc</code> on Unix-like
+systems, with any specified <code>PREFIX</code> prepended).</p>
+<p>The procedures in this library are, to some extent, a way to extend GPLOT&#39;s capabilities, or, at
+least, make some things much more convenient than they otherwise would be.</p>
+<p>The contents of <code>GPLPROC</code> include comments that document its procedures. Please read it for full
+information. To understand its features, here are a couple of examples.</p>
+<p>This <code>RELLIPSE</code> procedure draws an ellipse (which GPLOT/DIMFILM cannot do directly). It has five
+parameters, the center position <code>(XC,YC)</code>, the semi-major and semi-minor axis lengths and a rotation
+angle (a rotation of the ellipse axes).</p>
+<pre><code>C A ROTATED ELLIPSE <span class="hljs-string">"XC YC A B ANGLE-DEGREES"</span>
+RELLIPSE
+CL,<span class="hljs-number">0</span>,TWPI,<span class="hljs-number">360</span>,XLIN,X,&amp;,COS,S,SIN,<span class="hljs-number">3</span>,<span class="hljs-preprocessor">#,<span class="hljs-number">4</span>,#,SCL,<span class="hljs-number">5</span>,#,D2R,ROT,<span class="hljs-number">1</span>,#,<span class="hljs-number">2</span>,#,TRN,PTHC</span>
+</code></pre><p>To use this procedure to draw a rotated ellipse, two GPLOT commands are needed:</p>
+<pre><code>LOAD <span class="hljs-number">1</span> RELLIPSE
+<span class="hljs-built_in">EVAL</span> <span class="hljs-constant">@1</span> <span class="hljs-string">"5,1,0.5,0.9,33"</span>
+</code></pre><p>The first line loads the required procedure into a procedure register (1 here),
+then the second executes it, passing it the required arguments. If a given procedure
+is to be &quot;called&quot; multiple times, it need only be loaded once, of course.</p>
+<p>The second example shows a useful feature unique to <code>GPLPROC</code>. A major limitation of the
+evaluator is that RPN strings are limited to 80 characters. This is not enough for many
+&quot;real world&quot; applications. When a procedure is loaded from <code>GPLPROC</code>, it can span
+multiple lines. In such a case, the procedure is loaded into multiple successive procedure
+registers and <code>,@n</code> sequences are automatically added to line ends so that the when the
+procedure is called from an <code>EVAL</code> command, a single long procedure is assembled and
+executed. A side effect of this scheme is that lines can be no more than 77 characters
+long if another line follows in the procedure definition.</p>
+<pre><code>C GEAR <span class="hljs-string">"X Y R1 R2 N-TEETH ROT-DEGREES"</span>
+GEAR <span class="hljs-number">2</span>
+CL,<span class="hljs-number">0</span>,<span class="hljs-number">5</span>,<span class="hljs-preprocessor">#,&amp;,<span class="hljs-number">1</span>,+,XLIN,<span class="hljs-number">3</span>,#,<span class="hljs-number">4</span>,#,X,<span class="hljs-number">2</span>,/,ODD,SEL,X,TWPI,*,<span class="hljs-number">5</span>,#,/,<span class="hljs-number">6</span>,#,D2R,+,&amp;</span>
+COS,S,SIN,<span class="hljs-number">3</span>,G,*,S,<span class="hljs-number">3</span>,G,*,<span class="hljs-number">1</span>,<span class="hljs-preprocessor">#,<span class="hljs-number">2</span>,#,TRN,PTHO</span>
+</code></pre><p>Note that the number of lines in the full procedure (2 here) must be given
+after the procedure name. These procedures must be loaded into a procedure
+register number that leaves enough successive registers to hold the full thing.
+Here, for example, <code>LOAD 8 GEAR</code> would work, but <code>LOAD 9 GEAR</code> would not.</p>
+<p>The script <code>OBPRTST</code> calls every procedure currently defined in <code>GPLPROC</code> as
+shipped. The output of that is shown below.</p>
+<p><img src="gdea001.svg" alt=""></p>
+<p>It is intended that GPLOT users add their own procedures to <code>GPLPROC</code> to &quot;extend&quot;
+GPLOT to do things they want to do.</p>
+<h2 id="general-drawing-part-3-higher-level-drawing">General drawing Part 3 Higher level drawing</h2>
+<p>Although the evaluator can &quot;extend&quot; the capabilities of GPLOT to some extent,
+it has some pretty severe limitations and inconveniences. The main limitations
+are the maximum size of procedures and the complete lack of branching and
+looping features. In practice, you cannot &quot;draw anything&quot; with GPLOT/DIMFILM
+in the way that you can with PostScript, for example.</p>
+<p>There are some drawing operations beyond the (very) basic facilities described
+above which are sufficiently generally useful to &quot;build in&quot; to GPLOT. This hopefully
+makes it relatively easy to draw things that are commonly useful (easier than using
+PostScript, for example), while acknowledging that there are still 
+fundamental limitations to what can be drawn.</p>
+<p>To this end, GPLOT has three &quot;higher level&quot; drawing &quot;primitives&quot;:</p>
+<ul>
+<li>Decorated lines</li>
+<li>Boxed text</li>
+<li>Labels with pointing arrows.</li>
+</ul>
+<p>These can be used for a broad range of diagrams, but especially block diagrams.</p>
+<p>A <strong>decorated line</strong> is a series of connected and directed line segments, 
+the ends of which may have:</p>
+<ul>
+<li>Arrow heads. These will automatically point in the correct direction (hopefully).</li>
+<li>&quot;Half skips&quot;. These are (close to) quarter circles, and if a line ends and begins
+with one of these, it can give the appearence of skipping over another line, as
+was commonly seen in older circuit diagrams.</li>
+<li>No decorations or &quot;plain&quot;.</li>
+</ul>
+<p>Such a line is drawn by the <code>LINE</code> command which takes a string that defines the
+line segments and their decorations. Each coordinate or <em>point description</em> defining 
+a &quot;vertex&quot; in the &quot;polyline&quot; has the following components:</p>
+<pre><code>&lt;decoration&gt;x,y[,&lt;annotation_string&gt;]
+
+&lt;decoration&gt; = P (plain) <span class="hljs-keyword">or</span> A (arrow) <span class="hljs-keyword">or</span> S (half skip)
+
+&lt;annotation_string&gt; <span class="hljs-keyword">is</span> a short <span class="hljs-type">string</span> (currently limited <span class="hljs-keyword">to</span> <span class="hljs-number">5</span> <span class="hljs-property">characters</span>).
+It may <span class="hljs-keyword">contain</span> DIMFILM <span class="hljs-type">string</span> markup. It cannot <span class="hljs-keyword">contain</span> spaces.
+</code></pre><p>The annotation string, if supplied, will be drawn in a circle at the mid-point of the
+line segment ended by the point description that specifies it. This is intended to be
+a <em>very short</em> label.</p>
+<p>The point descriptions are separated by <code>&quot;&gt;&quot;</code> characters, which can be read in this
+context as &quot;to&quot;.</p>
+<p>Here is an example that defines a two segment decorated line, starting with no 
+decoration and ending in an arrow head with a label, <code>&quot;Le&quot;</code>, in the middle of the
+first of the two line segments:</p>
+<pre><code>LINE P7,<span class="hljs-number">6</span>&gt;P7,<span class="hljs-number">21</span>,L*LE&gt;A16,<span class="hljs-number">21</span>
+</code></pre><p>Additional characteristics of decorated lines are specified by the <code>ARROWPARM</code>
+and <code>LINEPARM</code> commands. The latter sets scale factors for drawing skips 
+and annotations, while the former sets the type, size and appearance of arrow
+heads. Note that the width and colour of decorated lines are set in the usual
+way (lines, arrows and skips are in <code>CSG GENERAL</code>, annotation text in <code>CSG TEXT</code>).</p>
+<p><strong>Boxed text</strong> is intended to be a fairly flexible component for constructing
+block diagrams, tables and many other drawings.  The element is basically text
+centered in a box of a specified size at a specified position (given either
+by centre or bottom left).</p>
+<p>A number of other features can be added, though.</p>
+<ul>
+<li>The inside of the box can be &quot;filled&quot; with hatched lines.</li>
+<li>A second box, inside the first and surrounding the text, can
+be drawn. It is a <code>BLANK</code> region, and it can be outlined.</li>
+<li>The text may have multiple lines (up to 5), separated by backslashes.</li>
+<li>The text may be centered or left justified.</li>
+<li>The text can contain DIMFILM string markup.</li>
+<li>The position of the boxed text can be automatically &quot;stepped&quot; by
+specified X and Y &quot;deltas&quot; after eah one is drawn. This makes it
+much easier to use this for constructing tables and other things.</li>
+</ul>
+<p>The main command for this element is <code>BOXTEXT</code>, which draws a given
+text string at a position given by either a supplied coordinate, or,
+if the coordinate is omitted, at the position of the last <code>BOXTEXT</code>
+incremented by previously specified deltas.</p>
+<p>A number of secondary commands set current characteristics of
+<code>BOXTEXT</code>. These are:</p>
+<ul>
+<li><code>BOXPSIZE</code> which sets the box size and how the position coordinate
+is to be interpreted.</li>
+<li><code>BOXPHATCH</code> which sets the hatching parameters (or turns it off).</li>
+<li><code>BOXPTEXT</code> which sets how text is drawn inside the box. There are
+two distinct modes: <code>FIX</code> and <code>SCALE</code>. In <code>FIX</code> mode, the <code>WIDTHSCALE</code>
+parameter sets how many lines will fit in the box height, while in <code>SCALE</code>
+mode, it sets the fraction of the box width the text should be scaled to fill.</li>
+<li><code>BOXPBOX</code> which controls whether the outer and inner boxes are outlined.</li>
+<li><code>BOXPDELTAS</code> which sets the automatic position step after each <code>BOXTEXT</code>
+is drawn.</li>
+</ul>
+<p><strong>Labels</strong> are the same graphical entities used to label points on a graph,
+but the coordinates of the thing they point at is in bounds rather than graph 
+coordinates.</p>
+<p>Here is a simple example of how these facilities can be used to draw a 
+small block diagram.</p>
+<p><img src="gh1b001.svg" alt=""></p>
+<pre><code>RESET
+BOUNDS <span class="hljs-number">0</span> <span class="hljs-number">42</span> <span class="hljs-number">0</span> <span class="hljs-number">26</span>
+
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+CSG ANNOT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+WID <span class="hljs-number">2</span>
+
+BOXPSIZE <span class="hljs-number">10</span> <span class="hljs-number">6</span> NO
+
+BOXT <span class="hljs-string">"B*LOX 1"</span> <span class="hljs-number">7</span> <span class="hljs-number">3</span>
+BOXT <span class="hljs-string">"B*LOX 2"</span> <span class="hljs-number">21</span> <span class="hljs-number">3</span>
+BOXT <span class="hljs-string">"C*LURIOUS\*UB*LOX 3"</span> <span class="hljs-number">35</span> <span class="hljs-number">3</span>
+
+BOXT <span class="hljs-string">"B*LOX 4"</span> <span class="hljs-number">35</span> <span class="hljs-number">13</span>
+
+BOXPHATCH <span class="hljs-number">0.05</span> <span class="hljs-number">8</span> HORIZ
+BOXPBOX BOTH
+BOXT <span class="hljs-string">"B*LOX 5\*UA*LN ODDITY"</span> <span class="hljs-number">21</span> <span class="hljs-number">21</span>
+
+CSG GEN
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+ARROWPARM BARBED <span class="hljs-number">0.8</span> <span class="hljs-number">2</span> <span class="hljs-number">0.3</span>
+LINEPARM <span class="hljs-number">0.5</span> <span class="hljs-number">1.5</span>
+LINE P12,<span class="hljs-number">3</span>&gt;A16,<span class="hljs-number">3</span>
+LINE P26,<span class="hljs-number">3</span>&gt;A30,<span class="hljs-number">3</span>
+LINE P35,<span class="hljs-number">6</span>&gt;A35,<span class="hljs-number">10</span>
+LINE A35,<span class="hljs-number">16</span>&gt;P35,<span class="hljs-number">21</span>,R*LT&gt;A26,<span class="hljs-number">21</span>
+LINE P7,<span class="hljs-number">6</span>&gt;P7,<span class="hljs-number">21</span>,L*LE&gt;A16,<span class="hljs-number">21</span>
+
+LINE P12<span class="hljs-number">.5</span>,<span class="hljs-number">12.5</span>&gt;P13<span class="hljs-number">.2</span>,<span class="hljs-number">12.5</span>&gt;A14<span class="hljs-number">.1</span>,<span class="hljs-number">14.1</span>
+ALABEL <span class="hljs-number">13.2</span> <span class="hljs-number">12.5</span> <span class="hljs-number">2</span> <span class="hljs-number">300</span> <span class="hljs-string">"What is this thing?"</span>
+
+OUTLINE DEVICE
+</code></pre><p>It may look painful to create a diagram such as this by entering coordinates, and
+perhaps it is. However, it may be less painful than it seems at first. A key simplification
+is to use an integer coordinate system with the box size a useful multiple of the unit size
+(e.g. so that middle of the box edges is easy to find). It is also helpful to have a
+grid printed out (!) with the coordinate system shown over a specified range (<code>BOUNDS</code>). As
+an aid to this, the script <code>OBGRID</code> can draw such a grid which can be used as the background
+of the diagram as it is developed (e.g. using the <code>gterm</code> device) or printed to help sketch
+out the diagram.</p>
+<p>Surely it would be easier to just use, say, Inkscape? Perhaps. I have drawn many block 
+diagrams with Inkscape and in some ways it is obviously easier. But it still takes longer
+than might be expected to get to a &quot;final&quot; result. It is also very difficult (at least 
+for me) to get lines and boxes to &quot;snap&quot; together precisely (I usually give up on perfecting
+this, to be honest). The GPLOT approach at least results in exact alignment of all elements!
+In summary, I&#39;m not sure it is all that more time consuming to get to an acceptable result.
+Which approach you prefer (using a mouse and relying on hand/eye coordination or working
+out and typing in coordinates) is a matter of personal taste. Obviously, if you want to draw
+a portrait of your dog, Inkscape (or a similar program) is the only sane choice! For more
+exactly defined tasks, a &quot;language based&quot; approach can make sense, as proved by the success
+of vector graphics description languages such as PGF/Tikz.</p>
+<p><img src="ghbb001.svg" alt=""></p>
+<pre><code><span class="hljs-comment">#</span>
+<span class="hljs-comment"># DRAW A GRID WITH NUMBERED AXES. USEFUL FOR BLOCK DIAGRAMS.</span>
+<span class="hljs-comment"># CALL WITH BOUNDS AS PARAMETERS.</span>
+<span class="hljs-comment">#</span>
+<span class="hljs-title">BOUNDS</span> <span class="hljs-variable">$1</span> <span class="hljs-variable">$2</span> <span class="hljs-variable">$3</span> <span class="hljs-variable">$4</span>
+CSG ALL
+COL <span class="hljs-number">0</span>.<span class="hljs-number">8</span> <span class="hljs-number">0</span>.<span class="hljs-number">8</span> <span class="hljs-number">0</span>.<span class="hljs-number">8</span>
+STRING <span class="hljs-number">9</span> <span class="hljs-string">"(I2)"</span>
+ITEVAL <span class="hljs-variable">$3</span> <span class="hljs-variable">$4</span> <span class="hljs-number">1</span> <span class="hljs-string">"<span class="hljs-variable">$1</span>,I,M,<span class="hljs-variable">$2</span>,I,D"</span>
+ITEVAL <span class="hljs-variable">$1</span> <span class="hljs-variable">$2</span> <span class="hljs-number">1</span> <span class="hljs-string">"I,<span class="hljs-variable">$3</span>,M,I,<span class="hljs-variable">$4</span>,D"</span>
+ITEVAL <span class="hljs-variable">$3</span> <span class="hljs-variable">$4</span> <span class="hljs-number">1</span> <span class="hljs-string">"<span class="hljs-variable">$4</span>,<span class="hljs-variable">$3</span>,-,100,/,TH,<span class="hljs-variable">$1</span>,I,M,I,9,TVI"</span>
+ITEVAL <span class="hljs-variable">$1</span> <span class="hljs-variable">$2</span> <span class="hljs-number">1</span> <span class="hljs-string">"<span class="hljs-variable">$4</span>,<span class="hljs-variable">$3</span>,-,100,/,TH,I,<span class="hljs-variable">$3</span>,0.5,+,M,I,9,TVI"</span>
+</code></pre><p>For a more sophisticated example of a block diagram drawn with GPLOT, look at the
+script <code>OBMODIO</code> which draws the block diagram at the top of this document showing
+the component parts of the Git-MODIFY inter-operability scheme.</p>
+<p>An example of using GPLOT (primarily <code>BOXTEXT</code>) to produce a drawing other than a
+block diagram is shown below. This documents the key bindings for the NOS 2 Full
+Screen Editor with a Macbook laptop keyboard.</p>
+<p><img src="gh2b001.svg" alt=""></p>
+<p>Further examples of how the &quot;higher level drawing&quot; features can be used can be seen
+in the <code>OBCHT1</code> and <code>OBCHT2</code> scripts which generate the GPLOT &quot;cheat sheet&quot; which can
+be found at the end of this document.</p>
+<h2 id="l-systems">L-Systems</h2>
+<p>L-systems or Lindenmeyer systems are a type of formal grammar (as in mathematical logic)
+developed by Aristid Lindenmeyer, a theoretical biologist, in 1968 to model the processes
+of plant development. They can be used to generate a variety of attractive images, beyond
+plants and trees, including self-similar fractals. See this 
+<a href="https://en.wikipedia.org/wiki/L-system">Wikipedia</a> article for more
+background information.</p>
+<p>Lindenmeyer systems generating 2D vector graphics are included in GPLOT. The implementation
+is based on Paul Bourke&#39;s description of a 1991 commercial product (probably now long dead)
+which can be found <a href="https://paulbourke.net/fractals/lsys/">here</a>. As with many of Paul Bourke&#39;s
+web pages, this is very informative and inspirational.</p>
+<p>L-systems work by manipulating strings, the characters of which either represent graphical actions
+(such as moving forward, drawing a line, or turning through an angle) or are &quot;variables&quot; with no
+associated graphical meaning.</p>
+<p>An L-system is defined by an &quot;axiom string&quot; and a set of &quot;re-writing rules&quot;, and, in our case,
+also a fixed &quot;turning angle&quot;. The &quot;axiom string&quot; must be set in string register 1 and up to
+8 &quot;re-writing rules&quot; can then appear in string registers 2 to 9 (used consecutively). The initial
+line angle is set by storing the angle (in degrees) in numeric register 3, with the X,Y coordinates
+of the origin of the system in registers 1 and 2.</p>
+<p>The characters allowed (&quot;vocabulary&quot;) are: <code>F A B C D E M X Y + - [ ]</code> Seven of these are associated
+with specific actions. Any alphabetic character can be substituted with a string by a re-writing
+rule. The seven &quot;action characters&quot; are:</p>
+<ul>
+<li><code>F</code> - draw a unit length line segment at the current drawing angle.</li>
+<li><code>D</code> - as <code>F</code>, but some systems need two substitutable drawing characters.</li>
+<li><code>M</code> - move by a unit length at the cureent drawing angle.</li>
+<li><code>+</code> - turn counter-clockwise by the turning angle.</li>
+<li><code>-</code> - turn clockwise by the turning angle.</li>
+<li><code>[</code> - push the current position and drawing angle on a stack.</li>
+<li><code>]</code> - pop the current position and drawing angle off a stack.</li>
+</ul>
+<p>This is all very abstract, of course! Paul Bourke&#39;s web page gives a simple example which is
+quite easy to follow, but more complex systems are not obvious (to me, anyway). </p>
+<p>Here is a classic example of a plant drawn with an L-system:</p>
+<p><img src="lsys001.svg" alt=""></p>
+<pre><code><span class="hljs-preprocessor"># PROCEDURE TO DRAW AN ALGORITHMICALLY DEFINED</span>
+<span class="hljs-preprocessor"># PLANT USING A LINDENMAYER SYSTEM.</span>
+<span class="hljs-preprocessor"># USAGE:</span>
+<span class="hljs-preprocessor">#  OBEY OBPLANT &lt;ITERATIONS&gt;</span>
+<span class="hljs-preprocessor">#   ITERATIONS BETWEEN <span class="hljs-number">5</span> AND <span class="hljs-number">8</span> SEEMS REASONABLE.</span>
+
+<span class="hljs-preprocessor"># INITIALISE GPLOT STATE.</span>
+RESET
+GRAPHMODE ON
+
+<span class="hljs-preprocessor"># SET THE COLOUR OF THE PLANT.</span>
+CSG GENERAL
+COL <span class="hljs-number">0.05</span> <span class="hljs-number">0.6</span> <span class="hljs-number">0.03</span>
+
+<span class="hljs-preprocessor"># DEFINE THE LINDENMAYER SYSTEM FOR THE PLANT.</span>
+STRING <span class="hljs-number">1</span> X
+STRING <span class="hljs-number">2</span> F:FF
+STRING <span class="hljs-number">3</span> X:F-[[X]+X]+F[+FX]-X 
+STO <span class="hljs-number">3</span> <span class="hljs-number">90</span>
+
+<span class="hljs-preprocessor"># DRAW THE PLANT</span>
+LSYSTEM <span class="hljs-number">2</span> $<span class="hljs-number">1</span> <span class="hljs-number">22.5</span>
+
+<span class="hljs-preprocessor"># SETUP TO ADD ANNOTATION</span>
+GRAPHMODE OFF
+BOUNDS <span class="hljs-number">0</span> <span class="hljs-number">1.33</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+CSG TEXT
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+
+<span class="hljs-preprocessor"># DEMONSTRATE CTEXT CENTRED TEXT.</span>
+MOVE <span class="hljs-number">0.3325</span> <span class="hljs-number">0.265</span>
+CTEXT <span class="hljs-number">0.532</span> <span class="hljs-string">"L*LINDENMAYER *UP*LLANT"</span>
+MOVE <span class="hljs-number">0.3325</span> <span class="hljs-number">0.185</span>
+CTEXT <span class="hljs-number">0.4655</span> <span class="hljs-string">"X, F:FF, X:F-[[X]+X]+F[+FX]-X, 22.5*L DEGREES, $1 ITERATIONS."</span>
+
+<span class="hljs-preprocessor"># DEMONSTRATE ROTATED TEXT VIA THE RPN EVALUATOR.</span>
+STRING <span class="hljs-number">5</span> <span class="hljs-string">"GPLOT/DIMFILM D*LEMONSTRATION AND TEST SCRIPT"</span>
+STRING <span class="hljs-number">6</span> <span class="hljs-string">"  DIMFILM 1972-95, GPLOT 2013-"</span>
+EVAL <span class="hljs-string">"1.31,0.05,M,90,TA,5,T,1.31,0.6,M,6,T"</span>
+
+<span class="hljs-preprocessor"># ADD THE GPLOT VERSION INFO, DRAWING CENTRED TEXT</span>
+<span class="hljs-preprocessor"># VIA A STORED PROCEDURE.</span>
+VERSION <span class="hljs-number">9</span>
+LOADP <span class="hljs-number">1</span> ECTEXT
+EVAL @<span class="hljs-number">1</span> <span class="hljs-string">"0.3325,0.125,0.45,9"</span>
+
+OUTLINE DEV
+</code></pre><p>Note that, in general, the complexity of the drawing explodes as the number
+of iterations increases. The GPLOT L-system implementation uses scratch files
+to avoid memory limitations on NOS, so large outputs are possible, but the
+compute times also explode! The maximum stack depth is set to 20, although this
+doesn&#39;t seem to be much of a limitation in practice.</p>
+<p>Here are some other examples. </p>
+<p>A complicated, bristly plant:</p>
+<p><img src="lsbr001.svg" alt=""></p>
+<pre><code>RESET
+
+<span class="hljs-header"># SET THE COLOUR OF THE PLANT.</span>
+CSG GENERAL
+COL 0.05 0.6 0.03
+
+<span class="hljs-header"># DEFINE THE LINDENMAYER SYSTEM FOR THE PLANT.</span>
+STRING 1 ABFFF
+STRING 2 A:[<span class="hljs-link_label">+++C</span>][<span class="hljs-link_reference">---C</span>]YA
+STRING 3 C:+X[-C]B
+STRING 4 X:-C[+X]B
+STRING 5 Y:YB
+STRING 6 B:[<span class="hljs-link_label">-FFF</span>][<span class="hljs-link_reference">+FFF</span>]F
+
+<span class="hljs-header"># INITIAL DRAWING ANGLE.</span>
+STO 3 90
+
+<span class="hljs-header"># DRAW.</span>
+LSYSTEM 5 $1 20
+</code></pre><p>A Minkowski island, after 4 iterations. L-systems can generate most
+(all?) fractal curves. Several such curves follow.</p>
+<p><img src="lssm001.svg" alt=""></p>
+<pre><code><span class="hljs-operator"><span class="hljs-keyword">RESET</span>
+
+<span class="hljs-keyword">STRING</span> <span class="hljs-number">1</span> <span class="hljs-keyword">F</span>+<span class="hljs-keyword">F</span>+<span class="hljs-keyword">F</span>+<span class="hljs-keyword">F</span>
+<span class="hljs-keyword">STRING</span> <span class="hljs-number">2</span> <span class="hljs-keyword">F</span>:<span class="hljs-keyword">F</span>+<span class="hljs-keyword">F</span>-<span class="hljs-keyword">F</span>-FF+<span class="hljs-keyword">F</span>+<span class="hljs-keyword">F</span>-<span class="hljs-keyword">F</span>
+
+STO <span class="hljs-number">3</span> <span class="hljs-number">0</span>
+
+CSG <span class="hljs-keyword">GENERAL</span>
+<span class="hljs-keyword">COL</span> <span class="hljs-number">0.9</span> <span class="hljs-number">0</span> <span class="hljs-number">0.1</span>
+
+LSYSTEM <span class="hljs-number">1</span> $<span class="hljs-number">1</span> <span class="hljs-number">90</span></span>
+</code></pre><p>A Sierpinski gasket after 6 iterations.</p>
+<p><img src="lssp001.svg" alt=""></p>
+<pre><code>RESET
+
+STRING <span class="hljs-number">1</span> F+F+F        ; AXIOM
+STRING <span class="hljs-number">2</span> F:F-F+F+F-F  ; GENERATOR
+
+STO <span class="hljs-number">3</span> <span class="hljs-number">0</span>               ; INITIAL ANGLE
+
+CSG GENERAL
+COL <span class="hljs-number">0.9</span> <span class="hljs-number">0</span> <span class="hljs-number">0.1</span>
+
+<span class="hljs-preprocessor"># DRAW THE GASKET</span>
+LSYSTEM <span class="hljs-number">1</span> $<span class="hljs-number">1</span> <span class="hljs-number">120</span>
+</code></pre><p>A Koch &quot;snowflake&quot; drawn with rectangular elements.</p>
+<p><img src="lsks001.svg" alt=""></p>
+<pre><code><span class="hljs-operator"><span class="hljs-keyword">RESET</span>
+
+<span class="hljs-keyword">STRING</span> <span class="hljs-number">1</span> <span class="hljs-keyword">F</span>+<span class="hljs-keyword">F</span>+<span class="hljs-keyword">F</span>+<span class="hljs-keyword">F</span>
+<span class="hljs-keyword">STRING</span> <span class="hljs-number">2</span> <span class="hljs-keyword">F</span>:FF+<span class="hljs-keyword">F</span>-<span class="hljs-keyword">F</span>+<span class="hljs-keyword">F</span>+FF
+
+STO <span class="hljs-number">3</span> <span class="hljs-number">0</span>
+
+CSG <span class="hljs-keyword">GENERAL</span>
+<span class="hljs-keyword">COL</span> <span class="hljs-number">0.9</span> <span class="hljs-number">0</span> <span class="hljs-number">0.1</span>
+
+LSYSTEM <span class="hljs-number">1</span> $<span class="hljs-number">1</span> <span class="hljs-number">90</span></span>
+</code></pre><p>A Gosper curve, or &quot;flowsnake&quot;, after 4 iterations.</p>
+<p><img src="lsgo001.svg" alt=""></p>
+<pre><code><span class="hljs-constant">RESET</span>
+
+<span class="hljs-constant">STRING</span> <span class="hljs-number">1</span> <span class="hljs-constant">F</span>
+<span class="hljs-constant">STRING</span> <span class="hljs-number">2</span> <span class="hljs-constant">F</span><span class="hljs-symbol">:F-D--D+F++FF+D-</span>
+<span class="hljs-constant">STRING</span> <span class="hljs-number">3</span> <span class="hljs-constant">D</span><span class="hljs-symbol">:+F-DD--D-F++F+D</span>
+
+<span class="hljs-constant">STO</span> <span class="hljs-number">3</span> <span class="hljs-number">90</span>
+
+<span class="hljs-constant">CSG</span> <span class="hljs-constant">GENERAL</span>
+<span class="hljs-constant">COL</span> <span class="hljs-number">0</span>.<span class="hljs-number">9</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>.<span class="hljs-number">1</span>
+
+<span class="hljs-constant">LSYSTEM</span> <span class="hljs-number">2</span> <span class="hljs-variable">$1</span> <span class="hljs-number">60</span>
+</code></pre><h2 id="gplot-cheat-sheet">GPLOT cheat sheet</h2>
+<p>GPLOT has quite a few commands and facilities. It is fully documented
+in a PDF format manual (LaTeX source for this can be found in the 
+<code>doc/gplot</code> directory).</p>
+<p>A quick guide in the form of a two page &quot;cheat sheet&quot; (drawn by GPLOT)
+is provided here, however. This is often sufficient as a reminder of
+the details when trying to do something.</p>
+<p><img src="cht1001.svg" alt=""></p>
+<p><img src="cht2001.svg" alt=""></p>
+<h2 id="fonts">Fonts</h2>
+<p>An example of each of the currently available fonts is shown in the figure
+below.</p>
+<p><img src="fosm001.svg" alt=""></p>
+<p>A complete set of font tables follow. You can use these to find the character
+number for any character in any font. These also show every character available
+in every font. Note there are some curious omissions ... for example, the default
+<code>SANS.SIMPLEX</code> font does not have an exclamation mark.</p>
+<h2 id="alphabetic-font-tables">Alphabetic font tables</h2>
+<p><img src="f01t001.svg" alt=""></p>
+<p><img src="f02t001.svg" alt=""></p>
+<p><img src="f03t001.svg" alt=""></p>
+<p><img src="f04t001.svg" alt=""></p>
+<p><img src="f05t001.svg" alt=""></p>
+<p><img src="f06t001.svg" alt=""></p>
+<p><img src="f07t001.svg" alt=""></p>
+<p><img src="f08t001.svg" alt=""></p>
+<p><img src="f09t001.svg" alt=""></p>
+<p><img src="f10t001.svg" alt=""></p>
+<p><img src="f11t001.svg" alt=""></p>
+<p><img src="f12t001.svg" alt=""></p>
+<p><img src="f13t001.svg" alt=""></p>
+<p><img src="f14t001.svg" alt=""></p>
+<p><img src="f15t001.svg" alt=""></p>
+<p><img src="f16t001.svg" alt=""></p>
+<p><img src="f17t001.svg" alt=""></p>
+<p><img src="f18t001.svg" alt=""></p>
+<h2 id="symbol-font-tables">Symbol font tables</h2>
+<p><img src="f01s001.svg" alt=""></p>
+<p><img src="f02s001.svg" alt=""></p>
+<p><img src="f03s001.svg" alt=""></p>
+<p><img src="f04s001.svg" alt=""></p>
+<p><img src="f05s001.svg" alt=""></p>
+<h2 id="marker-font-tables">Marker font tables</h2>
+<p><img src="f01m001.svg" alt=""></p>
+
+</body>
+</html>
