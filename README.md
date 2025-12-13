@@ -56,7 +56,7 @@ it isn't optional. Also, I fear DIMFILM might be entirely lost otherwise.
 Both GPLOT and DIMFILM are written in FORTRAN-77, which was often the
 best supported language prior to the dominance of "Unix-like" and Windows
 systems. Fortunately, FORTRAN-77 remains well supported today on "Unix-like"
-systems thanks to gfortran (along with modern Fortran, which is gfortran's
+systems thanks to **gfortran** (along with modern Fortran, which is **gfortran**'s
 main focus, of course).
 
 The DIMFILM library can also be cross-compiled and used on the Cray COS
@@ -66,7 +66,8 @@ a future "release".
 
 GPLOT and DIMFILM are developed and maintained primarily on CDC NOS 2.8.7.
 NOS has its own way of managing source code, at the heart of which is 
-a program called MODIFY. 
+a program called MODIFY. As of V0.89, GPLOT and DIMFILM can also be built
+on VAX/VMS and NOS/VE, although the latter port is "experimental" at present.
 
 MODIFY is quite usable, but is radically different from anything seen on
 today's mainstream systems. Source is kept in "program library" (PL) 
@@ -86,11 +87,11 @@ allows MODIFY and Git to inter-operate without too much pain.
 
 Please note that neither GPLOT nor DIMFILM have been built on any version
 of Windows. If a good FORTRAN-77 compiler is available for Windows (perhaps
-gfortran?), it should be fairly easy to get them working on Windows, but
+**gfortran**?), it should be fairly easy to get them working on Windows, but
 that is an "exercise for the reader" ... 
 
 Note that ports to other operating systems also rely on some of the tools
-written for MOOIFY/Git inter-operation. If you are interested in using GPLOT
+written for MODIFY/Git inter-operation. If you are interested in using GPLOT
 on those systems, you need to install the tools as per 
 [this section](#itiot) below.
 
@@ -285,12 +286,12 @@ There are additional options to help with building the source on
 Unix-like systems. 
 
 `-s scriptfile` or `--script scriptfile` will create a Bash
-shell script to run gfortran on every `.f` file. 
+shell script to run **gfortran** on every `.f` file. 
 
 `--omit a,b,c` will omit modules `a`, `b` and `c` from the
 script file. This may be needed for modules that are non-standard
 FORTRAN (e.g. include COMPASS assembler). These cannot be compiled
-by gfortran.
+by **gfortran**.
 
 `-l libname` or `--library libname` will add a section to the
 script file to insert all the `.o` files from compiling the
@@ -737,7 +738,7 @@ Along with a traditional manual,
 the documentation for GPLOT -- how to use it and what it can do -- takes the form
 of a "tutorial" with examples of almost every capability. 
 
-This "tutorial" can be found [here](tutorial/tutorial.html). For most purposes,
+This "tutorial" can be found [here](tutorial/tutorial.md). For most purposes,
 please refer to it as the primary documentation for GPLOT.
 
 It also serves as the "test suite" for GPLOT and DIMFILM as discussed below.
