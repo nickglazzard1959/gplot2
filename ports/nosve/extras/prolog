@@ -1,0 +1,34 @@
+crev status kind=status
+setwc $user
+chala user=guest password=guest
+IF $string($job(JOB_MODE)) = 'INTERACTIVE' THEN
+  term_name = ''
+  REPEAT
+    accl v=term_name i=input ..
+      p='Term type (Ncdxt Webterm Gterm Tek)> '
+    term_name = $substr($translate(LTU term_name) 1 1)
+  UNTIL (term_name = 'N' OR term_name = 'W' OR ..
+         term_name = 'G' OR term_name = 'T')
+  IF term_name = 'N' THEN
+    full_term_name = 'ncdxt'
+  ELSEIF term_name = 'W' THEN
+    full_term_name = 'webterm'
+  ELSEIF term_name = 'G' THEN
+    full_term_name = 'gterm'
+  ELSEIF term_name = 'T' THEN
+    full_term_name = 'tek4010'
+  IFEND
+  disv 'Using terminal type '//full_term_name
+  setpa al=terminal_definitions
+  IF (term_name = 'N' OR term_name = 'W') THEN
+    chais screen
+    chata tm=$name(full_term_name)
+  ELSEIF (term_name = 'G' OR term_name = 'T') THEN
+   chais line
+   chata tc=tty
+ IFEND
+  attf $fname('l') status=status
+  attf $fname('r') status=status
+IFEND
+crecle $system.osf$site_command_library status=status
+discl
