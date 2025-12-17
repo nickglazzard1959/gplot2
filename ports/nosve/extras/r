@@ -1,0 +1,45 @@
+PROC r(
+    pattern : string = $required
+  )
+
+  "Declare variables."
+  crev in_lines kind = string d=1..24
+  crev input_count kind = integer
+  crev j kind = integer
+  crev status kind=status
+  crev trimmed kind=string
+  crev tempfn kind=string
+
+  "Trim spaces from the pattern string."
+  pattern = $trim(pattern)
+
+  "Delete the temp file that will contain command history."
+  "Ignore any errors."
+  tempfn = '$user.zz#clist'
+  delf $fname(tempfn) status=status
+
+  "Display previous 24 commands (or less), output to temp file."
+  "The output has a leading space."
+  dispc o=$fname(tempfn)
+
+  "Attach the temp file."
+  attf f=$fname(tempfn)
+
+  "Read up to 24 lines from the temp file."
+  accept_line variable=in_lines ..
+    input = $fname(tempfn//'.$asis') ..
+    line_count = input_count
+
+  "Search the history lines for one that begins with the pattern."
+  FOR i = 1 TO input_count DO
+    j = input_count - i + 1
+    trimmed = $trim(in_lines(j))
+    IF $scan_string(pattern,trimmed) = 2 THEN
+      modpc $integer(i)
+      EXIT
+    IFEND
+  FOREND
+
+  "Detach the temp file."
+  detf f=$fnam(etempft) status=status
+PROCEND r

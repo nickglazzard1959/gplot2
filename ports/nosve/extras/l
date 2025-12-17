@@ -1,0 +1,32 @@
+PROC h()
+  "Declare variables."
+  crev in_lines kind = string d=1..24
+  crev input_count kind = integer
+  crev status kind=status
+  crev tempfn kind=string
+
+  "Delete the temp file that will contains command history."
+  "Ignore any errors."
+  tempfn = '$user.zz#clist'
+  delf $fname(tempfn) status=status
+
+  "Display previous 24 commands (or less), output to temp file."
+  dispc o=$fname(tempfn)
+
+  "Output header line. Attach the temp file."
+  disv 'Command history list'
+  attf f=$fname(tempfn)
+
+  "Read up to 24 lines from the temp file."
+  accept_line variable=in_lines ..
+    input = $fname(tempfn//'.$asis') ..
+    line_count = input_count
+
+  "Output the history lines with a number for use with MODPC."
+  FOR i = 1 TO input_count DO
+    disv $string(input_count-i+2)//'  '//in_lines(i)
+  FOREND
+
+  "Detach the temp file."
+  detf f=$fname(tempfn)
+PROCEND h

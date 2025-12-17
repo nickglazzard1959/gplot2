@@ -25,6 +25,8 @@ classifiers = ["Development Status :: 4 - Beta",
                "Operating System :: POSIX :: Linux",
                "Operating System :: MacOS :: MacOS X",
                "Operating System :: Other OS :: CDC NOS",
+               "Operating System :: Other OS :: CDC NOS/VE",
+               "Operating System :: Other OS :: DEC VAX/VMS",
                "Operating System :: Other OS :: Cray Research COS",
                "Programming Language :: Python :: 3"
               ]
@@ -43,6 +45,7 @@ trimcends = "nostools.trimcends:main"
 sgformat = "nostools.sgformat:main"
 svgview = "nostools.svgview:main"
 vmsftp = "nostools.vmsftp:main"
+awdecode = "nostools.awdecode:main"
 
 [tool.setuptools]
 packages = ["nostools"]
