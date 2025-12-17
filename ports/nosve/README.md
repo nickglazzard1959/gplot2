@@ -36,6 +36,35 @@ is created in an object library and that specifies the required libraries. It is
 "program description" which is "run" to activate the program.
 
 
+Configure the guest account in the NOS side of the RTR
+------------------------------------------------------
+
+The `guest` account on the RTR as shipped is configured to prevent the creation
+of permanent files as large as those needed by GPLOT and DIMFILM. It is also helpful
+to stop `guest` interactive sessions timing out (after about 10 minutes of inactivity).
+The `guest` account is already configured to allow multiple concurrent logins, which is also very useful.
+
+To make the desired changes, use `MODVAL` on the NOS console.
+```
+X.MODVAL.
+K,<modval jsn>.
+K.U,GUEST
+K.MS=77B
+K.CM=77B
+K.CS=7
+K.FS=7
+K.DS=7
+K.AW=CTIM
+K.END
+K.END
+[
+AB.
+```
+
+You can check which privileges the `guest` account has using the `awdecode` tool.
+This lets you enter the `AW` octal value and outputs a list of enabled privileges.
+
+
 Move the source to NOS on the dual-state RTR system
 ---------------------------------------------------
 
@@ -118,7 +147,7 @@ jobs to the NOS side of the RTR. This can be done by:
 ./put-vj-files.sh
 ```
 
-This creates the files `vjutils`, `vjgrdev`, `vjdimfm` and `vjgplot` on NOS.
+This creates the files `vjutils`, `vjgrdev`, `vjdimfm`, `vjvesup` and `vjgplot` on NOS.
 
 
 ### Using batch jobs from NOS
@@ -129,6 +158,7 @@ will submit the `vj` batch jobs to the input batch job queue on NOS/VE:
 submit,vjutils,dc=in,st=nve.
 submit,vjgrdev,dc=in,st=nve.
 submit,vjdimfm,dc=in,st=nve.
+submit,vjvesup,dc=in,st=nve.
 submit,vjgplot,dc=in,st=nve.
 ```
 
@@ -156,6 +186,8 @@ You can then build DIMFILM and GPLOT using these commands:
 ```
 setwc $user
 
+chala user=guest password=guest
+
 getf vjutils
 subj f=vjutils odi=log_utils ujn=jobutils
 
@@ -164,6 +196,9 @@ subj f=vjgrdev odi=log_grdev ujn=jobgrdev
 
 getf vjdimfm
 subj f=vjdimfm odi=log_dimfm ujn=jobdimfm
+
+getf vjvesup
+subj f=vjvesup odi=log_vesup ujn=jobvesup
 
 getf vjgplot
 subj f=vjgplot odi=log_gplot ujn=jobgplot

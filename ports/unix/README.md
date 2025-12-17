@@ -101,15 +101,11 @@ This copies the `gplot` binary and a script file, `ugplot` to
 copies the DIMFILM font file, found in `gplot-library/dadimfo.src`,
 to it. After this:
 ```
-./ugplot
+./gplot
 ```
 will start GPLOT, which should function identically to the NOS
-version. A script file is needed to arrange that `DADIMFO` is
-available no matter where `gplot` is run from. For cross-platform
-compatibility, it isn't possible to put a Unix style path
-in the source code and conditional compilation for this was
-less straightforward than usual. The script manages symbolic
-links so that the NOS code that opens `DADIMFO` works on "Unix" too.
+version. (The `ugplot` script file needed to run GPLOT on "Unix"
+prior to GPLOT V0.89 is no longer needed.)
 
 Note that command line arguments are as described for NOS in the
 GPLOT documentation, except that arguments are separated by spaces

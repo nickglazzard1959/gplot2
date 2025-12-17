@@ -665,7 +665,7 @@ MODIFY and Git representations of the source can be kept in sync using
 Building all components of GPLOT and DIMFILM on "Unix".
 -------------------------------------------------------
 
-Detailed information of building GPLOT and DIMFILM on "Unix-like" systems
+Detailed information on building GPLOT and DIMFILM on "Unix-like" systems
 can be found [here](ports/unix/README.md). These systems include macOS and
 Linux (Debian Linux specifically has been tested).
 
@@ -692,7 +692,7 @@ system.
 
 Full details on how to do this can be found [here](ports/cos/README.md).
 
-Ihe Cray X-MP is very much an "attached processor". In this case, it
+The Cray X-MP is very much an "attached processor". In this case, it
 must be attached to a (simulated) CDC Cyber 170-865 running NOS 2.8.7.
 See [this page](https://github.com/kej715/DtCyber/tree/main/NOS2.8.7) in
 Kevin Jordan's DtCyber repository for information on setting all this up.

@@ -203,10 +203,11 @@
 
     
 \usepackage[xetex,unicode,
-	pdftitle={GPLOT: A DIMFILM Based Graph Plotting and Drawing Program for CDC NOS 2.8},
-	pdfauthor={Nick Glazzard},
-	colorlinks,linkcolor=blue,citecolor=blue,urlcolor=blue
-	]{hyperref}
+pdftitle={GPLOT: A DIMFILM Based Graph Plotting and Drawing Program for CDC NOS 2.8
+  and other Operating Systems},
+pdfauthor={Nick Glazzard},
+colorlinks,linkcolor=blue,citecolor=blue,urlcolor=blue
+]{hyperref}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DOCUMENT
@@ -224,7 +225,7 @@
 {\color{white} \noindent \rule{\textwidth}{3mm}}
 \begin{center}
 \Huge
-\textcolor{white}{\textbf{GPLOT}: A \textbf{DIMFILM} Based Graph Plotting \\ and Drawing Program for CDC NOS 2.8}
+\textcolor{white}{\textbf{GPLOT}: A \textbf{DIMFILM} Based Graph Plotting \\ and Drawing Program for CDC NOS 2.8 \\ and other Operating Systems}
 \end{center}
 \vspace*{2mm}
 {\color{white} \noindent \rule{\textwidth}{3mm}}
@@ -243,7 +244,7 @@
 \begin{center}
 \Large 
 \textcolor{white}{
-Version 0.87\\
+Version 0.89\\
 \today
 }
 \end{center}
@@ -276,7 +277,8 @@ was not intended to be portable. It uses seven letter identifiers, dynamic memor
 the Common Memory Manager), and makes some use of NOS system calls.
 \newpara
 That said, it can be built and used on ``Unix-like'' systems (Debian Linux and macOS have been tested)
-where it behaves almost identically to the NOS version.
+where it behaves almost identically to the NOS version. As of V0.89, it can also be built on VAX/VMS and
+(experimentally) NOS/VE.
 \newpara
 Originally, \textbf{GPLOT} was focussed on plotting graphs from tabulated data and could perhaps be thought of
 as a stripped down \textbf{Gnuplot}, though with far fewer capabilities.
@@ -299,10 +301,11 @@ programs on modern operating systems (such an \textbf{Gnuplot}, matplotlib, etc.
 directly comparable to those programs. In some aspects, it does much less than they do, but it also does
 things they do not do.
 \newpara
-To build and install \textbf{GPLOT} on an emulated CYBER mainframe (with DtCyber), or on a ``Unix-like'' system,
+To build and install \textbf{GPLOT} on an emulated CYBER mainframe (with DtCyber), or on a ``Unix-like'' system or
+other supported system,
 please refer to the main \textbf{GPLOT} Github project \texttt{README.md}. This describes the build procedures in
 a step-by-step fashion and also explains how a single source code base can be used fairly easily on both NOS and
-``Unix-like'' systems.
+``Unix-like'' and other systems.
 \newpara
 \textbf{GPLOT} (with \textbf{DIMFILM}) is almost entirely self-contained -- it has no dependencies beyond the operating
 system and language runtime libraries. By modern standards, it is very light weight -- the entire source of
@@ -342,15 +345,41 @@ the usual rules for CCL (Cyber Control Language). Note that arguments containing
 need to be ``quoted'' by enclosing them in dollar signs (as per normal CCL practice).
 
 \newpara
-To run \textbf{GPLOT} on a ``Unix-like'' system, use:
+To run \textbf{GPLOT} on a ``Unix-like'' (or VAX/VMS) system, use:
 \begin{verbatim}
-$ ugplot
+$ gplot
 \end{verbatim}
 On these systems, options should be space separated and arguments containing spaces
 should be enclosed in double quotation marks -- the usual rules for the shell being
 used should be followed. Note, though, that the \texttt{keyword=value} format is used, as
-it is on NOS. \texttt{ugplot} must be used here -- this is a shell script that establishes
-symbolic links as necessary to arrange that the font file is accessible, then runs \textbf{GPLOT}.
+it is on NOS.
+
+\newpara
+Running \textbf{GPLOT} on a VAX/VMS system requires that a logical name be defined (to find
+the font definition file) and \textbf{GPLOT} should be defined as a ``foreign command'' so that
+parsing command line arguments works as intended. To do that, the following should be added
+to a login command procedure:
+\begin{verbatim}
+define DIMFONTS_LOGICAL DISK$USER:[<user>.GPLOT.GPLOT-SOURCE]DADIMFO.DAT
+gplot := "run DISK$USER:[<user>.GPLOT.GPLOT-SOURCE]gplot.exe"
+\end{verbatim}
+
+\newpara
+Running \textbf{GPLOT} on NOS/VE (which should be considered ``experimental'' and subject
+to change) can be done using
+\begin{verbatim}
+gplot.gplot
+\end{verbatim}
+or by adding GPLOT (which is a library as well as an ``executable'' -- which is really a ``program description''
+entry in the GPLOT library) to the command list using:
+\begin{verbatim}
+create_command_list_entry gplot
+\end{verbatim}
+after which
+\begin{verbatim}
+/ gplot
+\end{verbatim}
+will work.
 
 \newpara
 The following options are recognized.
@@ -393,9 +422,9 @@ GPLOT,OBEY=DOPLOT,PARM=$X Y 'A TITLE'$.
 \end{verbatim}
 
 \newpara
-On a ``Unix-like'' system, this would be:
+On a ``Unix-like'' system (and VMS and NOS/VE), this would be:
 \begin{verbatim}
-ugplot obey=doplot parm="x y 'a title'"
+gplot obey=doplot parm="x y 'a title'"
 \end{verbatim}
 
 \section{Commands}
@@ -1629,13 +1658,14 @@ at the end on one obey file will be inherited by the next).
 \item This script is device independent. It can be used ``as is'' with any of the supported devices.
 To generate SVG from it, we can use:
 \begin{lstlisting}
-/ GPLOT or $ UGPLOT
+/ GPLOT or $ gplot
 ? dev svg sveg 1200,800
 ? prefix obey-files
 ? obey obgraf1
 ? ex
 \end{lstlisting}
-which will create an SVG file called \texttt{sveg001} (\texttt{sveg001.svg} on ``Unix'') using a 
+which will create an SVG file called \texttt{sveg001} (\texttt{sveg001.svg} on ``Unix'' and VMS,
+\texttt{sveg001\_svg} on NOS/VE) using a 
 ``resolution'' of 1200 by 800 pixels (with SVG, this is
 really a ``size'' rather than a resolution, as the vector data can be scaled without losing detail).
 \item The various annotations associated with a graph (title, axis labels, etc.) should appear before the command which plots the data
@@ -1781,8 +1811,10 @@ so long as the entire path name does not exceed 72 characters.
 \newpara
 Note that NOS does not have file name extensions. In contrast,
 ``Unix-like'' systems pretty much rely on having file name extensions.
-EPS output files will be given \texttt{.eps} extensions on ``Unix'' and
-SVG files \texttt{.svg}. These should not be added to the file names you
+EPS output files will be given \texttt{.eps} extensions on ``Unix'' and VMS,
+SVG files will be given \texttt{.svg}. On NOS/VE, the ``extensions'' are
+\texttt{\_eps} and \texttt{\_svg}, as ``dot'' is the path element separator
+and extensions are not formally defined. These should not be added to the file names you
 type in or put in scripts.
 
 \newpara
@@ -5621,8 +5653,8 @@ files are to be found first.
 To run the EPS and SVG format verification tests on
 "Unix-like" systems, use:
 \begin{lstlisting}
-ugplot obey=obaleps
-ugplot obey=obalsvg
+gplot obey=obaleps
+gplot obey=obalsvg
 \end{lstlisting}
 from the \texttt{obey-files} directory (the generated
 files can be tidied
@@ -5630,7 +5662,8 @@ up afterwards, as desired).
 
 \newpara
 The output files will have \texttt{.svg} or \texttt{.eps} extensions in 
-this case, of course.
+this case, of course. This will also work on VMS and NOS/VE (with different
+``extension'' separator characters on the latter).
 
 
 
