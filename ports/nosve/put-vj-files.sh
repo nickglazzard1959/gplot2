@@ -12,4 +12,4 @@ fi
 source ../../.modgitproject
 echo "Project = ${MODGITPROJECT}"
 #
-nosftp -p $NOSPW -e "mput required-list display" $NOSUSER $NOSHOST
+nosftp -p $NOSPW -e "mput required-list ascii" $NOSUSER $NOSHOST
