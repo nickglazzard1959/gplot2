@@ -27,8 +27,11 @@ IF $string($job(JOB_MODE)) = 'INTERACTIVE' THEN
    chais line
    chata tc=tty
  IFEND
-  attf $fname('l') status=status
-  attf $fname('r') status=status
 IFEND
 crecle $system.osf$site_command_library status=status
+attf fileslib status=status
+IF status.NORMAL THEN
+  crecle fileslib status=status
+IFEND
+disv 'Current command list:'
 discl

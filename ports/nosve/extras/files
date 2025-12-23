@@ -1,0 +1,354 @@
+PROC dir(
+    pattern, p : string = $required
+  )
+  "List files on working catalog whose names contain pattern."
+  "Also display size in bytes and last data modification time."
+
+  "Declare variables."
+  crev file_names kind=string d=1..1000
+  crev nfiles kind=integer
+  crev zpad kind=string value='0000'
+  crev spad kind=string value='                                '
+
+  "Header."
+  disv 'Alphabetically sorted list of file names containing pattern.'
+  disv 'Catalog: '//$catalog()
+
+  "Get an array of file names that contain pattern."
+  file_list pattern, file_names, nfiles
+
+  "Get certain file attributes, format and output listing."
+  total_size = 0
+  FOR i = 1 TO nfiles DO
+    size = $file_attributes($fname(file_names(i)),s)
+    time = $file_attributes($fname(file_names(i)),ldmt)
+    fname = $trim($strrep(file_names(i)))
+    istr = $strrep(i)
+    lpad = 4 - $strlen(istr)
+    pads = $substr(zpad,1,lpad)
+    lnpad = 32 - $strlen(fname)
+    npads = $substr(spad,1,lnpad)
+    ssize = $strrep(size)
+    lsize = 9 - $strlen(ssize)
+    spads = $substr(spad,1,lsize)
+    sqtime = $strrep(time)//'/'//pads//istr
+    disv fname//npads//spads//ssize//'  '//sqtime
+    total_size = total_size + $integer($strrep(size))
+  FOREND
+
+  "Output summary."
+  disv 'Found '//nfiles//' files.'
+  disv 'Total size '//total_size//' bytes.'
+  
+PROCEND dir
+
+PROC dirt(
+    pattern, p : string = $required
+  )
+  "List files on working catalog whose names contain pattern."
+  "Also display size in bytes and last data modification time."
+
+  "Header."
+  disv 'Ascending mod time sorted list of file names containing pattern.'
+  disv 'Catalog: '//$catalog()
+
+  "Declare variables."
+  crev file_names kind=string d=1..1000
+  crev nfiles kind=integer
+  crev zpad kind=string value='0000'
+  crev spad kind=string value='                                '
+  crev ignore kind=status
+  crev input_count kind = integer
+
+  "Get array of matching file names."
+  file_list pattern, file_names, nfiles
+
+  "Exit now if no matching files."
+  IF nfiles = 0 THEN
+    disv 'No matching files found.'
+    EXIT
+  IFEND
+
+  "Get mod time data with index number appended."
+  crev out_used kind=string d=1..nfiles
+  FOR i = 1 TO nfiles DO
+    time = $file_attributes($fname(file_names(i)),ldmt)
+    istr = $strrep(i)
+    lpad = 4 - $strlen(istr)
+    pads = $substr(zpad,1,lpad)
+    out_used(i) = $strrep(time)//'/'//pads//istr
+  FOREND
+
+  "Write the mod times + index number only to a file."
+  outfn = '$user.zz#ftimes'
+  delf $fname(outfn) status=ignore
+  put_lines out_used o=$fname(outfn)
+
+  "Sort that file on mod time strings."
+  infn = '$user.zz#sorted'
+  sort from=$fname(outfn) to=$fname(infn) key=((1,19))
+
+  "Clean up the unsorted mod times file."
+  detf f=$fname(outfn) status=ignore
+  delf f=$fname(outfn) status=ignore
+
+  "Read the sorted mod times data into a string array."
+  attf f=$fname(infn) status=ignore  
+  accept_line variable=out_used ..
+    input = $fname(infn//'.$asis') ..
+    line_count = input_count
+
+  "Clean up the sorted mod times file."
+  detf f=$fname(infn) status=ignore
+  delf f=$fname(infn) status=ignore
+
+  "Output file information, indexed by the sorted index number."
+  total_size = 0
+  FOR i = 1 TO nfiles DO
+    j = $integer($substr(out_used(i),21,4))
+    size = $file_attributes($fname(file_names(j)),s)
+    time = $file_attributes($fname(file_names(j)),ldmt)
+    fname = $trim($strrep(file_names(j)))
+    istr = $strrep(i)
+    lpad = 4 - $strlen(istr)
+    pads = $substr(zpad,1,lpad)
+    lnpad = 32 - $strlen(fname)
+    npads = $substr(spad,1,lnpad)
+    ssize = $strrep(size)
+    lsize = 9 - $strlen(ssize)
+    spads = $substr(spad,1,lsize)
+    sqtime = $strrep(time)//'/'//pads//istr
+    disv fname//npads//spads//ssize//'  '//sqtime
+    total_size = total_size + $integer($strrep(size))
+  FOREND
+
+  "Summary information."
+  disv 'Found '//nfiles//' files.'
+  disv 'Total size '//total_size//' bytes.'
+  
+PROCEND dirt
+
+PROC file_list(
+    pattern : string = $required
+    result : array of string = $required
+    nfiles : var of integer = $required
+  )
+  "Get a list of files in the working catalog"
+  "whose names contain a pattern."
+  "Matching file names go in result array."
+
+  "Declare variables."
+  crev in_lines kind = string d=1..1000
+  crev input_count kind = integer
+  crev trim_len kind = integer
+  crev j kind = integer
+  crev ignore kind=status
+  crev trimmed kind=string
+  crev tempfn kind=string
+  crev out_names kind=string d=1..1000
+
+  "Trim spaces from the pattern string. Make upper case."
+  pattern = $translate(LTU $trim(pattern))
+
+  "Delete the temp file that will contain the raw disc output."
+  "Ignore any errors."
+  tempfn = '$user.zz#discout'
+  delf f=$fname(tempfn) status=ignore
+
+  "Display catalog, output to $user.zz#discout."
+  disc o=$fname(tempfn)
+
+  "Attach the catalog output file."
+  attf f=$fname(tempfn) status=ignore
+
+  "Read up to 1000 lines from the temp file."
+  accept_line variable=in_lines ..
+    input = $fname(tempfn//'.$asis') ..
+    line_count = input_count
+
+  "Clean up the temp. file."
+  detf f=$fname(tempfn) status=ignore
+  delf f=$fname(tempfn) status=ignore
+  
+  "Search the file name lines for lines with the pattern."
+  "First weed out any lines that do not contain FILE:"
+  "or that do contain ZZ#."
+  j = 0
+  FOR i = 1 TO input_count DO
+    trimmed = $trim(in_lines(i))
+    IF ($scan_string('FILE:',trimmed) <> 0) AND ($scan_string('ZZ#',trimmed) = 0) THEN
+      IF (pattern = '*') OR ($scan_string(pattern,trimmed) <> 0) THEN
+        trim_len = $strlen(trimmed)
+        out_names(j+1) = $substr(trimmed 11 trim_len)
+        j = j + 1
+      IFEND
+    IFEND
+  FOREND
+
+  "Return the file list."
+  $value(result) = out_names
+  $value(nfiles) = j
+  
+PROCEND file_list
+
+PROC replace_string(
+    instring, i : string = $required
+    matchstring, m : string = $required
+    repstring, r : string = $required
+    out, o : var of string = $required
+  )
+  "Replace occurences of matchstring in instring with repstring."
+
+  len_in = $strlen(instring)
+  len_match = $strlen(matchstring)
+  len_rep = $strlen(repstring)
+
+  LOOP
+    i_match = $scan_string(matchstring,instring)
+    IF i_match = 0 THEN
+      EXIT
+    IFEND
+    replaced = $substr(instring,1,i_match-1)// ..
+      repstring// ..
+      $substr(instring,i_match+len_match,len_in-len_match)
+    instring = replaced
+  LOOPEND
+  
+  $value(out) = instring
+  
+PROCEND replace_string
+
+PROC files(
+    template, t : string = $required
+    pattern, p : string = $required
+    outfile, o : file = $required
+  )
+  "Get a list of files in the working catalog"
+  "whose names contain a pattern."
+  "Generate an SCL script that contains template"
+  "with each * character substituted with a matching"
+  "file name and each ^ character substituted with the"
+  "matching file name with the search pattern string removed."
+
+  "Declare variables."
+  crev file_names kind=string d=1..1000
+  crev commands kind=string d=1..1000
+  crev temp_command kind=string
+  crev stripped_file_name kind=string
+  crev nfiles kind=integer
+  crev ignore kind=status
+
+  "Get array of matching file names."
+  file_list pattern, file_names, nfiles
+
+  "Exit now if no matching files."
+  IF nfiles = 0 THEN
+    disv 'No matching files found.'
+    EXIT
+  ELSE
+    disv 'Found '//nfiles//' matching files. Generating SCL file.'
+  IFEND
+
+  "Generate commands by substituting template characters with file names."
+  up_pattern = $translate(LTU $trim(pattern))
+  FOR i = 1 TO nfiles DO
+    replace_string template '*' $trim(file_names(i)) temp_command
+    replace_string $trim(file_names(i)) up_pattern '' stripped_file_name
+    replace_string temp_command '^' $trim(stripped_file_name) commands(i)
+  FOREND
+
+  "Write the output file."
+  BLOCK
+    crev out_used kind=string d=1..nfiles
+    FOR i = 1 to nfiles DO
+      out_used(i) = commands(i)
+    FOREND
+    put_lines out_used o=outfile
+  BLOCKEND
+  
+  "Detach the output file."
+  detf f=$fname(outfn) status=ignore
+PROCEND files
+
+PROC l()
+  "List previous commands with index numbers for use with modpc command."
+  
+  "Declare variables."
+  crev in_lines kind = string d=1..24
+  crev input_count kind = integer
+  crev status kind=status
+  crev tempfn kind=string
+
+  "Delete the temp file that will contains command history."
+  "Ignore any errors."
+  tempfn = '$user.zz#clist'
+  delf $fname(tempfn) status=status
+
+  "Display previous 24 commands (or less), output to temp file."
+  dispc o=$fname(tempfn)
+
+  "Output header line. Attach the temp file."
+  disv 'Command history list'
+  attf f=$fname(tempfn)
+
+  "Read up to 24 lines from the temp file."
+  accept_line variable=in_lines ..
+    input = $fname(tempfn//'.$asis') ..
+    line_count = input_count
+
+  "Output the history lines with a number for use with MODPC."
+  FOR i = 1 TO input_count DO
+    disv $string(input_count-i+2)//'  '//in_lines(i)
+  FOREND
+
+  "Detach the temp file."
+  detf f=$fname(tempfn)
+PROCEND l
+
+PROC r(
+    pattern : string = $required
+  )
+  "Find the last command that began with pattern and modpc it."
+  "This allows commands to be redone as per NOS R command."
+
+  "Declare variables."
+  crev in_lines kind = string d=1..24
+  crev input_count kind = integer
+  crev j kind = integer
+  crev status kind=status
+  crev trimmed kind=string
+  crev tempfn kind=string
+
+  "Trim spaces from the pattern string."
+  pattern = $trim(pattern)
+
+  "Delete the temp file that will contain command history."
+  "Ignore any errors."
+  tempfn = '$user.zz#clist'
+  delf $fname(tempfn) status=status
+
+  "Display previous 24 commands (or less), output to temp file."
+  "The output has a leading space."
+  dispc o=$fname(tempfn)
+
+  "Attach the temp file."
+  attf f=$fname(tempfn)
+
+  "Read up to 24 lines from the temp file."
+  accept_line variable=in_lines ..
+    input = $fname(tempfn//'.$asis') ..
+    line_count = input_count
+
+  "Search the history lines for one that begins with the pattern."
+  FOR i = 1 TO input_count DO
+    j = input_count - i + 1
+    trimmed = $trim(in_lines(j))
+    IF $scan_string(pattern,trimmed) = 2 THEN
+      modpc $integer(i)
+      EXIT
+    IFEND
+  FOREND
+
+  "Detach the temp file."
+  detf f=$fname(tempfn) status=status
+PROCEND r
