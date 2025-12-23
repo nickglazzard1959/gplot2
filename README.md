@@ -743,7 +743,7 @@ please refer to it as the primary documentation for GPLOT.
 
 It also serves as the "test suite" for GPLOT and DIMFILM as discussed below.
 
-
+<a id="verfwork"></a>
 Verifying GPLOT/DIMFILM is working correctly
 --------------------------------------------
 
@@ -752,6 +752,23 @@ create the figures for the "tutorial" document and this README.
 These aren't exhaustive tests, of course, but
 if the full set of Figures can be correctly generated on a system for all four
 supported devices, it is likely that (almost?) everything is working correctly.
+
+In the Git repository, the obey files are found in the `obey-files` subdirectory.
+On systems that have file systems with hierarchical directory structures (all supported
+systems except NOS), the GPLOT `prefix` command can be used to establish the `obey-files`
+subdirectory as the default source of input files (obey and data). On NOS, they
+must be in the directory of the account running GPLOT, of course.
+
+To move these obey files to NOS, proceed as follows:
+```
+cd obey-files
+./send-files.sh
+```
+As always, this requires that `.modgitproject` is correctly set up.
+
+For information on transferring the obey files to NOS/VE and VAX/VMS, please refer
+to the `README.md` files in `ports/nosve` and `ports/vms` respectively. Any
+"Unix-like" machine with the Git repository has them directly available, of course.
 
 To aid with verification, there are two obey files which generate all the figures
 in EPS or SVG format. These are `OBALEPS` and `OBALSVG`, which both rely on `OBALTST`.

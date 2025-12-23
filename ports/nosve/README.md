@@ -147,7 +147,9 @@ jobs to the NOS side of the RTR. This can be done by:
 ./put-vj-files.sh
 ```
 
-This creates the files `vjutils`, `vjgrdev`, `vjdimfm`, `vjvesup` and `vjgplot` on NOS.
+This creates the files `vjutils`, `vjgrdev`, `vjdimfm`, `vjvesup` and `vjgplot` on NOS,
+as well as some other "`vj`" files which can be used to help verify GPLOT is
+working correctly, as explained below.
 
 
 ### Using batch jobs from NOS
@@ -229,3 +231,38 @@ use the products of earlier jobs.
 
 After these jobs are finished, you can run GPLOT as described above for the "batch job from NOS"
 approach.
+
+
+Verifying GPLOT/DIMFILM is working correctly
+--------------------------------------------
+
+As explained in the main project `README.md`, the "test suite" for GPLOT (and, indirectly, DIMFILM) 
+consists of the obey files that create the figures for the "tutorial" document.
+
+To get these on to NOS/VE is a two step process.
+
+The first step is to move them from the Git repo on a "Unix-like" machine to
+NOS. This step is explained in the main project `README.md` [here](../README.md#verfwork).
+You can use `./send-files-nosve.sh` instead of `send-files.sh`, but they are effectively identical
+(the NOS/VE variant sends the files as ASCII rather than Display Code, 
+but the contents are upper case only anyway).
+
+Once they are on the NOS part of the dual-state RTR, they can be transferred to the NOS/VE part
+by running a batch job: `vjobget`. This can be submitted from NOS or from a NOS/VE interactive
+session in the same way that GPLOT build jobs can be run in these two different ways.
+
+Once the obey files are on NOS/VE (in a `$user.obey-files` catalog), you can run the tests using:
+```
+/ gplot.gplot (or gplot if a crecl gplot has been issued)
+? prefix $user.obey-files
+? device <desired device>
+? obey obaltst
+? exit
+/
+```
+You can omit the `dev` command and use `ob obalsvg` or `ob obaleps` to generate
+SVG or EPS files if desired.
+
+If SVG files are output, the batch job: `vjsvput` can be used to move the SVG files
+from NOS/VE to NOS. They can then be further transferredfrom NOS to a "Unix-like" system using
+the shell script `./
