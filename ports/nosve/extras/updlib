@@ -1,0 +1,8 @@
+getf files
+delcle fileslib status=ignore
+delf fileslib status=ignore
+creol
+add_modules files
+generate_library fileslib
+quit
+crecle fileslib
