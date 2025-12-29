@@ -14,6 +14,14 @@ import atexit
 import time
 import json
 
+# We need to treat the VAX/VMS V4.7 FTP server with great care.
+# It only seems to work if full paths are specified for directory operations (create/change/etc.)
+# It also needs VMS format directory specifications.
+# Prepare to keep track of the user's home directory and the full path.
+g_vms47 = False
+g_root47 = ''
+g_path47 = ''
+
 def valid_vms_name(name):
     """
     See if name looks valid for VMS ODS 2. If so, return True, else False.
@@ -28,7 +36,7 @@ def valid_vms_name(name):
         return False
     if len(ext) > 40:
         return False
-    if not (name[0].isalpha() or (name[0] == '[')):
+    if not (name[0].isalpha() or (name[0] == '[') or (name[0] == '*')):
         return False
     for i in range(1,len(name)):
         if not (name[i].isalpha() or name[i].isdigit() or (name[i] in specials)):
@@ -54,6 +62,9 @@ def login_to_ftp(ftp, username, password):
     try:
         print(ftp.login(user=username,passwd=password))
         print(ftp.getwelcome())
+        # If trying to connect to VMS 4.7, do not use passive mode.
+        if g_vms47:
+            ftp.set_pasv(False)
         return True
     except Exception as e:
         print('Login failed.')
@@ -161,14 +172,35 @@ def delete_directory(ftp, dirname):
     except Exception as e:
         print('delete_directory({0}): ftp.rmd() failed.'.format(dirname))
         print('... reason:', e)
-        return False    
+        return False
 
 def change_remote_directory(ftp, dirname):
     """
     Change the remote working directory to dirname.
+    Note that this is only intended to "go down" a single directory.
+    Specifying a multi-element path is not intended to work and will not.
+    VMS 4.7 needs to be handled specially. Using ".." as a dirname will
+    "go up" one level. 
     """
+    global g_path47
+    
+    if g_vms47:
+        if dirname == '..':
+            if g_path47 == g_root47:
+                print('Cannot go up, already at user root.')
+                dirname = g_root47
+            else:
+                dotindex = g_path47.rfind('.')
+                if dotindex >= 0:
+                    dirname = g_path47[:dotindex]+']'
+                else:
+                    dirname = g_root47
+        else:
+            dirname = g_path47[:-1]+'.'+dirname+']'
+        print('change_remote_directory() VMS 4.7, dirname=',dirname)
     try:
         print(ftp.cwd(dirname))
+        g_path47 = dirname
         return True
     except Exception as e:
         print('change_remote_directory({0}): ftp.cwd() failed.'.format(dirname))
@@ -178,7 +210,11 @@ def change_remote_directory(ftp, dirname):
 def create_remote_directory(ftp, dirname):
     """
     Create remote directory called dirname.
+    VMS 4.7 needs to be handled specially.
     """
+    if g_vms47:
+        dirname = g_path47[:-1]+'.'+dirname+']'
+        print('create_remote_directory() VMS 4.7, dirname=',dirname)        
     try:
         print(ftp.mkd(dirname))
         return True
@@ -186,12 +222,25 @@ def create_remote_directory(ftp, dirname):
         print('create_remote_directory({0}): ftp.mkd() failed.'.format(dirname))
         print('... reason:', e)
         return False
-    
+
+def show_directory(ftp):
+    """
+    Show remote directory name.
+    """
+    try:
+        print(ftp.pwd())
+        return True
+    except Exception as e:
+        print('show_directory({0}): ftp.pwd() failed.'.format(dirname))
+        print('... reason:', e)
+        return False
 
 def main():
     """
     Mainline.
     """
+    global g_vms47, g_root47, g_path47
+    
     # Set up minimal readline history functionality.
     history_file = os.path.join(os.path.expanduser("~"), ".vms_ftp_history")
     try:
@@ -215,6 +264,7 @@ def main():
     parser.add_argument("-b", "--binary", help="Set initial transfer type to BINARY (def: TEXT).", action='store_true')
     parser.add_argument("-q", "--quiterror", help="Quit if an error occurs.", action='store_true')
     parser.add_argument("-m", "--mapfile", help="JSON file with dictionary defining file extension mappings.")
+    parser.add_argument("-r", "--root47", help="Full path of user directory to work around VMS 4.7 FTP issues.")
     args = parser.parse_args()
 
     if args.debug is None:
@@ -257,6 +307,17 @@ def main():
         print('Invalid password characters')
         sys.exit(3)
 
+    # Get the VMS 4.7 user directory "root", if any. If present, try to make things work
+    # with the VMS 4.7 FTP server. This seems to work if given absolute paths for directories ...
+    g_vms47 = False
+    g_root47 = ''
+    g_path47 = ''
+    if (args.root47 is not None) and (args.root47 != 'none'):
+        g_vms47 = True
+        g_root47 = args.root47
+        g_path47 = args.root47
+        print('Using VAX/VMS V4.7 FTP server compatibility mode.')
+
     # Open FTP connection.
     print('Contacting VMS FTP server on host:', args.hostname)
     ntries = 40
@@ -298,6 +359,7 @@ def main():
         BIN = 15
         TEXT = 16
         DELD = 17
+        PWD = 18
         
     commands = {'quit': (0, 0, '', cmds.QUIT, 'Exit VMS FTP.'),
                 'exit': (0, 0, '', cmds.QUIT, 'Exit VMS FTP.'),
@@ -312,11 +374,12 @@ def main():
                 'del':  (1, 1, 'vmsname', cmds.DEL, 'Delete a file.'),
                 'mput': (1, 1, 'listname', cmds.MPUT, 'Send a list of files to the server.'),
                 'mget': (1, 1, 'listname', cmds.MGET, 'Get a list of files from the server.'),
-                'cd':   (1, 1, 'dirname', cmds.CD, 'Change remote working directory.'),
-                'cred': (1, 1, 'dirname', cmds.CRED, 'Create remote directory.'),
+                'cd':   (1, 1, 'dirname', cmds.CD, 'Change to remote sub-directory. Use .. to go up.'),
+                'cred': (1, 1, 'dirname', cmds.CRED, 'Create remote sub-directory.'),
                 'bin':  (0, 0, '', cmds.BIN, 'Change transfer mode to BINARY.'),
                 'text': (0, 0, '', cmds.TEXT, 'Change transfer mode to TEXT.'),
-                'deld': (1, 1, 'dirname', cmds.DELD, 'Delete a directory.')}
+                'deld': (1, 1, 'dirname', cmds.DELD, 'Delete a remote sub-directory.'),
+                'pwd':  (0, 0, '', cmds.PWD, 'Show current remote working directory.')}
 
     def parse_cmd( cmdline, commands ):
         """
@@ -604,8 +667,14 @@ def main():
                     if not delete_directory(ftp, argslist[0]+'.dir;1'):
                         print('Failed.')                
                         if args.quiterror:
-                            quit_on_error()                        
-
+                            quit_on_error()
+                            
+            elif cmdcode == cmds.PWD:
+                if not show_directory(ftp):
+                    print('Failed.')
+                    if args.quiterror:
+                        quit_on_error()
+                        
         if args.execute is not None:
             quit_ftp(ftp)
             sys.exit(0)

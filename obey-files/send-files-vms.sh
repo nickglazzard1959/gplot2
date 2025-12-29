@@ -12,4 +12,10 @@ if [ -z "${VMSHOST}" ]; then
     echo "Environment variable VMSHOST must be defined."
 fi
 #
-vmsftp -p $VMSPASSWORD -e "mput required-list" $VMSUSER $VMSHOST
+if [ -z "${VMSUSERROOT}" ]; then
+    UROOT="none"
+else
+    UROOT="${VMSUSERROOT}"
+fi
+#
+vmsftp -p $VMSPASSWORD -r ${UROOT} -e "mput required-list" $VMSUSER $VMSHOST

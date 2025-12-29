@@ -56,8 +56,13 @@ echo "\$ PURGE" >> gplot-build.com
 ftgplot.f
 support.f
 EOF
-    ) > gplot-files
-vmsftp -p ${VMSPASSWORD} -m ../vmsexts.json ${VMSUSER} ${VMSHOST} << EOF
+) > gplot-files
+if [ -z "${VMSUSERROOT}" ]; then
+    UROOT="none"
+else
+    UROOT="${VMSUSERROOT}"
+fi
+vmsftp -p ${VMSPASSWORD} -m ../vmsexts.json -r ${UROOT} ${VMSUSER} ${VMSHOST} << EOF
 cred gplot
 cd gplot
 cred gplot-source

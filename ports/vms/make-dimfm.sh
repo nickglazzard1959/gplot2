@@ -609,8 +609,13 @@ done
 echo "\$ LIB/OBJ/CREATE DIMFM *.OBJ" >> dimfm-source/dimfm-build.com
 echo "\$ PURGE" >> dimfm-source/dimfm-build.com
 #
+if [ -z "${VMSUSERROOT}" ]; then
+    UROOT="none"
+else
+    UROOT="${VMSUSERROOT}"
+fi
 cd dimfm-source
-vmsftp -p ${VMSPASSWORD} -m ../vmsexts.json ${VMSUSER} ${VMSHOST} << EOF
+vmsftp -p ${VMSPASSWORD} -m ../vmsexts.json -r ${UROOT} ${VMSUSER} ${VMSHOST} << EOF
 cred gplot
 cd gplot
 cred dimfm-source

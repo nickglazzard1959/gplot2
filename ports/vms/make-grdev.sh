@@ -83,8 +83,18 @@ done
 echo "\$ LIB/OBJ/CREATE GRDEV *.OBJ" >> grdev-source/grdev-build.com
 echo "\$ PURGE" >> grdev-source/grdev-build.com
 #
+# Do some processing of tektst.f if building for VMS 4.7, where AND() is unresolved.
+# This is signalled by VMSUSERROOT being set (needed to work with VMS 4.7 FTP).
 cd grdev-source
-vmsftp -p ${VMSPASSWORD} -m ../vmsexts.json ${VMSUSER} ${VMSHOST} << EOF
+if [ -z "${VMSUSERROOT}" ]; then
+    UROOT="none"
+else
+    UROOT="${VMSUSERROOT}"
+    sed -e 's/ AND(/ IAND(/' tektst.f > x.f
+    rm -f tektst.f
+    mv x.f tektst.f
+fi
+vmsftp -p ${VMSPASSWORD} -m ../vmsexts.json -r ${UROOT} ${VMSUSER} ${VMSHOST} << EOF
 cred gplot
 cd gplot
 cred lib

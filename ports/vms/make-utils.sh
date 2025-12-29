@@ -3,7 +3,7 @@
 # Process PLUTILS source in utils-library to create VMS FORTRAN
 # compatible code, then transfer that code to VMS.
 #
-
+set -x
 echo "Construct UTILS library."
 #
 if [ -z "${VMSUSER}" ]; then
@@ -48,7 +48,12 @@ echo "\$ FORT${FOPT} CHARS" >> utils-build.com
 echo "\$ LIB/OBJ/CREATE UTILS *.OBJ" >> utils-build.com
 echo "\$ PURGE" >> utils-build.com
 #
-vmsftp -p ${VMSPASSWORD} -m ../vmsexts.json ${VMSUSER} ${VMSHOST} << EOF
+if [ -z "${VMSUSERROOT}" ]; then
+    UROOT="none"
+else
+    UROOT="${VMSUSERROOT}"
+fi
+vmsftp -p ${VMSPASSWORD} -m ../vmsexts.json -r ${UROOT} ${VMSUSER} ${VMSHOST} << EOF
 cred gplot
 cd gplot
 cred lib

@@ -290,4 +290,3 @@ C
       OPEN(UNIT=IUNIT, FILE='SYS$INPUT', STATUS='OLD')
       RETURN
       END
-      
