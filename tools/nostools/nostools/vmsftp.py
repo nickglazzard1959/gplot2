@@ -373,7 +373,7 @@ def main():
                 'ls':   (0, 1, '', cmds.LS, '[string] List local working directory, [names containing string].'),
                 'del':  (1, 1, 'vmsname', cmds.DEL, 'Delete a file.'),
                 'mput': (1, 1, 'listname', cmds.MPUT, 'Send a list of files to the server.'),
-                'mget': (1, 1, 'listname', cmds.MGET, 'Get a list of files from the server.'),
+                'mget': (1, 2, 'listname [ext]', cmds.MGET, 'Get a list of files from the server. Maybe add .ext'),
                 'cd':   (1, 1, 'dirname', cmds.CD, 'Change to remote sub-directory. Use .. to go up.'),
                 'cred': (1, 1, 'dirname', cmds.CRED, 'Create remote sub-directory.'),
                 'bin':  (0, 0, '', cmds.BIN, 'Change transfer mode to BINARY.'),
@@ -477,6 +477,8 @@ def main():
                     if len(inname) > 0:
                         if inname[0] != '#':
                             inname = inname.lower()
+                            if len(argslist) == 2:
+                                inname = inname + '.' + argslist[1]
                             nfiles += 1
                             print('... getting:', inname, '(', nfiles, ')')
                             if not valid_vms_name(inname):
@@ -484,9 +486,9 @@ def main():
                                 if args.quiterror:
                                     quit_on_error()
                             else:
-                                outname = inname + '.' + argslist[2]
+                                outname = inname
                                 if not get_file(ftp, inname, outname, as_binary):
-                                    print('... ... Failed to send file. Skipping ...')
+                                    print('... ... Failed to get file. Skipping ...')
                                 else:
                                     ngot += 1
 

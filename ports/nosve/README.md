@@ -264,5 +264,21 @@ You can omit the `dev` command and use `ob obalsvg` or `ob obaleps` to generate
 SVG or EPS files if desired.
 
 If SVG files are output, the batch job: `vjsvput` can be used to move the SVG files
-from NOS/VE to NOS. They can then be further transferredfrom NOS to a "Unix-like" system using
-the shell script `./
+from NOS/VE to NOS. They can then be further transferred from NOS to a "Unix-like" system using
+these commands (working in the `obey-files` directory):
+```
+$ nosftp guest localhost
+(enter password for guest)
+NOS FTP> mget fetch-list ascii svg
+NOS FTP> bye
+$
+```
+
+SVG files, once on the "Unix-like" system, can be viewed with:
+```
+svgview <filename.svg>
+```
+or all of them in the current directory can be presented in turn using:
+```
+svgviewall.sh
+```

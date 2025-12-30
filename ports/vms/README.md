@@ -122,3 +122,48 @@ For example:
 define DIMFONTS_LOGICAL DISK$HOME:[USERS.<user>.GPLOT.GPLOT-SOURCE]DADIMFO.DAT
 gplot :== "run DISK$HOME:[USERS.<user>.GPLOT.GPLOT-SOURCE]gplot.exe"
 ```
+
+
+Verifying GPLOT/DIMFILM is working correctly
+--------------------------------------------
+
+As explained in the main project `README.md`, the "test suite" for GPLOT (and, indirectly, DIMFILM) 
+consists of the obey files that create the figures for the "tutorial" document.
+
+To transfer these obey files to a VAX/VMS system, proceed as follows:
+```
+$ cd obey-files
+$ ./send-files-vms.sh
+```
+
+This puts all the obey files in the user's home directory (!) from where they can be moved if
+desired, or the test can be run in there. To generate all SVG files, for example:
+```
+$ gplot
+? obey obalsvg
+? exit
+```
+
+To retrieve all the SVG files after the tests have been completed, you can use:
+```
+$ cd obey-files
+$ vmsftp <user> <host>
+(enter pasword for user)
+VMS FTP> mget fetch-list svg
+VMS FTP> bye
+```
+
+Note that if you are contacting a VMS V4.7 system, you must specify `VMSUSERROOT` too:
+```
+$ vmsftp -r ${VMSUSERROOT} <user> <host>
+...
+```
+
+SVG files, once on the "Unix-like" system, can be viewed with:
+```
+svgview <filename.svg>
+```
+or all of them in the current directory can be presented in turn using:
+```
+svgviewall.sh
+```
