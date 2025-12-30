@@ -1,7 +1,12 @@
 Building all components of GPLOT and DIMFILM on VAX/VMS
 =======================================================
 
-This can be done as follows.
+This can be done as follows. Please note that there is a section below
+with some additional notes for people using VAX/VMS 4.7. These notes
+are not needed if using VAX/VMS 7.3. They may be relevant for other versions
+(only 7.3 and 4.7 have been tested).
+Please read this section **first** if it is relevant to you.
+
 
 Transferring source to the VAX/VMS host
 ---------------------------------------
@@ -72,7 +77,7 @@ to run GPLOT. Those things can done with:
 ```
 define DIMFONTS_LOGICAL DISK$USER:[<user>.GPLOT.GPLOT-SOURCE]DADIMFO.DAT
 
-gplot := "run DISK$USER:[<user>.GPLOT.GPLOT-SOURCE]gplot.exe"
+gplot :== "run DISK$USER:[<user>.GPLOT.GPLOT-SOURCE]gplot.exe"
 ```
 
 Note that the file paths here are case insensitive. It is possible that
@@ -84,3 +89,36 @@ added to your login command procedure if you are planning to use GPLOT much.
 
 GPLOT uses "foreign command" argument parsing on VMS so that the command line arguments available
 on "Unix-like" systems are also available on VMS using the same syntax.
+
+
+Installing on VAX/VMS 4.7 (Telegraphics turnkey system)
+-------------------------------------------------------
+
+Probably the most readily available VAX/VMS "distribution" today (2025/2026) is
+the [Telegraphics VAX/VMS 4.7 turnkey](http://cmg.telegraphics.net/classiccmp/vms/vms_tk.html). 
+This is very easy to install (using "open" SIMH 4.1) and has no "licensing issues".
+
+However, the FTP server on that system has some idiosyncracies which must be worked
+around. The `VMSFTP` tool will do what is necessary if the environment variable
+`VMSUSERROOT` is set to the home directory of the user for whom GPLOT is being
+installed. For example (if additional user directories are being created in the
+same location as the example users):
+```
+export VMSUSERROOT='disk$home:[users.<user>]'
+```
+
+If this environment variable is not defined, `VMSFTP` will not take additional steps
+which are needed for the V4.7 FTP server. It should **not** be defined if using VAX/VMS 7.3
+for example, as these additional steps may cause problems rather than fixing them. For
+example, VMS 4.7 FORTRAN does not define the AND intrinsic and this is also fixed up
+when `VMSUSERROOT` is defined in a way that might be incompatible with VMS 7.3 (and maybe other
+versions).
+
+**After** defining `VMSUSERROOT`, follow the steps above to install GPLOT/DIMFILM.
+
+You should also adjust the paths used in the "Running GPLOT" section, of course.
+For example:
+```
+define DIMFONTS_LOGICAL DISK$HOME:[USERS.<user>.GPLOT.GPLOT-SOURCE]DADIMFO.DAT
+gplot :== "run DISK$HOME:[USERS.<user>.GPLOT.GPLOT-SOURCE]gplot.exe"
+```
