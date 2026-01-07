@@ -30,7 +30,7 @@ C  LICENSE, A COPY OF WHICH IS INCLUDED IN THE GIT
 C  REPOSITORY FOR THE PROJECT.
 C
 C  --------------------------------------------------
-C  GPLOT (C) 2013-2025 NICK GLAZZARD, NICK.NOS28@GMAIL.COM
+C  GPLOT (C) 2013-2026 NICK GLAZZARD, NICK.NOS28@GMAIL.COM
 C ===================================================
 C
 C LOGICAL UNIT NUMBER (LUN) USAGE
@@ -93,7 +93,7 @@ C
 #ifndef PORTF77
       PARAMETER( MAXFNL=7 )
 #endif
-      PARAMETER( NCMDS=98, NFONTS=24, NREGS=9 )
+      PARAMETER( NCMDS=100, NFONTS=24, NREGS=9 )
 C
 C INITIAL DEFAULT NUMBER OF POINTS THAT CAN BE GRAPHED.
 C USED ONLY ON SYSTEMS THAT SUPPORT DYNAMIC MEMORY ALLOCATION.
@@ -122,7 +122,7 @@ C
       INTEGER KUSEKEY, KADDKEY, KKEYS, KRESET, KTXBPS
       INTEGER KTXBPH, KTXBPT, KTXBPB, KLINE, KGLABEL, KALABEL
       INTEGER KARPARM, KANPARM, KWAIT, KAXINT, KVRI, K2DEVAL
-      INTEGER KGRFMOD, KTXBPD
+      INTEGER KGRFMOD, KTXBPD, KCRV, KBEZ
       PARAMETER( KDEV=1, KMAXPT=2, KCOL=3, KWID=4, KMARK=5 )
       PARAMETER( KCLR=6, KMOVE=7, KDRAW=8, KTEXT=9, KREAD=10 )
       PARAMETER( KXYPT=11, KXYLN=12, KXYAUT=13, KXRAN=14, KYRAN=15 )
@@ -143,7 +143,7 @@ C
       PARAMETER( KTXBPS=84, KTXBPH=85, KTXBPT=86, KTXBPB=87, KLINE=88 )
       PARAMETER( KGLABEL=89, KALABEL=90, KARPARM=91, KANPARM=92 )
       PARAMETER( KWAIT=93, KAXINT=94, KVRI=95, K2DEVAL=96, KGRFMOD=97 )
-      PARAMETER( KTXBPD=98 )
+      PARAMETER( KTXBPD=98, KCRV=99, KBEZ=100 )
 C
 C DEVICE CODES.
 C
@@ -439,6 +439,8 @@ C
       CMDS(K2DEVAL) = '2DEVAL'
       CMDS(KGRFMOD) = 'GRAPHMODE'
       CMDS(KTXBPD) = 'BOXPDELTAS'
+      CMDS(KCRV) = 'CURVE'
+      CMDS(KBEZ) = 'BEZIER'
 C
 C DEVICE NAMES.
 C
@@ -751,6 +753,8 @@ C
       DCMDS(KGRFMOD) = '"ON" "OFF" - TURN GRAPH MODE ON/OFF. "ON" '//
      +     'SETS BOUNDS TO DEVICE ASPECT RATIO. "OFF" = 0 1 0 1'
       DCMDS(KTXBPD) = 'DX DY - SET BOX AUTO STEPS.'
+      DCMDS(KCRV) = 'C OR O - DRAW A CURVE IN BOUNDS COORDINATES.'
+      DCMDS(KBEZ) = 'C OR O - DRAW A BEZIER IN BOUNDS COORDINATES.'
 C
 C DEVICE DESCRIPTIONS.
 C
@@ -861,6 +865,8 @@ C
       NARGS(K2DEVAL) = 1
       NARGS(KGRFMOD) = 1
       NARGS(KTXBPD) = 2
+      NARGS(KCRV) = 1
+      NARGS(KBEZ) = 1
 C
 C SET UP COMMANDS WITH VARIABLE ARGUMENT COUNTS. RELEVANT
 C COMMAND CODES AND MAXIMUM NUMBER OF ARGUMENTS.
@@ -1496,7 +1502,7 @@ C
      +        261,262,263,264,265,266,267,268,269,270,
      +        271,272,273,274,275,276,277,278,279,280,
      +        281,282,283,284,285,286,287,288,289,290,
-     +        291,292,293,294,295,296,297,298),ICMD
+     +        291,292,293,294,295,296,297,298,359,360),ICMD
 C
 C DEVICE
  201     CONTINUE
@@ -3615,6 +3621,28 @@ C BOXPDELTAS DX DY
          YBOXSTP = F2
          GOTO 299
 C
+C CURVE
+ 359     CONTINUE
+         IF( .NOT. HAVDEV )GOTO 9090
+         IF( .NOT. HAVDATA )GOTO 9095
+         IF( NDATA .GT. 1 )THEN
+            CALL CRVDRW(DA(IXOFF),DA(IYOFF),NDATA,(ARGS(1)(1:1).EQ.'C'),
+     +           DOBB, BB)
+            GCHANGE = .TRUE.
+         ENDIF
+         GOTO 299
+C
+C BEZIER
+ 360     CONTINUE
+         IF( .NOT. HAVDEV )GOTO 9090
+         IF( .NOT. HAVDATA )GOTO 9095
+         IF( NDATA .GT. 1 )THEN
+            CALL BEZDRW(DA(IXOFF),DA(IYOFF),NDATA,(ARGS(1)(1:1).EQ.'C'),
+     +           DOBB, BB)
+            GCHANGE = .TRUE.
+         ENDIF
+         GOTO 299
+C
 C END OF COMMAND SWITCH
 C IF THE GRAPHICS DISPLAY HAS BEEN CHANGED, TRY TO ENSURE THE
 C CHANGES ARE MADE VISIBLE - BUT ONLY IF AT INTERACTIVE LEVEL.
@@ -4920,7 +4948,7 @@ C
       INTEGER ISTKNEW, IREG, NEWELEM, IARG, IOEN, IOST, IMPOS, NFMT
       INTEGER ISTKPO4
       REAL ARG, DOMLIM, CEILING, V, FLOOR, MPI
-      PARAMETER( NOPS=93 )
+      PARAMETER( NOPS=97 )
       PARAMETER( MPI=3.14159265359 )
       CHARACTER*4 OPNAMES(NOPS)
       INTEGER MINSTK(NOPS), OPLEN(NOPS)
@@ -4955,7 +4983,7 @@ C (39 FOR FREE FORMAT). THIS COULD BE COMPACTED IF NEEDED.
      +              'SETY',    'C',    'A',  'BOX',   'PC',
      +                 '#',    '=',    '&',    'S',  'ROT',
      +               'TRN',  'SCL',   'R2D', 'D2R',  'LAB',
-     +                'CL',    'G',   'GCD'/
+     +                'CL', 'G', 'GCD','CRVO', 'CRVC', 'BEZO', 'BEZC'/
 C 1 CHARACTER SYNONMYS FOR:   RCL:#, STO:=, DUP:&, SWAP:S.
       DATA MINSTK/2, 2, 2, 2, 1,
      +            2, 2, 1, 1, 1,
@@ -4975,7 +5003,7 @@ C 1 CHARACTER SYNONMYS FOR:   RCL:#, STO:=, DUP:&, SWAP:S.
      +            1, 3, 5, 4, 1,
      +            1, 2, 1, 2, 3,
      +            4, 4, 1, 1, 4,
-     +            0, 2, 2/
+     +            0, 2, 2, 2, 2, 2, 2/
       DATA OPLEN/1, 1, 1, 1, 1,
      +           2, 2, 3, 3, 3,
      +           4, 4, 4, 3, 4,
@@ -4994,7 +5022,7 @@ C 1 CHARACTER SYNONMYS FOR:   RCL:#, STO:=, DUP:&, SWAP:S.
      +           4, 1, 1, 3, 2,
      +           1, 1, 1, 1, 3,
      +           3, 3, 3, 3, 3,
-     +           2, 1, 3/
+     +           2, 1, 3, 4, 4, 4, 4/
 C
 C---- THE DOMAIN OF SEVERAL MATHEMATICAL FUNCTIONS IS LIMITED TO THIS:
 C---- ALSO, IF TRPDIV0, TRAP DIVIDE BY < ABS(1E-9) ELSE USE 1E-9.
@@ -5150,7 +5178,7 @@ C--- IT IS A KNOWN OPERATOR. TRY TO APPLY IT.
      +              261,262,263,264,265,266,267,268,269,270,
      +              271,272,273,274,275,276,277,278,279,280,
      +              237,236,234,222,285,286,287,288,289,290,
-     +              291,292,293),IOP
+     +              291,292,293,294,295,296,297),IOP
 C
 C--- + : ADD ( A1 A2 -- A1 ) : A1 = A1 + A2
  201           CONTINUE
@@ -6224,6 +6252,60 @@ C--- GCD: ( C1 C2 -- C1) : C1 = GCD(C1,C2) (GREATEST COMMON DIVISOR)
  2393          CONTINUE
                ISTACK = ISTACK - 1
                GOTO 299
+C
+C--- CRVO, CRVC : ( A1 A2 -- ) : DRAW SMOOTH CURVE X=A1,Y=A2, OPEN/CLOSED
+ 294           CONTINUE
+               CLOSED = .FALSE.
+               GOTO 2194
+ 295           CONTINUE
+               CLOSED = .TRUE.
+ 2194          CONTINUE
+               IF( .NOT. HAVDEV )GOTO 9008
+               X = STACK(ISTKPOP)
+               Y = STACK(ISTKTOP)
+               XO = X
+               YO = Y
+               CALL CRVDRW(STACK(ISTKPOP),
+     +              STACK(ISTKTOP),
+     +              NELEM,CLOSED,
+     +              DOBB, BB)               
+               IF( CLOSED )THEN
+                  X = XO
+                  Y = YO
+               ELSE
+                  X = STACK(ISTKPOP+NELEM-1)
+                  Y = STACK(ISTKTOP+NELEM-1)                  
+               ENDIF
+               IF( .NOT. DOBB )GCHANGE = .TRUE.
+               ISTACK = ISTACK - 2
+               GOTO 299
+C
+C--- BEZO, BEZC : ( A1 A2 -- ) : DRAW BEZIER CURVE X=A1,Y=A2, OPEN/CLOSED
+ 296           CONTINUE
+               CLOSED = .FALSE.
+               GOTO 2196
+ 297           CONTINUE
+               CLOSED = .TRUE.
+ 2196          CONTINUE
+               IF( .NOT. HAVDEV )GOTO 9008
+               X = STACK(ISTKPOP)
+               Y = STACK(ISTKTOP)
+               XO = X
+               YO = Y
+               CALL BEZDRW(STACK(ISTKPOP),
+     +              STACK(ISTKTOP),
+     +              NELEM,CLOSED,
+     +              DOBB, BB)               
+               IF( CLOSED )THEN
+                  X = XO
+                  Y = YO
+               ELSE
+                  X = STACK(ISTKPOP+NELEM-1)
+                  Y = STACK(ISTKTOP+NELEM-1)                  
+               ENDIF
+               IF( .NOT. DOBB )GCHANGE = .TRUE.
+               ISTACK = ISTACK - 2
+               GOTO 299    
 C
 C--- END OF OPERATOR SWITCH.
  299           CONTINUE
@@ -7703,6 +7785,314 @@ C---- SWAP IF AARRAY(JG) > AARRAY(J).
       RETURN
       END
 C
+      SUBROUTINE BSOLVE(RX, RY, X, Y, Z, BB, N, CYCLIC)
+C-----------------------------------------------------------------------
+C CALCULATE BEZIER CONTROL POINTS (X,Y) GIVEN A SET OF N POINTS THROUGH
+C WHICH THE THE CURVE MUST PASS (RX,RY), AKA "KNOTS". SO THAT THE FIRST
+C AND SECOND DERIVATIVES OF THE CURVE ARE CONTINUOUS.
+C
+C IF CYCLIC, THE FIRST AND LAST SEGMENTS ARE SUCH THAT THE CURVE IS
+C CLOSED, PRESERVING THE SMOOTHNESS REQUIREMENTS.
+C
+C IF NOT CYCLIC, THE FIRST AND LAST SEGMENTS ARE LINEAR.
+C
+C Z AND BB ARE INTERNAL WORK ARRAYS.
+C
+C ONLY ONE CONTROL POINT (P) IS CALCULATED HERE, AS THE SECOND (Q) CAN
+C BE TRIVIALLY CALCULATED BY SYMMETRY FROM IT. A BEZIER SEGMENT IS THEN
+C DEFINED BY R(I), P, Q, R(I+1) WHEN DRAWING IT.
+C
+C FOR EACH OF THE X AND Y COMPONENTS OF P:
+C P (RETURNED AS (X,Y)) = M R WHERE M IS A TRI-DIAGONAL MATRIX. THIS
+C CAN BE SOLVED USING THE THOMAS METHOD, WHICH IS WHAT THIS IMPLEMENTS.
+C
+C THIS CODE ORIGINATED HERE:
+C  HTTPS://WWW.PARTICLEINCELL.COM/2012/BEZIER-SPLINES/ (IN JAVASCRIPT)
+C IT WAS MODIFIED FOR USE IN TIKZ AND CYCLIC BEHAVIOUR ADDED HERE:
+C  HTTPS://GITHUB.COM/STEVECHECKOWAY/TIKZLIBRARYSPLINE (IN PYTHON)
+C-----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      INTEGER N
+      REAL RX(N), RY(N), X(N), Y(N), Z(N), BB(N)
+      LOGICAL CYCLIC
+C
+      INTEGER I
+      REAL AN1, BN1, B, D, FX, FY
+C
+      IF( CYCLIC )THEN
+         BB(1) = 3.0
+      ELSE
+         BB(1) = 2.0
+      ENDIF
+C
+      X(1) = RX(1)
+      Y(1) = RY(1)
+      Z(1) = 1.0
+C
+      DO 2 I=2,N-1
+         B = BB(I-1)
+         BB(I) = 4.0 - 1.0 / B
+         X(I) = RX(I) - X(I-1) / B
+         Y(I) = RY(I) - Y(I-1) / B
+         Z(I) = 0.0 - Z(I-1) / B
+ 2    CONTINUE
+C
+      IF( CYCLIC )THEN
+         AN1 = 1.0
+         BN1 = 3.0
+      ELSE
+         AN1 = 2.0
+         BN1 = 7.0
+      ENDIF
+C
+      BB(N) = BN1 - AN1 / BB(N-1)
+      X(N) = RX(N) - AN1 * X(N-1) / BB(N-1)
+      Y(N) = RY(N) - AN1 * Y(N-1) / BB(N-1)
+      Z(N) = 1.0 - Z(N-1) / BB(N-1)
+C
+      X(N) = X(N) / BB(N)
+      Y(N) = Y(N) / BB(N)
+      Z(N) = Z(N) / BB(N)
+C
+      DO 3 I=(N-1),1,-1
+         X(I) = (X(I) - X(I+1)) / BB(I)
+         Y(I) = (Y(I) - Y(I+1)) / BB(I)
+         Z(I) = (Z(I) - Z(I+1)) / BB(I)
+ 3    CONTINUE
+C
+      IF( CYCLIC )THEN
+         D = 1.0 + Z(1) + Z(N)
+         FX = (X(1) + X(N)) / D
+         FY = (Y(1) + Y(N)) / D
+         DO 4 I=1,N
+            X(I) = X(I) - FX * Z(I)
+            Y(I) = Y(I) - FY * Z(I)
+ 4       CONTINUE
+      ENDIF
+C
+      RETURN
+      END
+C
+      SUBROUTINE CRVDRW(X, Y, NU, CYCLIC, DOBB, BB)
+C-----------------------------------------------------------------------
+C DRAW A SMOOTH CURVE THROUGH THE NU POINTS (X,Y) BY CALCULATING
+C CONTROL POINTS FOR A BEZIER CURVE SO THAT THE CURVE HAS CONTINUOUS
+C FIRST AND SECOND DERIVATIVES.
+C
+C IF CYCLIC, JOIN THE LAST GIVEN POINT TO THE FIRST.
+C-----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      INTEGER NU
+      REAL X(NU), Y(NU), BB(4)
+      LOGICAL CYCLIC, DOBB
+C
+      INTEGER MAXN
+      PARAMETER( MAXN=200 )
+C
+      REAL RX(MAXN), RY(MAXN), PX(MAXN), PY(MAXN), QX(MAXN), QY(MAXN)
+      REAL Z(MAXN), B(MAXN)
+      INTEGER I, J, N
+C
+C--- CHECK AND POSSIBLY MODIFY THE POINT COUNT.
+C
+      N = NU
+      IF( .NOT. CYCLIC )THEN
+         N = N - 1
+      ENDIF
+      IF( (N .LT. 2) .OR. (N .GE. MAXN) )THEN
+         CALL TXBEGIN
+         WRITE(6,100)
+ 100     FORMAT(1X,'CRVDRW - INVALID POINT COUNT.')
+         CALL TXEND
+         RETURN
+      ENDIF      
+C
+C--- ESTABLISH BOUNDARY CONDITIONS.
+C
+      IF( CYCLIC )THEN
+         DO 1 I=1,N
+            J = I + 1
+            IF( J .GT. N )J = 1
+            RX(I) = 4.0 * X(I) + 2.0 * X(J)
+            RY(I) = 4.0 * Y(I) + 2.0 * Y(J)
+ 1       CONTINUE
+      ELSE
+         RX(1) = X(1) + 2.0 * X(2)
+         RY(1) = Y(1) + 2.0 * Y(2)
+         DO 2 I=2,(N-1)
+            RX(I) = 4.0 * X(I) + 2.0 * X(I+1)
+            RY(I) = 4.0 * Y(I) + 2.0 * Y(I+1)
+ 2       CONTINUE
+C        N+1 IS SAFE BECAUSE NOT CYCLIC CASE, N = N - 1 ABOVE.
+         RX(N) = 8.0 * X(N) + X(N+1)
+         RY(N) = 8.0 * Y(N) + Y(N+1)
+      ENDIF
+C
+C--- SOLVE FOR THE SECOND CONTROL POINT OF EACH SEGMENT SUCH THAT
+C--- CONTINUOUS FIRST AND SECOND DERIVATIVES ARE OBTAINED.
+C
+      CALL BSOLVE(RX, RY, PX, PY, Z, B, N, CYCLIC)
+C
+C--- FIND THE THIRD CONTROL POINT OF EACH SEGMENT BY SYMMETRY.
+C--- ACCOUNT FOR BOUNDARY CONDITIONS.
+C
+      DO 3 I=1,(N-1)
+         QX(I) = 2.0 * X(I+1) - PX(I+1)
+         QY(I) = 2.0 * Y(I+1) - PY(I+1)
+ 3    CONTINUE
+C
+      IF( CYCLIC )THEN
+         QX(N) = 2.0 * X(1) - PX(1)
+         QY(N) = 2.0 * Y(1) - PY(1)
+      ELSE
+C        N+1 IS SAFE BECAUSE NOT CYCLIC CASE, N = N - 1 ABOVE.         
+         QX(N) = 0.5 * (X(N+1) + PX(N))
+         QY(N) = 0.5 * (Y(N+1) + PY(N))
+      ENDIF
+C
+C--- DRAW EACH SEGMENT.
+C
+      CALL BEZDRAW(X, Y, PX, PY, QX, QY, N, CYCLIC, DOBB, BB)
+C
+      RETURN
+      END
+C
+      SUBROUTINE BEZDRAW(X, Y, PX, PY, QX, QY, N, CYCLIC, DOBB, BB)
+C-----------------------------------------------------------------------
+C DRAW A BEZIER CURVE FROM ITS CONTROL POLYGON:
+C (X_I,Y_I),(PX_I,PY_I),(QX_I,QY_I) ...
+C      (X_N,Y_N),(PX_N,PY_N),(QX_N,QY_N),(X_N+1,Y_N+1)
+C WHERE N IS THE NUMBER OF CONTROL POLYGON SEGMENTS.
+C IF CYCLIC, JOIN THE FIRST TO THE LAST POINT.
+C-----------------------------------------------------------------------
+      IMPLICIT LOGICAL (A-Z)
+      INTEGER N
+      REAL X(N+1), Y(N+1), PX(N), PY(N), QX(N), QY(N), BB(4)
+      LOGICAL CYCLIC, DOBB
+C
+      REAL DX, DY, DLINSQ, DPOLSQ, DSCALE, DT, XP, YP
+      REAL T(3), S(5)
+      INTEGER I, J, L, M
+C
+C--- IF THE SPECIFICATION IS INVALID, GIVE UP.
+C
+      IF( ( N .LT. 1 ) .OR. ( CYCLIC .AND. ( N .LT. 2 ) ) )THEN
+         CALL TXBEGIN
+         WRITE(6,100)
+ 100     FORMAT(1X,'BEZDRAW - INVALID POINT COUNT.')
+         CALL TXEND
+         RETURN
+      ENDIF
+C
+C--- DRAW EACH SEGMENT.
+C
+      DO 4 I=1,N
+         L = I + 1
+         IF( CYCLIC )THEN
+            IF( L .GT. N )L = 1
+         ENDIF
+C
+C--- HEURISTIC TO SCALE NO OF POINTS USED TO DRAW THE SEGMENT BASED ON
+C--- RATIO OF CONTROL POLYGON ARC LENGTH TO LENGTH OF LINEAR 1ST TO 4TH.
+C
+         DX = X(L) - X(I)
+         DY = Y(L) - Y(I)
+         DLINSQ = SQRT(DX*DX + DY*DY)
+         DX = PX(I) - X(I)
+         DY = PY(I) - Y(I)
+         DPOLSQ = SQRT(DX*DX + DY*DY)
+         DX = QX(I) - PX(I)
+         DY = QY(I) - PY(I)
+         DPOLSQ = DPOLSQ + SQRT(DX*DX + DY*DY)
+         DX = X(L) - QX(I)
+         DY = Y(L) - QY(I)
+         DPOLSQ = DPOLSQ + SQRT(DX*DX + DY*DY)
+         DSCALE = DPOLSQ / DLINSQ
+         M = INT(16 * DSCALE * DSCALE)
+C
+C--- DRAW THE CURRENT SEGMENT.
+C
+         DT = 1.0 / (M - 1)
+         DO 5 J=1,M
+            T(1) = (J-1) * DT
+            S(1) = 1.0 - T(1)
+            T(2) = T(1) * T(1)
+            S(2) = S(1) * S(1)
+            T(3) = T(1) * T(2)
+            S(3) = S(1) * S(2)
+            S(4) = 3.0 * S(2) * T(1)
+            S(5) = 3.0 * S(1) * T(2)
+            XP = S(3) * X(I) + S(4) * PX(I) + S(5) * QX(I) + T(3) * X(L)
+            YP = S(3) * Y(I) + S(4) * PY(I) + S(5) * QY(I) + T(3) * Y(L)
+C
+            IF( DOBB )THEN
+               BB(1) = MIN(BB(1),XP)
+               BB(2) = MAX(BB(2),XP)
+               BB(3) = MIN(BB(3),YP)
+               BB(4) = MAX(BB(4),YP)
+            ELSE
+               IF( (I .EQ. 1) .AND. (J .EQ. 1) )THEN
+                  CALL OFF2(XP, YP)
+               ELSE
+                  CALL ON2(XP, YP)
+               ENDIF
+            ENDIF
+ 5       CONTINUE
+ 4    CONTINUE
+C
+      RETURN
+      END
+C
+      SUBROUTINE BEZDRW(KX, KY, N, CYCLIC, DOBB, BB)
+C-----------------------------------------------------------------------
+C ALSO DRAW A BEZIER CURVE FROM ITS CONTROL POLYGON, BUT IN THIS CASE
+C THE KNOTS AND OTHER CONTROL POINTS ARE IN THE SAME ARRAYS.
+C-----------------------------------------------------------------------
+C
+      IMPLICIT LOGICAL (A-Z)
+      INTEGER N
+      REAL KX(N), KY(N), BB(4)
+      LOGICAL CYCLIC, DOBB
+C
+      INTEGER MAXN
+      PARAMETER( MAXN=200 )
+C
+      REAL X(MAXN), Y(MAXN), PX(MAXN), PY(MAXN), QX(MAXN), QY(MAXN)
+      INTEGER I, J, M
+C
+C--- IF THE SPECIFICATION IS INVALID, GIVE UP.
+C
+      M = N / 3
+      IF( (N .LT. 4) .OR. ((3*M+1) .NE. N) .OR. (M .GE. MAXN) )THEN
+         CALL TXBEGIN
+         WRITE(6,100)
+ 100     FORMAT(1X,'BEZDRW - INVALID POINT COUNT.')
+         CALL TXEND
+         RETURN
+      ENDIF
+C
+C--- REARRANGE THE DATA.
+C
+      J = 1
+      DO 1 I=1,M
+         X(I) = KX(J)
+         Y(I) = KY(J)
+         J = J + 1
+         PX(I) = KX(J)
+         PY(I) = KY(J)
+         J = J + 1
+         QX(I) = KX(J)
+         QY(I) = KY(J)
+         J = J + 1         
+ 1    CONTINUE
+      X(M+1) = KX(J)
+      Y(M+1) = KY(J)
+C
+      CALL BEZDRAW(X, Y, PX, PY, QX, QY, M, CYCLIC, DOBB, BB)
+C
+      RETURN
+      END
+C
       SUBROUTINE VERSION( OUTSTR )
 C------------------------------------
 C GET THE VERSION NUMBER OF GPLOT.
@@ -7710,7 +8100,7 @@ C------------------------------------
       IMPLICIT LOGICAL (A-Z)
       CHARACTER*4 OUTSTR
 C
-      OUTSTR = '0.89'
+      OUTSTR = '0.90'
       RETURN
       END
 C
@@ -7719,7 +8109,7 @@ C------------------------------------
 C GET LAST MODIFIED DATE.
 C------------------------------------
       CHARACTER*9 LASTMD
-      PARAMETER( LASTMD='07-DEC-25' )
+      PARAMETER( LASTMD='07-JAN-26' )
       GETMOD = LASTMD
       RETURN
       END
