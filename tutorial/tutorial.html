@@ -861,6 +861,7 @@ for GPLOT and DIMFILM.</p>
 <li><a href="#the-rpn-evaluator-for-drawing-2d-parametric-functions">The RPN Evaluator for drawing 2D parametric functions</a></li>
 <li><a href="#general-drawing-part-2-evaluator-assisted">General drawing Part 2 Evaluator assisted</a></li>
 <li><a href="#general-drawing-part-3-higher-level-drawing">General drawing Part 3 Higher level drawing</a></li>
+<li><a href="#general-drawing-part-4-smooth-curves">General drawing Part 4 Smooth curves</a></li>
 <li><a href="#l-systems">L-Systems</a></li>
 <li><a href="#alphabetic-font-tables">Alphabetic font tables</a></li>
 <li><a href="#symbol-font-tables">Symbol font tables</a></li>
@@ -2148,10 +2149,15 @@ a given position, <code>ARC</code> which draws a segment of a circle, and <code>
 draws a rectangle.</p>
 <p>Two GPLOT commands build slightly on this: <code>CRECT</code> draws a rectangle centered
 on a given location and <code>PATH</code> uses the contents of the X and Y arrays
-to draw a polyline. GPLOT/DIMFILM does not support the drawing of any
+to draw a polyline. DIMFILM does not support the drawing of any
 kinds of smooth curves for general drawing purposes (<code>INTERPOLATE</code> can
 interpolate smooth curves between data points for graph plotting, but this
-can&#39;t be used for general drawing).</p>
+can&#39;t be used for general drawing). </p>
+<p>As of V0.90, GPLOT adds two means of
+drawing curves: curves defined by a Bezier control polygon and a smooth
+curve that passes through supplied points (which works by calculating a full
+Bezier polygon such that the first and second derivatives of the resulting
+curve are continuous).</p>
 <p>DIMFILM has very limited geometric transformation support and GPLOT does
 not provide access to this. GPLOT does provide a more comprehensive
 geometric transformation capability through its RPN evaluator, though.</p>
@@ -2810,6 +2816,161 @@ Screen Editor with a Macbook laptop keyboard.</p>
 <p>Further examples of how the &quot;higher level drawing&quot; features can be used can be seen
 in the <code>OBCHT1</code> and <code>OBCHT2</code> scripts which generate the GPLOT &quot;cheat sheet&quot; which can
 be found at the end of this document.</p>
+<h2 id="general-drawing-part-4-smooth-curves">General drawing Part 4 Smooth curves</h2>
+<p>It is nice to be able to draw smooth curves in some cases, but DIMFILM itself has
+no facilities for this (except for interpolating points on graphs for data with
+monotonically increasing X).</p>
+<p>Late in the day (V0.90), GPLOT added smooth curve drawing features. These are based
+on cubic Bezier curves. </p>
+<p>Given that GPLOT is a text command based system, it isn&#39;t possible to interactively
+adjust &quot;handles&quot; on Bezier curves to get the shape you want. This is one reason smooth
+curves were omitted for a long time.</p>
+<p>To help avoid this problem, one of the two smooth curve facilities generates a curve
+that passes <em>through</em> the points supplied. Internally, a Bezier curve is used, but the
+&quot;handle&quot; points (through which the curve does <em>not</em> pass) are calculated &quot;behind the scenes&quot;
+so that the curve has continuous first and second derivatives -- i.e. it is really
+smooth!</p>
+<p>The points through which the curve passes are supplied in the same way as for plotting
+graphs and for the <code>PATH</code> command.</p>
+<p>This script is a very simple example of the <code>CURVE</code> command with the open and closed
+boundary options. The points specified are shown with point markers so you can see the
+curve passes through them.</p>
+<pre><code>RESET
+<span class="hljs-preprocessor">#</span>
+BOUNDS -<span class="hljs-number">1</span> <span class="hljs-number">5</span> -<span class="hljs-number">1</span> <span class="hljs-number">4</span>
+OB OBGRID <span class="hljs-string">"-1 5 -1 4"</span>
+<span class="hljs-preprocessor">#</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0.0</span> <span class="hljs-number">1.0</span>
+<span class="hljs-number">3.0</span> <span class="hljs-number">1.0</span>
+<span class="hljs-number">2.0</span> <span class="hljs-number">3.0</span>
+<span class="hljs-number">1.5</span> <span class="hljs-number">0.0</span>
+EOF
+<span class="hljs-preprocessor"># - DRAW POINT MARKERS</span>
+STRING <span class="hljs-number">1</span> <span class="hljs-string">"(I2)"</span>
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-number">2</span>DITEVAL <span class="hljs-number">1</span> <span class="hljs-number">4</span> <span class="hljs-number">1</span> <span class="hljs-string">"X,I,EL,3,G,I,EL,3,G,S,0.3,TH,M,7,MK,I,1,TVI"</span>
+<span class="hljs-preprocessor"># - OPEN CURVE</span>
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+CURVE O
+<span class="hljs-preprocessor"># - CLOSED CURVE</span>
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+CURVE C
+</code></pre><p><img src="scsc001.svg" alt=""></p>
+<p>The way the markers are drawn introduces a new way of calling the evaluator. The
+<code>2DITEVAL</code> command works in the same way as the <code>ITEVAL</code> command, but preserves the
+contents of the second stack level which contains Y coordinates when data is <code>READ</code>.</p>
+<p>In some cases, though, a perfectly smooth curve is not what is wanted. For this reason,
+a &quot;plain&quot; Bezier curve drawing command is also supplied. This takes a Bezier control
+polygon from the usual X and Y arrays. The curve will pass through every third point
+in the coordinate arrays. The two intermediate points are locations that &quot;attract&quot; the
+curve to them and are the points that are adjusted using &quot;handles&quot; in interactive systems.
+Many textbooks and online educational materials can be consulted for more details if
+desired. Note that the curve will only be &quot;smooth&quot; if the points before and after a
+point through which the curve passes, and that point, all lie on a straight line. Otherwise,
+more or less &quot;sharp&quot; changes in direction will occur -- which may be what is desired.</p>
+<p>This script shows how to draw an open Bezier curve:</p>
+<pre><code>RESET
+<span class="hljs-preprocessor">#</span>
+BOUNDS -<span class="hljs-number">1</span> <span class="hljs-number">21</span> -<span class="hljs-number">1</span> <span class="hljs-number">9</span>
+OB OBGRID <span class="hljs-string">"-1 21 -1 9"</span>
+<span class="hljs-preprocessor">#</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0</span> <span class="hljs-number">4</span>
+<span class="hljs-number">2</span> <span class="hljs-number">8</span>
+<span class="hljs-number">9</span> <span class="hljs-number">3</span>
+<span class="hljs-number">10</span> <span class="hljs-number">2</span>
+<span class="hljs-number">13</span> <span class="hljs-number">0</span>
+<span class="hljs-number">19</span> <span class="hljs-number">3</span>
+<span class="hljs-number">20</span> <span class="hljs-number">7</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># DRAW THE CONTROL POLYGON</span>
+COL <span class="hljs-number">0.4</span> <span class="hljs-number">0.4</span> <span class="hljs-number">0.4</span>
+PATH O
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># DRAW THE CONTROL POINTS</span>
+STRING <span class="hljs-number">1</span> <span class="hljs-string">"(I2)"</span>
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-number">2</span>DITEVAL <span class="hljs-number">1</span> <span class="hljs-number">7</span> <span class="hljs-number">1</span> <span class="hljs-string">"X,I,EL,3,G,I,EL,3,G,S,0.3,TH,M,7,MK,I,1,TVI"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># DRAW AN OPEN BEZIER CURVE USING THIS CONTROL POLYGON.</span>
+BEZIER O
+</code></pre><p><img src="scbo001.svg" alt=""></p>
+<p>One thing which can be done with a <em>closed</em> Bezier curve is to draw an
+almost exact circle. This is an interesting test, in fact. A circle
+drawing script is:</p>
+<pre><code>RESET
+<span class="hljs-preprocessor">#</span>
+BOUNDS -<span class="hljs-number">1.5</span> <span class="hljs-number">1.5</span> -<span class="hljs-number">1.5</span> <span class="hljs-number">1.5</span>
+OB OBGRID <span class="hljs-string">"-1.5 1.5 -1.5 1.5"</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">1</span> <span class="hljs-number">0</span>
+<span class="hljs-number">1</span> <span class="hljs-number">0.55228</span>
+<span class="hljs-number">0.55228</span> <span class="hljs-number">1</span>
+<span class="hljs-number">0</span> <span class="hljs-number">1</span>
+-<span class="hljs-number">0.55228</span> <span class="hljs-number">1</span>
+-<span class="hljs-number">1</span> <span class="hljs-number">0.55228</span>
+-<span class="hljs-number">1</span> <span class="hljs-number">0</span>
+-<span class="hljs-number">1</span> -<span class="hljs-number">0.55228</span>
+-<span class="hljs-number">0.55228</span> -<span class="hljs-number">1</span>
+<span class="hljs-number">0</span> -<span class="hljs-number">1</span>
+<span class="hljs-number">0.55228</span> -<span class="hljs-number">1</span>
+<span class="hljs-number">1</span> -<span class="hljs-number">0.55228</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># DRAW THE CONTROL POINTS. WITH NUMERIC LABELS.</span>
+COL <span class="hljs-number">1</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+STRING <span class="hljs-number">1</span> <span class="hljs-string">"(I2)"</span>
+<span class="hljs-number">2</span>DITEVAL <span class="hljs-number">1</span> <span class="hljs-number">9</span> <span class="hljs-number">1</span> <span class="hljs-string">"X,I,EL,3,G,I,EL,3,G,S,0.2,TH,M,7,MK,0.1,TH,I,1,TVI"</span>
+STRING <span class="hljs-number">1</span> <span class="hljs-string">"(I3)"</span>
+<span class="hljs-number">2</span>DITEVAL <span class="hljs-number">10</span> <span class="hljs-number">12</span> <span class="hljs-number">1</span> <span class="hljs-string">"X,I,EL,3,G,I,EL,3,G,S,0.2,TH,M,7,MK,0.1,TH,I,1,TVI"</span>
+<span class="hljs-preprocessor">#</span>
+<span class="hljs-preprocessor"># DRAW A CLOSED BEZIER CURVE THROUGH THESE POINTS. SHOULD BE A CIRCLE.</span>
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>
+BEZIER C
+</code></pre><p><img src="scbc001.svg" alt=""></p>
+<p>These smooth curve drawing facilities can also be accessed from the evaluator.
+Four operators have been added: </p>
+<ul>
+<li><code>CRVO</code> draws an open smooth curve through the points in the top two stack levels.</li>
+<li><code>CRVC</code> draws a closed smooth curve through those points.</li>
+<li><code>BEZO</code> draws an open Bezier curve using the control polygon in the top two stack levels.</li>
+<li><code>BEZC</code> draws a closed Bezier curve.</li>
+</ul>
+<p>You must be careful with the number of points supplied to the <code>BEZO</code> and <code>BEZC</code> operators, as
+valid control polygons must have a specific number of points. An open Bezier curve control
+polygon must conform to <code>((N - 1) % 3) = 0</code>, where N is the number of supplied points. A
+closed Bezier curve control polygon must conform to <code>(N % 3) = 0</code>. Here, <code>%</code> is the &quot;modulo&quot;
+or &quot;remainder&quot; operator.</p>
+<p>These constraints also apply to the <code>BEZIER</code> command.</p>
+<p>Here is a very simple script that shows these operators in use. This also used the <code>2DEVAL</code>
+command to call the evaluator. Like <code>2DITEVAL</code>, this preserves the contents of the array
+normally used to hold the <code>Y</code> values from a <code>READ</code> command.</p>
+<pre><code>RESET
+<span class="hljs-preprocessor">#</span>
+BOUNDS -<span class="hljs-number">1</span> <span class="hljs-number">5</span> -<span class="hljs-number">1</span> <span class="hljs-number">5</span>
+<span class="hljs-preprocessor">#</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0</span> <span class="hljs-number">1</span>
+<span class="hljs-number">3</span> <span class="hljs-number">1</span>
+<span class="hljs-number">2</span> <span class="hljs-number">3</span>
+<span class="hljs-number">1.5</span> <span class="hljs-number">0</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-number">2</span>DEVAL <span class="hljs-string">"X,S,CRVC"</span>
+<span class="hljs-preprocessor">#</span>
+READ HERE <span class="hljs-number">1</span> <span class="hljs-number">2</span>
+<span class="hljs-number">0.0</span> <span class="hljs-number">4.0</span>
+<span class="hljs-number">0.0</span> <span class="hljs-number">1.0</span>
+<span class="hljs-number">1.0</span> <span class="hljs-number">0.0</span>
+<span class="hljs-number">4.0</span> <span class="hljs-number">0.0</span>
+EOF
+<span class="hljs-preprocessor">#</span>
+COL <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-number">2</span>DEVAL <span class="hljs-string">"X,S,BEZO"</span>
+</code></pre><p><img src="scev001.svg" alt=""></p>
 <h2 id="l-systems">L-Systems</h2>
 <p>L-systems or Lindenmeyer systems are a type of formal grammar (as in mathematical logic)
 developed by Aristid Lindenmeyer, a theoretical biologist, in 1968 to model the processes

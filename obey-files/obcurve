@@ -1,3 +1,5 @@
+RESET
+#
 BOUNDS -1 5 -1 5
 OB OBGRID "-1 5 -1 5"
 #

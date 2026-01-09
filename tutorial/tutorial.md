@@ -37,6 +37,7 @@ Here are links to each of the examples:
 - [The RPN Evaluator for drawing 2D parametric functions](#the-rpn-evaluator-for-drawing-2d-parametric-functions)
 - [General drawing Part 2 Evaluator assisted](#general-drawing-part-2-evaluator-assisted)
 - [General drawing Part 3 Higher level drawing](#general-drawing-part-3-higher-level-drawing)
+- [General drawing Part 4 Smooth curves](#general-drawing-part-4-smooth-curves)
 - [L-Systems](#l-systems)
 - [Alphabetic font tables](#alphabetic-font-tables)
 - [Symbol font tables](#symbol-font-tables)
@@ -1573,10 +1574,16 @@ draws a rectangle.
 
 Two GPLOT commands build slightly on this: `CRECT` draws a rectangle centered
 on a given location and `PATH` uses the contents of the X and Y arrays
-to draw a polyline. GPLOT/DIMFILM does not support the drawing of any
+to draw a polyline. DIMFILM does not support the drawing of any
 kinds of smooth curves for general drawing purposes (`INTERPOLATE` can
 interpolate smooth curves between data points for graph plotting, but this
-can't be used for general drawing).
+can't be used for general drawing). 
+
+As of V0.90, GPLOT adds two means of
+drawing curves: curves defined by a Bezier control polygon and a smooth
+curve that passes through supplied points (which works by calculating a full
+Bezier polygon such that the first and second derivatives of the resulting
+curve are continuous).
 
 DIMFILM has very limited geometric transformation support and GPLOT does
 not provide access to this. GPLOT does provide a more comprehensive
@@ -2353,6 +2360,190 @@ Screen Editor with a Macbook laptop keyboard.
 Further examples of how the "higher level drawing" features can be used can be seen
 in the `OBCHT1` and `OBCHT2` scripts which generate the GPLOT "cheat sheet" which can
 be found at the end of this document.
+
+
+## General drawing Part 4 Smooth curves
+
+It is nice to be able to draw smooth curves in some cases, but DIMFILM itself has
+no facilities for this (except for interpolating points on graphs for data with
+monotonically increasing X).
+
+Late in the day (V0.90), GPLOT added smooth curve drawing features. These are based
+on cubic Bezier curves. 
+
+Given that GPLOT is a text command based system, it isn't possible to interactively
+adjust "handles" on Bezier curves to get the shape you want. This is one reason smooth
+curves were omitted for a long time.
+
+To help avoid this problem, one of the two smooth curve facilities generates a curve
+that passes *through* the points supplied. Internally, a Bezier curve is used, but the
+"handle" points (through which the curve does *not* pass) are calculated "behind the scenes"
+so that the curve has continuous first and second derivatives -- i.e. it is really
+smooth!
+
+The points through which the curve passes are supplied in the same way as for plotting
+graphs and for the `PATH` command.
+
+This script is a very simple example of the `CURVE` command with the open and closed
+boundary options. The points specified are shown with point markers so you can see the
+curve passes through them.
+
+```
+RESET
+#
+BOUNDS -1 5 -1 4
+OB OBGRID "-1 5 -1 4"
+#
+READ HERE 1 2
+0.0 1.0
+3.0 1.0
+2.0 3.0
+1.5 0.0
+EOF
+# - DRAW POINT MARKERS
+STRING 1 "(I2)"
+COL 1 0 0
+2DITEVAL 1 4 1 "X,I,EL,3,G,I,EL,3,G,S,0.3,TH,M,7,MK,I,1,TVI"
+# - OPEN CURVE
+COL 1 0 1
+CURVE O
+# - CLOSED CURVE
+COL 0 0 1
+CURVE C
+```
+
+![](scsc001.svg)
+
+The way the markers are drawn introduces a new way of calling the evaluator. The
+`2DITEVAL` command works in the same way as the `ITEVAL` command, but preserves the
+contents of the second stack level which contains Y coordinates when data is `READ`.
+
+In some cases, though, a perfectly smooth curve is not what is wanted. For this reason,
+a "plain" Bezier curve drawing command is also supplied. This takes a Bezier control
+polygon from the usual X and Y arrays. The curve will pass through every third point
+in the coordinate arrays. The two intermediate points are locations that "attract" the
+curve to them and are the points that are adjusted using "handles" in interactive systems.
+Many textbooks and online educational materials can be consulted for more details if
+desired. Note that the curve will only be "smooth" if the points before and after a
+point through which the curve passes, and that point, all lie on a straight line. Otherwise,
+more or less "sharp" changes in direction will occur -- which may be what is desired.
+
+This script shows how to draw an open Bezier curve:
+```
+RESET
+#
+BOUNDS -1 21 -1 9
+OB OBGRID "-1 21 -1 9"
+#
+READ HERE 1 2
+0 4
+2 8
+9 3
+10 2
+13 0
+19 3
+20 7
+EOF
+#
+# DRAW THE CONTROL POLYGON
+COL 0.4 0.4 0.4
+PATH O
+#
+# DRAW THE CONTROL POINTS
+STRING 1 "(I2)"
+COL 1 0 0
+2DITEVAL 1 7 1 "X,I,EL,3,G,I,EL,3,G,S,0.3,TH,M,7,MK,I,1,TVI"
+#
+# DRAW AN OPEN BEZIER CURVE USING THIS CONTROL POLYGON.
+BEZIER O
+```
+
+![](scbo001.svg)
+
+One thing which can be done with a *closed* Bezier curve is to draw an
+almost exact circle. This is an interesting test, in fact. A circle
+drawing script is:
+```
+RESET
+#
+BOUNDS -1.5 1.5 -1.5 1.5
+OB OBGRID "-1.5 1.5 -1.5 1.5"
+READ HERE 1 2
+1 0
+1 0.55228
+0.55228 1
+0 1
+-0.55228 1
+-1 0.55228
+-1 0
+-1 -0.55228
+-0.55228 -1
+0 -1
+0.55228 -1
+1 -0.55228
+EOF
+#
+# DRAW THE CONTROL POINTS. WITH NUMERIC LABELS.
+COL 1 0 0
+STRING 1 "(I2)"
+2DITEVAL 1 9 1 "X,I,EL,3,G,I,EL,3,G,S,0.2,TH,M,7,MK,0.1,TH,I,1,TVI"
+STRING 1 "(I3)"
+2DITEVAL 10 12 1 "X,I,EL,3,G,I,EL,3,G,S,0.2,TH,M,7,MK,0.1,TH,I,1,TVI"
+#
+# DRAW A CLOSED BEZIER CURVE THROUGH THESE POINTS. SHOULD BE A CIRCLE.
+COL 0 0 1
+BEZIER C
+```
+
+![](scbc001.svg)
+
+These smooth curve drawing facilities can also be accessed from the evaluator.
+Four operators have been added: 
+
+- `CRVO` draws an open smooth curve through the points in the top two stack levels.
+- `CRVC` draws a closed smooth curve through those points.
+- `BEZO` draws an open Bezier curve using the control polygon in the top two stack levels.
+- `BEZC` draws a closed Bezier curve.
+
+You must be careful with the number of points supplied to the `BEZO` and `BEZC` operators, as
+valid control polygons must have a specific number of points. An open Bezier curve control
+polygon must conform to `((N - 1) % 3) = 0`, where N is the number of supplied points. A
+closed Bezier curve control polygon must conform to `(N % 3) = 0`. Here, `%` is the "modulo"
+or "remainder" operator.
+
+These constraints also apply to the `BEZIER` command.
+
+Here is a very simple script that shows these operators in use. This also used the `2DEVAL`
+command to call the evaluator. Like `2DITEVAL`, this preserves the contents of the array
+normally used to hold the `Y` values from a `READ` command.
+
+```
+RESET
+#
+BOUNDS -1 5 -1 5
+#
+READ HERE 1 2
+0 1
+3 1
+2 3
+1.5 0
+EOF
+#
+COL 1 0 0
+2DEVAL "X,S,CRVC"
+#
+READ HERE 1 2
+0.0 4.0
+0.0 1.0
+1.0 0.0
+4.0 0.0
+EOF
+#
+COL 0 0 1
+2DEVAL "X,S,BEZO"
+```
+
+![](scev001.svg)
 
 
 ## L-Systems

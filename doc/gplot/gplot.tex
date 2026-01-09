@@ -137,6 +137,12 @@
 %\usepackage{makeidx}
 %\makeindex
 
+%% NG: Adjust contents layout.
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\setlength{\cftsubsecnumwidth}{4em}
+\setlength{\cftsubsubsecnumwidth}{5em}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Remarks
@@ -244,7 +250,7 @@ colorlinks,linkcolor=blue,citecolor=blue,urlcolor=blue
 \begin{center}
 \Large 
 \textcolor{white}{
-Version 0.89\\
+Version 0.90\\
 \today
 }
 \end{center}
@@ -361,7 +367,7 @@ parsing command line arguments works as intended. To do that, the following shou
 to a login command procedure:
 \begin{verbatim}
 define DIMFONTS_LOGICAL DISK$USER:[<user>.GPLOT.GPLOT-SOURCE]DADIMFO.DAT
-gplot := "run DISK$USER:[<user>.GPLOT.GPLOT-SOURCE]gplot.exe"
+gplot :== "run DISK$USER:[<user>.GPLOT.GPLOT-SOURCE]gplot.exe"
 \end{verbatim}
 
 \newpara
@@ -402,10 +408,10 @@ The following options are recognized.
    run) in order to make the files to be used \texttt{LOCAL}. On the other hand, if changes have been made to a \texttt{LOCAL} version
    of a \texttt{PERMANENT} file, these will be lost when \textbf{GPLOT} \texttt{READs} or \texttt{OBEYs} 
    that file with `auto \texttt{GET}' in effect. So be 
-   careful! This option is not relevant on ``Unix-like'' systems.
+   careful! This option is only relevant on NOS systems.
  \item \textttc{SAVE=YN}\\
    Turn on automatic \texttt{SAVE} or \texttt{REPLACE} of graphics output files as indirect \texttt{PERMANENT} files.
-   This option is not relevant on ``Unix-like'' systems.
+   This option is only relevant on NOS systems.
 \item \textttc{DEBUG=YN}\\
    Outputs debugging information (mostly to do with \texttt{OBEY} file arguments and parameter substitutions currently).
 \item \textttc{QUIET=YN}\\
@@ -609,6 +615,16 @@ There is also a command that draws an arbitrary polyline.
 \item \textttc{PATH TYPE} --- Use the contents of the \texttt{X,Y} arrays (e.g. as set by \texttt{READ} or the
   evaluator (see below) as the vertices of a polyline. If \texttt{TYPE} is \texttt{C} (closed), join the
   last coordinate pair to the first. If \texttt{TYPE} is \texttt{O} (open) do not do that.
+\item \textttc{CURVE TYPE} --- Use the contents of the \texttt{X,Y} arrays (e.g. as set by \texttt{READ} or the
+  evaluator (see below) as points through which a smooth curve must pass. If \texttt{TYPE} is \texttt{C} (closed), join the
+  last coordinate pair to the first. If \texttt{TYPE} is \texttt{O} (open) do not do that. The curve is calculated
+  so that its first and second derivatives are continuous.
+\item \textttc{BEZIER TYPE} --- Use the contents of the \texttt{X,Y} arrays (e.g. as set by \texttt{READ} or the
+  evaluator (see below) as the vertices of a cubic B\'{e}zier control polygon.
+  If \texttt{TYPE} is \texttt{C} (closed), join the last coordinate pair to the first. If \texttt{TYPE} is
+  \texttt{O} (open) do not do that. Note that there are rules about the number of points that must be
+  supplied for the control polygon to be valid. Specifically, for an open curve, the number of
+  control points, $N$, must conform to $((N-1) \mod 3) = 0$, and for a closed curve: $(N \mod 3) = 0$.
 \end{itemize}
 
 \subsection{Graph Axis Commands}
@@ -877,7 +893,7 @@ something like plotting macros (with parameters) to be used.
   The user should respond with \texttt{Y (enter)} or just \texttt{(enter)} to continue.
   If \texttt{N (enter)} is used, the request
   for a response will be repeated. If \texttt{Q (enter)} is used, \textbf{GPLOT} will perform
-  an \texttt{EXIT} command and terminate.
+  an \texttt{EXIT} command and terminate. Note that the response is case sensitive and upper case must be used here.
 \item \textttc{RESET} --- Reset most of \textbf{GPLOT} state to the default values. This does not include any data that has been
   \texttt{READ} or the selected device.
 \item \textttc{PREFIX PATH} --- Set a prefix string to be pre-pended to all input file names.\\
@@ -967,8 +983,15 @@ A very useful variant on EVAL is:
 \item \textttc{ITEVAL start end step RPN-string [``arguments'']}
 \end{itemize}
 which will evaluate the RPN-string \texttt{max( int( (end - start + step) / step ), 0 ) } times, as per a Fortran DO-loop. The value of
-the loop counter can be accessed using the token \texttt{I} in the \texttt{RPN-string}. The \texttt{I} token has the value 1 if used in an
+the loop counter can be accessed using the token \texttt{I} in the \texttt{RPN-string}.
+The \texttt{I} token has the value 1 if used in an
 \texttt{RPN-string} evaluated via \texttt{EVAL}.
+\newpara
+Both \texttt{EVAL} and \texttt{ITEVAL} will preserve stack level 0 (or X). In some cases, it is also necessary to preserve
+stack level 1 (or Y) when $(x,y)$ data points (e.g. from \texttt{READ}) are to be processed with the evaluator.
+The \textttc{2DEVAL} command does this, and is otherwise equivalent to \texttt{EVAL}. Although Y is preserved on entry to
+the evaluator, stack level 1 is not otherwise protected in the way stack level 0 is. The \textttc{2DITEVAL}
+command is a ``Y preserving'' version of \texttt{ITEVAL} too.
 \newpara
 There are RPN operators which directly produce graphical output. It is sometimes useful to know the bounds of that output before
 actually drawing anything, and three commands are provided to do that: \texttt{BBSTART}, \texttt{BBEND} and \texttt{BBSET}. See
@@ -988,6 +1011,8 @@ A full list of the commands provided for the RPN evaluator follows.
   For example: \texttt{ERANGE 2 1 8 8} results in \texttt{2, 4, 8, 16, 32, 64, 128 and 256} appearing in X.
 \item \textttc{EVAL RPN-string [``arguments'']} --- See above.
 \item \textttc{ITEVAL start end step RPN-string [``arguments'']} --- See above.
+\item \textttc{2DEVAL RPN-string [``arguments'']} --- See above.
+\item \textttc{2DITEVAL start end step RPN-string [``arguments'']} --- See above.  
 \item \textttc{PROC N RPN} --- Put an RPN string into Procedure Register N (1 to 9).
 \item \textttc{LOADPROC N NAME} --- Copy a named procedure from the \texttt{GPLPROC} procedure library file to Procedure Register \texttt{N}.
   For more information on this, see Section~\ref{gplproc-sect}.
@@ -1241,7 +1266,7 @@ CEIL & ( A1 -- A1 ) & A1 = CEILING(A1) \\
 \end{small}
 
 \subsubsection{Graphics}
-These operators provide a pretty complete set drawing functions. If the \texttt{BBSTART} command has been given, they do not
+These operators provide a pretty complete set of drawing functions. If the \texttt{BBSTART} command has been given, they do not
 actually draw anything. Instead, they accumulate a bounding box, which can be used by issuing a \texttt{BBSET} command,
 which sets the plotting bounds to the accumulated bounding box. Using the \texttt{BBEND} command restores the
 normal drawing functions of these operators.
@@ -1257,15 +1282,20 @@ D & ( C1 C2 -- ) & DRAW TO (C1,C2) \\
 C & ( C1 C2 C3 -- ) & DRAW CIRCLE, CENTER C1,C2 RADIUS C3. \\
 A & ( C1 C2 C3 C4 C5 -- ) & DRAW ARC, CENTER C1,C2 RADIUS C3, ANGLES C4 TO C5. \\
 BOX & ( C1 C2 C3 C4 -- ) & DRAW RECTANGLE, BOTTOM LEFT C1,C2 WIDTH C3 HEIGHT C4. \\
+MK & ( C1 -- ) & DRAW MARKER WITH CODE NUMBER C1, CENTRE CURRENT POS. \\
 HDSH & ( A1 -- A1 ) & DRAW RELATIVE (1,0) IF A1[I] > 0 ELSE MOVE \\
 VDSH & ( A1 -- A1 ) & DRAW RELATIVE (0,1) IF A1[I] > 0 ELSE MOVE \\
 PTHO & ( A1 A2 -- ) & DRAW POLYLINE X=A1,Y=A2, OPEN \\
 PTHC & ( A1 A2 -- ) & DRAW POLYLINE X=A1,Y=A2, CLOSED \\
+CRVO & ( A1 A2 -- ) & DRAW SMOOTH LINE X=A1,Y=A2, OPEN \\
+CRVC & ( A1 A2 -- ) & DRAW SMOOTH LINE X=A1,Y=A2, CLOSED \\
+BEZO & ( A1 A2 -- ) & DRAW CUBIC BEZIER X=A1,Y=A2, OPEN \\
+BEZC & ( A1 A2 -- ) & DRAW CUBIC BEZIER X=A1,Y=A2, CLOSED \\
 T & ( C1 -- ) & DRAW CONTENTS OF STRING REGISTER C1 AS TEXT. \\
 TVF & ( C1 C2 -- C1 ) & DRAW C1 AS TEXT USING FORMAT STRING IN C2. \\
 TVI & ( C1 C2 -- C1 ) & DRAW INT(C1) AS TEXT USING FORMAT STRING IN C2. \\
 TS & ( C1 -- ) & DRAW SYMBOL WITH CODE NUMBER C1 \\
-TM & ( C1 -- ) & DRAW MARKER WITH CODE NUMBER C1 \\
+TM & ( C1 -- ) & DRAW MARKER WITH CODE NUMBER C1 AS TEXT \\
 TC & ( C1 -- ) & DRAW CHARACTER WITH CODE C1 FROM CURRENT ALPHABET \\
 TH & ( C1 -- ) & SET TEXT/MARKER/SYMBOL HEIGHT \\
 TA & ( C1 -- ) & SET TEXT DRAWING ANGLE IN DEGREES CCW \\
@@ -1496,6 +1526,10 @@ These let you point at something with a short message. These commands draw label
   lengths'' as the axis ranges may be wildly different or log axes may be in effect. The arguments are the same as
   for \texttt{ALABEL} apart from the meaning of the coordinates.
 \end{itemize}
+
+\section{Drawing smooth curves}
+GPLOT can draw smooth curves in two different ways, and either with commands or evaluator operators. It is best to
+refer to the tutorial material on these facilities in Section~\ref{smooth-label}.
 
 \section{Defining and drawing L-systems}
 Leveraging the functionality added for general purpose function evaluation described above, a quite specialised but
@@ -3517,11 +3551,18 @@ a circle, and \texttt{RECT} which draws a rectangle.
 \newpara
 Two \textbf{GPLOT} commands build slightly on this: \texttt{CRECT} draws a
 rectangle centered on a given location and \texttt{PATH} uses the
-contents of the X and Y arrays to draw a polyline. \textbf{GPLOT/DIMFILM} does
+contents of the X and Y arrays to draw a polyline.
+
+\newpara
+Although \textbf{DIMFILM} does
 not support the drawing of any kinds of smooth curves for general
 drawing purposes (\texttt{INTERPOLATE} can interpolate smooth curves
 between data points for graph plotting, but this can't be used for
-general drawing).
+general drawing), the latest version of \textbf{GPLOT} has two means
+of drawing such things. One calculates a curve that passes through
+a supplied set of points with the constraint the curve's first and
+second derivatives are continuous. The second means draws a curve
+defined by a cubic B\'{e}zier control polygon.
 
 \newpara
 \textbf{DIMFILM} has very limited geometric transformation support and \textbf{GPLOT} does
@@ -4537,6 +4578,225 @@ Further examples of how the ``higher level drawing'' features can be
 used can be seen in the \texttt{OBCHT1} and \texttt{OBCHT2} scripts
 which generate the \textbf{GPLOT} ``cheat sheet'' which can be found at the end
 of this document.
+
+\subsection{General drawing - Part 4: Smooth curves}\label{smooth-label}
+
+\newpara
+It is nice to be able to draw smooth curves in some cases, but \textbf{DIMFILM} itself has
+no facilities for this (except for interpolating points on graphs for data with
+monotonically increasing X).
+
+\newpara
+Late in the day (V0.90), \textbf{GPLOT} added smooth curve drawing features. These are based
+on cubic B\'{e}zier curves. 
+
+\newpara
+Given that \textbf{GPLOT} is a text command based system, it isn't possible to interactively
+adjust ``handles'' on B\'{e}zier curves to get the shape you want. This is one reason smooth
+curves were omitted for a long time.
+
+\newpara
+To help avoid this problem, one of the two smooth curve facilities generates a curve
+that passes \textit{through} the points supplied. Internally, a B\'{e}zier curve is used, but the
+``handle'' points (through which the curve does \textit{not} pass) are calculated ``behind the scenes''
+so that the curve has continuous first and second derivatives -- i.e. it is really
+smooth!
+
+\newpara
+The points through which the curve passes are supplied in the same way as for plotting
+graphs and for the \texttt{PATH} command.
+
+\newpara
+This script is a very simple example of the \texttt{CURVE} command with the open and closed
+boundary options. The points specified are shown with point markers so you can see the
+curve passes through them.
+
+\begin{lstlisting}
+RESET
+#
+BOUNDS -1 5 -1 4
+OB OBGRID "-1 5 -1 4"
+#
+READ HERE 1 2
+0.0 1.0
+3.0 1.0
+2.0 3.0
+1.5 0.0
+EOF
+# - DRAW POINT MARKERS
+STRING 1 "(I2)"
+COL 1 0 0
+2DITEVAL 1 4 1 "X,I,EL,3,G,I,EL,3,G,S,0.3,TH,M,7,MK,I,1,TVI"
+# - OPEN CURVE
+COL 1 0 1
+CURVE O
+# - CLOSED CURVE
+COL 0 0 1
+CURVE C
+\end{lstlisting}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/scsc001.eps}
+  \caption{Example of open and closed \texttt{CURVE} commands}
+  \label{fig:scsc001}
+\end{figure}
+
+\newpara
+The way the markers are drawn introduces a new way of calling the evaluator. The
+\texttt{2DITEVAL} command works in the same way as the \texttt{ITEVAL} command, but preserves the
+contents of the second stack level which contains Y coordinates when data is \texttt{READ}.
+
+\newpara
+In some cases, though, a perfectly smooth curve is not what is wanted. For this reason,
+a ``plain'' B\'{e}zier curve drawing command is also supplied. This takes a B\'{e}zier control
+polygon from the usual X and Y arrays. The curve will pass through every third point
+in the coordinate arrays. The two intermediate points are locations that ``attract'' the
+curve to them and are the points that are adjusted using ``handles'' in interactive systems.
+Many textbooks and online educational materials can be consulted for more details if
+desired. Note that the curve will only be ``smooth'' if the points before and after a
+point through which the curve passes, and that point, all lie on a straight line. Otherwise,
+more or less ``sharp'' changes in direction will occur -- which may be what is desired.
+
+\newpara
+This script shows how to draw an open B\'{e}zier curve:
+\begin{lstlisting}
+RESET
+#
+BOUNDS -1 21 -1 9
+OB OBGRID "-1 21 -1 9"
+#
+READ HERE 1 2
+0 4
+2 8
+9 3
+10 2
+13 0
+19 3
+20 7
+EOF
+#
+# DRAW THE CONTROL POLYGON
+COL 0.4 0.4 0.4
+PATH O
+#
+# DRAW THE CONTROL POINTS
+STRING 1 "(I2)"
+COL 1 0 0
+2DITEVAL 1 7 1 "X,I,EL,3,G,I,EL,3,G,S,0.3,TH,M,7,MK,I,1,TVI"
+#
+# DRAW AN OPEN BEZIER CURVE USING THIS CONTROL POLYGON.
+BEZIER O
+\end{lstlisting}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/scbo001.eps}
+  \caption{Example of an open \texttt{BEZIER} curve}
+  \label{fig:scbo001}
+\end{figure}
+
+\newpara
+One thing which can be done with a \textit{closed} B\'{e}zier curve is to draw an
+almost exact circle. This is an interesting test, in fact. A circle
+drawing script is:
+\begin{lstlisting}
+RESET
+#
+BOUNDS -1.5 1.5 -1.5 1.5
+OB OBGRID "-1.5 1.5 -1.5 1.5"
+READ HERE 1 2
+1 0
+1 0.55228
+0.55228 1
+0 1
+-0.55228 1
+-1 0.55228
+-1 0
+-1 -0.55228
+-0.55228 -1
+0 -1
+0.55228 -1
+1 -0.55228
+EOF
+#
+# DRAW THE CONTROL POINTS. WITH NUMERIC LABELS.
+COL 1 0 0
+STRING 1 "(I2)"
+2DITEVAL 1 9 1 "X,I,EL,3,G,I,EL,3,G,S,0.2,TH,M,7,MK,0.1,TH,I,1,TVI"
+STRING 1 "(I3)"
+2DITEVAL 10 12 1 "X,I,EL,3,G,I,EL,3,G,S,0.2,TH,M,7,MK,0.1,TH,I,1,TVI"
+#
+# DRAW A CLOSED BEZIER CURVE THROUGH THESE POINTS. SHOULD BE A CIRCLE.
+COL 0 0 1
+BEZIER C
+\end{lstlisting}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/scbc001.eps}
+  \caption{Example of a closed \texttt{BEZIER} curve}
+  \label{fig:scbc001}
+\end{figure}
+
+\newpara
+These smooth curve drawing facilities can also be accessed from the evaluator.
+Four operators have been added: 
+
+\begin{itemize}
+\item \texttt{CRVO} draws an open smooth curve through the points in the top two stack levels.
+\item \texttt{CRVC} draws a closed smooth curve through those points.
+\item \texttt{BEZO} draws an open B\'{e}zier curve using the control polygon in the top two stack levels.
+\item \texttt{BEZC} draws a closed B\'{e}zier curve.
+\end{itemize}
+
+\newpara
+You must be careful with the number of points supplied to the \texttt{BEZO} and \texttt{BEZC} operators, as
+valid control polygons must have a specific number of points. An open B\'{e}zier curve control
+polygon must conform to $((N - 1) \mod 3) = 0$, where N is the number of supplied points. A
+closed B\'{e}zier curve control polygon must conform to $(N \mod 3) = 0$.
+
+\newpara
+These constraints also apply to the \texttt{BEZIER} command.
+
+\newpara
+Here is a very simple script that shows these operators in use. This also used the \texttt{2DEVAL}
+command to call the evaluator. Like \texttt{2DITEVAL}, this preserves the contents of the array
+normally used to hold the \texttt{Y} values from a \texttt{READ} command.
+
+\begin{lstlisting}
+RESET
+#
+BOUNDS -1 5 -1 5
+#
+READ HERE 1 2
+0 1
+3 1
+2 3
+1.5 0
+EOF
+#
+COL 1 0 0
+2DEVAL "X,S,CRVC"
+#
+READ HERE 1 2
+0.0 4.0
+0.0 1.0
+1.0 0.0
+4.0 0.0
+EOF
+#
+COL 0 0 1
+2DEVAL "X,S,BEZO"
+\end{lstlisting}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\maxwidth]{../../temp/scev001.eps}
+  \caption{Smooth curves drawn with the RPN evaluator}
+  \label{fig:scev001}
+\end{figure}
+
 
 \subsection{L-Systems}\label{l-systems}
 \newpara
@@ -5710,9 +5970,14 @@ needed for building on COS (\textbf{DIMFILM} library only) and Unix, using a sin
 code base. Many further changes and additions were made
 between July and October 2025 -- many of them a direct result of trying to use it (e.g. to produce the figures
 in this manual). The additions include the ``higher level drawing'' functions.
+Ports to VAX/VMS and NOS/VE (the latter must be considered experimental at present) were done in November and December 2025.
+Smooth curve drawing features based on cubic B\'{e}zier curves were added in early January 2026.
 
 \newpara
-The current version (0.87) may be genuinely useful (I find it to be).
+The current version (0.90) may be genuinely useful (I find it to be).
+I consider this version to be complete in a sense, in that it may have taken the basic structure of the program as
+far as it reasonably can be taken. I am not currently planning on doing further work on \textbf{GPLOT} (beyond bug fixes if
+necessary), but perhaps others will add to it.
 
 \section{Cheat sheet or Reference card}
 Very often, a reminder of \textbf{GPLOT} commands and operators is all that is needed when
