@@ -84,7 +84,7 @@ exceptions thrown are:
 - `RuntimeError` if there is any problem related to running GPLOT or a viewing program, or if the
   constructor failed (which will throw `ValueError`) and the user has insisted on continuing anyway.
   
-Automatic documentation for the `gplot` class can be found [here](gplot.gplot.html). This was created with:
+Automatic documentation for the `gplot` class can be found [here](https://github.com/nickglazzard1959/gplot2/blob/3d3e4bc703e5e0eab72d2458cace12519f5cd30d/python/gplot/gplot.gplot.html). This was created with:
 ```
 python -m pydoc -w gplot.gplot
 ```
