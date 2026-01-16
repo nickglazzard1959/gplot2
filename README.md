@@ -874,6 +874,16 @@ The output files will have `.svg` or `.eps` extensions in
 this case, of course.
 
 
+Using GPLOT from Python on "Unix-like" systems
+----------------------------------------------
+
+The graph plotting subset of GPLOT can be used from Python using the `gplot`
+module. This defines a `gplot` class which is intended to make plotting graphs
+simple.
+
+Information on this can be found [here](python/gplot/README.md).
+
+
 Other software to use with GPLOT
 --------------------------------
 

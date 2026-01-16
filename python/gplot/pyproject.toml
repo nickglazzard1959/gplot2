@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gplot"
+version = "0.1.0"
+description = "Use GPLOT from Python to plot data"
+readme = "README.md"
+requires-python = ">=3.9"
+keywords = ["data science"]
+license = {file = "LICENSE"}
+
+authors = [
+{name = "Nick Glazzard", email = "nick.nos28@gmail.com"}
+]
+
+maintainers = [
+{name = "Nick Glazzard", email = "nick.nos28@gmail.com"}
+]
+
+classifiers = ["Development Status :: 4 - Beta",
+               "Intended Audience :: Science/Research",
+               "License :: OSI Approved :: MIT License",
+               "Operating System :: POSIX :: Linux",
+               "Operating System :: MacOS :: MacOS X",
+               "Programming Language :: Python :: 3"
+              ]
+
+dependencies = [
+             "numpy<2"
+             ]
+
