@@ -10,3 +10,5 @@ xelatex gplot.tex > /dev/null
 xelatex gplot.tex > /dev/null
 xelatex gplot.tex > /dev/null
 rm -f gplot.aux	gplot.log gplot.out
+cp gplot.pdf ../pre-built
+cp cheat-sheet.pdf ../pre-built
