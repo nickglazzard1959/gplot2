@@ -5069,6 +5069,428 @@ COL 0.9 0 0.1
 LSYSTEM 2 $1 60
 \end{lstlisting}
 
+
+\section{Using GPLOT from Python programs on Unix-like systems}
+\newpara
+Plotting data from inside a Python program is often useful (pretty obviously!).
+The package universally used for this is the excellent \textbf{matplotlib} but a small
+Python library can be used to plot data with \textbf{GPLOT} too.
+
+\newpara
+The library  can be installed using:
+
+\begin{lstlisting}
+cd python/gplot
+pip install .
+\end{lstlisting}
+
+\newpara
+Using a virtual environment, as described in the documentation for the `tools`
+programs is highly recommended. These tools
+must also be installed, as they include viewers for SVG and EPS files which the
+library will potentially try to run.
+
+\newpara
+After installation, you can \texttt{import gplot} and use the \texttt{gplot} class to provide
+access to the graph plotting subset of \textbf{GPLOT} commands.
+
+\newpara
+Note that behind the scenes, this works in the simplest way possible: a list of \textbf{GPLOT}
+commands is compiled, and the \textbf{GPLOT} program is run to execute them, generating (usually)
+an SVG format file which can be displayed (with \texttt{svgview}) or renamed to preserve the
+output file.
+
+\newpara
+Although this is a simple approach, it is quite effective on modern hardware (\textbf{GPLOT/DIMFILM}
+is very lightweight by today's standards) and is not slow. In fact, the Python based \texttt{svgview}
+program is often significantly slower to run than \textbf{GPLOT}, although the combination is quite
+fast enough for normal purposes.
+
+\newpara
+A minimal example of the use of the \texttt{gplot} module is:
+\begin{lstlisting}
+import gplot
+import numpy as np
+x=np.linspace(0,7,101)
+y=np.sin(x)
+plt = gplot.gplot()
+plt.xyline(x,y)
+plt.draw()
+\end{lstlisting}
+
+\newpara
+This will display a cycle (and bit) of a sine wave in a pop-up window when \texttt{draw()} is called.
+
+\newpara
+The default size is 800 by 800 pixels. On a 4K display, a nice size is 2048 x 1280, while a good HD display size
+is 1280 x 800. To set a size use, for example:
+\begin{lstlisting}
+plt = gplot.gplot(size=(2048,1280))
+\end{lstlisting}
+
+\newpara
+The default output device is \texttt{svg}. Any \textbf{GPLOT} device can be used,
+including \texttt{epscol} for EPS format files. In this case,
+the \texttt{offset=(0,0)} option to the constructor might be useful to remove or adjust the default
+margin of half an inch (note that sizes and offsets are in inches for EPS).
+
+\newpara
+The names of the \texttt{gplot} class functions are usually identical to the \textbf{GPLOT} command names they generate
+and the arguments, when they are names, also follow the names used in \textbf{GPLOT}, so the ``cheat sheet'' and other
+\textbf{GPLOT} documentation can be used directly for this Python interface.
+
+\newpara
+There are a few exceptions:
+\begin{itemize}
+\item When \texttt{on} and \texttt{off} values are concerned, these can be given as strings, or
+\texttt{"yes"} and \texttt{"no"} can be used or \texttt{True} and \texttt{False} can be used.
+\item  Unlike \textbf{GPLOT} commands, Python function names cannot be abbreviated (!), so
+\texttt{csgroup} has been shortened to \texttt{csg}. 
+\item  There are three separate functions to plot data with error bars (as the mechanism \textbf{GPLOT} uses to distinguish
+these types isn't applicable to Python). These are: \texttt{xyplot\_yerrors()},
+\texttt{xyplot\_yerrors\_asym()} and \texttt{xyplot\_xyerrors()}.
+These can be given a \texttt{cmd} argument of \texttt{xyline} or \texttt{xypoint} to control the type of
+  plot to generate.
+\item  The marker to be used for points can be specified with a single character string or with a number. This
+  may make selecting commonly used markers simpler.
+\item  If drawing a single graph (without sub-figures), it isn't necessary to use \texttt{key()} to draw the key.
+  This \emph{is}
+  needed, though, for all sub-figures except the last if a plot with multiple sub-figures and keys is being
+  made.
+\item There is an escape mechanism that allows any \textbf{GPLOT} command to be inserted in to the command stream
+  executed when \texttt{draw()} is called: \texttt{command("command text")}. This can be used to run the evaluator,
+  for example.
+\end{itemize}
+
+\newpara
+Speaking of exceptions, the \texttt{gplot} module will throw exceptions to signal error conditions by default. It is 
+possible to choose boolean condition code returns instead by setting \texttt{throwup=False} in the constructor. The
+exceptions thrown are:
+\begin{itemize}
+\item \texttt{ValueError} when improper arguments are supplied to a function.
+\item \texttt{RuntimeError} if there is any problem related to running \textbf{GPLOT} or a viewing program, or if the
+  constructor failed (which will throw \texttt{ValueError}) and the user has insisted on continuing anyway.
+\end{itemize}
+
+\newpara
+The subset of tutorial examples that cover graph plotting have been re-implemented in Python
+in the file: \texttt{python/testpyif.py} to serve as examples and also to test almost all features
+of the \texttt{gplot} module.
+
+\newpara
+To run this, just use:
+\begin{lstlisting}
+python testpyif.py
+\end{lstlisting}
+This will plot each tutorial example in turn.
+
+\subsection{Automated documentation for the \texttt{gplot} class}
+
+\newpara
+Automatic documentation for the \texttt{gplot} class was created with:
+\begin{lstlisting}
+pydoc2md gplot . 
+\end{lstlisting}
+The result is pretty basic, but hopefully will answer any detailed questions.
+
+\begin{itemize}
+ 
+\item{\textbf{gplot} class}\\
+Provide a Python callable interface to \textbf{GPLOT}.
+This can be used to plot graphs (and potentially draw other things) from Python code.
+
+\item{\texttt{\_\_init\_\_} (constructor)}\\
+\begin{lstlisting}
+def __init__(self, device='svg', size=None, offset=None, throwup=True):
+\end{lstlisting}
+Create a \texttt{gplot} class instance.
+
+\item{\texttt{csg}}\\
+\begin{lstlisting}
+def csg(self, which):
+\end{lstlisting}
+Choose the colour/style group to which the following \texttt{colour()}, \texttt{width()} apply.
+
+\item{\texttt{width}}\\
+\begin{lstlisting}
+def width(self, width):
+\end{lstlisting}
+Set line drawing width.
+
+\item{\texttt{symht}}\\
+\begin{lstlisting}
+def symht(self, height):
+\end{lstlisting}
+Set symbol drawing height.
+
+\item{\texttt{style}}\\
+\begin{lstlisting}
+def style(self, which, length=None):
+\end{lstlisting}
+Choose the line drawing style.
+
+\item{\texttt{colour}}\\
+\begin{lstlisting}
+def colour(self, r, g, b):
+\end{lstlisting}
+Set the drawing colour for the current colour/style group.
+
+\item{\texttt{xyplot}}\\
+\begin{lstlisting}
+def xyplot(self, x, y, cmd):
+\end{lstlisting}
+Draw \texttt{xyline}, \texttt{xypoint} or \texttt{xyhistogram}.
+
+\item{\texttt{xyplot\_yerrors}}\\
+\begin{lstlisting}
+def xyplot_yerrors(self, x, y, e, cmd):
+\end{lstlisting}
+Draw \texttt{xyline}, \texttt{xypoint} with symmetric Y error bars
+
+\item{\texttt{xyplot\_yerrors\_asym}}\\
+\begin{lstlisting}
+def xyplot_yerrors_asym(self, x, y, e1, e2, cmd):
+\end{lstlisting}
+Draw \texttt{xyline}, \texttt{xypoint} with asymmetric Y error bars
+
+\item{\texttt{xyplot\_xyerrors}}\\
+\begin{lstlisting}
+def xyplot_xyerrors(self, x, y, ex, ey, cmd):
+\end{lstlisting}
+Draw \texttt{xyline}, \texttt{xypoint} with symmetric X and Y error bars
+
+\item{\texttt{xyline}}\\
+\begin{lstlisting}
+def xyline(self, x, y):
+\end{lstlisting}
+Draw a line plot taking points from x and y arrays or lists.
+
+\item{\texttt{xypoint}}\\
+\begin{lstlisting}
+def xypoint(self, x, y):
+\end{lstlisting}
+Draw a point plot taking points from x and y arrays or lists.
+
+\item{\texttt{xyhistogram}}\\
+\begin{lstlisting}
+def xyhistogram(self, x, y):
+\end{lstlisting}
+Draw a histogram plot taking points from x and y arrays or lists.
+
+\item{\texttt{grmove}}\\
+\begin{lstlisting}
+def grmove(self, x, y):
+\end{lstlisting}
+Move to graph coordinates \texttt{(x,y)}
+
+\item{\texttt{grdraw}}\\
+\begin{lstlisting}
+def grdraw(self, x, y):
+\end{lstlisting}
+Draw to graph coordinates \texttt{(x,y)}
+
+\item{\texttt{xyauto}}\\
+\begin{lstlisting}
+def xyauto(self):
+\end{lstlisting}
+Auto range both axes.
+
+\item{\texttt{xrange}}\\
+\begin{lstlisting}
+def xrange(self, xlo, xhi):
+\end{lstlisting}
+Set X axis range.
+
+\item{\texttt{yrange}}\\
+\begin{lstlisting}
+def yrange(self, ylo, yhi):
+\end{lstlisting}
+Set Y axis range.
+
+\item{\texttt{xysame}}\\
+\begin{lstlisting}
+def xysame(self):
+\end{lstlisting}
+Keep last (auto determined) ranges on both axes.
+
+\item{\texttt{xlinear}}\\
+\begin{lstlisting}
+def xlinear(self):
+\end{lstlisting}
+Set X axis to linear.
+
+\item{\texttt{ylinear}}\\
+\begin{lstlisting}
+def ylinear(self):
+\end{lstlisting}
+Set Y axis to linear.
+
+\item{\texttt{xlog}}\\
+\begin{lstlisting}
+def xlog(self):
+\end{lstlisting}
+Set X axis to log.
+
+\item{\texttt{ylog}}\\
+\begin{lstlisting}
+def ylog(self):
+\end{lstlisting}
+Set Y axis to log.
+
+\item{\texttt{intvalues}}\\
+\begin{lstlisting}
+def intvalues(self, axisname):
+\end{lstlisting}
+  Try to use integer values on one, both or no axes.\\
+  \texttt{axisname: none, x, y} or \texttt{both}
+
+\item{\texttt{grid}}\\
+\begin{lstlisting}
+def grid(self, axisname):
+\end{lstlisting}
+  Draw grid lines along one, both or no axes.\\
+  \texttt{axisname}: \texttt{none, x, y} or \texttt{both}
+
+\item{\texttt{outline}}\\
+\begin{lstlisting}
+def outline(self, objname):
+\end{lstlisting}
+  Outline some feature.\\
+  \texttt{objname}: \texttt{pane, blank, bounds, device}
+
+\item{\texttt{interpolate}}\\
+\begin{lstlisting}
+def interpolate(self, interpname):
+\end{lstlisting}
+  Set graph plotting interpolation type.\\
+  \texttt{interpname}: \texttt{linear, cubic, quintic}
+
+\item{\texttt{histstyle}}\\
+\begin{lstlisting}
+def histstyle(self, histmode, width=None):
+\end{lstlisting}
+  Set histogram drawing style.\\
+  \texttt{histmode}: \texttt{abut, abut+shade, lines, wide, wide+shade}
+
+\item{\texttt{annotate}}\\
+\begin{lstlisting}
+def annotate(self, uonoff):
+\end{lstlisting}
+Turn graph annotation on or off.
+
+\item{\texttt{rightannot}}\\
+\begin{lstlisting}
+def rightannot(self, uonoff):
+\end{lstlisting}
+Turn right edge graph annotation on or off.
+
+\item{\texttt{title}}\\
+\begin{lstlisting}
+def title(self, text, lower=False):
+\end{lstlisting}
+Set the graph title.
+
+\item{\texttt{xlabel}}\\
+\begin{lstlisting}
+def xlabel(self, text):
+\end{lstlisting}
+Set the X axis label.
+
+\item{\texttt{ylabel}}\\
+\begin{lstlisting}
+def ylabel(self, text):
+\end{lstlisting}
+Set the Y axis label.
+
+\item{\texttt{rylabel}}\\
+\begin{lstlisting}
+def rylabel(self, text):
+\end{lstlisting}
+Set the right side Y axis label.
+
+\item{\texttt{gstyle}}\\
+\begin{lstlisting}
+def gstyle(self, stylename):
+\end{lstlisting}
+  Set graph plotting style.\\
+  \texttt{stylename}: \texttt{boxed, axes, open}
+
+\item{\texttt{axcut}}\\
+\begin{lstlisting}
+def axcut(self, xo, yo):
+\end{lstlisting}
+Set the point through which drawn axes should pass.
+
+\item{\texttt{drawaxes}}\\
+\begin{lstlisting}
+def drawaxes(self, uonoff):
+\end{lstlisting}
+Draw axes, or not.
+
+\item{\texttt{marker}}\\
+\begin{lstlisting}
+def marker(self, which):
+\end{lstlisting}
+Set the marker to be used to plot points.
+
+\item{\texttt{usekey}}\\
+\begin{lstlisting}
+def usekey(self):
+\end{lstlisting}
+Prepare to create a key for the graph.
+
+\item{\texttt{addkey}}\\
+\begin{lstlisting}
+def addkey(self, text):
+\end{lstlisting}
+Add a key for the last specified \texttt{xyline} or \texttt{xypoint}.
+
+\item{\texttt{graphmode}}\\
+\begin{lstlisting}
+def graphmode(self, uonoff):
+\end{lstlisting}
+Turn graphmode on or off.
+
+\item{\texttt{subfig}}\\
+\begin{lstlisting}
+def subfig(self, nx, ny, ix, iy, shrink=None):
+\end{lstlisting}
+Draw the next graph as a sub-figure, \texttt{(ix,iy)} in a grid of nx x ny.
+
+\item{\texttt{glabel}}\\
+\begin{lstlisting}
+def glabel(self, gx, gy, length, angle, text):
+\end{lstlisting}
+  Draw a label with an arrow and boxed text.\\
+  \texttt{(gx,gy)} are graph coordinates to which the arrow points.\\
+  \texttt{length} is the length of the arrow shaft in bounds units.\\
+  \texttt{angle} is the angle of the arrow shaft in degrees wrt +X.
+
+\item{\texttt{command}}\\
+\begin{lstlisting}
+def command(self, cmd):
+\end{lstlisting}
+Add an arbitrary \textbf{GPLOT} command. Useful for tests.
+
+\item{\texttt{drawkeys}}\\
+\begin{lstlisting}
+def drawkeys(self):
+\end{lstlisting}
+Draw the keys legend panel.
+
+\item{\texttt{reset}}\\
+\begin{lstlisting}
+def reset(self):
+\end{lstlisting}
+Reset state.
+
+\item{\texttt{draw}}\\
+\begin{lstlisting}
+def draw(self, outfile=None):
+\end{lstlisting}
+Draw the accumulated graph description. Clear the commands. Prepare for the next frame.
+\end{itemize}
+
 \clearpage
 \part{Appendices}
 \clearpage

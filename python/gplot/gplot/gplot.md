@@ -78,7 +78,7 @@ def __init__(self, device='svg', size=None, offset=None, throwup=True):
 ```
 
 
->  no docstring
+> Create a `gplot` class instance (constructor).
 
 --------
 ## line: 40 - `_get_image_file_name`
@@ -94,7 +94,8 @@ def _get_image_file_name(self):
 ```
 def _yesno_bool(self, yn):
 ```
->Allow either boolean or strings for "yes/no" arguments to functions.Permit y[es], n[o], on, off or True, False
+>Allow either boolean or strings for "yes/no" arguments to functions.  
+>Permit `y[es]`, `n[o]`, `on`, `off` or `True`, `False`
 
 --------
 ## line: 72 - `_check_init`
@@ -102,7 +103,7 @@ def _yesno_bool(self, yn):
 ```
 def _check_init(self):
 ```
->If initialisation failed and throeong exceptions, do that.
+>If initialisation failed and throwing exceptions, throw `RuntimeError`.
 
 --------
 ## line: 79 - `csg`
@@ -110,7 +111,7 @@ def _check_init(self):
 ```
 def csg(self, which):
 ```
->Choose the colour/style group to which the following colour(), width() apply.
+>Choose the colour/style group to which the following `colour()`, `width()` apply.
 
 --------
 ## line: 97 - `width`
@@ -150,7 +151,7 @@ def colour(self, r, g, b):
 ```
 def xyplot(self, x, y, cmd):
 ```
->Draw xyline, xypoint or xyhistogram.
+>Draw `xyline`, `xypoint` or `xyhistogram`.
 
 --------
 ## line: 191 - `xyplot_yerrors`
@@ -158,7 +159,7 @@ def xyplot(self, x, y, cmd):
 ```
 def xyplot_yerrors(self, x, y, e, cmd):
 ```
->Draw xyline, xypoint with symmetric Y error bars
+>Draw `xyline`, `xypoint` with symmetric Y error bars
 
 --------
 ## line: 225 - `xyplot_yerrors_asym`
@@ -166,7 +167,7 @@ def xyplot_yerrors(self, x, y, e, cmd):
 ```
 def xyplot_yerrors_asym(self, x, y, e1, e2, cmd):
 ```
->Draw xyline, xypoint with asymmetric Y error bars
+>Draw `xyline`, `xypoint` with asymmetric Y error bars
 
 --------
 ## line: 261 - `xyplot_xyerrors`
@@ -174,7 +175,7 @@ def xyplot_yerrors_asym(self, x, y, e1, e2, cmd):
 ```
 def xyplot_xyerrors(self, x, y, ex, ey, cmd):
 ```
->Draw xyline, xypoint with symmetric X and Y error bars
+>Draw `xyline`, `xypoint` with symmetric X and Y error bars
 
 --------
 ## line: 297 - `xyline`
@@ -182,7 +183,7 @@ def xyplot_xyerrors(self, x, y, ex, ey, cmd):
 ```
 def xyline(self, x, y):
 ```
->Draw a line plot taking points from x and y arrays or lists.
+>Draw a line plot taking points from `x` and `y` arrays or lists.
 
 --------
 ## line: 307 - `xypoint`
@@ -190,7 +191,7 @@ def xyline(self, x, y):
 ```
 def xypoint(self, x, y):
 ```
->Draw a point plot taking points from x and y arrays or lists.
+>Draw a point plot taking points from `x` and `y` arrays or lists.
 
 --------
 ## line: 317 - `xyhistogram`
@@ -198,7 +199,7 @@ def xypoint(self, x, y):
 ```
 def xyhistogram(self, x, y):
 ```
->Draw a histogram plot taking points from x and y arrays or lists.
+>Draw a histogram plot taking points from `x` and `y` arrays or lists.
 
 --------
 ## line: 327 - `grmove`
@@ -206,7 +207,7 @@ def xyhistogram(self, x, y):
 ```
 def grmove(self, x, y):
 ```
->Move to graph coordinates (x,y)
+>Move to graph coordinates `(x,y)`
 
 --------
 ## line: 338 - `grdraw`
@@ -214,7 +215,7 @@ def grmove(self, x, y):
 ```
 def grdraw(self, x, y):
 ```
->Draw to graph coordinates (x,y)
+>Draw to graph coordinates `(x,y)`
 
 --------
 ## line: 349 - `xyauto`
@@ -286,7 +287,8 @@ def ylog(self):
 ```
 def intvalues(self, axisname):
 ```
->Try to use integer values on one, both or no axes.axisname: none, x, y or both
+>Try to use integer values on one, both or no axes.
+>`axisname`: `none`, `x`, `y` or `both`
 
 --------
 ## line: 456 - `grid`
@@ -294,7 +296,8 @@ def intvalues(self, axisname):
 ```
 def grid(self, axisname):
 ```
->Draw grid lines along one, both or no axes.axisname: none, x, y or both
+>Draw grid lines along one, both or no axes.
+>`axisname`: `none`, `x`, `y` or `both`
 
 --------
 ## line: 475 - `outline`
@@ -302,7 +305,8 @@ def grid(self, axisname):
 ```
 def outline(self, objname):
 ```
->Outline some feature.objname: pane, blank, bounds, device
+>Outline some feature.
+>`objname`: `pane`, `blank`, `bounds`, `device`
 
 --------
 ## line: 494 - `interpolate`
@@ -310,7 +314,8 @@ def outline(self, objname):
 ```
 def interpolate(self, interpname):
 ```
->Set graph plotting interpolation type.interpname: linear, cubic, quintic
+>Set graph plotting interpolation type.
+>`interpname`: `linear`, `cubic`, `quintic`
 
 --------
 ## line: 513 - `histstyle`
@@ -318,7 +323,8 @@ def interpolate(self, interpname):
 ```
 def histstyle(self, histmode, width=None):
 ```
->Set histogram drawing style.histmode: abut, abut+shade, lines, wide, wide+shade
+>Set histogram drawing style.
+>`histmode`: `abut`, `abut+shade`, `lines`, `wide`, `wide+shade`
 
 --------
 ## line: 535 - `annotate`
@@ -374,7 +380,8 @@ def rylabel(self, text):
 ```
 def gstyle(self, stylename):
 ```
->Set graph plotting style.stylename: boxed, axes, open
+>Set graph plotting style.
+>`stylename`: `boxed`, `axes`, `open`
 
 --------
 ## line: 627 - `axcut`
@@ -414,7 +421,7 @@ def usekey(self):
 ```
 def addkey(self, text):
 ```
->Add a key for the last specified xyline or xypoint.
+>Add a key for the last specified `xyline` or `xypoint`.
 
 --------
 ## line: 700 - `graphmode`
@@ -430,7 +437,7 @@ def graphmode(self, uonoff):
 ```
 def subfig(self, nx, ny, ix, iy, shrink=None):
 ```
->Draw the next graph as a sub-figure, (ix,iy) in a grid of nx x ny.
+>Draw the next graph as a sub-figure, `(ix,iy)` in a grid of `nx` x `ny`.
 
 --------
 ## line: 727 - `glabel`
@@ -438,7 +445,10 @@ def subfig(self, nx, ny, ix, iy, shrink=None):
 ```
 def glabel(self, gx, gy, length, angle, text):
 ```
->Draw a label with an arrow and boxed text.(gx,gy) are graph coordinates to which the arrow points.length is the length of the arrow shaft in bounds units.angle is the angle of the arrow shaft in degrees wrt +X.
+>Draw a label with an arrow and boxed text.
+>`(gx,gy)` are graph coordinates to which the arrow points.
+>`length` is the length of the arrow shaft in bounds units.
+>`angle` is the angle of the arrow shaft in degrees w.r.t. `+X`.
 
 --------
 ## line: 741 - `command`
@@ -446,7 +456,7 @@ def glabel(self, gx, gy, length, angle, text):
 ```
 def command(self, cmd):
 ```
->Add an arbitrary GPLOT command. Useful for tests.
+>Add an arbitrary **GPLOT** command. Useful for tests.
 
 --------
 ## line: 752 - `drawkeys`
@@ -470,4 +480,5 @@ def reset(self):
 ```
 def draw(self, outfile=None):
 ```
->Draw the accumulated graph description. Clear the commands.Prepare for the next frame.
+>Draw the accumulated graph description. Clear the commands.
+>Prepare for the next frame.
