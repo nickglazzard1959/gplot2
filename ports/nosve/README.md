@@ -7,6 +7,9 @@ This can be used with the "nosve" branch in his DtCyber fork.
 The following information assumes you have built DtCyber and followed the instructions
 to get a working NOS + NOS/VE dual-state system up and running.
 
+Some tools that may be useful when working with NOS/VE can be found in the `extras`
+sub-directory. Information on them can be found [here](extras/README.md).
+
 
 Overall strategy
 ----------------
@@ -249,7 +252,11 @@ but the contents are upper case only anyway).
 
 Once they are on the NOS part of the dual-state RTR, they can be transferred to the NOS/VE part
 by running a batch job: `vjobget`. This can be submitted from NOS or from a NOS/VE interactive
-session in the same way that GPLOT build jobs can be run in these two different ways.
+session in the same way that GPLOT build jobs can be run in these two different ways. In detail:
+```
+getf vjobget
+subj f=vjobget odi=obget_log ujn=obgetjob
+```
 
 Once the obey files are on NOS/VE (in a `$user.obey-files` catalog), you can run the tests using:
 ```
@@ -264,7 +271,13 @@ You can omit the `dev` command and use `ob obalsvg` or `ob obaleps` to generate
 SVG or EPS files if desired.
 
 If SVG files are output, the batch job: `vjsvput` can be used to move the SVG files
-from NOS/VE to NOS. They can then be further transferred from NOS to a "Unix-like" system using
+from NOS/VE to NOS. In detail:
+```
+getf vjsvput
+subj f=vjsvput odi=svput_log ujn=svputjob
+```
+
+They can then be further transferred from NOS to a "Unix-like" system using
 these commands (working in the `obey-files` directory):
 ```
 $ nosftp guest localhost
